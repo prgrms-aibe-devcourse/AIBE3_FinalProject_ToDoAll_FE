@@ -16,9 +16,9 @@ concurrency:
 
 env:
   MODEL: gpt-4o-mini
-  MAX_TOKENS: "2000"
-  MAX_FILES: "30"
-  MAX_LINES: "1500"
+  MAX_TOKENS: '2000'
+  MAX_FILES: '30'
+  MAX_LINES: '1500'
   EXCLUDE_GLOBS: |
     **/*.lock
     **/node_modules/**
@@ -32,7 +32,7 @@ env:
     **/*.pdf
     **/__snapshots__/**
     **/*.test.tsx
-  ONLY_ON_LABEL: ""
+  ONLY_ON_LABEL: ''
 
 jobs:
   review:
@@ -153,40 +153,36 @@ jobs:
           AUTHOR=$(gh api repos/${{ github.repository }}/pulls/$PR --jq .user.login)
           LABELS=$(gh api repos/${{ github.repository }}/pulls/$PR --jq '[.labels[].name] | join(", ")')
 
-          cat > system.txt <<EOF
-You are a senior frontend reviewer for React + TypeScript projects.
-You provide actionable, concise code reviews with file/line hints.
-Focus on: component structure, state management, hooks misuse, render performance, type safety, accessibility, styling consistency (Tailwind), test coverage, and clean code.
-EOF
+          echo "You are a senior frontend reviewer for React + TypeScript projects." > system.txt
+          echo "You provide actionable, concise code reviews with file/line hints." >> system.txt
+          echo "Focus on: component structure, state management, hooks misuse, render performance, type safety, accessibility, styling consistency (Tailwind), test coverage, and clean code." >> system.txt
 
-          cat > user.txt <<EOF
-<PR_META>
-title: $TITLE
-author: $AUTHOR
-labels: $LABELS
-body: |
-$BODY
-</PR_META>
-
-<REVIEW_SCOPE>
-- Only review the provided diff/patch.
-- Do NOT request full repo context.
-</REVIEW_SCOPE>
-
-<TECH_STACK_HINTS>
-- React 18+, TypeScript, Vite, Tailwind CSS, Zustand/Redux, React Query, React Router.
-</TECH_STACK_HINTS>
-
-<OUTPUT_FORMAT>
-- 1-3 risk bullets
-- Then issue list with file hints & fixes
-- Include test ideas if possible
-</OUTPUT_FORMAT>
-
-<DIFF_JSON>
-$(cat diff.json | jq -c .)
-</DIFF_JSON>
-EOF
+          echo "<PR_META>" > user.txt
+          echo "title: $TITLE" >> user.txt
+          echo "author: $AUTHOR" >> user.txt
+          echo "labels: $LABELS" >> user.txt
+          echo "body: |" >> user.txt
+          echo "$BODY" >> user.txt
+          echo "</PR_META>" >> user.txt
+          echo "" >> user.txt
+          echo "<REVIEW_SCOPE>" >> user.txt
+          echo "- Only review the provided diff/patch." >> user.txt
+          echo "- Do NOT request full repo context." >> user.txt
+          echo "</REVIEW_SCOPE>" >> user.txt
+          echo "" >> user.txt
+          echo "<TECH_STACK_HINTS>" >> user.txt
+          echo "- React 18+, TypeScript, Vite, Tailwind CSS, Zustand/Redux, React Query, React Router." >> user.txt
+          echo "</TECH_STACK_HINTS>" >> user.txt
+          echo "" >> user.txt
+          echo "<OUTPUT_FORMAT>" >> user.txt
+          echo "- 1-3 risk bullets" >> user.txt
+          echo "- Then issue list with file hints & fixes" >> user.txt
+          echo "- Include test ideas if possible" >> user.txt
+          echo "</OUTPUT_FORMAT>" >> user.txt
+          echo "" >> user.txt
+          echo "<DIFF_JSON>" >> user.txt
+          jq -c . < diff.json >> user.txt
+          echo "</DIFF_JSON>" >> user.txt
 
       - name: Call OpenAI
         id: llm
