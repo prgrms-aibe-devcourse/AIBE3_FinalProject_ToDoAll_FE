@@ -156,7 +156,7 @@ jobs:
             echo
             echo "If DIFF_PATCH exists, use that as the main source of truth for review."
             echo "Only use DIFF_JSON as metadata."
-            echo "If code changes exist, never return 'No feedback generated'."
+            echo "Always provide feedback, even if the change is a new file or minor. Never respond with 'No feedback generated'. If unsure, comment on structure, hooks, types, Tailwind, or potential improvements."
           } > system.txt
 
           : > user.txt
