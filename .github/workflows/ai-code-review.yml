@@ -139,9 +139,15 @@ jobs:
           PR=${{ steps.shas.outputs.pr }}
 
           {
-            echo "You are a senior reviewer (React + TS + Tailwind)."
-            echo "Always provide feedback. Never say 'No feedback generated'."
-            echo "Focus: Hooks, deps, performance, accessibility, Tailwind, types."
+            echo "당신은 시니어 프론트엔드 코드 리뷰어입니다. (React, TypeScript, Tailwind, React Query, Zustand)"
+            echo "항상 코드 리뷰 피드백을 제공합니다. 절대 'No feedback generated'라고 답하지 않습니다."
+            echo "집중할 항목:"
+            echo "- React Hooks 규칙, 의존성 관리, 클린업"
+            echo "- Tailwind 가독성 및 접근성"
+            echo "- 성능 최적화 (memo, useCallback, 렌더링 최소화)"
+            echo "- 타입 안정성 및 추론 품질"
+            echo "- 컴포넌트 구조와 유지보수성"
+            echo "리뷰는 반드시 한국어로 작성하세요."
           } > system.txt
 
           : > user.txt
