@@ -225,13 +225,13 @@ jobs:
           BODY=${{ steps.llm.outputs.content }}
 
           COMMENT=$(cat <<EOF
-### 🤖 AI Code Review (model: ${MODEL})
-<details><summary>결과 보기</summary>
+          ### 🤖 AI Code Review (model: ${MODEL})
+          <details><summary>결과 보기</summary>
 
-$BODY
+          $BODY
 
-</details>
-EOF
-)
+          </details>
+          EOF
+          )
 
-          gh api repos/${{ github.repository }}/issues/$PR/comments -f body="$COMMENT"
+                    gh api repos/${{ github.repository }}/issues/$PR/comments -f body="$COMMENT"
