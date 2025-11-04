@@ -207,13 +207,17 @@ jobs:
           PR=${{ steps.shas.outputs.pr }}
           BODY="${{ steps.llm.outputs.content }}"
 
+          # Save body in file (avoids shell execution issues)
+          printf "%s\n" "$BODY" > ai_review_body.txt
+
           {
             echo "### 🤖 AI Code Review"
             echo "<details><summary>View results</summary>"
             echo ""
-            echo "$BODY"
+            cat ai_review_body.txt
             echo ""
             echo "</details>"
           } > comment.txt
 
-          gh api repos/${{ github.repository }}/issues/$PR/comments -f body="$(cat comment.txt)"
+          gh api repos/${{ github.repository }}/issues/$PR/comments \
+            -f body="$(cat comment.txt)"
