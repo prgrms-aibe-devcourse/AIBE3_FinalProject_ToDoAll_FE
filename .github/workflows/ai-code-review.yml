@@ -11,10 +11,10 @@ permissions:
   pull-requests: write
 
 env:
-  MODEL: 'gpt-4o-mini'
-  MAX_TOKENS: 2000
-  MAX_FILES: 40
-  MAX_LINES: 1800
+  MODEL: gpt-4o-mini
+  MAX_TOKENS: '2000'
+  MAX_FILES: '40'
+  MAX_LINES: '1800'
   EXCLUDE_GLOBS: |
     **/*.lock
     **/node_modules/**
@@ -40,6 +40,7 @@ jobs:
         run: |
           set -euo pipefail
           EVENT="${{ github.event_name }}"
+
           if [[ "$EVENT" == "issue_comment" ]]; then
             BODY="${{ github.event.comment.body }}"
             if [[ ! "$BODY" =~ ^/ai-review ]]; then
@@ -47,6 +48,7 @@ jobs:
               exit 0
             fi
           fi
+
           if [[ "$EVENT" == "pull_request" && "${{ github.event.pull_request.draft }}" == "true" ]]; then
             echo "not_needed=true" >> "$GITHUB_OUTPUT"
             exit 0
@@ -54,9 +56,9 @@ jobs:
 
       - name: Exit if not needed
         if: steps.gate.outputs.not_needed == 'true'
-        run: echo "Skip AI review"
+        run: echo "⏭️ Skip AI review"
 
-      - name: Checkout
+      - name: Checkout repo
         if: steps.gate.outputs.not_needed != 'true'
         uses: actions/checkout@v4
         with:
@@ -65,8 +67,11 @@ jobs:
       - name: Setup SHAs
         id: shas
         if: steps.gate.outputs.not_needed != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
+
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             BASE="${{ github.event.pull_request.base.sha }}"
             HEAD="${{ github.event.pull_request.head.sha }}"
@@ -76,11 +81,10 @@ jobs:
             BASE=$(gh api repos/${{ github.repository }}/pulls/$PR --jq .base.sha)
             HEAD=$(gh api repos/${{ github.repository }}/pulls/$PR --jq .head.sha)
           fi
+
           echo "base=$BASE" >> "$GITHUB_OUTPUT"
           echo "head=$HEAD" >> "$GITHUB_OUTPUT"
           echo "pr=$PR" >> "$GITHUB_OUTPUT"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Filter files
         id: files
@@ -130,33 +134,28 @@ jobs:
             echo "oversize=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Build prompt (no heredoc)
+      - name: Build prompt
         run: |
           PR=${{ steps.shas.outputs.pr }}
 
           {
-            echo "You are a senior frontend reviewer for React + TypeScript + Tailwind + React Query + Zustand."
-            echo "Focus on:"
-            echo "- Hooks & deps"
-            echo "- Accessibility"
-            echo "- Tailwind patterns"
-            echo "- Performance"
-            echo "- Types & inference"
-            echo
-            echo "Always review even new files. Never answer 'No feedback generated'."
-            echo "If no issues, suggest improvements anyway."
+            echo "You are a senior reviewer (React + TS + Tailwind)."
+            echo "Always provide feedback. Never say 'No feedback generated'."
+            echo "Focus: Hooks, deps, performance, accessibility, Tailwind, types."
           } > system.txt
 
           : > user.txt
-          printf "%s\n" "<PR>" >> user.txt
+          echo "<PR>" >> user.txt
           gh api repos/${{ github.repository }}/pulls/$PR --jq '{title:.title, author:.user.login, body:.body}' >> user.txt
-          printf "%s\n" "</PR>" >> user.txt
-          printf "%s\n" "<DIFF_JSON>" >> user.txt
+          echo "</PR>" >> user.txt
+
+          echo "<DIFF_JSON>" >> user.txt
           jq -c . < diff.json >> user.txt
-          printf "%s\n" "</DIFF_JSON>" >> user.txt
-          printf "%s\n" "<DIFF_PATCH>" >> user.txt
+          echo "</DIFF_JSON>" >> user.txt
+
+          echo "<DIFF_PATCH>" >> user.txt
           git diff ${{ steps.shas.outputs.base }} ${{ steps.shas.outputs.head }} >> user.txt
-          printf "%s\n" "</DIFF_PATCH>" >> user.txt
+          echo "</DIFF_PATCH>" >> user.txt
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -172,17 +171,7 @@ jobs:
             --arg sys "$(cat system.txt)" \
             --arg usr "$(cat user.txt)" \
             --argjson mt ${MAX_TOKENS} \
-            '
-            {
-              "model": $model,
-              "messages": [
-                { "role": "system", "content": $sys },
-                { "role": "user", "content": $usr }
-              ],
-              "max_tokens": $mt,
-              "temperature": 0.2
-            }
-            '
+            '{model:$model, messages:[{role:"system",content:$sys},{role:"user",content:$usr}], max_tokens:$mt, temperature:0.2}'
           )
 
           RESP=$(curl -sS https://api.openai.com/v1/chat/completions \
@@ -191,30 +180,20 @@ jobs:
             -d "$PAYLOAD"
           )
 
-          echo "LLM raw response:"
-          echo "$RESP"
-
-          CONTENT=$(echo "$RESP" | jq -r '.choices[0].message.content // "⚠️ Model returned empty response"')
-
-          echo "content<<EOF" >> "$GITHUB_OUTPUT"
-          echo "$CONTENT" >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
+          echo "$RESP" > llm_response.json
+          jq -r '.choices[0].message.content // "⚠️ Model returned empty response"' < llm_response.json > llm_content.txt
 
       - name: Comment PR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PR=${{ steps.shas.outputs.pr }}
-          BODY="${{ steps.llm.outputs.content }}"
-
-          # Save body in file (avoids shell execution issues)
-          printf "%s\n" "$BODY" > ai_review_body.txt
 
           {
             echo "### 🤖 AI Code Review"
             echo "<details><summary>View results</summary>"
             echo ""
-            cat ai_review_body.txt
+            cat llm_content.txt
             echo ""
             echo "</details>"
           } > comment.txt
