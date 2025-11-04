@@ -148,6 +148,10 @@ jobs:
             echo "- Tailwind readability & accessibility"
             echo "- Performance (memo/useCallback)"
             echo "- Types & inference"
+            echo
+            echo "If DIFF_PATCH exists, use that as the main source of truth for review."
+            echo "Only use DIFF_JSON as metadata."
+            echo "If code changes exist, never return 'No feedback generated'."
           } > system.txt
 
           : > user.txt
@@ -157,6 +161,10 @@ jobs:
           printf "%s\n" "<DIFF_JSON>" >> user.txt
           jq -c . < diff.json >> user.txt
           printf "%s\n" "</DIFF_JSON>" >> user.txt
+
+          printf "%s\n" "<DIFF_PATCH>" >> user.txt
+          git diff ${{ steps.shas.outputs.base }} ${{ steps.shas.outputs.head }} >> user.txt
+          printf "%s\n" "</DIFF_PATCH>" >> user.txt
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
