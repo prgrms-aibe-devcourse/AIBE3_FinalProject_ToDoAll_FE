@@ -223,15 +223,17 @@ jobs:
         run: |
           PR=${{ steps.shas.outputs.pr }}
           BODY="${{ steps.llm.outputs.content }}"
+
           COMMENT_FILE="comment.txt"
 
-          echo "### 🤖 AI Code Review (model: ${MODEL})" > $COMMENT_FILE
-          echo "<details><summary>결과 보기</summary>" >> $COMMENT_FILE
-          echo "" >> $COMMENT_FILE
-          echo "$BODY" >> $COMMENT_FILE
-          echo "" >> $COMMENT_FILE
-          echo "</details>" >> $COMMENT_FILE
+          {
+            echo "### 🤖 AI Code Review (model: ${MODEL})"
+            echo "<details><summary>결과 보기</summary>"
+            echo ""
+            printf "%s\n" "$BODY"
+            echo ""
+            echo "</details>"
+          } > $COMMENT_FILE
 
-          gh api \
-            repos/${{ github.repository }}/issues/$PR/comments \
+          gh api repos/${{ github.repository }}/issues/$PR/comments \
             -f body="$(cat $COMMENT_FILE)"
