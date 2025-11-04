@@ -146,6 +146,8 @@ jobs:
       - name: Compose prompts
         id: prompt
         shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PR=${{ steps.shas.outputs.pr }}
           TITLE=$(gh api repos/${{ github.repository }}/pulls/$PR --jq .title)
