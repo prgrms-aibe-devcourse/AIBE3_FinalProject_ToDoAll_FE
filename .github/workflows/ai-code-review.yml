@@ -223,5 +223,15 @@ jobs:
         run: |
           PR=${{ steps.shas.outputs.pr }}
           BODY=${{ steps.llm.outputs.content }}
-          COMMENT="### 🤖 AI Code Review (model: ${MODEL})\n<details><summary>결과 보기</summary>\n\n$BODY\n\n</details>"
+
+          COMMENT=$(cat <<EOF
+### 🤖 AI Code Review (model: ${MODEL})
+<details><summary>결과 보기</summary>
+
+$BODY
+
+</details>
+EOF
+)
+
           gh api repos/${{ github.repository }}/issues/$PR/comments -f body="$COMMENT"
