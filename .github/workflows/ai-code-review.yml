@@ -130,11 +130,6 @@ jobs:
             echo "oversize=false" >> "$GITHUB_OUTPUT"
           fi
 
-          echo "===== DEBUG: diff.json ====="
-          cat diff.json
-          echo "===== DEBUG: raw git diff ====="
-          git diff "$BASE" "$HEAD"
-
       - name: Build prompt (no heredoc)
         run: |
           PR=${{ steps.shas.outputs.pr }}
@@ -162,11 +157,6 @@ jobs:
           printf "%s\n" "<DIFF_PATCH>" >> user.txt
           git diff ${{ steps.shas.outputs.base }} ${{ steps.shas.outputs.head }} >> user.txt
           printf "%s\n" "</DIFF_PATCH>" >> user.txt
-
-          echo "===== DEBUG: system.txt ====="
-          cat system.txt
-          echo "===== DEBUG: user.txt ====="
-          cat user.txt
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

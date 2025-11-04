@@ -19,7 +19,7 @@ export default function AiReviewTest({ initial = 0 }: Props) {
   return (
     <div className="p-4">
       <button className="bg-red-500 px-4 py-2 text-white rounded" onClick={increment}>
-        Count: {count} clicks
+        Count: {count} hihi
       </button>
 
       <div className="mt-2 text-sm text-gray-500">Current theme: {theme}</div>
