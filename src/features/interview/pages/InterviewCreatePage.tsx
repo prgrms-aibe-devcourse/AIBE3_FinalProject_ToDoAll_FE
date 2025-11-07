@@ -31,7 +31,7 @@ export default function InterviewCreatePage() {
     search.trim().length > 0
       ? interviewers.filter(
           (i) =>
-            !invitedIds.includes(i.id) && // <- 초대한 사람 빼기
+            !invitedIds.includes(i.id) && // 초대한 사람 빼기
             (i.name.includes(search) || i.email.toLowerCase().includes(search.toLowerCase()))
         )
       : [];
@@ -39,7 +39,7 @@ export default function InterviewCreatePage() {
   const handleInvite = (person: Interviewer) => {
     if (!invited.find((i) => i.id === person.id)) {
       setInvited((prev) => [...prev, person]);
-      setSearch(''); // ✅ 검색창 초기화
+      setSearch(''); //검색창 초기화
     }
   };
 
