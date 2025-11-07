@@ -1,23 +1,13 @@
-type ResumeData = {
-  name: string;
-  email: string;
-  phone: string;
-  applyDate: string;
-  birth: string;
-  address: string;
-  profileImage: string;
-  education: string;
-  experience: string;
-  skills: string[];
-  files: {
-    resume: string;
-    portfolio: string;
-  };
-};
+import type { ResumeData } from '../types/resumes.types';
 
-export default function ResumeInfo({ data }: { data: ResumeData }) {
+interface ResumeInfoProps {
+  data: ResumeData;
+}
+
+export default function ResumeInfo({ data }: ResumeInfoProps) {
   return (
     <div className="bg-white rounded-2xl shadow p-6">
+      {/* 헤더 */}
       <header className="flex justify-between items-center mb-8">
         <div>
           <h2 className="text-2xl font-bold">{data.name}</h2>
@@ -25,12 +15,12 @@ export default function ResumeInfo({ data }: { data: ResumeData }) {
         </div>
         <img
           src={data.profileImage}
-          alt="profile"
+          alt={`${data.name} 프로필`}
           className="w-24 h-24 rounded-full object-cover"
         />
       </header>
 
-      <div className="space-y-4 text-sm">
+      <div className="space-y-2 text-sm">
         <div>
           <b>이메일:</b> {data.email}
         </div>
@@ -60,7 +50,7 @@ export default function ResumeInfo({ data }: { data: ResumeData }) {
 
       <section className="mt-4">
         <h3 className="font-semibold border-b pb-1 mb-2">스킬</h3>
-        <ul className="flex gap-2 flex-wrap">
+        <ul className="flex flex-wrap gap-2">
           {data.skills.map((skill) => (
             <li key={skill} className="px-3 py-1 bg-gray-100 rounded-lg text-gray-700">
               {skill}

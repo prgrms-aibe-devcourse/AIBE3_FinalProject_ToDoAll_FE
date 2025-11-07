@@ -1,11 +1,9 @@
+import type { ResumeData } from './ResumeInfo';
 import checkImg from '../../../assets/Done.png';
 import prohibitionImg from '../../../assets/iconoir_prohibition.png';
 
 interface ApplicantStatusProps {
-  data: {
-    name: string;
-    skills: string[];
-  };
+  data: ResumeData;
 }
 
 export default function ApplicantStatus({ data }: ApplicantStatusProps) {

@@ -1,11 +1,11 @@
-// src/features/resumes/pages/ResumeDetail.tsx
+import type { ResumeData } from './types/resumes.types';
 import ResumeInfo from './components/ResumeInfo';
 import ResumeMemo from './components/ResumeMemo';
 import ApplicantInfo from './components/ApplicantInfo';
 import ApplicantStatus from './components/ApplicantStatus';
 
 export default function ResumeDetail() {
-  const dummyResume = {
+  const dummyResume: ResumeData = {
     id: '1',
     name: '김잡다',
     email: 'jobdal@gmail.com',
@@ -27,7 +27,14 @@ export default function ResumeDetail() {
     <div className="flex h-screen bg-[#FAF8F8]">
       <aside className="w-1/4 p-4">
         <ApplicantStatus data={dummyResume} />
-        <ApplicantInfo />
+        <ApplicantInfo
+          data={{
+            email: dummyResume.email,
+            phone: dummyResume.phone,
+            applyDate: dummyResume.applyDate,
+          }}
+        />
+
         <ResumeMemo />
       </aside>
 

@@ -1,16 +1,22 @@
 import { useState } from 'react';
+import type { ResumeData } from '../types/resumes.types';
+import plusImg from '../../../assets/mdi-light_plus-box.png';
 
-export default function ApplicantInfo() {
+interface ApplicantInfoProps {
+  data: Pick<ResumeData, 'email' | 'phone' | 'applyDate'>;
+}
+
+export default function ApplicantInfo({ data }: ApplicantInfoProps) {
   const [tags, setTags] = useState(['주니어']);
   const [newTag, setNewTag] = useState('');
-  const [isInputVisible, setIsInputVisible] = useState(false); // 입력창 표시 여부
+  const [isInputVisible, setIsInputVisible] = useState(false);
 
   const addTag = () => {
     if (newTag.trim() === '') return;
-    if (tags.includes(newTag.trim())) return; // 중복 방지
+    if (tags.includes(newTag.trim())) return;
     setTags([...tags, newTag.trim()]);
     setNewTag('');
-    setIsInputVisible(false); // 추가 후 입력창 닫기
+    setIsInputVisible(false);
   };
 
   const removeTag = (tagToRemove: string) => {
@@ -18,25 +24,40 @@ export default function ApplicantInfo() {
   };
 
   return (
-    <div className="p-4 border rounded-lg w-80 space-y-3">
-      <div>
-        <span className="font-semibold">이메일:</span> example@email.com
+    <div className="p-4 space-y-3 border-t border-b" style={{ borderColor: '#837C7C' }}>
+      <div className="flex items-center gap-3">
+        <span className="font-semibold text-[14px] text-[#413F3F]">이메일</span>
+        <span className="font-light text-[14px] text-[#413F3F]">{data.email}</span>
       </div>
-      <div>
-        <span className="font-semibold">연락처:</span> 010-1234-5678
+
+      <div className="flex items-center gap-3">
+        <span className="font-semibold text-[14px] text-[#413F3F]">연락처</span>
+        <span className="font-light text-[14px] text-[#413F3F]">{data.phone}</span>
       </div>
-      <div>
-        <span className="font-semibold">접수일:</span> 2025-11-07
+
+      <div className="flex items-center gap-3">
+        <span className="font-semibold text-[14px] text-[#413F3F]">접수일</span>
+        <span className="font-light text-[14px] text-[#413F3F]">{data.applyDate}</span>
       </div>
 
       <div>
-        <span className="font-semibold">태그:</span>
+        {/* 태그 제목 + 플러스 아이콘 한 줄 정렬 */}
+        <div className="flex items-center gap-2">
+          <span className="font-semibold text-[14px] text-[#413F3F]">태그</span>
+          <img
+            src={plusImg}
+            alt="태그 추가"
+            className="w-5 h-5 cursor-pointer hover:scale-110 transition"
+            onClick={() => setIsInputVisible(!isInputVisible)}
+          />
+        </div>
+
         <div className="flex gap-2 mt-2 flex-wrap items-center">
-          {/* 기존 태그들 */}
           {tags.map((tag) => (
             <span
               key={tag}
-              className="px-2 py-1 bg-yellow-100 text-yellow-800 text-sm font-medium rounded-full cursor-pointer"
+              className="px-2 py-1 text-sm font-medium rounded-[5px] cursor-pointer"
+              style={{ backgroundColor: '#D9D9D9', color: '#413F3F' }}
               onClick={() => removeTag(tag)}
               title="클릭하면 삭제됩니다"
             >
@@ -44,29 +65,22 @@ export default function ApplicantInfo() {
             </span>
           ))}
 
-          {/* + 버튼 */}
-          <button
-            onClick={() => setIsInputVisible(!isInputVisible)}
-            className="px-2 py-1 bg-yellow-400 hover:bg-yellow-500 text-white rounded-full font-bold text-lg"
-          >
-            +
-          </button>
-
-          {/* 입력창 (플러스 클릭 시만 표시) */}
           {isInputVisible && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 mt-2">
               <input
                 type="text"
                 value={newTag}
                 onChange={(e) => setNewTag(e.target.value)}
                 placeholder="태그 입력"
-                className="border rounded-lg px-2 py-1"
+                className="border rounded-lg px-2 py-1 text-[14px]"
+                style={{ borderColor: '#413F3F', color: '#413F3F' }}
                 onKeyDown={(e) => e.key === 'Enter' && addTag()}
                 autoFocus
               />
               <button
                 onClick={addTag}
-                className="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded-lg"
+                className="px-3 py-1 rounded-lg text-[14px]"
+                style={{ backgroundColor: '#413F3F', color: '#FFFFFF' }}
               >
                 등록
               </button>
