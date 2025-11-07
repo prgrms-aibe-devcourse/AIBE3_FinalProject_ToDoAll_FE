@@ -1,1 +1,29 @@
 @import 'tailwindcss';
+@import 'tailwindcss/preflight';
+
+@font-face {
+    font-family: "Pretendard Variable";
+    src: url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/woff2/PretendardVariable.woff2")
+    format("woff2");
+    font-weight: 45 920;
+    font-style: normal;
+    font-display: swap;
+}
+
+@theme {
+    /* 폰트 */
+    --default-font-family: "Pretendard Variable", var(--font-sans);
+
+    /* 색상 */
+    --color-jd-violet: #752F6D;
+    --color-jd-yellow: #F7A534;
+    --color-jd-scarlet: #DE4F36;
+    --color-jd-white: #FAF8F8;
+    --color-jd-black: #413F3F;
+    --color-jd-gray-light: #E3DBDB;
+    --color-jd-gray-dark: #837C7C;
+}
+
+@layer base {
+    html { @apply font-sans; }
+}
