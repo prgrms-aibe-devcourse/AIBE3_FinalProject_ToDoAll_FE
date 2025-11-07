@@ -1,4 +1,3 @@
-import React from 'react';
 import JobPostCardContainer from '../jobpostcard/JobPostCard.container';
 import { JobPostCardSkeleton } from '../jobpostcard/JobPostCard';
 import type { JobPost, OpenHandler } from '../../types/JobPost.types';
