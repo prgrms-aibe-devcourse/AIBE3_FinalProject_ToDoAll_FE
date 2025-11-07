@@ -1,5 +1,6 @@
 // routes.tsx
 
+import JDDetailDemoPage from '../pages/JDDetailDemoPage';
 import InterviewCreatePage from '../features/interview/pages/InterviewCreatePage';
 import InterviewManagePage from '../features/interview/pages/InterviewManagePage';
 
@@ -11,5 +12,6 @@ export const noLayoutRoutes = [
 // 메인 레이아웃 적용되는 페이지
 export const mainRoutes = [
   { path: '/interview/create', element: <InterviewCreatePage /> },
+  { path: '/detail-demo', element: <JDDetailDemoPage /> },
   { path: '/interview/manage', element: <InterviewManagePage /> },
 ];
