@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import type { Interviewer } from '../types/interviewer';
 import ApplicantProfileCard from '../components/create/ApplicantProfileCard';
 import InterviewerSearchBox from '../components/create/InterviewerSearchBox';
@@ -29,14 +29,15 @@ export default function InterviewCreatePage() {
   const [invited, setInvited] = useState<Interviewer[]>([]);
 
   const invitedIds = invited.map((p) => p.id);
-  const filtered =
-    search.trim().length > 0
+  const filtered = useMemo(() => {
+    return search.trim().length > 0
       ? interviewers.filter(
           (i) =>
             !invitedIds.includes(i.id) &&
             (i.name.includes(search) || i.email.toLowerCase().includes(search.toLowerCase()))
         )
       : [];
+  }, [search, interviewers, invitedIds]);
 
   const handleInvite = (person: Interviewer) => {
     if (!invited.find((i) => i.id === person.id)) {
