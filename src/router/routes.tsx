@@ -1,6 +1,6 @@
 // routes.tsx
 
-import InterviewCreatePage from '../features/interview/InterviewCreatePage';
+import InterviewCreatePage from '../features/interview/pages/InterviewCreatePage';
 
 // 레이아웃 없는 페이지 (로그인/회원가입 관련)
 export const noLayoutRoutes = [

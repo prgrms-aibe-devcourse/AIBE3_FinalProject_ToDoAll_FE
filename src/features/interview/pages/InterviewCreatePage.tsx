@@ -1,12 +1,6 @@
 import { useState } from 'react';
 import { Search } from 'lucide-react';
-
-interface Interviewer {
-  id: number;
-  name: string;
-  email: string;
-  avatar: string;
-}
+import type { Interviewer } from '../types/interviewer';
 
 export default function InterviewCreatePage() {
   const [search, setSearch] = useState('');
@@ -51,11 +45,11 @@ export default function InterviewCreatePage() {
     <div className="flex min-h-screen bg-[#fbf9f9] px-12 py-8">
       <h1 className="text-xl font-semibold w-40 mt-4">면접 생성</h1>
 
-      <div className="flex flex-1 justify-center items-start bg-white rounded-3xl shadow-sm p-10 relative">
+      <div className="flex flex-1 justify-center items-start bg-white rounded-3xl shadow-xl p-10 mt-16 mr-40">
         <div className="flex gap-12 w-full max-w-5xl">
           {/* 왼쪽 지원자 프로필 카드 */}
           <div className="flex-1">
-            <div className="bg-[#d8cfcc] rounded-xl p-6 flex flex-col items-center shadow-md">
+            <div className="bg-[#d8cfcc] rounded-xl p-6 mt-16 flex flex-col items-center shadow-md">
               <img
                 src="/profile-sample.jpg"
                 alt="김잡다"
@@ -105,12 +99,12 @@ export default function InterviewCreatePage() {
             {/* 검색 결과: 리스트 위에 덮어지는 레이어 */}
             {search && (
               <div className="absolute top-24 left-0 w-full z-20">
-                <div className="bg-white border rounded-xl shadow-lg p-4 max-h-60 overflow-y-auto space-y-3">
+                <div className="bg-white border-gray-300 rounded-xl shadow-lg p-4 max-h-60 overflow-y-auto space-y-3">
                   {filtered.length > 0 ? (
                     filtered.map((i) => (
                       <div
                         key={i.id}
-                        className="flex items-center justify-between border rounded-lg px-4 py-2 hover:bg-gray-50"
+                        className="flex items-center justify-between border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50"
                       >
                         <div className="flex items-center gap-3">
                           <img
@@ -147,7 +141,7 @@ export default function InterviewCreatePage() {
                   {invited.map((i) => (
                     <div
                       key={i.id}
-                      className="flex items-center justify-between border rounded-xl shadow-sm px-4 py-3 bg-white"
+                      className="relative flex items-center border-gray-500 rounded-xl shadow px-4 py-3 bg-white"
                     >
                       <div className="flex items-center gap-3">
                         <img
@@ -155,15 +149,15 @@ export default function InterviewCreatePage() {
                           alt={i.name}
                           className="w-10 h-10 rounded-full object-cover"
                         />
-                        <div>
-                          <p className="font-medium">{i.name}</p>
-                          <p className="text-xs text-gray-500">{i.email}</p>
-                        </div>
+                        <span className="text-gray-800 font-medium">{i.name}</span>
                       </div>
 
+                      {/* ✅ 오른쪽 상단 X 버튼 */}
                       <button
                         onClick={() => handleRemove(i.id)}
-                        className="text-gray-500 hover:text-gray-700 text-xl"
+                        className="absolute top-2 right-2 w-5 h-5 flex items-center justify-center 
+               bg-gray-200 hover:bg-gray-300 rounded-full text-gray-600 text-xs 
+               transition"
                       >
                         ×
                       </button>
