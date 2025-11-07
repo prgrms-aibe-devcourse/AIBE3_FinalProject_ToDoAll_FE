@@ -24,8 +24,8 @@ export default function ResumeDetail() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <aside className="w-1/4 border-r bg-white p-4">
+    <div className="flex h-screen bg-[#FAF8F8]">
+      <aside className="w-1/4 p-4">
         <ApplicantStatus />
         <ApplicantInfo />
         <ResumeMemo />
