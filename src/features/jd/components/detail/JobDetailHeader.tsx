@@ -26,9 +26,7 @@ export function JobDetailHeader({
             {statusLabel}
           </span>
         </div>
-        <p className="mt-1 text-sm text-gray-600">
-          {job.location} <span className="mx-2 text-gray-300">|</span> {job.applicantsCount}명 지원
-        </p>
+        <p className="mt-1 text-sm text-gray-600">{job.location}</p>
         {job.skills?.length ? (
           <div className="mt-2 flex flex-wrap gap-1.5">
             {job.skills.map((s, i) => (
