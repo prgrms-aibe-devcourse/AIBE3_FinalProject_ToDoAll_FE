@@ -2,6 +2,7 @@
 import ResumeInfo from './components/ResumeInfo';
 import ResumeMemo from './components/Resumememo';
 import ApplicantInfo from './components/ApplicantInfo';
+import ApplicantStatus from './components/ApplicantStatus';
 
 export default function ResumeDetail() {
   const dummyResume = {
@@ -25,6 +26,7 @@ export default function ResumeDetail() {
   return (
     <div className="flex h-screen bg-gray-50">
       <aside className="w-1/4 border-r bg-white p-4">
+        <ApplicantStatus />
         <ApplicantInfo />
         <ResumeMemo />
       </aside>
