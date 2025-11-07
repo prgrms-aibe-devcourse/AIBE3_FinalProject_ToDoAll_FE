@@ -1,12 +1,23 @@
 import { Routes, Route } from 'react-router-dom';
+import { mainRoutes, noLayoutRoutes } from './routes';
 
-// 페이지 import
-import InterviewCreatePage from '../features/interview/InterviewCreatePate';
+import MainLayout from '../components/layouts/MainLayout';
+import NoLayout from '../components/layouts/NoLayout';
 
 export default function AppRouter() {
   return (
     <Routes>
-      <Route path="/interview/create" element={<InterviewCreatePage />} />
+      <Route element={<NoLayout />}>
+        {noLayoutRoutes.map((route) => (
+          <Route key={route.path} path={route.path} element={route.element} />
+        ))}
+      </Route>
+
+      <Route element={<MainLayout />}>
+        {mainRoutes.map((route) => (
+          <Route key={route.path} path={route.path} element={route.element} />
+        ))}
+      </Route>
     </Routes>
   );
 }
