@@ -1,6 +1,6 @@
 // src/features/resumes/pages/ResumeDetail.tsx
 import ResumeInfo from './components/ResumeInfo';
-import ResumeMemo from './components/Resumememo';
+import ResumeMemo from './components/ResumeMemo';
 import ApplicantInfo from './components/ApplicantInfo';
 import ApplicantStatus from './components/ApplicantStatus';
 
@@ -26,7 +26,7 @@ export default function ResumeDetail() {
   return (
     <div className="flex h-screen bg-[#FAF8F8]">
       <aside className="w-1/4 p-4">
-        <ApplicantStatus />
+        <ApplicantStatus data={dummyResume} />
         <ApplicantInfo />
         <ResumeMemo />
       </aside>
