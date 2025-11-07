@@ -1,4 +1,3 @@
-import React from 'react';
 import JobPostCard from './JobPostCard';
 import type { JobPost, OpenHandler } from '../../types/JobPost.types';
 

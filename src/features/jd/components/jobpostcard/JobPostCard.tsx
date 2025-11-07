@@ -1,5 +1,3 @@
-import React from 'react';
-
 export type JobPostCardProps = {
   title: string;
   location: string;
