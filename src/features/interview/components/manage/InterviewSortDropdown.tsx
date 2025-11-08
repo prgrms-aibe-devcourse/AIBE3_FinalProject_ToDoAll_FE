@@ -42,7 +42,7 @@ export default function InterviewSortDropdown({ jobPosts, onSelect }: InterviewS
     <div ref={dropdownRef} className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="text-sm text-gray-500 hover:text-gray-700 border border-gray-300 rounded-md px-3 py-1.5 bg-white transition"
+        className="translate-y-17 text-sm text-gray-500 hover:text-gray-700 border border-gray-300 rounded-md px-3 py-1.5 bg-white transition"
       >
         {selected}
       </button>

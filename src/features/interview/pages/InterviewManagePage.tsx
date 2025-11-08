@@ -21,13 +21,13 @@ export default function InterviewManagePage() {
   const [activeTab, setActiveTab] = useState<TabStatus>('전체');
   const [selectedJD, setSelectedJD] = useState<number | null>(null);
 
-  // ✅ 예시 공고 리스트
+  // 예시 공고 리스트
   const jobPosts = [
     { id: 1, title: '시니어 프론트엔드 개발자' },
     { id: 2, title: '백엔드 개발자 (Spring)' },
   ];
 
-  // ✅ 예시 인터뷰 데이터
+  // 예시 인터뷰 데이터
   const interviews: InterviewCardData[] = [
     {
       id: 1,
@@ -75,7 +75,7 @@ export default function InterviewManagePage() {
     },
   ];
 
-  // ✅ 탭 + 공고 기준 필터링
+  // 탭 + 공고 기준 필터링
   const filtered = interviews.filter((i) => {
     const matchTab = activeTab === '전체' || tabToInterviewStatus[activeTab].includes(i.status);
     const matchJD = selectedJD ? i.jd_id === selectedJD : true;
