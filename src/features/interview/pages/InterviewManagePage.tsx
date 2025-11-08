@@ -56,7 +56,7 @@ export default function InterviewManagePage() {
       date: '2025-12-01',
       time: '12:00',
       interviewers: '홍길동, 홍길순',
-      status: '보류',
+      status: '미정',
       avatar: 'https://cdn.pixabay.com/photo/2025/10/02/06/28/mood-9867715_1280.jpg',
     },
   ];

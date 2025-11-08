@@ -38,7 +38,7 @@ export default function InterviewCard({
       <InterviewInfoSection date={date} time={time} interviewers={interviewers} />
 
       {/* 버튼 영역 */}
-      <InterviewActions status={status} />
+      <InterviewActions status={status} name={name} avatar={avatar} />
     </div>
   );
 }
