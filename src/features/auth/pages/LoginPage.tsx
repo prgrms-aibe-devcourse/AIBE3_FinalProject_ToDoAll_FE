@@ -1,0 +1,208 @@
+import React, { useEffect, useRef, useState } from 'react';
+
+export default function LoginPage() {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const onVisibility = () => {
+      const v = videoRef.current;
+      if (!v) return;
+      if (document.hidden) v.pause();
+      else v.play().catch(() => {});
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
+  }, []);
+
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setTimeout(() => setSubmitting(false), 700);
+  };
+
+  return (
+    <div className="relative min-h-dvh w-full overflow-hidden">
+      {/* 배경 비디오 */}
+      <video
+        ref={videoRef}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        className="pointer-events-none fixed inset-0 h-full w-full object-cover"
+      >
+        <source src="/videos/login-bg.mp4" type="video/mp4" />
+      </video>
+
+      {/* 글래스 카드 */}
+      <main className="relative z-10 grid min-h-dvh place-items-center px-4">
+        <section
+          className="
+            w-full max-w-[1120px]
+            rounded-[24px]
+            bg-white/[0.15] backdrop-blur-[20px]
+            ring-1 ring-white/[0.15]
+            shadow-[0_24px_70px_rgba(0,0,0,.28)]
+            px-10 py-12
+            min-h-[640px]
+            flex flex-col justify-center
+          "
+        >
+          {/* 좌측 520px / 우측 480px, 사이 간격 64px */}
+          <div className="grid items-center gap-16 md:grid-cols-[520px_480px]">
+            {/* 좌측: 로고 + 카피 (정중앙 정렬) */}
+            <div className="flex flex-col items-center justify-center text-center">
+              <img
+                src="/logo/login-logo.png"
+                alt="jobda"
+                className="w-auto drop-shadow-[0_3px_10px_rgba(0,0,0,.35)]"
+                style={{ height: '200px' }}
+              />
+              <h2
+                className="mt-6 text-white text-center font-black leading-tight tracking-tight"
+                style={{
+                  fontSize: '30px',
+                  fontWeight: 600,
+                  textShadow: '0 3px 18px rgba(0,0,0,0.4)',
+                  WebkitFontSmoothing: 'antialiased',
+                }}
+              >
+                잡다와 함께 효율적인 채용을
+                <br />
+                경험해 보세요
+              </h2>
+            </div>
+
+            {/* 우측: 폼 */}
+            <form onSubmit={onSubmit} className="w-full flex flex-col gap-8">
+              {/* 입력 필드 그룹 */}
+              <div className="flex flex-col gap-10">
+                {/* 이메일 */}
+                <div className="flex flex-col gap-3">
+                  <label htmlFor="email" className="block text-sm font-semibold text-jd-black">
+                    계정 이메일
+                  </label>
+                  <div className="relative">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#413F3F]">
+                      <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+                      </svg>
+                    </div>
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      autoComplete="email"
+                      required
+                      placeholder="name@jobda.com"
+                      className="
+                        h-12 w-full
+                        rounded-full
+                        border border-jd-gray-light
+                        bg-jd-white
+                        pl-12 pr-5
+                        text-[#413F3F] placeholder:text-jd-gray-dark/70
+                        outline-none
+                        shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
+                        focus:border-jd-gray-light focus:ring-0
+                      "
+                      style={{
+                        borderRadius: 15,
+                        paddingLeft: '3rem',
+                        paddingRight: '1rem',
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* 비밀번호 */}
+                <div className="flex flex-col gap-3">
+                  <label htmlFor="password" className="block text-sm font-semibold text-jd-black">
+                    비밀번호
+                  </label>
+                  <div className="relative">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#413F3F] z-10">
+                      <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
+                      </svg>
+                    </div>
+                    <input
+                      id="password"
+                      name="password"
+                      type="password"
+                      autoComplete="current-password"
+                      required
+                      placeholder="••••••••"
+                      className="
+                        h-12 w-full
+                        rounded-full
+                        border border-jd-gray-light
+                        bg-transparent focus:bg-transparent
+                        backdrop-blur-md
+                        pl-12 pr-5
+                        text-jd-black placeholder:text-jd-gray-dark/70
+                        outline-none
+                        shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
+                        focus:border-jd-gray-light focus:ring-0
+                      "
+                      style={{
+                        borderRadius: 15,
+                        paddingLeft: '3rem',
+                        paddingRight: '1rem',
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 로그인 버튼 */}
+              <button
+                type="submit"
+                disabled={submitting}
+                className="
+                  relative z-10
+                  h-12 w-full rounded-full
+                  !text-white
+                  !bg-[#F7A534]
+                  [background-image:none]
+                  !opacity-100
+                  shadow-[0_4px_12px_rgba(247,165,52,.25)]
+                  hover:brightness-[1.05] active:brightness-95
+                  transition
+                "
+                style={{
+                  height: 44,
+                  width: '100%',
+                  borderRadius: 15,
+                  color: '#fff',
+                  backgroundColor: '#F7A534',
+                  backgroundImage: 'none',
+                }}
+              >
+                <span
+                  className="login-btn-text font-extrabold"
+                  style={{ fontVariationSettings: "'wght' 800" }}
+                >
+                  {submitting ? '로그인 중...' : '로그인'}
+                </span>
+              </button>
+
+              {/* 하단 링크 */}
+              <div className="mt-[-20px] text-center text-xs text-[#413F3F]">
+                <a className="underline-offset-2 hover:underline" href="/forgot">
+                  비밀번호 찾기
+                </a>
+                <span className="mx-1.5 opacity-50"> | </span>
+                <a className="underline-offset-2 hover:underline" href="/signup">
+                  회원가입
+                </a>
+              </div>
+            </form>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}

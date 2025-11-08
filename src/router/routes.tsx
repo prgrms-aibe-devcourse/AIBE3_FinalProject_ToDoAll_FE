@@ -10,6 +10,7 @@ import InterviewQuestionCreatePage from '../features/interview/pages/InterviewQu
 
 // 레이아웃 없는 페이지 (로그인/회원가입 관련)
 export const noLayoutRoutes = [
+  { path: '/login', element: <LoginPage /> },
   { path: '/interview/create/test', element: <InterviewCreatePage /> },
 ];
 
