@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { type InterviewStatus } from '../../types/interviewer';
 
 interface InterviewActionsProps {
@@ -7,16 +7,24 @@ interface InterviewActionsProps {
   avatar?: string;
 }
 
-/**
- * 인터뷰 카드 하단 버튼 영역
- * - 상태별로 다른 버튼 세트 표시
- * - '미정'일 때 결과 등록 모달 표시
- */
 export default function InterviewActions({ status, name, avatar }: InterviewActionsProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null); // 모달 참조용 ref
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
+
+  // 모달 영역 밖 클릭 시 닫기
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+        setIsModalOpen(false);
+      }
+    };
+
+    if (isModalOpen) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isModalOpen]);
 
   if (status === '예정') {
     return (
@@ -45,10 +53,14 @@ export default function InterviewActions({ status, name, avatar }: InterviewActi
             결과 등록
           </button>
         </div>
+
         {/* 결과 등록 모달 */}
         {isModalOpen && (
           <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-            <div className="relative bg-[#E3DBDB] rounded-2xl p-8 w-[90%] max-w-[600px] h-[300px] text-center shadow-xl flex flex-col items-center">
+            <div
+              ref={modalRef}
+              className="relative bg-[#E3DBDB] rounded-2xl p-8 w-[90%] max-w-[600px] h-[300px] text-center shadow-xl flex flex-col items-center"
+            >
               {/* 닫기 버튼 */}
               <button
                 onClick={handleCloseModal}
@@ -57,7 +69,7 @@ export default function InterviewActions({ status, name, avatar }: InterviewActi
                 ✕
               </button>
 
-              {/* ✅ 프로필 - 내부 상단 중앙 */}
+              {/* 프로필 */}
               {avatar && (
                 <img
                   src={avatar}
@@ -108,7 +120,7 @@ export default function InterviewActions({ status, name, avatar }: InterviewActi
   if (status === '진행중') {
     return (
       <div className="flex justify-center gap-4">
-        <button className="bg-purple-900 text-white font-semibold px-5 py-2 rounded-lg  hover:bg-purple-700">
+        <button className="bg-purple-900 text-white font-semibold px-5 py-2 rounded-lg hover:bg-purple-700">
           면접 시작
         </button>
       </div>
