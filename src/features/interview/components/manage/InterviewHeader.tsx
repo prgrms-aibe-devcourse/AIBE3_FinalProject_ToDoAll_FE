@@ -1,30 +1,38 @@
+import { type InterviewStatus } from '../../types/interviewer';
+
 interface InterviewHeaderProps {
   avatar: string;
   name: string;
   position: string;
-  status: '전체' | '예정' | '완료' | '진행중';
+  status: InterviewStatus;
 }
 
+/**
+ * 인터뷰 카드 상단 헤더
+ * - 프로필 이미지, 이름, 포지션, 상태 배지 표시
+ */
 export default function InterviewHeader({ avatar, name, position, status }: InterviewHeaderProps) {
+  // 상태별 스타일 매핑
+  const statusStyle: Record<InterviewStatus, { bg: string; text: string; label?: string }> = {
+    예정: { bg: 'bg-purple-900', text: 'text-white', label: '면접 시작' },
+    진행중: { bg: '', text: '', label: '' },
+    합격: { bg: 'bg-red-500', text: 'text-white', label: '합격' },
+    보류: { bg: 'bg-red-500', text: 'text-white', label: '보류' },
+    불합격: { bg: 'bg-red-500', text: 'text-white', label: '불합격' },
+    미정: { bg: '', text: '', label: '' },
+  };
+
+  const { bg, text, label } = statusStyle[status];
+
   return (
     <div className="flex items-center gap-3 mb-3">
       <img src={avatar} alt={name} className="w-12 h-12 rounded-full object-cover" />
-      <div>
-        <h3 className="font-semibold">{name}</h3>
+      <div className="flex flex-col">
+        <h3 className="font-semibold text-gray-900">{name}</h3>
         <p className="text-sm text-gray-500">{position}</p>
       </div>
-      <span
-        className={`ml-auto text-xs px-3 py-1 rounded-full ${
-          status === '진행중'
-            ? 'bg-purple-900 text-white'
-            : status === '완료'
-              ? 'bg-green-600 text-white'
-              : status === '예정'
-                ? 'bg-yellow-400 text-gray-800'
-                : 'bg-gray-300 text-gray-700'
-        }`}
-      >
-        {status === '진행중' ? '면접 시작' : status}
+      <span className={`ml-auto px-3 py-1 text-xs font-medium rounded-full ${bg} ${text}`}>
+        {label ?? status}
       </span>
     </div>
   );

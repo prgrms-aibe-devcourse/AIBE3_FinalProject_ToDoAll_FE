@@ -1,8 +1,7 @@
 import InterviewHeader from './InterviewHeader';
 import InterviewInfoSection from './InterviewInfoSection';
 import InterviewActions from './InterviewActions';
-
-export type InterviewStatus = '전체' | '예정' | '완료' | '진행중';
+import { type InterviewStatus } from '../../types/interviewer';
 
 export interface InterviewCardProps {
   id: number;
