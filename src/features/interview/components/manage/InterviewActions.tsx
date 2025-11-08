@@ -40,7 +40,7 @@ export default function InterviewActions({ status }: InterviewActionsProps) {
           면접 노트
         </button>
         {/* 질문 세트가 있는 경우 질문 세트 보기 */}
-        <button className="text-gray-100 bg-green-700 font-semibold px-5 py-2 rounded-lg hover:bg-green-600">
+        <button className="text-gray-100 bg-green-500 font-semibold px-5 py-2 rounded-lg hover:bg-green-400">
           등록 완료
         </button>
       </div>
@@ -62,7 +62,7 @@ export default function InterviewActions({ status }: InterviewActionsProps) {
       <button className="bg-purple-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-purple-700">
         면접 노트
       </button>
-      <button className="bg-green-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-green-700">
+      <button className="bg-green-300 text-white font-semibold px-5 py-2 rounded-lg hover:bg-green-200">
         등록 완료
       </button>
     </div>
