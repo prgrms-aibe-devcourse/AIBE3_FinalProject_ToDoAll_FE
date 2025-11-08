@@ -32,13 +32,13 @@ export default function InterviewCard({
     >
       <button className="absolute top-3 right-3 text-gray-400 hover:text-gray-600">×</button>
 
-      {/* 👤 헤더 영역 */}
+      {/* 헤더 영역 */}
       <InterviewHeader avatar={avatar} name={name} position={position} status={status} />
 
-      {/* 📅 인터뷰 정보 */}
+      {/* 인터뷰 정보 */}
       <InterviewInfoSection date={date} time={time} interviewers={interviewers} />
 
-      {/* ⚙️ 버튼 영역 */}
+      {/* 버튼 영역 */}
       <InterviewActions status={status} />
     </div>
   );

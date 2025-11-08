@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import InterviewCard, { type InterviewStatus } from '../components/manage/InterviewCard';
+import InterviewFilterTabs from '../components/manage/InterviewFilterTabs';
 
 interface InterviewCardData {
   id: number;
@@ -59,24 +60,10 @@ export default function InterviewManagePage() {
       </div>
 
       {/* 필터 탭 */}
-      <div className="flex gap-6 border-gray-300 pb-3">
-        {(['전체', '예정', '완료', '진행중'] as InterviewStatus[]).map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-5 py-2 rounded-full text-sm font-semibold transition ${
-              activeTab === tab
-                ? 'bg-[#E35B43] text-white shadow'
-                : 'text-gray-600 hover:text-black'
-            }`}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
+      <InterviewFilterTabs activeTab={activeTab} onChange={setActiveTab} />
 
       {/* 카드 리스트 */}
-      <div className="grid grid-cols-3 gap-8">
+      <div className="grid grid-cols-3 gap-8 mt-6">
         {filtered.map((item) => (
           <InterviewCard key={item.id} {...item} />
         ))}
