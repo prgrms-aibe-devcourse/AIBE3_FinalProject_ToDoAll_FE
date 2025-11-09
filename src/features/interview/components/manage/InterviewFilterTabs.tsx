@@ -6,10 +6,6 @@ interface InterviewFilterTabsProps {
   onChange: (status: TabStatus) => void;
 }
 
-/**
- * 면접 관리 페이지의 상단 필터 탭
- * - 전체 / 예정 / 완료 / 진행중
- */
 export default function InterviewFilterTabs({ activeTab, onChange }: InterviewFilterTabsProps) {
   const tabs: TabStatus[] = ['전체', '예정', '완료', '진행중'];
 

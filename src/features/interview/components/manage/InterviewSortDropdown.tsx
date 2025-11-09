@@ -48,7 +48,7 @@ export default function InterviewSortDropdown({ jobPosts, onSelect }: InterviewS
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-md shadow-lg z-10">
+        <div className="absolute translate-y-17 right-0 mt-2 w-56 bg-white border border-gray-200 rounded-md shadow-lg z-10">
           {/* 전체 보기 */}
           <button
             onClick={() => handleSelect(null)}
