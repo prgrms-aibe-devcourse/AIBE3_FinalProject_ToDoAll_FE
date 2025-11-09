@@ -10,12 +10,11 @@ export default function ResumeMemo() {
       {/* textarea + 버튼을 감싸는 relative 컨테이너 */}
       <div className="relative">
         <textarea
-          className="w-full h-32 bg-white rounded-lg p-3 pr-16 shadow-md focus:shadow-lgtransition-shadow resize-none border-[#837C7C] text-[#413F3F] text-[14px]"
+          className="w-full h-32 bg-white rounded-lg p-3 pr-16 shadow-md focus:shadow-lg transition-shadow resize-none border-[#837C7C] text-[#413F3F] text-[14px]"
           placeholder="메모를 입력하세요..."
           value={memo}
           onChange={(e) => setMemo(e.target.value)}
         />
-
         {/* textarea 안 오른쪽 아래에 고정되는 버튼 */}
         <button
           onClick={() => console.log('메모 저장:', memo)}
