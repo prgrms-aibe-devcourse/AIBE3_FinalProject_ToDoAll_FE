@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function LoginPage() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const onVisibility = () => {
@@ -101,9 +103,10 @@ export default function LoginPage() {
                         h-12 w-full
                         rounded-full
                         border border-jd-gray-light
-                        bg-jd-white
+                        bg-transparent focus:bg-transparent
+                        backdrop-blur-md
                         pl-12 pr-5
-                        text-[#413F3F] placeholder:text-jd-gray-dark/70
+                        text-jd-black placeholder:text-jd-gray-dark/70
                         outline-none
                         shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
                         focus:border-jd-gray-light focus:ring-0
@@ -125,7 +128,9 @@ export default function LoginPage() {
                   <div className="relative">
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#413F3F] z-10">
                       <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
+                        <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0
+                        2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71
+                        1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
                       </svg>
                     </div>
                     <input
@@ -191,13 +196,23 @@ export default function LoginPage() {
 
               {/* 하단 링크 */}
               <div className="mt-[-20px] text-center text-xs text-[#413F3F]">
-                <a className="underline-offset-2 hover:underline" href="/forgot">
+                <button
+                  type="button"
+                  onClick={() => navigate('/forgot')}
+                  className="underline-offset-2 hover:underline cursor-pointer"
+                >
                   비밀번호 찾기
-                </a>
+                </button>
+
                 <span className="mx-1.5 opacity-50"> | </span>
-                <a className="underline-offset-2 hover:underline" href="/signup">
+
+                <button
+                  type="button"
+                  onClick={() => navigate('/signup/email')}
+                  className="underline-offset-2 hover:underline cursor-pointer"
+                >
                   회원가입
-                </a>
+                </button>
               </div>
             </form>
           </div>
