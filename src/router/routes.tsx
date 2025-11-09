@@ -2,6 +2,7 @@
 
 import JDDetailDemoPage from '../pages/JDDetailDemoPage';
 import InterviewCreatePage from '../features/interview/pages/InterviewCreatePage';
+import InterviewManagePage from '../features/interview/pages/InterviewManagePage';
 
 // 레이아웃 없는 페이지 (로그인/회원가입 관련)
 export const noLayoutRoutes = [
@@ -12,4 +13,5 @@ export const noLayoutRoutes = [
 export const mainRoutes = [
   { path: '/interview/create', element: <InterviewCreatePage /> },
   { path: '/detail-demo', element: <JDDetailDemoPage /> },
+  { path: '/interview/manage', element: <InterviewManagePage /> },
 ];
