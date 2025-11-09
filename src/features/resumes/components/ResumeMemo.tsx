@@ -5,7 +5,7 @@ export default function ResumeMemo() {
 
   return (
     <div className="flex flex-col">
-      <h3 className="font-semibold mb-2 text-[#413F3F] text-[14px]">메모</h3>
+      <h3 className="font-semibold mb-2 text-[#413F3F] text-[14px]">memo</h3>
 
       {/* textarea + 버튼을 감싸는 relative 컨테이너 */}
       <div className="relative">

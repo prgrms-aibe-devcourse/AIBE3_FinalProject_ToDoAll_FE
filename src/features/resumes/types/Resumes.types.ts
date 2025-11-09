@@ -9,6 +9,8 @@ export type ResumeData = {
   profileImage: string;
   education: string;
   experience: string;
+  activities?: string;
+  certifications?: string;
   skills: string[];
   files: {
     resume: string;
