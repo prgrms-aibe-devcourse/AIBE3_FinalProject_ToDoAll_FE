@@ -1,8 +1,8 @@
-import type { ResumeData } from './types/resumes.types';
-import ResumeInfo from './components/ResumeInfo';
-import ResumeMemo from './components/ResumeMemo';
-import ApplicantInfo from './components/ApplicantInfo';
-import ApplicantStatus from './components/ApplicantStatus';
+import type { ResumeData } from '../types/resumes.types';
+import ResumeInfo from '../components/ResumeInfo';
+import ResumeMemo from '../components/ResumeMemo';
+import ApplicantInfo from '../components/ApplicantInfo';
+import ApplicantStatus from '../components/ApplicantStatus';
 
 export default function ResumeDetail() {
   const dummyResume: ResumeData = {

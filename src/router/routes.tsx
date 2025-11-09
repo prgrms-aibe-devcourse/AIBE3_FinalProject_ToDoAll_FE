@@ -3,7 +3,7 @@
 import JDDetailDemoPage from '../pages/JDDetailDemoPage';
 import InterviewCreatePage from '../features/interview/pages/InterviewCreatePage';
 import InterviewManagePage from '../features/interview/pages/InterviewManagePage';
-import ResumeDetail from '../features/resumes/ResumeDetail';
+import ResumeDetail from '../features/resumes/page/ResumeDetail';
 
 // 레이아웃 없는 페이지 (로그인/회원가입 관련)
 export const noLayoutRoutes = [
