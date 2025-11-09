@@ -1,13 +1,24 @@
 @import 'tailwindcss';
-/* src/index.css */
-body {
-  font-family:
-    'Pretendard',
-    -apple-system,
-    BlinkMacSystemFont,
-    system-ui,
-    Roboto,
-    'Helvetica Neue',
-    'Segoe UI',
-    sans-serif;
+
+@font-face {
+  font-family: 'Pretendard Variable';
+  src: url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/packages/pretendard/dist/web/variable/woff2/PretendardVariable.woff2')
+    format('woff2');
+  font-weight: 45 920;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  /* 폰트 */
+  --default-font-family: 'Pretendard Variable', var(--font-sans);
+
+  /* 색상 */
+  --color-jd-violet: #752f6d;
+  --color-jd-yellow: #f7a534;
+  --color-jd-scarlet: #de4f36;
+  --color-jd-white: #faf8f8;
+  --color-jd-black: #413f3f;
+  --color-jd-gray-light: #e3dbdb;
+  --color-jd-gray-dark: #837c7c;
 }
