@@ -3,7 +3,10 @@
 import JDDetailDemoPage from '../pages/JDDetailDemoPage';
 import InterviewCreatePage from '../features/interview/pages/InterviewCreatePage';
 import InterviewManagePage from '../features/interview/pages/InterviewManagePage';
-import ResumeDetail from '../features/resumes/pages/ResumeDetail.tsx';
+import ResumeDetail from '../features/resumes/pages/ResumeDetail';
+import DashBoard from '../pages/DashBoard.tsx';
+import JDCreatePage from '../pages/JDCreatePage.tsx';
+import InterviewQuestionCreatePage from '../features/interview/pages/InterviewQuestionCreatePage';
 import ResumeForm from '../features/resumes/pages/ResumeCreatePage.tsx';
 
 // 레이아웃 없는 페이지 (로그인/회원가입 관련)
@@ -18,5 +21,8 @@ export const mainRoutes = [
   { path: '/interview/manage', element: <InterviewManagePage /> },
   { path: '/interview/create', element: <InterviewCreatePage /> },
   { path: '/resumes/:id', element: <ResumeDetail /> },
+  { path: '/dashboard', element: <DashBoard /> },
+  { path: '/jobs/new', element: <JDCreatePage /> },
+  { path: '/interview/manage/question-create', element: <InterviewQuestionCreatePage /> },
   { path: '/resumes/create', element: <ResumeForm /> },
 ];
