@@ -26,7 +26,7 @@ export default function InterviewActions({
 
   // 면접 노트 페이지로 이동하는 함수
   const handleOpenInterviewNote = () => {
-    navigate('/interview/manage/question-note', {
+    navigate('/interview/manage/question-create', {
       state: {
         name,
         avatar,
