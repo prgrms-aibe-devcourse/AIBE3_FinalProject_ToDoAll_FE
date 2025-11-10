@@ -1,4 +1,6 @@
 // 프로필 데이터
+import { useLocation } from 'react-router-dom';
+
 const profileData = {
   name: '김철수',
   title: '프론트엔드 개발자',
@@ -45,6 +47,8 @@ const questionData = [
 ];
 
 export default function InterviewQuestionNotePage() {
+  const location = useLocation();
+  const { name, avatar /*, interviewId */ } = location.state || {};
   return (
     <div className="mx-auto p-8 min-h-screen bg-[#fbf9f9] font-sans font-semibold">
       <h1 className="text-2xl font-bold mb-6 text-jd-black">질문 노트</h1>
@@ -54,11 +58,7 @@ export default function InterviewQuestionNotePage() {
         <div className="w-1/4">
           <div className="bg-white border border-gray-200 shadow-md rounded-2xl p-5 flex flex-col text-left text-sm">
             <div className="flex items-center gap-3 mb-3">
-              <img
-                src={profileData.image}
-                alt={profileData.name}
-                className="w-12 h-12 rounded-full object-cover"
-              />
+              <img src={avatar} alt={name} className="w-12 h-12 rounded-full object-cover" />
               <div>
                 <h2 className="text-sm text-jd-black">{profileData.name}</h2>
                 <p className="text-xs text-jd-gray-dark">{profileData.title}</p>
