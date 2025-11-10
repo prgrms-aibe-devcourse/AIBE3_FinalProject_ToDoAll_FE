@@ -363,12 +363,13 @@ export default function SignupFormPage() {
               h-12 w-40 select-none
               !rounded-[15px] !text-white font-extrabold tracking-tight
               [background-image:none] !opacity-100
-              shadow-[0_4px_12px_rgba(117,47,109,.25)]
               transition will-change-transform outline-none
               ${
                 isFormValid
-                  ? '!bg-[#752F6D] hover:brightness-[1.05] active:brightness-95 focus-visible:ring-2 focus-visible:ring-[#752F6D]/40'
-                  : '!bg-[#E3DBDB] text-[#413F3F]/60 cursor-not-allowed opacity-70'
+                  ? 'shadow-[0_4px_12px_rgba(117,47,109,.25)] !bg-[#752F6D] ' +
+                    'hover:brightness-[1.05] active:brightness-95 focus-visible:ring-2 ' +
+                    'focus-visible:ring-[#752F6D]/40'
+                  : '!bg-[#CDBFD4] text-[#413F3F]/60 cursor-not-allowed opacity-70'
               }
           `}
             style={{ appearance: 'none', WebkitAppearance: 'none' }}
