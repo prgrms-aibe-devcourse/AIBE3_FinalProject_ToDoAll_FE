@@ -4,7 +4,7 @@ import { Field, Input, TextArea, TagInput } from './fields';
 export type JobPostFormValues = {
   title: string;
   department: string;
-  workType: string; // 근무 형태
+  workType: string;
   experience: string;
   location: string;
   postedAt: string;

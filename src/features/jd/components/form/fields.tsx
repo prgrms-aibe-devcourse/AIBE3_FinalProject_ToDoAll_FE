@@ -1,5 +1,3 @@
-/* eslint-disable react/prop-types */ // TS 환경: prop-types 요구 비활성 (파일 한정)
-
 import React, { useState } from 'react';
 import { Pill } from '../shared/Pill';
 
