@@ -10,9 +10,11 @@ export default function QuestionNoteSection({ questionNotes }: QuestionNoteSecti
   const [checkedQuestions, setCheckedQuestions] = useState<Set<string>>(new Set());
 
   const toggleCheck = (question: string) => {
-    const newSet = new Set(checkedQuestions);
-    newSet.has(question) ? newSet.delete(question) : newSet.add(question);
-    setCheckedQuestions(newSet);
+    setCheckedQuestions((prev) => {
+      const newSet = new Set(prev);
+      newSet.has(question) ? newSet.delete(question) : newSet.add(question);
+      return newSet;
+    });
   };
 
   return (
