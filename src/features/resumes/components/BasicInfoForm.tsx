@@ -16,7 +16,6 @@ export default function BasicInfoForm({ formData, onChange }: Props) {
   return (
     <section className="bg-white p-6 shadow-md rounded-2xl mb-6">
       <div className="flex flex-col md:flex-row gap-6">
-        {/* 왼쪽 */}
         <div className="flex-1 grid grid-cols-1 gap-4">
           <div className="flex gap-4">
             <input
@@ -94,7 +93,6 @@ export default function BasicInfoForm({ formData, onChange }: Props) {
           </div>
         </div>
 
-        {/* 오른쪽 */}
         <div className="w-48 h-48 flex-shrink-0">
           <label className="block w-full h-full border rounded-lg overflow-hidden cursor-pointer">
             {formData.profileImage ? (

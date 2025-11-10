@@ -1,4 +1,3 @@
-// components/ResumeInfo.tsx
 import type { ResumeData, EducationItem } from '../types/resumes.types';
 
 interface ResumeInfoProps {
@@ -44,7 +43,6 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
           </div>
         </div>
 
-        {/* 첨부파일 */}
         <section className="mt-6 flex flex-row gap-2">
           <div className="border border-[#E3DBDB] rounded-[10px] p-5 flex-1">
             <h2 className="font-semibold text-[#413F3F]">자기소개서</h2>
@@ -75,7 +73,6 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
           </div>
         </section>
 
-        {/* 학력사항 */}
         <section className="mt-6">
           <h3 className="font-semibold text-[#413F3F] bg-[#FAF8F8] border-y border-[#837C7C] py-2 px-3 mb-3">
             학력사항
@@ -83,7 +80,6 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
           {data.education.length > 0 ? (
             <div className="px-3 space-y-2">
               {data.education.map((edu: EducationItem, idx) => {
-                // 타입 가드: 대학/대학원인지 체크
                 const isUniversity = edu.type === '대학' || edu.type === '대학원';
                 return (
                   <div key={idx}>
@@ -109,7 +105,6 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
           )}
         </section>
 
-        {/* 경력사항 */}
         <section className="mt-4">
           <h3 className="font-semibold text-[#413F3F] bg-[#FAF8F8] border-y border-[#837C7C] py-2 px-3 mb-3">
             경력사항
@@ -121,7 +116,6 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
           )}
         </section>
 
-        {/* 스킬 */}
         <section className="mt-4">
           <h3 className="font-semibold text-[#413F3F] bg-[#FAF8F8] border-y border-[#837C7C] py-2 px-3 mb-3">
             스킬
@@ -139,7 +133,6 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
           )}
         </section>
 
-        {/* 경험/활동/교육 */}
         <section className="mt-4">
           <h3 className="font-semibold text-[#413F3F] bg-[#FAF8F8] border-y border-[#837C7C] py-2 px-3 mb-3">
             경험/활동/교육
@@ -151,7 +144,6 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
           )}
         </section>
 
-        {/* 자격/어학/수상 */}
         <section className="mt-4">
           <h3 className="font-semibold text-[#413F3F] bg-[#FAF8F8] border-y border-[#837C7C] py-2 px-3 mb-3">
             자격/어학/수상

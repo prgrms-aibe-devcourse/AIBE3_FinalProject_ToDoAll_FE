@@ -20,7 +20,7 @@ export default function ResumeCreatePage() {
     },
     files: { resume: '', portfolio: '', etc: [] },
     education: [],
-    career: [], // ← 추가
+    career: [],
     skills: [],
     experience: '',
     activities: '',
@@ -38,7 +38,7 @@ export default function ResumeCreatePage() {
       | '남'
       | '여'
       | ResumeData['education']
-      | ResumeData['career'] // ← 추가
+      | ResumeData['career']
   ) => {
     setFormData((prev) => {
       switch (field) {
@@ -50,7 +50,7 @@ export default function ResumeCreatePage() {
           return { ...prev, gender: value as '남' | '여' };
         case 'education':
           return { ...prev, education: value as ResumeData['education'] };
-        case 'career': // ← 추가
+        case 'career':
           return { ...prev, career: value as ResumeData['career'] };
         default:
           return { ...prev, [field]: value };

@@ -45,7 +45,6 @@ export default function ResumeForm({ formData, onChange }: Props) {
     job: '',
   });
 
-  // 학력 구분 변경
   const handleTypeChange = (type: EducationItem['type']) => {
     if (type === '대학' || type === '대학원') {
       setNewEdu({
@@ -70,7 +69,6 @@ export default function ResumeForm({ formData, onChange }: Props) {
     }
   };
 
-  // 학력 추가
   const addEducation = () => {
     if (!newEdu.type || !newEdu.name || !newEdu.startDate || !newEdu.endDate) {
       alert('학력 구분, 학교명, 입학일, 졸업일을 모두 입력해주세요.');
@@ -87,7 +85,6 @@ export default function ResumeForm({ formData, onChange }: Props) {
     });
   };
 
-  // 파일 추가
   const addFile = () => {
     if (!newFile.file) {
       alert('파일을 선택해주세요.');
@@ -104,7 +101,6 @@ export default function ResumeForm({ formData, onChange }: Props) {
     setNewFile({ name: '', file: undefined });
   };
 
-  // 경력 추가
   const addCareer = () => {
     const { company, startDate, endDate, position, department, job } = newCareer;
     if (!company || !startDate || !endDate || !position || !department || !job) {
@@ -125,7 +121,6 @@ export default function ResumeForm({ formData, onChange }: Props) {
 
   return (
     <section className="bg-white p-6 space-y-6 mt-6 rounded-[10px] shadow-sm text-[#413F3F]">
-      {/* 포트폴리오/기타문서 */}
       <div className="bg-[#FAF8F8] border-t border-b border-[#E0E0E0] p-2 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-[#413F3F]">포트폴리오 및 기타문서</h2>
       </div>
@@ -172,7 +167,6 @@ export default function ResumeForm({ formData, onChange }: Props) {
         </div>
       )}
 
-      {/* 학력 */}
       <div className="bg-[#FAF8F8] border-t border-b border-[#E0E0E0] p-2 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-[#413F3F]">최종 학력 사항</h2>
         <button
@@ -185,7 +179,6 @@ export default function ResumeForm({ formData, onChange }: Props) {
         </button>
       </div>
 
-      {/* 학력 리스트 */}
       <div>
         {formData.education.map((edu: EducationItem, idx: number) => (
           <div
@@ -304,7 +297,6 @@ export default function ResumeForm({ formData, onChange }: Props) {
         </div>
       )}
 
-      {/* 경력 */}
       <div className="bg-[#FAF8F8] border-t border-b border-[#E0E0E0] p-2 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-[#413F3F]">경력</h2>
         <button
@@ -317,7 +309,6 @@ export default function ResumeForm({ formData, onChange }: Props) {
         </button>
       </div>
 
-      {/* 경력 리스트 */}
       <div>
         {formData.career?.map((item: CareerItem, idx: number) => (
           <div
@@ -335,7 +326,6 @@ export default function ResumeForm({ formData, onChange }: Props) {
         ))}
       </div>
 
-      {/* 경력 입력 폼 */}
       {showCareerForm && (
         <div className="space-y-3 bg-[#FAFAFA] p-4 rounded-[10px] border border-[#E5E5E5]">
           <div className="flex flex-wrap gap-3 items-center mt-2">
@@ -398,8 +388,8 @@ export default function ResumeForm({ formData, onChange }: Props) {
 
       <TagSection
         title="경험/활동/교육"
-        tags={formData.experience ? formData.experience.split(',') : []} // 문자열을 배열로 변환
-        onChange={(updated) => onChange('experience', updated.join(','))} // 배열을 다시 문자열로 저장
+        tags={formData.experience ? formData.experience.split(',') : []}
+        onChange={(updated) => onChange('experience', updated.join(','))}
       />
 
       <TagSection

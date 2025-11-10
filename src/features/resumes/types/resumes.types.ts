@@ -24,15 +24,14 @@ export type EducationItem =
       dayTime: '주간' | '야간';
       gpa?: number;
     };
-// src/features/resumes/types/resumes.types.ts
 
 export type CareerItem = {
   company: string;
   startDate: string;
   endDate: string;
-  position: string; // 직급/직책
-  department: string; // 근무부서
-  job: string; // 직무
+  position: string;
+  department: string;
+  job: string;
 };
 
 export type ResumeData = {
@@ -51,7 +50,7 @@ export type ResumeData = {
     etc?: string[];
   };
   education: EducationItem[];
-  career?: CareerItem[]; // ← 추가
+  career?: CareerItem[];
   skills: string[];
   experience: string;
   activities: string;
