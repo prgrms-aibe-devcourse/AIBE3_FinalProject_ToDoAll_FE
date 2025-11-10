@@ -3,6 +3,7 @@ import { useState } from 'react';
 import plusImg from '../../../assets/Vector-2.png';
 import dropImg from '../../../assets/Vector.png';
 import purplePlusImg from '../../../assets/Vector-3.png';
+import TagSection from './TagForm';
 
 type Props = {
   formData: ResumeData;
@@ -389,16 +390,23 @@ export default function ResumeForm({ formData, onChange }: Props) {
         </div>
       )}
 
-      {/* 기타 섹션 */}
-      <div className="bg-[#FAF8F8] border-t border-b border-[#E0E0E0] p-2 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-[#413F3F]">스킬</h2>
-      </div>
-      <div className="bg-[#FAF8F8] border-t border-b border-[#E0E0E0] p-2 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-[#413F3F]">경험/활동/교육</h2>
-      </div>
-      <div className="bg-[#FAF8F8] border-t border-b border-[#E0E0E0] p-2 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-[#413F3F]">자격/어학/수상</h2>
-      </div>
+      <TagSection
+        title="스킬"
+        tags={formData.skills}
+        onChange={(updated) => onChange('skills', updated)}
+      />
+
+      <TagSection
+        title="경험/활동/교육"
+        tags={formData.experience ? formData.experience.split(',') : []} // 문자열을 배열로 변환
+        onChange={(updated) => onChange('experience', updated.join(','))} // 배열을 다시 문자열로 저장
+      />
+
+      <TagSection
+        title="자격/어학/수상"
+        tags={formData.certifications ? formData.certifications.split(',') : []}
+        onChange={(updated) => onChange('certifications', updated.join(','))}
+      />
     </section>
   );
 }
