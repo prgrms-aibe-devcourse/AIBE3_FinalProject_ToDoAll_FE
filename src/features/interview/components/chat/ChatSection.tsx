@@ -3,9 +3,10 @@ import type { Message } from '../../types/chatroom';
 
 interface ChatSectionProps {
   initialMessages: Message[];
+  avatar?: string;
 }
 
-export default function ChatSection({ initialMessages }: ChatSectionProps) {
+export default function ChatSection({ initialMessages, avatar }: ChatSectionProps) {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [newMessage, setNewMessage] = useState('');
 
@@ -23,7 +24,7 @@ export default function ChatSection({ initialMessages }: ChatSectionProps) {
           <div key={m.id} className={`flex ${m.isMine ? 'justify-end' : 'justify-start'}`}>
             {!m.isMine && (
               <img
-                src="https://cdn.pixabay.com/photo/2025/10/02/06/28/mood-9867715_1280.jpg"
+                src={avatar}
                 alt="상대방 프로필"
                 className="w-8 h-8 rounded-full border mr-3 border-jd-gray-light"
               />

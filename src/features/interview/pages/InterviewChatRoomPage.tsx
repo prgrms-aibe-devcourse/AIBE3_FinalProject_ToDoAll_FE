@@ -1,3 +1,4 @@
+import { useLocation } from 'react-router-dom';
 import ChatSection from '../components/chat/ChatSection';
 import QuestionNoteSection from '../components/chat/QuestionNoteSection';
 import InterviewSummarySection from '../components/chat/InterviewSummarySection';
@@ -49,6 +50,9 @@ const interviewSummary: InterviewSummary[] = [
 ];
 
 export default function InterviewChatRoomPage() {
+  const location = useLocation();
+  const { avatar /*, interviewId */ } = location.state || {};
+
   return (
     <div className="flex flex-col h-screen bg-jd-white text-jd-black overflow-hidden">
       {/* 헤더 */}
@@ -63,7 +67,7 @@ export default function InterviewChatRoomPage() {
       <div className="flex flex-1 gap-6 px-8 pb-8 overflow-hidden">
         {/* 내부 스크롤 방지용 */}
         <div className="flex flex-1 gap-6 h-full overflow-hidden">
-          <ChatSection initialMessages={initialMessages} />
+          <ChatSection initialMessages={initialMessages} avatar={avatar} />
           <QuestionNoteSection questionNotes={questionNotes} />
           <InterviewSummarySection summaries={interviewSummary} />
         </div>
