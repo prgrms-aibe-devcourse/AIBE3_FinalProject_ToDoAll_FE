@@ -61,7 +61,7 @@ export default function InterviewChatRoomPage() {
   return (
     <div className="flex flex-col h-screen bg-jd-white text-jd-black overflow-hidden">
       {/* 헤더 */}
-      <header className="flex justify-between items-center px-10 py-6 h-20 flex-shrink-0">
+      <header className="flex justify-between items-center px-10 py-6 h-20 shrink-0">
         <h1 className="text-3xl font-semibold text-jd-black">면접</h1>
         <button
           onClick={handleEndInterview}

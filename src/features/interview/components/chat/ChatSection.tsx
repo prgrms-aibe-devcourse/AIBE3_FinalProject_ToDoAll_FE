@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import type { Message } from '../../types/chatroom';
 
 interface ChatSectionProps {
@@ -43,7 +43,7 @@ export default function ChatSection({ initialMessages, avatar }: ChatSectionProp
       </div>
 
       {/* 입력창 */}
-      <div className="flex-shrink-0">
+      <div className="shrink-0">
         <div className="flex items-center border border-jd-gray-light rounded-full px-4 py-1.5 w-full bg-white shadow-sm">
           <input
             type="text"

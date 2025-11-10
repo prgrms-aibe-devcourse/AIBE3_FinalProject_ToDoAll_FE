@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Check } from 'lucide-react';
 import type { QuestionSection } from '../../types/chatroom';
 
@@ -17,7 +17,7 @@ export default function QuestionNoteSection({ questionNotes }: QuestionNoteSecti
 
   return (
     <div className="w-[35%] flex flex-col max-h-full bg-white border border-jd-gray-light rounded-2xl shadow-md p-6 overflow-hidden">
-      <h2 className="text-2xl font-semibold mb-4 text-jd-gray-dark flex-shrink-0">질문 노트</h2>
+      <h2 className="text-2xl font-semibold mb-4 text-jd-gray-dark shrink-0">질문 노트</h2>
       <div className="flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
         {questionNotes.map((section, idx) => (
           <div key={idx} className="mb-6">
