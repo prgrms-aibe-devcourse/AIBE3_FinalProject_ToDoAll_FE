@@ -72,7 +72,7 @@ export default function AuthShell({
       <main className="relative z-10 grid min-h-dvh place-items-center px-4">
         <section
           className={`w-full max-w-[1120px] rounded-[25px]
-            bg-white/5 backdrop-blur-[25px] ring-1 ring-white/20
+            bg-white/30 backdrop-blur-[30px] ring-1 ring-white/30
             shadow-[0_8px_40px_rgba(0,0,0,.10)]
             px-10 py-[80px] md:py-[100px] min-h-[640px]
             flex flex-col ${showLeftPane ? 'justify-center' : 'justify-start'}

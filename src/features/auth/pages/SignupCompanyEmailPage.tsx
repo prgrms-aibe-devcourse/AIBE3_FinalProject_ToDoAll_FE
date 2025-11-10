@@ -1,10 +1,37 @@
 import type React from 'react';
+import { useState } from 'react';
 import AuthShell from '../components/AuthShell';
 
+const PERSONAL_DOMAINS = new Set([
+  'gmail.com',
+  'naver.com',
+  'daum.net',
+  'hanmail.net',
+  'outlook.com',
+  'hotmail.com',
+  'yahoo.com',
+  'icloud.com',
+]);
+
 export default function SignupCompanyEmailPage() {
+  const [email, setEmail] = useState('');
+  const [invalid, setInvalid] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.trim();
+    setEmail(value);
+
+    const at = value.lastIndexOf('@');
+    const domain = at >= 0 ? value.slice(at + 1).toLowerCase() : '';
+    // 비어있거나 개인용 도메인이면 경고
+    setInvalid(Boolean(domain) && PERSONAL_DOMAINS.has(domain));
+  };
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (invalid || !email) return; // 회사 이메일 아닐 때 전송 막기
     // TODO: 이메일 인증 로직
+    // 서버에서도 반드시 2차 검증(화이트리스트/블랙리스트) 수행할 것
+    console.log('회사 이메일 인증 요청:', email);
   };
 
   return (
@@ -29,6 +56,8 @@ export default function SignupCompanyEmailPage() {
 
             <input
               type="email"
+              value={email}
+              onChange={handleChange}
               placeholder="name@jobda.com"
               className="h-12 w-full rounded-full border border-jd-gray-light
               bg-jd-white pl-12 pr-5 text-[#413F3F] placeholder:text-jd-gray-dark/70
@@ -37,13 +66,29 @@ export default function SignupCompanyEmailPage() {
               style={{ borderRadius: 15, paddingLeft: '3rem' }}
             />
           </div>
+          {/* 경고 문구 */}
+          {invalid && (
+            <div
+              id="email-warning"
+              className="flex items-start gap-1 text-[13px] text-[#D13B3B] leading-tight border-t border-[#D13B3B]/30 pt-2"
+            >
+              <span className="mt-[1px]">ⓘ</span>
+              <span>
+                기업 이메일로 가입해 주세요. 잡다는 기업 전용 채용 관리 솔루션으로 기업 이메일을
+                통한 가입을 권장하고 있습니다.
+              </span>
+            </div>
+          )}
         </div>
 
         <button
           type="submit"
-          className="h-12 w-full !rounded-[15] !text-white font-extrabold !bg-[#752F6D] [background-image:none]
-          !opacity-100 shadow-[0_4px_12px_rgba(117,47,109,.25)] hover:brightness-[1.05] active:brightness-95 transition"
-          style={{ height: 44, borderRadius: 15 }}
+          disabled={!email || invalid}
+          className="h-12 w-full !rounded-[15px] !text-white font-extrabold !bg-[#752F6D] [background-image:none]
+          !opacity-100 shadow-[0_4px_12px_rgba(117,47,109,.25)] hover:brightness-[1.05] active:brightness-95 transition
+          ${!email || invalid ? 'bg-[#752F6D]/60 cursor-not-allowed' : 'bg-[#752F6D] hover:brightness-[1.05] active:brightness-95'}`}
+          style={{ height: 44 }"
+          style={{ height: 44 }}
         >
           이메일 인증
         </button>

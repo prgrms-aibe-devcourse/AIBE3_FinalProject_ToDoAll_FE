@@ -155,7 +155,8 @@ export default function SignupFormPage() {
               </div>
               <input
                 placeholder="예: 매니저"
-                name="signup-title"
+                name="user_field"
+                autoComplete="off"
                 className="h-12 w-full rounded-full border border-jd-gray-light bg-jd-white pl-12 pr-5 text-[#413F3F]
         placeholder:text-jd-gray-dark/70 outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
         focus:border-jd-gray-light focus:ring-0"
