@@ -50,9 +50,9 @@ const interviewSummary: InterviewSummary[] = [
 
 export default function InterviewChatRoomPage() {
   return (
-    <div className="flex flex-col h-screen bg-jd-white text-jd-black">
+    <div className="flex flex-col h-screen bg-jd-white text-jd-black overflow-hidden">
       {/* 헤더 */}
-      <header className="flex justify-between items-center px-10 py-6 h-20">
+      <header className="flex justify-between items-center px-10 py-6 h-20 flex-shrink-0">
         <h1 className="text-3xl font-semibold text-jd-black">면접</h1>
         <button className="bg-jd-yellow text-white px-6 py-2 rounded-lg hover:bg-jd-yellow-hover transition text-m font-semibold">
           면접 종료
@@ -60,10 +60,13 @@ export default function InterviewChatRoomPage() {
       </header>
 
       {/* 본문 (3열 레이아웃) */}
-      <div className="flex flex-1 gap-6 px-8 pb-8">
-        <ChatSection initialMessages={initialMessages} />
-        <QuestionNoteSection questionNotes={questionNotes} />
-        <InterviewSummarySection summaries={interviewSummary} />
+      <div className="flex flex-1 gap-6 px-8 pb-8 overflow-hidden">
+        {/* 내부 스크롤 방지용 */}
+        <div className="flex flex-1 gap-6 h-full overflow-hidden">
+          <ChatSection initialMessages={initialMessages} />
+          <QuestionNoteSection questionNotes={questionNotes} />
+          <InterviewSummarySection summaries={interviewSummary} />
+        </div>
       </div>
     </div>
   );

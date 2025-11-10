@@ -16,9 +16,9 @@ export default function ChatSection({ initialMessages }: ChatSectionProps) {
   };
 
   return (
-    <div className="flex flex-col w-[40%] bg-white border border-jd-gray-light rounded-2xl shadow-md p-6">
+    <div className="flex flex-col flex-1 max-h-full bg-white border border-jd-gray-light rounded-2xl shadow-md p-6 overflow-hidden">
       {/* 채팅 리스트 */}
-      <div className="flex-1 overflow-y-auto space-y-3 mb-4">
+      <div className="flex-1 overflow-y-auto space-y-3 mb-4 pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
         {messages.map((m) => (
           <div key={m.id} className={`flex ${m.isMine ? 'justify-end' : 'justify-start'}`}>
             {!m.isMine && (
@@ -42,7 +42,7 @@ export default function ChatSection({ initialMessages }: ChatSectionProps) {
       </div>
 
       {/* 입력창 */}
-      <div className="flex items-center gap-2">
+      <div className="flex-shrink-0">
         <div className="flex items-center border border-jd-gray-light rounded-full px-4 py-1.5 w-full bg-white shadow-sm">
           <input
             type="text"
