@@ -1,8 +1,8 @@
-// src/features/auth/pages/SignupFormPage.tsx
 import type React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import AuthShell from '../components/AuthShell';
+import PrivacyModal from '../components/PrivacyModal';
 
 export default function SignupFormPage() {
   const [searchParams] = useSearchParams();
@@ -24,6 +24,9 @@ export default function SignupFormPage() {
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
 
+  // 모달 트리거 버튼 ref
+  const openPrivacyBtnRef = useRef<HTMLButtonElement | null>(null);
+
   // 검증 함수 먼저 선언
   const validatePassword = (pw: string) => /[a-zA-Z]/.test(pw) && /\d/.test(pw) && pw.length >= 8;
 
@@ -44,9 +47,6 @@ export default function SignupFormPage() {
   const isPasswordValid = validatePassword(password); // 영어+숫자+8자
   const isPasswordMatch = password.length > 0 && password === passwordConfirm; // 일치
   const isRequiredFilled = !!companyName.trim() && !!name.trim() && !!position.trim(); // 반드시 boolean
-  const isFormValid = Boolean(
-    isRequiredFilled && isPasswordValid && isPasswordMatch && notContainsPII
-  );
 
   // touched 상태 추가
   const [touched, setTouched] = useState({
@@ -57,6 +57,13 @@ export default function SignupFormPage() {
     passwordConfirm: false,
   });
   const [didSubmit, setDidSubmit] = useState(false);
+  const [consentChecked, setConsentChecked] = useState(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+
+  //최종 유효성에 동의 포함
+  const isFormValid = Boolean(
+    isRequiredFilled && isPasswordValid && isPasswordMatch && notContainsPII && consentChecked
+  );
 
   // 공통 헬퍼: onBlur 시 즉석 에러 세팅
   const setFieldError = (key: 'companyName' | 'name' | 'position', value: string) => {
@@ -94,7 +101,7 @@ export default function SignupFormPage() {
       return; //  서버 전송 중단
     }
 
-    // 2) 최종 안전장치: 폼이 유효하지 않으면 전송 금지
+    //  최종 안전장치: 폼이 유효하지 않으면 전송 금지
     if (!isFormValid) return;
 
     setErrors({});
@@ -351,6 +358,44 @@ export default function SignupFormPage() {
               <span aria-hidden>ⓘ</span> 비밀번호가 일치하지 않습니다
             </p>
           )}
+        {/* 개인정보 동의 섹션 */}
+        <div className="mt-2">
+          <label className="flex items-start gap-2 text-sm text-[#413F3F]">
+            <input
+              type="checkbox"
+              checked={consentChecked}
+              onChange={(e) => setConsentChecked(e.target.checked)}
+              className="mt-1 h-4 w-4 rounded border-jd-gray-light text-[#752F6D] focus:ring-[#752F6D]"
+              required
+            />
+            <span>
+              개인정보 수집 및 이용에 동의합니다.
+              <button
+                type="button"
+                ref={openPrivacyBtnRef} // 트리거 버튼 ref 저장
+                onClick={() => setShowPrivacyModal(true)}
+                className="ml-2 underline text-[#752F6D] hover:brightness-110"
+              >
+                자세히 보기
+              </button>
+            </span>
+          </label>
+
+          {didSubmit && !consentChecked && (
+            <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
+              <span aria-hidden>ⓘ</span> 동의가 필요합니다.
+            </p>
+          )}
+        </div>
+
+        {/* 모달 */}
+        {showPrivacyModal && (
+          <PrivacyModal
+            onClose={() => setShowPrivacyModal(false)}
+            title="개인정보 수집‧이용 동의"
+            returnFocusRef={openPrivacyBtnRef} // 닫힐 때 포커스 복귀
+          />
+        )}
 
         {/* 회원가입 버튼 */}
         <div className="flex justify-end">
