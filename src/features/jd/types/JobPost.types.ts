@@ -4,7 +4,7 @@ export interface JobPost {
   id: string;
   title: string;
   location: string;
-  applicantsCount: number;
+  applicantCount: number;
   status: JobStatus;
   skills: string[];
   thumbnailUrl?: string;
