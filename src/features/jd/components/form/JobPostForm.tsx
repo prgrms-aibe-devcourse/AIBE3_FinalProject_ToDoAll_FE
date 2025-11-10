@@ -7,14 +7,14 @@ export type JobPostFormValues = {
   workType: string; // 근무 형태
   experience: string;
   location: string;
-  postedAt: string; // ISO (시작일)
-  deadline?: string; // ISO (마감일)
+  postedAt: string;
+  deadline?: string;
   education: string;
-  salary: string; // 근무 급여/조건
-  benefits: string; // 복리후생 (문장)
-  description: string; // 업무 설명
-  requiredSkills: string[]; // 필수
-  preferredSkills: string[]; // 우대
+  salary: string;
+  benefits: string;
+  description: string;
+  requiredSkills: string[];
+  preferredSkills: string[];
 };
 
 export default function JobPostForm({
