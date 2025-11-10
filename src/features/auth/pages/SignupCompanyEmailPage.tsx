@@ -41,7 +41,7 @@ export default function SignupCompanyEmailPage() {
 
         <button
           type="submit"
-          className="h-12 w-full rounded-full !text-white font-extrabold !bg-[#752F6D] [background-image:none]
+          className="h-12 w-full !rounded-[15] !text-white font-extrabold !bg-[#752F6D] [background-image:none]
           !opacity-100 shadow-[0_4px_12px_rgba(117,47,109,.25)] hover:brightness-[1.05] active:brightness-95 transition"
           style={{ height: 44, borderRadius: 15 }}
         >

@@ -167,24 +167,18 @@ export default function LoginPage() {
                 type="submit"
                 disabled={submitting}
                 className="
-                  relative z-10
-                  h-12 w-full rounded-full
-                  !text-white
-                  !bg-[#F7A534]
-                  [background-image:none]
-                  !opacity-100
-                  shadow-[0_4px_12px_rgba(247,165,52,.25)]
-                  hover:brightness-[1.05] active:brightness-95
-                  transition
-                "
-                style={{
-                  height: 44,
-                  width: '100%',
-                  borderRadius: 15,
-                  color: '#fff',
-                  backgroundColor: '#F7A534',
-                  backgroundImage: 'none',
-                }}
+                relative z-10
+                h-[44px] w-full
+                !rounded-[15px]
+                !text-white
+                !bg-[#F7A534]
+                [background-image:none]
+                opacity-100
+                shadow-[0_4px_12px_rgba(247,165,52,.25)]
+                hover:brightness-[1.05]
+                active:brightness-95
+                transition
+              "
               >
                 <span
                   className="login-btn-text font-extrabold"

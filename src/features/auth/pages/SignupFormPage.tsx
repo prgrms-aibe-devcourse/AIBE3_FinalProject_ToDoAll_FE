@@ -73,28 +73,96 @@ export default function SignupFormPage() {
         {/* 기업명 */}
         <div className="flex flex-col gap-3">
           <label className="block text-sm font-semibold text-jd-black">기업명</label>
-          <input
-            placeholder="회사명을 입력하세요"
-            className="h-12 w-full rounded-full border border-jd-gray-light
+          <div className="relative">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#413F3F]">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"
+                className="text-[#413F3F]"
+              >
+                <path
+                  d="M4 22h16v-2h-1V4a1 1 0 0 0-1-1h-4V2h-4v1H6a1 1 0 0 0-1
+                1v16H4v2zm3-2V5h10v15H7zM9 7h2v2H9V7zm0 4h2v2H9v-2zm0 4h2v2H9v-2zm4-8h2v2h-2V7zm0
+                4h2v2h-2v-2zm0 4h2v2h-2v-2z"
+                />
+              </svg>
+            </div>
+            <input
+              placeholder="회사명을 입력하세요"
+              className="h-12 w-full rounded-full border border-jd-gray-light
               bg-jd-white pl-12 pr-5 text-[#413F3F] placeholder:text-jd-gray-dark/70
               outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
               focus:border-jd-gray-light focus:ring-0"
-            style={{ borderRadius: 15, paddingLeft: '3rem' }}
-          />
+              style={{ borderRadius: 15, paddingLeft: '3rem' }}
+            />
+          </div>
         </div>
 
-        {/* 이름 */}
-        <div className="flex flex-col gap-3">
-          <label className="block text-sm font-semibold text-jd-black">이름</label>
-          <input
-            placeholder="이름을 입력하세요"
-            autoComplete="new-password"
-            name="signup-name"
-            className="h-12 w-full rounded-full border border-jd-gray-light bg-jd-white px-5 text-[#413F3F]
-            placeholder:text-jd-gray-dark/70 outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
-            focus:border-jd-gray-light focus:ring-0"
-            style={{ borderRadius: 15, paddingLeft: '3rem' }}
-          />
+        {/* 이름 + 직책 (2열) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* 이름 */}
+          <div className="flex flex-col gap-3">
+            <label className="block text-sm font-semibold text-jd-black">이름</label>
+            <div className="relative">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#413F3F]">
+                {/* user icon */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-5 h-5"
+                  aria-hidden="true"
+                >
+                  <path d="M20 21v-2a4 4 0 0 0-3-3.87M4 21v-2a4 4 0 0 1 3-3.87m9-7.13a4 4 0 1 0-8 0 4 4 0 0 0 8 0Z" />
+                </svg>
+              </div>
+              <input
+                placeholder="이름을 입력하세요"
+                autoComplete="off"
+                name="signup-name"
+                className="h-12 w-full rounded-full border border-jd-gray-light bg-jd-white pl-12 pr-5 text-[#413F3F]
+        placeholder:text-jd-gray-dark/70 outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
+        focus:border-jd-gray-light focus:ring-0"
+                style={{ borderRadius: 15, paddingLeft: '3rem' }}
+              />
+            </div>
+          </div>
+
+          {/* 직책 */}
+          <div className="flex flex-col gap-3">
+            <label className="block text-sm font-semibold text-jd-black">직책</label>
+            <div className="relative">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#413F3F]">
+                {/* briefcase icon (18x18, currentColor) */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 64 64"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path d="M26 6c-2.18 0-4 1.82-4 4v2H5v17c0 2.21 1.79 4 4 4h19v-4h8v4h19c2.21 0 4-1.79 4-4V12H42v-2c0-2.18-1.82-4-4-4H26zm0 4h12v2H26v-2zm4 21v6h4v-6h-4zM5 35v15c0 2.21 1.79 4 4 4h46c2.21 0 4-1.79 4-4V36l-23-.43V39h-8v-3.57L5 35z" />
+                </svg>
+              </div>
+              <input
+                placeholder="예: 매니저"
+                name="signup-title"
+                className="h-12 w-full rounded-full border border-jd-gray-light bg-jd-white pl-12 pr-5 text-[#413F3F]
+        placeholder:text-jd-gray-dark/70 outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
+        focus:border-jd-gray-light focus:ring-0"
+                style={{ borderRadius: 15, paddingLeft: '3rem' }}
+              />
+            </div>
+          </div>
         </div>
 
         {/* 비밀번호 */}
@@ -163,8 +231,8 @@ export default function SignupFormPage() {
             type="submit"
             className="
               inline-flex items-center justify-center
-              h-12 w-56 select-none
-              !rounded-full !bg-[#752F6D] !text-white
+              h-12 w-40 select-none
+              !rounded-[15px] !bg-[#752F6D] !text-white
               font-extrabold tracking-tight
               [background-image:none] !opacity-100
               shadow-[0_4px_12px_rgba(117,47,109,.25)]
