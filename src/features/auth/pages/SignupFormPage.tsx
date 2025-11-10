@@ -13,6 +13,34 @@ export default function SignupFormPage() {
   const [companyEmail, setCompanyEmail] = useState('');
   const [loading, setLoading] = useState(true);
 
+  // 필수 입력값 상태들 — 컴포넌트 "안"에서 선언
+  const [name, setName] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [position, setPosition] = useState('');
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  // 비밀번호 상태값과 에러메시지 상태
+
+  const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
+  // 비밀번호 요건 체크(대/소문자, 숫자, 특수문자, 길이)
+  const pwChecks = {
+    english: /[a-zA-Z]/.test(password),
+    digit: /\d/.test(password),
+    length: password.length >= 8,
+  };
+
+  // “개인정보 미포함” (회사 이메일/이름 조합이 비밀번호에 들어가면 위험)
+  const piiTokens = [companyEmail?.split('@')[0] || ''].filter(Boolean);
+  const notContainsPII = !piiTokens.some(
+    (t) => t && password.toLowerCase().includes(t.toLowerCase())
+  );
+
+  // 폼 제출 시 최종 검증
+  const validatePassword = (pw: string) => /[a-zA-Z]/.test(pw) && /\d/.test(pw) && pw.length >= 8;
+
   useEffect(() => {
     // 개발 중엔 서버 요청 대신 임시 이메일 세팅
     const fakeEmail = 'developer@jobda.com';
@@ -22,8 +50,32 @@ export default function SignupFormPage() {
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // 1) 텍스트 필수값 에러 수집
+    const newErrors: { [key: string]: string } = {};
+    if (!companyName.trim()) newErrors.companyName = '회사명을 입력해주세요.';
+    if (!name.trim()) newErrors.name = '이름을 입력해주세요.';
+    if (!position.trim()) newErrors.position = '직책을 입력해주세요.';
+
+    // 2) 비밀번호 에러 메시지 결정(형식 → 일치 → PII)
+    let pwMsg = '';
+    if (!validatePassword(password)) {
+      pwMsg = '비밀번호는 영어 대소문자, 숫자를 포함해 8자 이상이어야 합니다.';
+    } else if (password !== passwordConfirm) {
+      pwMsg = '비밀번호가 일치하지 않습니다.';
+    } else if (!notContainsPII) {
+      pwMsg = '개인정보(이메일 ID 등)가 비밀번호에 포함되어 있습니다.';
+    }
+    setPasswordError(pwMsg);
+
+    // 3) 하나라도 에러가 있으면 제출 중단
+    if (Object.keys(newErrors).length > 0 || pwMsg) {
+      setErrors(newErrors);
+      return;
+    }
+    setErrors({});
     // TODO: 회원가입 요청 (token과 함께 전송)
-    console.log('회원가입 제출:', { companyEmail });
+    console.log('회원가입 제출:', { companyEmail, companyName, name, position, password });
   };
 
   if (loading) {
@@ -92,6 +144,13 @@ export default function SignupFormPage() {
               </svg>
             </div>
             <input
+              value={companyName}
+              onChange={(e) => {
+                setCompanyName(e.target.value); // ← 상태 실제 사용
+                if (errors.companyName) {
+                  setErrors((prev) => ({ ...prev, companyName: '' })); // 실시간 에러 해제(선택)
+                }
+              }}
               placeholder="회사명을 입력하세요"
               className="h-12 w-full rounded-full border border-jd-gray-light
               bg-jd-white pl-12 pr-5 text-[#413F3F] placeholder:text-jd-gray-dark/70
@@ -100,6 +159,11 @@ export default function SignupFormPage() {
               style={{ borderRadius: 15, paddingLeft: '3rem' }}
             />
           </div>
+          {errors.companyName && (
+            <p className="text-xs text-red-600 flex items-center gap-1 mt-0.5">
+              <span aria-hidden>ⓘ</span> {errors.companyName}
+            </p>
+          )}
         </div>
 
         {/* 이름 + 직책 (2열) */}
@@ -125,6 +189,13 @@ export default function SignupFormPage() {
                 </svg>
               </div>
               <input
+                value={name}
+                onChange={(e) => {
+                  setName(e.target.value); // ← 상태 실제 사용
+                  if (errors.name) {
+                    setErrors((prev) => ({ ...prev, name: '' }));
+                  }
+                }}
                 placeholder="이름을 입력하세요"
                 autoComplete="off"
                 name="signup-name"
@@ -134,6 +205,11 @@ export default function SignupFormPage() {
                 style={{ borderRadius: 15, paddingLeft: '3rem' }}
               />
             </div>
+            {errors.name && (
+              <p className="text-xs text-red-600 flex items-center gap-1 mt-0.5">
+                <span aria-hidden>ⓘ</span> {errors.name}
+              </p>
+            )}
           </div>
 
           {/* 직책 */}
@@ -154,6 +230,13 @@ export default function SignupFormPage() {
                 </svg>
               </div>
               <input
+                value={position}
+                onChange={(e) => {
+                  setPosition(e.target.value); // ← 상태 실제 사용
+                  if (errors.position) {
+                    setErrors((prev) => ({ ...prev, position: '' }));
+                  }
+                }}
                 placeholder="예: 매니저"
                 name="user_field"
                 autoComplete="off"
@@ -163,6 +246,11 @@ export default function SignupFormPage() {
                 style={{ borderRadius: 15, paddingLeft: '3rem' }}
               />
             </div>
+            {errors.position && (
+              <p className="text-xs text-red-600 flex items-center gap-1 mt-0.5">
+                <span aria-hidden>ⓘ</span> {errors.position}
+              </p>
+            )}
           </div>
         </div>
 
@@ -186,7 +274,9 @@ export default function SignupFormPage() {
             </div>
             <input
               type="password"
-              placeholder="••••••••"
+              placeholder="영어 대소문자, 숫자 8자 이상"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="h-12 w-full rounded-full border border-jd-gray-light
               bg-jd-white pl-12 pr-5 text-[#413F3F] placeholder:text-jd-gray-dark/70
               outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
@@ -194,6 +284,20 @@ export default function SignupFormPage() {
               style={{ borderRadius: 15, paddingLeft: '3rem' }}
             />
           </div>
+          {/* 요건 뱃지 */}
+          <div className="mt-1 flex flex-wrap gap-2">
+            <ReqBadge ok={pwChecks.english} label="영문자" />
+            <ReqBadge ok={pwChecks.digit} label="숫자" />
+            <ReqBadge ok={pwChecks.length} label="8자 이상" />
+            <ReqBadge ok={notContainsPII} label="개인정보 미포함" />
+          </div>
+
+          {/* 에러 메시지 (빨간 안내문) */}
+          {passwordError && (
+            <p className="text-xs text-red-600 flex items-center gap-1">
+              <span aria-hidden>❗</span> {passwordError}
+            </p>
+          )}
         </div>
 
         {/* 비밀번호 확인 */}
@@ -216,7 +320,9 @@ export default function SignupFormPage() {
             </div>
             <input
               type="password"
-              placeholder="••••••••"
+              placeholder="비밀번호를 한 번 더 입력하세요"
+              value={passwordConfirm}
+              onChange={(e) => setPasswordConfirm(e.target.value)}
               className="h-12 w-full rounded-full border border-jd-gray-light
               bg-jd-white pl-12 pr-5 text-[#413F3F] placeholder:text-jd-gray-dark/70
               outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
@@ -225,6 +331,12 @@ export default function SignupFormPage() {
             />
           </div>
         </div>
+        {/* 에러 메시지 표시 */}
+        {passwordConfirm && password !== passwordConfirm && (
+          <p className="text-xs text-red-600 flex items-center gap-1">
+            <span aria-hidden>ⓘ</span> 비밀번호가 일치하지 않습니다
+          </p>
+        )}
 
         {/* 회원가입 버튼 */}
         <div className="flex justify-end">
@@ -248,5 +360,16 @@ export default function SignupFormPage() {
         </div>
       </form>
     </AuthShell>
+  );
+}
+
+function ReqBadge({ ok, label }: { ok: boolean; label: string }) {
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px3 py-0.5 text-xs font-medium mr-1 mb-1
+        ${ok ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}
+    >
+      {ok ? '✓' : '✕'}&nbsp;{label}
+    </span>
   );
 }
