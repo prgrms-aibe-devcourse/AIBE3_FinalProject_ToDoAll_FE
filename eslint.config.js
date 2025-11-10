@@ -30,7 +30,16 @@ export default defineConfig([
       ...reactHooks.configs['recommended'].rules,
       ...reactRefresh.configs.vite.rules,
       'react/react-in-jsx-scope': 'off',
-      'react/prop-types': 'off', // TypeScript를 사용하므로 PropTypes 비활성화
+      'react/prop-types': 'off',
+      // Use core rule to avoid missing plugin in some environments
+      'no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
       'prettier/prettier': 'warn',
     },
     settings: {

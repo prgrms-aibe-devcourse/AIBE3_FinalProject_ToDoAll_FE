@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { ResumeData } from '../types/resumes.types';
 import BasicInfoForm from '../components/BasicInfoForm';
+import ResumeForm from '../components/ResumeForm';
 
 export default function ResumeCreatePage() {
   const [formData, setFormData] = useState<ResumeData>({
@@ -27,7 +28,15 @@ export default function ResumeCreatePage() {
 
   const handleChange = (
     field: keyof ResumeData,
-    value: string | boolean | string[] | ResumeData['files'] | ResumeData['address'] | '남' | '여'
+    value:
+      | string
+      | boolean
+      | string[]
+      | ResumeData['files']
+      | ResumeData['address']
+      | '남'
+      | '여'
+      | ResumeData['education']
   ) => {
     setFormData((prev) => {
       switch (field) {
@@ -37,6 +46,8 @@ export default function ResumeCreatePage() {
           return { ...prev, address: value as ResumeData['address'] };
         case 'gender':
           return { ...prev, gender: value as '남' | '여' };
+        case 'education':
+          return { ...prev, education: value as ResumeData['education'] };
         default:
           return { ...prev, [field]: value };
       }
@@ -56,6 +67,7 @@ export default function ResumeCreatePage() {
         </h2>
 
         <BasicInfoForm formData={formData} onChange={handleChange} />
+        <ResumeForm formData={formData} onChange={handleChange} />
       </div>
     </div>
   );
