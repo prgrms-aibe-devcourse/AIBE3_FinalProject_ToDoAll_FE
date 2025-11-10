@@ -68,6 +68,8 @@ export default function JobPostForm({
             />
           </Field>
         </div>
+      </div>
+      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-4">
         <div className="sm:col-span-1">
           <Field label="부서">
             <Input
@@ -96,6 +98,8 @@ export default function JobPostForm({
             />
           </Field>
         </div>
+      </div>
+      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-4">
         <div className="sm:col-span-1">
           <Field label="시작일">
             <Input
@@ -173,6 +177,9 @@ export default function JobPostForm({
           onChange={(n) => update('requiredSkills', n)}
           placeholder="Enter 또는 , 로 추가"
         />
+      </div>
+
+      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <TagInput
           label="우대 스킬"
           value={values.preferredSkills}
