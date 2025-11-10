@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Field, Input, TextArea, TagInput } from './Fields';
+import { Field, Input, TextArea, TagInput } from './fields';
 
 export type JobPostFormValues = {
   title: string;
