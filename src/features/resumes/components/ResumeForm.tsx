@@ -1,4 +1,4 @@
-import type { ResumeData, EducationItem } from '../types/resumes.types';
+import type { ResumeData, EducationItem, CareerItem } from '../types/resumes.types';
 import { useState } from 'react';
 import plusImg from '../../../assets/Vector-2.png';
 import dropImg from '../../../assets/Vector.png';
@@ -17,6 +17,7 @@ type Props = {
       | '남'
       | '여'
       | EducationItem[]
+      | CareerItem[]
   ) => void;
 };
 
@@ -32,6 +33,16 @@ export default function ResumeForm({ formData, onChange }: Props) {
 
   const [showFileForm, setShowFileForm] = useState(false);
   const [newFile, setNewFile] = useState<{ name: string; file?: File }>({ name: '' });
+
+  const [showCareerForm, setShowCareerForm] = useState(false);
+  const [newCareer, setNewCareer] = useState<CareerItem>({
+    company: '',
+    startDate: '',
+    endDate: '',
+    position: '',
+    department: '',
+    job: '',
+  });
 
   // 학력 구분 변경
   const handleTypeChange = (type: EducationItem['type']) => {
@@ -85,12 +96,30 @@ export default function ResumeForm({ formData, onChange }: Props) {
     const displayName = newFile.name?.trim() || newFile.file.name;
     const updatedFiles = {
       ...formData.files,
-      // 실제 업로드 없이 파일명만 저장 (타입: string[])
       etc: [...currentEtc, displayName],
     };
     onChange('files', updatedFiles);
     setShowFileForm(false);
     setNewFile({ name: '', file: undefined });
+  };
+
+  // 경력 추가
+  const addCareer = () => {
+    const { company, startDate, endDate, position, department, job } = newCareer;
+    if (!company || !startDate || !endDate || !position || !department || !job) {
+      alert('모든 항목을 입력해주세요.');
+      return;
+    }
+    onChange('career', [...(formData.career ?? []), newCareer]);
+    setShowCareerForm(false);
+    setNewCareer({
+      company: '',
+      startDate: '',
+      endDate: '',
+      position: '',
+      department: '',
+      job: '',
+    });
   };
 
   return (
@@ -110,7 +139,6 @@ export default function ResumeForm({ formData, onChange }: Props) {
         </button>
       </div>
 
-      {/* 파일 입력 폼 */}
       {showFileForm && (
         <div className="p-4 rounded-[10px] space-y-3">
           <div className="flex items-center gap-3">
@@ -118,12 +146,7 @@ export default function ResumeForm({ formData, onChange }: Props) {
               type="file"
               accept=".pdf,.docx,.pptx,.zip,.jpg,.png"
               className="border p-2 rounded-[10px] text-[#413F3F] flex-[40px]"
-              onChange={(e) =>
-                setNewFile({
-                  ...newFile,
-                  file: e.target.files?.[0],
-                })
-              }
+              onChange={(e) => setNewFile({ ...newFile, file: e.target.files?.[0] })}
             />
             <button
               type="button"
@@ -136,7 +159,6 @@ export default function ResumeForm({ formData, onChange }: Props) {
         </div>
       )}
 
-      {/* 업로드(추가)된 파일 목록 */}
       {((formData.files.etc && formData.files.etc.length > 0) || formData.files.portfolio) && (
         <div className="bg-white border border-[#E5E5E5] rounded-[10px] p-4 -mt-2">
           <div className="text-sm text-[#413F3F] font-medium mb-2">첨부된 파일</div>
@@ -149,7 +171,7 @@ export default function ResumeForm({ formData, onChange }: Props) {
         </div>
       )}
 
-      {/* 학력 헤더 */}
+      {/* 학력 */}
       <div className="bg-[#FAF8F8] border-t border-b border-[#E0E0E0] p-2 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-[#413F3F]">최종 학력 사항</h2>
         <button
@@ -164,7 +186,7 @@ export default function ResumeForm({ formData, onChange }: Props) {
 
       {/* 학력 리스트 */}
       <div>
-        {formData.education.map((edu, idx) => (
+        {formData.education.map((edu: EducationItem, idx: number) => (
           <div
             key={idx}
             className="flex gap-2 flex-wrap p-2 border-b last:border-b-0 border-[#837C7C] text-[#413F3F]"
@@ -179,10 +201,8 @@ export default function ResumeForm({ formData, onChange }: Props) {
         ))}
       </div>
 
-      {/* 학력 입력 폼 */}
       {showEduForm && (
         <div className="space-y-3 bg-[#FAFAFA] p-4 rounded-[10px] border border-[#E5E5E5]">
-          {/* 학력 구분 */}
           <div className="relative w-40">
             <select
               className="border px-3 py-2 pr-10 rounded-[10px] w-full appearance-none shadow-none outline-none text-[#413F3F]"
@@ -208,15 +228,12 @@ export default function ResumeForm({ formData, onChange }: Props) {
           {newEdu.type && (
             <>
               <div className="flex flex-wrap gap-3 items-center mt-2">
-                {/* 학교명 */}
                 <input
                   className="border py-2 px-3 rounded-[10px] w-48 text-[#413F3F]"
                   placeholder="학교명"
                   value={newEdu.name ?? ''}
                   onChange={(e) => setNewEdu({ ...newEdu, name: e.target.value })}
                 />
-
-                {/* 입학일, 졸업일 */}
                 <input
                   type="date"
                   className="border p-2 rounded-[10px] w-36 text-[#413F3F]"
@@ -229,8 +246,6 @@ export default function ResumeForm({ formData, onChange }: Props) {
                   value={newEdu.endDate ?? ''}
                   onChange={(e) => setNewEdu({ ...newEdu, endDate: e.target.value })}
                 />
-
-                {/* 졸업 여부 */}
                 <label className="flex items-center gap-2 h-full">
                   <input
                     type="checkbox"
@@ -241,7 +256,6 @@ export default function ResumeForm({ formData, onChange }: Props) {
                   <span className="text-[#413F3F]">졸업</span>
                 </label>
 
-                {/* 대학/대학원 추가 */}
                 {(newEdu.type === '대학' || newEdu.type === '대학원') && (
                   <>
                     <input
@@ -288,6 +302,103 @@ export default function ResumeForm({ formData, onChange }: Props) {
           )}
         </div>
       )}
+
+      {/* 경력 */}
+      <div className="bg-[#FAF8F8] border-t border-b border-[#E0E0E0] p-2 flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-[#413F3F]">경력</h2>
+        <button
+          type="button"
+          className="px-3 py-1 text-[#413F3F] flex items-center gap-1 hover:opacity-80 transition"
+          onClick={() => setShowCareerForm(true)}
+        >
+          <img src={plusImg} alt="plus" className="w-3 h-3" />
+          추가
+        </button>
+      </div>
+
+      {/* 경력 리스트 */}
+      <div>
+        {formData.career?.map((item: CareerItem, idx: number) => (
+          <div
+            key={idx}
+            className="flex gap-2 flex-wrap p-2 border-b last:border-b-0 border-[#837C7C] text-[#413F3F]"
+          >
+            <span className="font-medium">{item.company}</span>
+            <span>
+              {item.startDate} ~ {item.endDate}
+            </span>
+            <span>{item.position}</span>
+            <span>{item.department}</span>
+            <span>{item.job}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* 경력 입력 폼 */}
+      {showCareerForm && (
+        <div className="space-y-3 bg-[#FAFAFA] p-4 rounded-[10px] border border-[#E5E5E5]">
+          <div className="flex flex-wrap gap-3 items-center mt-2">
+            <input
+              className="border py-2 px-3 rounded-[10px] w-48"
+              placeholder="회사명"
+              value={newCareer.company}
+              onChange={(e) => setNewCareer({ ...newCareer, company: e.target.value })}
+            />
+            <input
+              type="month"
+              className="border p-2 rounded-[10px] w-36"
+              placeholder="입사년월"
+              value={newCareer.startDate}
+              onChange={(e) => setNewCareer({ ...newCareer, startDate: e.target.value })}
+            />
+            <input
+              type="month"
+              className="border p-2 rounded-[10px] w-36"
+              placeholder="퇴사년월"
+              value={newCareer.endDate}
+              onChange={(e) => setNewCareer({ ...newCareer, endDate: e.target.value })}
+            />
+            <input
+              className="border py-2 px-3 rounded-[10px] w-36"
+              placeholder="직무"
+              value={newCareer.job}
+              onChange={(e) => setNewCareer({ ...newCareer, job: e.target.value })}
+            />
+            <input
+              className="border py-2 px-3 rounded-[10px] w-36"
+              placeholder="근무부서"
+              value={newCareer.department}
+              onChange={(e) => setNewCareer({ ...newCareer, department: e.target.value })}
+            />
+            <input
+              className="border py-2 px-3 rounded-[10px] w-36"
+              placeholder="직급/직책"
+              value={newCareer.position}
+              onChange={(e) => setNewCareer({ ...newCareer, position: e.target.value })}
+            />
+          </div>
+          <div className="flex justify-end mt-3">
+            <button
+              type="button"
+              className="px-4 py-2 bg-[#E3DBDB] text-[#413F3F] rounded-[8px] hover:bg-[#B1A0A0] transition"
+              onClick={addCareer}
+            >
+              입력
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 기타 섹션 */}
+      <div className="bg-[#FAF8F8] border-t border-b border-[#E0E0E0] p-2 flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-[#413F3F]">스킬</h2>
+      </div>
+      <div className="bg-[#FAF8F8] border-t border-b border-[#E0E0E0] p-2 flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-[#413F3F]">경험/활동/교육</h2>
+      </div>
+      <div className="bg-[#FAF8F8] border-t border-b border-[#E0E0E0] p-2 flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-[#413F3F]">자격/어학/수상</h2>
+      </div>
     </section>
   );
 }
