@@ -5,7 +5,7 @@ const demo: JobDetail = {
   id: '1',
   title: '시니어 프론트엔드 개발자',
   location: '서울 강남구',
-  applicantsCount: 25,
+  applicantCount: 25,
   status: 'OPEN',
   skills: ['Tailwind CSS', 'Git', 'Next.js', 'TypeScript', 'React'],
   postedAt: '2024-10-15T00:00:00.000Z',

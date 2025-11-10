@@ -44,7 +44,7 @@ export default function JobPostForm({
     ...defaultValues,
   });
 
-  const update = (k: keyof JobPostFormValues, v: any) => setValues((s) => ({ ...s, [k]: v }));
+  const update = (k: keyof JobPostFormValues, v: unknown) => setValues((s) => ({ ...s, [k]: v }));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
