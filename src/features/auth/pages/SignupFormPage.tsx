@@ -19,11 +19,13 @@ export default function SignupFormPage() {
   const [position, setPosition] = useState('');
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-  // 비밀번호 상태값과 에러메시지 상태
+  // 비밀번호 입력 상태
 
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
-  const [passwordError, setPasswordError] = useState('');
+
+  // 검증 함수 먼저 선언
+  const validatePassword = (pw: string) => /[a-zA-Z]/.test(pw) && /\d/.test(pw) && pw.length >= 8;
 
   // 비밀번호 요건 체크(대/소문자, 숫자, 특수문자, 길이)
   const pwChecks = {
@@ -38,8 +40,37 @@ export default function SignupFormPage() {
     (t) => t && password.toLowerCase().includes(t.toLowerCase())
   );
 
-  // 폼 제출 시 최종 검증
-  const validatePassword = (pw: string) => /[a-zA-Z]/.test(pw) && /\d/.test(pw) && pw.length >= 8;
+  // 파생 상태: 이제야 최종 유효성 계산
+  const isPasswordValid = validatePassword(password); // 영어+숫자+8자
+  const isPasswordMatch = password.length > 0 && password === passwordConfirm; // 일치
+  const isRequiredFilled = !!companyName.trim() && !!name.trim() && !!position.trim(); // 반드시 boolean
+  const isFormValid = Boolean(
+    isRequiredFilled && isPasswordValid && isPasswordMatch && notContainsPII
+  );
+
+  // touched 상태 추가
+  const [touched, setTouched] = useState({
+    companyName: false,
+    name: false,
+    position: false,
+    password: false,
+    passwordConfirm: false,
+  });
+  const [didSubmit, setDidSubmit] = useState(false);
+
+  // 공통 헬퍼: onBlur 시 즉석 에러 세팅
+  const setFieldError = (key: 'companyName' | 'name' | 'position', value: string) => {
+    setErrors((prev) => ({
+      ...prev,
+      [key]: value.trim()
+        ? ''
+        : key === 'companyName'
+          ? '회사명을 입력해주세요.'
+          : key === 'name'
+            ? '이름을 입력해주세요.'
+            : '직책을 입력해주세요.',
+    }));
+  };
 
   useEffect(() => {
     // 개발 중엔 서버 요청 대신 임시 이메일 세팅
@@ -50,32 +81,31 @@ export default function SignupFormPage() {
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setDidSubmit(true);
 
-    // 1) 텍스트 필수값 에러 수집
+    // 텍스트 필수값 에러 수집
     const newErrors: { [key: string]: string } = {};
     if (!companyName.trim()) newErrors.companyName = '회사명을 입력해주세요.';
     if (!name.trim()) newErrors.name = '이름을 입력해주세요.';
     if (!position.trim()) newErrors.position = '직책을 입력해주세요.';
 
-    // 2) 비밀번호 에러 메시지 결정(형식 → 일치 → PII)
-    let pwMsg = '';
-    if (!validatePassword(password)) {
-      pwMsg = '비밀번호는 영어 대소문자, 숫자를 포함해 8자 이상이어야 합니다.';
-    } else if (password !== passwordConfirm) {
-      pwMsg = '비밀번호가 일치하지 않습니다.';
-    } else if (!notContainsPII) {
-      pwMsg = '개인정보(이메일 ID 등)가 비밀번호에 포함되어 있습니다.';
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors); //  필수값 미입력만 경고로 유지
+      return; //  서버 전송 중단
     }
-    setPasswordError(pwMsg);
 
-    // 3) 하나라도 에러가 있으면 제출 중단
-    if (Object.keys(newErrors).length > 0 || pwMsg) {
-      setErrors(newErrors);
-      return;
-    }
+    // 2) 최종 안전장치: 폼이 유효하지 않으면 전송 금지
+    if (!isFormValid) return;
+
     setErrors({});
     // TODO: 회원가입 요청 (token과 함께 전송)
-    console.log('회원가입 제출:', { companyEmail, companyName, name, position, password });
+    console.log('회원가입 제출:', {
+      companyEmail,
+      companyName,
+      name,
+      position,
+      passwordLen: password.length,
+    });
   };
 
   if (loading) {
@@ -89,39 +119,6 @@ export default function SignupFormPage() {
   return (
     <AuthShell>
       <form onSubmit={onSubmit} className="flex flex-col gap-6">
-        {/*  인증된 회사 이메일 (개발용 고정 표시) */}
-        <div className="flex flex-col gap-3">
-          <label className="block text-sm font-semibold text-jd-black">회사 이메일 (인증됨)</label>
-          <div className="relative">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#413F3F]">
-              {/* mail icon */}
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 4-8 5-8-5V6l8 5 8-5v2Z" />
-              </svg>
-            </div>
-            <input
-              value={companyEmail}
-              readOnly
-              className="h-12 w-full rounded-full border border-jd-gray-light bg-gray-100 pl-12 pr-5 text-[#413F3F]
-              placeholder:text-jd-gray-dark/70 outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
-              focus:border-jd-gray-light focus:ring-0 cursor-not-allowed select-none"
-              style={{ borderRadius: 15, paddingLeft: '3rem' }}
-            />
-          </div>
-          <div className="flex items-center gap-2 text-xs text-[#413F3F]/80">
-            <span className="inline-flex items-center rounded-full bg-[#E3DBDB] px-2 py-0.5">
-              인증 완료
-            </span>
-            <span>이메일은 변경할 수 없습니다.</span>
-          </div>
-        </div>
-
         {/* 기업명 */}
         <div className="flex flex-col gap-3">
           <label className="block text-sm font-semibold text-jd-black">기업명</label>
@@ -148,8 +145,12 @@ export default function SignupFormPage() {
               onChange={(e) => {
                 setCompanyName(e.target.value); // ← 상태 실제 사용
                 if (errors.companyName) {
-                  setErrors((prev) => ({ ...prev, companyName: '' })); // 실시간 에러 해제(선택)
+                  setErrors((prev) => ({ ...prev, companyName: '' }));
                 }
+              }}
+              onBlur={() => {
+                setTouched((prev) => ({ ...prev, companyName: true }));
+                setFieldError('companyName', companyName);
               }}
               placeholder="회사명을 입력하세요"
               className="h-12 w-full rounded-full border border-jd-gray-light
@@ -159,7 +160,7 @@ export default function SignupFormPage() {
               style={{ borderRadius: 15, paddingLeft: '3rem' }}
             />
           </div>
-          {errors.companyName && (
+          {(touched.companyName || didSubmit) && errors.companyName && (
             <p className="text-xs text-red-600 flex items-center gap-1 mt-0.5">
               <span aria-hidden>ⓘ</span> {errors.companyName}
             </p>
@@ -194,7 +195,12 @@ export default function SignupFormPage() {
                   setName(e.target.value); // ← 상태 실제 사용
                   if (errors.name) {
                     setErrors((prev) => ({ ...prev, name: '' }));
+                    setFieldError('name', name);
                   }
+                }}
+                onBlur={() => {
+                  setTouched((p) => ({ ...p, name: true }));
+                  setFieldError('name', name);
                 }}
                 placeholder="이름을 입력하세요"
                 autoComplete="off"
@@ -205,7 +211,7 @@ export default function SignupFormPage() {
                 style={{ borderRadius: 15, paddingLeft: '3rem' }}
               />
             </div>
-            {errors.name && (
+            {(touched.name || didSubmit) && errors.name && (
               <p className="text-xs text-red-600 flex items-center gap-1 mt-0.5">
                 <span aria-hidden>ⓘ</span> {errors.name}
               </p>
@@ -237,6 +243,10 @@ export default function SignupFormPage() {
                     setErrors((prev) => ({ ...prev, position: '' }));
                   }
                 }}
+                onBlur={() => {
+                  setTouched((p) => ({ ...p, position: true }));
+                  setFieldError('position', position);
+                }}
                 placeholder="예: 매니저"
                 name="user_field"
                 autoComplete="off"
@@ -246,7 +256,7 @@ export default function SignupFormPage() {
                 style={{ borderRadius: 15, paddingLeft: '3rem' }}
               />
             </div>
-            {errors.position && (
+            {(touched.position || didSubmit) && errors.position && (
               <p className="text-xs text-red-600 flex items-center gap-1 mt-0.5">
                 <span aria-hidden>ⓘ</span> {errors.position}
               </p>
@@ -274,9 +284,14 @@ export default function SignupFormPage() {
             </div>
             <input
               type="password"
-              placeholder="영어 대소문자, 숫자 8자 이상"
+              placeholder="영문자, 숫자 8자 이상"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              onBlur={() => setTouched((p) => ({ ...p, password: true }))}
+              minLength={8}
+              autoComplete="new-password"
+              autoCapitalize="none"
+              spellCheck={false}
               className="h-12 w-full rounded-full border border-jd-gray-light
               bg-jd-white pl-12 pr-5 text-[#413F3F] placeholder:text-jd-gray-dark/70
               outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
@@ -291,13 +306,6 @@ export default function SignupFormPage() {
             <ReqBadge ok={pwChecks.length} label="8자 이상" />
             <ReqBadge ok={notContainsPII} label="개인정보 미포함" />
           </div>
-
-          {/* 에러 메시지 (빨간 안내문) */}
-          {passwordError && (
-            <p className="text-xs text-red-600 flex items-center gap-1">
-              <span aria-hidden>❗</span> {passwordError}
-            </p>
-          )}
         </div>
 
         {/* 비밀번호 확인 */}
@@ -323,6 +331,10 @@ export default function SignupFormPage() {
               placeholder="비밀번호를 한 번 더 입력하세요"
               value={passwordConfirm}
               onChange={(e) => setPasswordConfirm(e.target.value)}
+              onBlur={() => setTouched((p) => ({ ...p, passwordConfirm: true }))}
+              autoComplete="new-password"
+              autoCapitalize="none"
+              spellCheck={false}
               className="h-12 w-full rounded-full border border-jd-gray-light
               bg-jd-white pl-12 pr-5 text-[#413F3F] placeholder:text-jd-gray-dark/70
               outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
@@ -332,27 +344,33 @@ export default function SignupFormPage() {
           </div>
         </div>
         {/* 에러 메시지 표시 */}
-        {passwordConfirm && password !== passwordConfirm && (
-          <p className="text-xs text-red-600 flex items-center gap-1">
-            <span aria-hidden>ⓘ</span> 비밀번호가 일치하지 않습니다
-          </p>
-        )}
+        {(touched.passwordConfirm || didSubmit) &&
+          passwordConfirm &&
+          password !== passwordConfirm && (
+            <p className="text-xs text-red-600 flex items-center gap-1">
+              <span aria-hidden>ⓘ</span> 비밀번호가 일치하지 않습니다
+            </p>
+          )}
 
         {/* 회원가입 버튼 */}
         <div className="flex justify-end">
           <button
             type="submit"
-            className="
+            disabled={!isFormValid}
+            aria-disabled={!isFormValid}
+            className={`
               inline-flex items-center justify-center
               h-12 w-40 select-none
-              !rounded-[15px] !bg-[#752F6D] !text-white
-              font-extrabold tracking-tight
+              !rounded-[15px] !text-white font-extrabold tracking-tight
               [background-image:none] !opacity-100
               shadow-[0_4px_12px_rgba(117,47,109,.25)]
-              hover:brightness-[1.05] active:brightness-95
-              transition will-change-transform
-              outline-none ring-0 focus-visible:ring-2 focus-visible:ring-[#752F6D]/40
-            "
+              transition will-change-transform outline-none
+              ${
+                isFormValid
+                  ? '!bg-[#752F6D] hover:brightness-[1.05] active:brightness-95 focus-visible:ring-2 focus-visible:ring-[#752F6D]/40'
+                  : '!bg-[#E3DBDB] text-[#413F3F]/60 cursor-not-allowed opacity-70'
+              }
+          `}
             style={{ appearance: 'none', WebkitAppearance: 'none' }}
           >
             회원가입
@@ -366,8 +384,11 @@ export default function SignupFormPage() {
 function ReqBadge({ ok, label }: { ok: boolean; label: string }) {
   return (
     <span
-      className={`inline-flex items-center rounded-full px3 py-0.5 text-xs font-medium mr-1 mb-1
-        ${ok ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}
+      className={`inline-flex items-center justify-center rounded-full
+        !px-2.5 !py-1.5 text-[11.5px] font-medium leading-[1.1]
+        border border-transparent
+        ${ok ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}
+        shadow-sm`}
     >
       {ok ? '✓' : '✕'}&nbsp;{label}
     </span>
