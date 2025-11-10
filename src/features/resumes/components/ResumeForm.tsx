@@ -2,10 +2,10 @@ import type { ResumeData, EducationItem } from '../types/resumes.types';
 import { useState } from 'react';
 import plusImg from '../../../assets/Vector-2.png';
 import dropImg from '../../../assets/Vector.png';
+import purplePlusImg from '../../../assets/Vector-3.png';
 
 type Props = {
   formData: ResumeData;
-
   onChange: (
     _field: keyof ResumeData,
     _value:
@@ -30,7 +30,10 @@ export default function ResumeForm({ formData, onChange }: Props) {
     endDate: '',
   });
 
-  // 학력 구분 변경 시
+  const [showFileForm, setShowFileForm] = useState(false);
+  const [newFile, setNewFile] = useState<{ name: string; file?: File }>({ name: '' });
+
+  // 학력 구분 변경
   const handleTypeChange = (type: EducationItem['type']) => {
     if (type === '대학' || type === '대학원') {
       setNewEdu({
@@ -72,9 +75,81 @@ export default function ResumeForm({ formData, onChange }: Props) {
     });
   };
 
+  // 파일 추가
+  const addFile = () => {
+    if (!newFile.file) {
+      alert('파일을 선택해주세요.');
+      return;
+    }
+    const currentEtc = formData.files.etc ?? [];
+    const displayName = newFile.name?.trim() || newFile.file.name;
+    const updatedFiles = {
+      ...formData.files,
+      // 실제 업로드 없이 파일명만 저장 (타입: string[])
+      etc: [...currentEtc, displayName],
+    };
+    onChange('files', updatedFiles);
+    setShowFileForm(false);
+    setNewFile({ name: '', file: undefined });
+  };
+
   return (
     <section className="bg-white p-6 space-y-6 mt-6 rounded-[10px] shadow-sm text-[#413F3F]">
-      {/* 헤더 */}
+      {/* 포트폴리오/기타문서 */}
+      <div className="bg-[#FAF8F8] border-t border-b border-[#E0E0E0] p-2 flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-[#413F3F]">포트폴리오 및 기타문서</h2>
+      </div>
+      <div className="flex justify-center">
+        <button
+          type="button"
+          className="flex items-center gap-2 border rounded-[10px] px-4 py-2 text-[#752F6D] hover:bg-[#F3EAF7] transition"
+          onClick={() => setShowFileForm(!showFileForm)}
+        >
+          <img src={purplePlusImg} alt="plusPerple" className="w-4 h-4" />
+          포트폴리오 및 기타문서 추가
+        </button>
+      </div>
+
+      {/* 파일 입력 폼 */}
+      {showFileForm && (
+        <div className="p-4 rounded-[10px] space-y-3">
+          <div className="flex items-center gap-3">
+            <input
+              type="file"
+              accept=".pdf,.docx,.pptx,.zip,.jpg,.png"
+              className="border p-2 rounded-[10px] text-[#413F3F] flex-[40px]"
+              onChange={(e) =>
+                setNewFile({
+                  ...newFile,
+                  file: e.target.files?.[0],
+                })
+              }
+            />
+            <button
+              type="button"
+              className="px-4 py-2 bg-[#E3DBDB] text-[#413F3F] rounded-[8px] hover:bg-[#B1A0A0] transition"
+              onClick={addFile}
+            >
+              추가
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 업로드(추가)된 파일 목록 */}
+      {((formData.files.etc && formData.files.etc.length > 0) || formData.files.portfolio) && (
+        <div className="bg-white border border-[#E5E5E5] rounded-[10px] p-4 -mt-2">
+          <div className="text-sm text-[#413F3F] font-medium mb-2">첨부된 파일</div>
+          <ul className="list-disc pl-5 space-y-1 text-sm text-[#413F3F]">
+            {formData.files.portfolio ? <li>{formData.files.portfolio}</li> : null}
+            {formData.files.etc?.map((name, i) => (
+              <li key={name + i}>{name}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* 학력 헤더 */}
       <div className="bg-[#FAF8F8] border-t border-b border-[#E0E0E0] p-2 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-[#413F3F]">최종 학력 사항</h2>
         <button
@@ -130,10 +205,9 @@ export default function ResumeForm({ formData, onChange }: Props) {
             />
           </div>
 
-          {/* 학력 구분 선택 시 입력 폼 */}
           {newEdu.type && (
             <>
-              <div className="flex flex-wrap gap-3 items-center">
+              <div className="flex flex-wrap gap-3 items-center mt-2">
                 {/* 학교명 */}
                 <input
                   className="border py-2 px-3 rounded-[10px] w-48 text-[#413F3F]"
@@ -167,7 +241,7 @@ export default function ResumeForm({ formData, onChange }: Props) {
                   <span className="text-[#413F3F]">졸업</span>
                 </label>
 
-                {/* 대학/대학원일 경우 추가 항목 */}
+                {/* 대학/대학원 추가 */}
                 {(newEdu.type === '대학' || newEdu.type === '대학원') && (
                   <>
                     <input
@@ -177,13 +251,9 @@ export default function ResumeForm({ formData, onChange }: Props) {
                         (newEdu as Extract<EducationItem, { type: '대학' | '대학원' }>).major ?? ''
                       }
                       onChange={(e) =>
-                        setNewEdu({
-                          ...newEdu,
-                          major: e.target.value,
-                        } as EducationItem)
+                        setNewEdu({ ...newEdu, major: e.target.value } as EducationItem)
                       }
                     />
-
                     <select
                       className="border p-2 rounded-[10px] w-28 text-[#413F3F]"
                       value={
@@ -204,11 +274,10 @@ export default function ResumeForm({ formData, onChange }: Props) {
                 )}
               </div>
 
-              {/* 입력 버튼 */}
               <div className="flex justify-end mt-3">
                 <button
                   type="button"
-                  className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
+                  className="px-4 py-2 bg-[#E3DBDB] text-[#413F3F] rounded-[8px] hover:bg-[#B1A0A0] transition"
                   disabled={!newEdu.type || !newEdu.name || !newEdu.startDate || !newEdu.endDate}
                   onClick={addEducation}
                 >
