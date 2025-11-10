@@ -26,7 +26,7 @@ export default function QuestionSection({
 }: QuestionSectionProps) {
   return (
     <div className="mb-6 border-b border-gray-100 pb-4">
-      {/* 🟣 주제 제목 */}
+      {/* 주제 제목 */}
       <div className="flex items-center justify-between mb-2">
         {isEditing ? (
           <input
@@ -42,7 +42,7 @@ export default function QuestionSection({
           <h3 className="italic text-jd-gray-dark text-[20px]">주제가 입력되지 않았습니다</h3>
         )}
 
-        {/* 🗑 주제 삭제 버튼 */}
+        {/* 주제 삭제 버튼 */}
         {isEditing && (
           <button
             onClick={() => onDeleteSection(sectionIdx)}
@@ -53,7 +53,7 @@ export default function QuestionSection({
         )}
       </div>
 
-      {/* 🟣 질문 목록 */}
+      {/* 질문 목록 */}
       <ul className="space-y-1 text-jd-black list-disc pl-8 ml-4">
         {section.questions.map((q, i) => (
           <li key={i} className="flex items-center gap-2">
@@ -66,7 +66,7 @@ export default function QuestionSection({
                   placeholder="새로운 질문을 입력하세요"
                   className="border border-jd-gray-light rounded px-2 py-1 w-full text-sm focus:outline-jd-gray-dark"
                 />
-                {/* 🗑 질문 삭제 버튼 */}
+                {/* 질문 삭제 버튼 */}
                 <button
                   onClick={() => onDeleteQuestion(sectionIdx, i)}
                   className="text-jd-gray-dark hover:text-jd-scarlet text-[12px]"
@@ -83,7 +83,7 @@ export default function QuestionSection({
         ))}
       </ul>
 
-      {/* 🟣 질문 추가 버튼 */}
+      {/* 질문 추가 버튼 */}
       {isEditing && (
         <button
           onClick={() => onAddQuestion(sectionIdx)}
