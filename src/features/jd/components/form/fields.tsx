@@ -78,6 +78,15 @@ export function TagInput({
     <div>
       {label ? <div className="mb-1 text-[12px] font-medium text-gray-600">{label}</div> : null}
       <div className="flex flex-wrap items-center gap-2 rounded-xl border border-gray-200 bg-white px-2 py-2">
+        <input
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={onKeyDown}
+          placeholder={placeholder}
+          className="flex-1 min-w-[120px] border-none bg-transparent px-2 py-1 text-sm focus:outline-none"
+        />
+      </div>
+      <div className="mt-2 flex flex-wrap gap-2">
         {value.map((t, i) => (
           <Pill key={t + i} className="bg-white">
             <span className="mr-1">{t}</span>
@@ -91,13 +100,6 @@ export function TagInput({
             </button>
           </Pill>
         ))}
-        <input
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={onKeyDown}
-          placeholder={placeholder}
-          className="flex-1 min-w-[120px] border-none bg-transparent px-2 py-1 text-sm focus:outline-none"
-        />
       </div>
     </div>
   );
