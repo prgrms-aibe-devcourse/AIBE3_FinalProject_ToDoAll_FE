@@ -47,7 +47,7 @@ const questionData = [
 export default function InterviewQuestionNotePage() {
   return (
     <div className="mx-auto p-8 min-h-screen bg-[#fbf9f9] font-sans font-semibold">
-      <h1 className="text-2xl font-bold mb-6 text-[#413F3F]">질문 노트</h1>
+      <h1 className="text-2xl font-bold mb-6 text-jd-black">질문 노트</h1>
 
       <div className="flex gap-8">
         {/* 왼쪽 프로필 */}
@@ -60,33 +60,36 @@ export default function InterviewQuestionNotePage() {
                 className="w-12 h-12 rounded-full object-cover"
               />
               <div>
-                <h2 className="text-sm text-[#413F3F]">{profileData.name}</h2>
-                <p className="text-xs text-[#837C7C]">{profileData.title}</p>
+                <h2 className="text-sm text-jd-black">{profileData.name}</h2>
+                <p className="text-xs text-jd-gray-dark">{profileData.title}</p>
               </div>
             </div>
 
             {/* 일정 / 시간 / 면접관 */}
-            <div className="flex items-start text-[12px] text-gray-700 mb-2 gap-x-6 mt-1">
-              <div className="flex flex-col">
-                <span className="font-medium text-gray-500 mb-0.5">일자</span>
+            <div className="flex items-start text-[12px] text-jd-black mb-2 mt-1">
+              <div className="flex flex-col basis-1/3">
+                <span className="font-medium text-jd-gray-dark mb-0.5">일자</span>
                 <span>{profileData.date}</span>
               </div>
-              <div className="flex flex-col">
-                <span className="font-medium text-gray-500 mb-0.5">시간</span>
+              <div className="flex flex-col basis-1/3">
+                <span className="font-medium text-jd-gray-dark mb-0.5">시간</span>
                 <span>{profileData.time}</span>
               </div>
-              <div className="flex flex-col">
-                <span className="font-medium text-gray-500 mb-0.5">면접관</span>
+              <div className="flex flex-col basis-1/3">
+                <span className="font-medium text-jd-gray-dark mb-0.5">면접관</span>
                 <span>{profileData.interviewers.join(', ')}</span>
               </div>
             </div>
 
             {/* 보유 스킬 */}
             <div className="mb-2">
-              <p className="text-[12px] font-medium text-gray-500 mb-1 mt-2">보유 스킬</p>
+              <p className="text-[12px] font-medium text-jd-gray-dark mb-1 mt-2">보유 스킬</p>
               <div className="flex gap-2 flex-wrap">
                 {profileData.skills.map((skill) => (
-                  <span key={skill} className="px-2 py-0.5 bg-gray-100 rounded-full text-xs border">
+                  <span
+                    key={skill}
+                    className="px-2 py-0.5 text-jd-gray-dark rounded-full text-xs border"
+                  >
                     {skill}
                   </span>
                 ))}
@@ -95,12 +98,12 @@ export default function InterviewQuestionNotePage() {
 
             {/* 부족 스킬 */}
             <div className="mb-2">
-              <p className="text-[12px] font-medium text-gray-500 mb-1 mt-2">부족 스킬</p>
+              <p className="text-[12px] font-medium text-jd-gray-dark mb-1 mt-2">부족 스킬</p>
               <div className="flex gap-2 flex-wrap">
                 {profileData.missingSkills.map((missingSkills) => (
                   <span
                     key={missingSkills}
-                    className="px-2 py-0.5 bg-gray-100 rounded-full text-xs border"
+                    className="px-2 py-0.5 text-jd-gray-dark rounded-full text-xs border"
                   >
                     {missingSkills}
                   </span>
@@ -109,7 +112,7 @@ export default function InterviewQuestionNotePage() {
             </div>
 
             {/* 경력 */}
-            <ul className="list-disc pl-4 text-xs text-[#837C7C] space-y-1 mt-2">
+            <ul className="list-disc pl-4 text-xs text-jd-gray-dark space-y-1 mt-2">
               {profileData.experiences.map((exp, i) => (
                 <li key={i}>{exp}</li>
               ))}
@@ -122,8 +125,10 @@ export default function InterviewQuestionNotePage() {
           <div className="bg-white border border-gray-200 shadow-md rounded-2xl p-8 text-sm leading-relaxed">
             {questionData.map((section) => (
               <div key={section.title} className="mb-6">
-                <h3 className="font-semibold text-[20px] text-[#837C7C] mb-2">{section.title}</h3>
-                <ul className="space-y-1 text-[#413F3F] list-disc pl-8 ml-4">
+                <h3 className="font-semibold text-[20px] text-jd-gray-dark mb-2">
+                  {section.title}
+                </h3>
+                <ul className="space-y-1 text-jd-black list-disc pl-8 ml-4">
                   {section.questions.map((q, i) => (
                     <li key={i}>{q}</li>
                   ))}
@@ -134,7 +139,7 @@ export default function InterviewQuestionNotePage() {
 
           {/* 수정 버튼 */}
           <div className="flex justify-end mt-8">
-            <button className="bg-purple-600 text-white hover:bg-purple-700 px-6 py-2 rounded-lg shadow-md">
+            <button className="bg-jd-violet text-white hover:bg-jd-violet-hover px-6 py-2 rounded-lg shadow-md">
               질문 수정
             </button>
           </div>
