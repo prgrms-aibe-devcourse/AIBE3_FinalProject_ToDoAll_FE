@@ -38,7 +38,7 @@ export default function SignupCompanyEmailPage() {
     <AuthShell>
       <form onSubmit={onSubmit} className="flex flex-col gap-6">
         <div className="flex flex-col gap-3">
-          <label className="block text-sm font-semibold text-jd-black">회사 이메일</label>
+          <label className="block text-m font-semibold text-jd-black">회사 이메일</label>
 
           <div className="relative">
             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#413F3F]">
@@ -70,7 +70,7 @@ export default function SignupCompanyEmailPage() {
           {invalid && (
             <div
               id="email-warning"
-              className="flex items-start gap-1 text-[13px] text-[#D13B3B] leading-tight border-t border-[#D13B3B]/30 pt-2"
+              className="flex items-start gap-1 text-[14px] text-[#D13B3B] leading-tight border-t border-[#D13B3B]/30 pt-2"
             >
               <span className="mt-[1px]">ⓘ</span>
               <span>

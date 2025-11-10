@@ -32,6 +32,10 @@ export default function AuthShell({
     return () => document.removeEventListener('visibilitychange', onVisibility);
   }, [withVideo]);
 
+  const rightPaneClass = showLeftPane
+    ? 'w-full -translate-x-6 md:-translate-x-10'
+    : 'mx-auto w-full max-w-[520px]';
+
   return (
     <div className="relative min-h-dvh w-full overflow-hidden">
       {/* 배경: 비디오 or 회색 ‘사진 톤’ */}
@@ -112,9 +116,7 @@ export default function AuthShell({
             )}
 
             {/* 우측(또는 전체) 컨텐츠 */}
-            <div className={showLeftPane ? 'w-full' : 'mx-auto w-full max-w-[520px]'}>
-              {children}
-            </div>
+            <div className={rightPaneClass}>{children}</div>
           </div>
         </section>
       </main>

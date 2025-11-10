@@ -121,7 +121,7 @@ export default function SignupFormPage() {
       <form onSubmit={onSubmit} className="flex flex-col gap-6">
         {/* 기업명 */}
         <div className="flex flex-col gap-3">
-          <label className="block text-sm font-semibold text-jd-black">기업명</label>
+          <label className="block text-m font-semibold text-jd-black">기업명</label>
           <div className="relative">
             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#413F3F]">
               <svg
@@ -171,7 +171,7 @@ export default function SignupFormPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* 이름 */}
           <div className="flex flex-col gap-3">
-            <label className="block text-sm font-semibold text-jd-black">이름</label>
+            <label className="block text-m font-semibold text-jd-black">이름</label>
             <div className="relative">
               <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#413F3F]">
                 {/* user icon */}
@@ -220,7 +220,7 @@ export default function SignupFormPage() {
 
           {/* 직책 */}
           <div className="flex flex-col gap-3">
-            <label className="block text-sm font-semibold text-jd-black">직책</label>
+            <label className="block text-m font-semibold text-jd-black">직책</label>
             <div className="relative">
               <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#413F3F]">
                 {/* briefcase icon (18x18, currentColor) */}
@@ -266,7 +266,7 @@ export default function SignupFormPage() {
 
         {/* 비밀번호 */}
         <div className="flex flex-col gap-3">
-          <label className="block text-sm font-semibold text-jd-black">비밀번호</label>
+          <label className="block text-m font-semibold text-jd-black">비밀번호</label>
           <div className="relative">
             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#413F3F]">
               <svg
@@ -310,7 +310,7 @@ export default function SignupFormPage() {
 
         {/* 비밀번호 확인 */}
         <div className="flex flex-col gap-3">
-          <label className="block text-sm font-semibold text-jd-black">비밀번호 확인</label>
+          <label className="block text-m font-semibold text-jd-black">비밀번호 확인</label>
           <div className="relative">
             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#413F3F]">
               <svg
