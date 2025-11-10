@@ -11,17 +11,17 @@
 }
 
 @theme {
-    /* 폰트 */
-    --default-font-family: "Pretendard Variable", var(--font-sans);
+  /* 폰트 */
+  --default-font-family: 'Pretendard Variable', var(--font-sans);
 
-    /* 색상 */
-    --color-jd-violet: #752F6D;
-    --color-jd-yellow: #F7A534;
-    --color-jd-scarlet: #DE4F36;
-    --color-jd-white: #FAF8F8;
-    --color-jd-black: #413F3F;
-    --color-jd-gray-light: #E3DBDB;
-    --color-jd-gray-dark: #837C7C;
+  /* 색상 */
+  --color-jd-violet: #752f6d;
+  --color-jd-yellow: #f7a534;
+  --color-jd-scarlet: #de4f36;
+  --color-jd-white: #faf8f8;
+  --color-jd-black: #413f3f;
+  --color-jd-gray-light: #e3dbdb;
+  --color-jd-gray-dark: #837c7c;
 }
 
 @layer components {
