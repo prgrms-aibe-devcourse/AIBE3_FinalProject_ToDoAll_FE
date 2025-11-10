@@ -9,7 +9,7 @@ export default function SummationCard() {
         <h3 className="text-4xl font-semibold text-gray-700">12</h3>
         <p className="text-sm font-light text-gray-500">진행 중인 채용 공고</p>
       </div>
-      <DetailButton />
+      <DetailButton className="relative top-3" />
       <BookText className="absolute top-[30px] right-[30px] text-jd-gray-dark" size="20px" />
     </div>
   );
