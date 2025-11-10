@@ -69,6 +69,31 @@ export default function InterviewQuestionCreatePage() {
     setQuestionData(updated);
   };
 
+  const handleAddQuestion = (sectionIdx: number) => {
+    const updated = [...questionData];
+    updated[sectionIdx].questions.push('');
+    setQuestionData(updated);
+  };
+
+  const handleAddSection = () => {
+    const updated = [...questionData, { title: '', questions: [''] }];
+    setQuestionData(updated);
+  };
+
+  // 질문 삭제
+  const handleDeleteQuestion = (sectionIdx: number, questionIdx: number) => {
+    const updated = [...questionData];
+    updated[sectionIdx].questions.splice(questionIdx, 1);
+    setQuestionData(updated);
+  };
+
+  // 주제(섹션) 삭제
+  const handleDeleteSection = (sectionIdx: number) => {
+    const updated = [...questionData];
+    updated.splice(sectionIdx, 1);
+    setQuestionData(updated);
+  };
+
   return (
     <div className="mx-auto p-8 min-h-screen bg-[#fbf9f9] font-sans font-semibold">
       <h1 className="text-2xl font-bold mb-6 text-jd-black">질문 노트</h1>
@@ -88,8 +113,21 @@ export default function InterviewQuestionCreatePage() {
                 isEditing={isEditing}
                 onQuestionChange={handleQuestionChange}
                 onTitleChange={handleTitleChange}
+                onAddQuestion={handleAddQuestion}
+                onDeleteQuestion={handleDeleteQuestion}
+                onDeleteSection={handleDeleteSection}
               />
             ))}
+
+            {/* 주제 추가 버튼 (수정 모드일 때만) */}
+            {isEditing && (
+              <button
+                onClick={handleAddSection}
+                className="mt-4 text-[14px] text-jd-violet hover:text-jd-violet-hover transition"
+              >
+                ＋ 주제 추가
+              </button>
+            )}
           </div>
 
           <EditButton isEditing={isEditing} onToggle={handleToggleEdit} />
