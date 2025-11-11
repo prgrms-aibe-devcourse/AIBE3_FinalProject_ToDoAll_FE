@@ -19,6 +19,7 @@ import ResetPasswordEmailPage from '../features/auth/pages/ResetPasswordEmailPag
 import MyPage from '../features/auth/pages/MyPage';
 import InterviewNotePage from '../features/interview/pages/InterviewNotePage';
 
+import ResumeList from '../features/resumes/pages/ResumeListPage.tsx';
 // 레이아웃 없는 페이지 (로그인/회원가입 관련)
 export const noLayoutRoutes = [
   { path: '/login', element: <LoginPage /> },
@@ -46,4 +47,5 @@ export const mainRoutes = [
   { path: '/resumes/create', element: <ResumeForm /> },
 
   { path: '/interview/chat-room', element: <InterviewChatRoomPage /> },
+  { path: '/resumes', element: <ResumeList /> },
 ];

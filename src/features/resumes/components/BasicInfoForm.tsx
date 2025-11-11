@@ -3,13 +3,7 @@ import vectorImg from '../../../assets/Vector.png';
 
 type Props = {
   formData: ResumeData;
-
-  onChange: (
-    // eslint-disable-next-line no-unused-vars
-    field: keyof ResumeData,
-    // eslint-disable-next-line no-unused-vars
-    value: string | string[] | ResumeData['files'] | ResumeData['address'] | '남' | '여' | boolean
-  ) => void;
+  onChange: (_field: keyof ResumeData, _value: ResumeData[keyof ResumeData]) => void;
 };
 
 export default function BasicInfoForm({ formData, onChange }: Props) {
