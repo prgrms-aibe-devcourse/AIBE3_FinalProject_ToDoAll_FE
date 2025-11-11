@@ -27,6 +27,11 @@
   --color-jd-green: #5cc46f;
 }
 
+@layer components {
+  .jd-LongViewSection-RWD { @apply max-w-sm md:max-w-[584px] }
+  .jd-LongViewSection-RWD-full { @apply max-w-sm md:max-w-[584px] xl:max-w-full }
+}
+
 @layer utilities {
   .jd-dashboard-section {
     box-shadow: 0 4px 4px 0 #00000040;
