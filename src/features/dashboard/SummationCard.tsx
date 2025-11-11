@@ -3,7 +3,7 @@ import { BookText } from 'lucide-react';
 
 export default function SummationCard() {
   return (
-    <div className="w-full max-w-[279px] flex flex-col justify-between relative aspect-[12/8] bg-white rounded-[20px] p-[30px] jd-dashboard-section">
+    <div className="w-full max-w-sm md:max-w-[279px] flex flex-col justify-between relative aspect-[12/8] bg-white rounded-[20px] p-[30px] jd-dashboard-section">
       <h2 className="font-bold text-jd-gray-dark mb-[20px]">활성 공고</h2>
       <div>
         <h3 className="text-4xl font-semibold text-gray-700">12</h3>
