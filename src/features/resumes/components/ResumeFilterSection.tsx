@@ -46,15 +46,16 @@ export default function ResumeFilterSection({ onSearch, onTabChange }: Props) {
           추천 후보
         </button>
       </div>
-
-      {/* 필터 박스 */}
+      {/* 필터 박스 */}{' '}
       <div className="flex bg-white p-8 rounded-b-lg shadow-md">
-        {/* 왼쪽 영역 (필터) */}
+        {' '}
+        {/* 왼쪽 영역 (필터) */}{' '}
         <div className="flex flex-col gap-6 w-full max-w-[480px] mr-auto">
-          {/* 첫 줄: 채용 공고 + 추천 인원 */}
-          {/* 채용 공고 */}
+          {' '}
+          {/* 첫 줄: 채용 공고 + 추천 인원 */} {/* 채용 공고 */}{' '}
           <div className="flex flex-col flex-1 relative">
-            <h2 className="text-[#413F3F] text-[14px] font-medium mb-1">채용 공고</h2>
+            {' '}
+            <h2 className="text-[#413F3F] text-[14px] font-medium mb-1">채용 공고</h2>{' '}
             <select
               className="appearance-none bg-white border border-[#E3DBDB] rounded-md p-2 pr-10 text-[15px] w-full shadow-none focus:outline-none font-medium text-[#413F3F]"
               style={{
@@ -64,21 +65,22 @@ export default function ResumeFilterSection({ onSearch, onTabChange }: Props) {
                 backgroundImage: 'none',
               }}
             >
-              <option value="latest">시니어 프론트 개발자</option>
-              <option value="oldest">백엔드 개발자</option>
-              <option value="name">디자이너</option>
-            </select>
+              {' '}
+              <option value="latest">시니어 프론트 개발자</option>{' '}
+              <option value="oldest">백엔드 개발자</option>{' '}
+              <option value="name">디자이너</option>{' '}
+            </select>{' '}
             <img
               src={arrowImg}
               alt="arrow"
               className="w-4 h-4 absolute right-2 top-[70%] -translate-y-1/2 pointer-events-none"
-            />
-          </div>
-
-          {/* 추천 인원 */}
+            />{' '}
+          </div>{' '}
+          {/* 추천 인원 */}{' '}
           {activeTab === 'recommended' && (
             <div className="flex flex-col flex-1 relative">
-              <h2 className="text-[#413F3F] text-[14px] font-medium mb-1">추천 인원</h2>
+              {' '}
+              <h2 className="text-[#413F3F] text-[14px] font-medium mb-1">추천 인원</h2>{' '}
               <select
                 className="appearance-none bg-white border border-[#E3DBDB] rounded-md p-2 pr-10 text-[15px] w-full shadow-none focus:outline-none font-medium text-[#413F3F]"
                 style={{
@@ -88,21 +90,21 @@ export default function ResumeFilterSection({ onSearch, onTabChange }: Props) {
                   backgroundImage: 'none',
                 }}
               >
-                <option value="1">1명</option>
-                <option value="2">2명</option>
-                <option value="3">3명</option>
-              </select>
+                {' '}
+                <option value="1">1명</option> <option value="2">2명</option>{' '}
+                <option value="3">3명</option>{' '}
+              </select>{' '}
               <img
                 src={arrowImg}
                 alt="arrow"
                 className="w-4 h-4 absolute right-2 top-[70%] -translate-y-1/2 pointer-events-none"
-              />
+              />{' '}
             </div>
-          )}
-
-          {/* 정렬순 */}
+          )}{' '}
+          {/* 정렬순 */}{' '}
           <div className="flex flex-col w-full relative">
-            <h2 className="text-[#413F3F] text-[14px] font-medium mb-1">정렬순</h2>
+            {' '}
+            <h2 className="text-[#413F3F] text-[14px] font-medium mb-1">정렬순</h2>{' '}
             <select
               className="appearance-none bg-white border border-[#E3DBDB] rounded-md p-2 pr-10 text-[15px] w-full shadow-none focus:outline-none font-medium text-[#413F3F]"
               style={{
@@ -112,18 +114,17 @@ export default function ResumeFilterSection({ onSearch, onTabChange }: Props) {
                 backgroundImage: 'none',
               }}
             >
-              <option value="latest">최신순</option>
-              <option value="oldest">오래된순</option>
-              <option value="name">이름순</option>
-            </select>
+              {' '}
+              <option value="latest">최신순</option> <option value="oldest">오래된순</option>{' '}
+              <option value="name">이름순</option>{' '}
+            </select>{' '}
             <img
               src={arrowImg}
               alt="arrow"
               className="w-4 h-4 absolute right-2 top-[70%] -translate-y-1/2 pointer-events-none"
-            />
-          </div>
+            />{' '}
+          </div>{' '}
         </div>
-
         {/* 오른쪽 검색 버튼 */}
         <div className="flex flex-col justify-end ml-auto mt-auto pb-6 relative top-6">
           <button

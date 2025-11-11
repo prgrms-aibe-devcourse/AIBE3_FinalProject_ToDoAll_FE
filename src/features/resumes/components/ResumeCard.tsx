@@ -1,83 +1,98 @@
 import type { ResumeData } from '../types/resumes.types';
+import emptyHeartImg from '../../../assets/Favorite-2.png';
+import fullHeartImg from '../../../assets/Heart.png';
+import { useState } from 'react';
 
 type Props = {
   resume: ResumeData;
-  matchRate?: number; // 매칭률 추가
-  onView?: () => void; // "보기" 버튼 클릭 핸들러
-  onInvite?: () => void; // "면접 초대" 클릭 핸들러
+  matchRate?: number;
+  onView?: () => void;
+  onInvite?: () => void;
 };
 
-export default function ResumeCard({ resume, matchRate = 50, onView, onInvite }: Props) {
+export default function ResumeCard({ resume, matchRate = 50, onView }: Props) {
+  const [checked, setChecked] = useState(false);
+
+  const handleClick = () => {
+    setChecked(!checked);
+    onView?.();
+  };
+
   return (
-    <div className="bg-white shadow-md rounded-2xl p-6 flex items-start justify-between hover:shadow-lg transition">
-      {/* 왼쪽: 프로필 + 정보 */}
-      <div className="flex items-start gap-4">
-        {/* 프로필 이미지 */}
+    <div className="relative w-full flex mx-auto bg-white shadow-md rounded-2xl p-6 flex hover:shadow-lg transition">
+      <div className="flex items-start gap-4 w-full pr-[160px]">
         <img
           src={resume.profileImage || '/default-profile.png'}
           alt={resume.name}
           className="w-24 h-24 rounded-full object-cover"
         />
 
-        {/* 텍스트 정보 */}
-        <div>
-          {/* 이름 + 추천 태그 */}
-          <div className="flex items-center gap-2 mb-1">
-            <h2 className="font-semibold text-lg">{resume.name}</h2>
-            <span className="bg-yellow-100 text-yellow-700 text-xs px-2 py-1 rounded">추천</span>
-          </div>
-
-          {/* 경력 or 자기소개 */}
-          <p className="text-gray-600 mb-3">{resume.experience}</p>
-
-          {/* 기술 매칭률 */}
-          <div className="text-sm text-gray-500 mb-1">기술 매칭률</div>
-          <div className="w-64 bg-gray-200 h-2 rounded-full mb-2">
-            <div
-              className="h-2 bg-red-400 rounded-full transition-all"
-              style={{ width: `${matchRate}%` }}
-            />
-          </div>
-          <div className="text-sm font-semibold text-red-500 mb-3">{matchRate}%</div>
-
-          {/* 스킬 태그 */}
-          <div className="flex flex-wrap gap-2 mb-3">
-            {resume.skills.map((skill) => (
-              <span
-                key={skill}
-                className="text-xs bg-gray-100 border rounded-full px-2 py-1 text-gray-600"
-              >
-                {skill}
+        <div className="flex flex-col justify-between w-full">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <h2 className="font-semibold text-[24px] text-[#413F3F]">{resume.name}</h2>
+              <span className="bg-[#F7A534] text-white font-semibold text-xs px-2 py-[2px] rounded-full">
+                추천
               </span>
-            ))}
-          </div>
+            </div>
 
-          {/* 경력 목록 */}
-          {resume.career && resume.career.length > 0 && (
-            <ul className="text-sm text-gray-600 list-disc list-inside">
-              {resume.career.map((c, idx) => (
-                <li key={idx}>
-                  {c.company} / {c.position} / {c.department}
-                </li>
+            <p className="text-[#837C7C] mb-3">{resume.experience}</p>
+
+            <div className="items-center gap-4 mb-3">
+              <div className="flex items-center gap-4 mb-3">
+                <div className="text-m text-[#413F3F] font-medium">기술 매칭률</div>
+                <div className="px-[120px] text-2xl font-semibold text-[#DE4F36]">{matchRate}%</div>
+              </div>
+              <div className="w-64 bg-[#E3DBDB] h-2 rounded-full">
+                <div
+                  className="h-2 bg-[#DE4F36] rounded-full transition-all"
+                  style={{ width: `${matchRate}%` }}
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2 mb-3">
+              {resume.skills.map((skill) => (
+                <span
+                  key={skill}
+                  className="text-xs bg-white border rounded-full px-2 py-1 text-[#837C7C] border-[#837C7C]"
+                >
+                  {skill}
+                </span>
               ))}
-            </ul>
-          )}
+            </div>
+
+            {resume.career && resume.career.length > 0 && (
+              <ul className="text-sm text-[#837C7C] list-disc list-inside mb-4">
+                {resume.career.map((c, idx) => (
+                  <li key={idx}>
+                    {c.company} / {c.position} / {c.department}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* 오른쪽 버튼 영역 */}
-      <div className="flex flex-col items-end gap-2">
+      <div className="absolute top-6 right-6 flex flex-col items-end gap-2">
+        <button onClick={handleClick} className="rounded-full transition">
+          <img src={checked ? fullHeartImg : emptyHeartImg} alt="heart" className="w-5 h-5" />
+        </button>
+      </div>
+
+      <div className="absolute bottom-6 right-6 flex gap-2">
         <button
-          onClick={onView}
-          className="border px-4 py-2 rounded-full text-sm text-[#5C1E78] hover:bg-[#5C1E78] hover:text-white transition"
+          onClick={handleClick}
+          className="rounded-full bg-[#752F6D] text-[#FAF8F8] px-4 py-2 font-medium transition hover:bg-[#9A3F90]"
         >
-          📄 보기
+          보류
         </button>
         <button
-          onClick={onInvite}
-          className="border px-4 py-2 rounded-full text-sm bg-[#5C1E78] text-white hover:bg-[#47155e] transition"
+          onClick={handleClick}
+          className="rounded-full bg-[#752F6D] text-[#FAF8F8] px-4 py-2 font-medium transition hover:bg-[#9A3F90]"
         >
-          ✉️ 면접 초대
+          면접 초대
         </button>
       </div>
     </div>
