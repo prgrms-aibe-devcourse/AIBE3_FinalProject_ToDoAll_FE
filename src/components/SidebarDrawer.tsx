@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 type Props = {
   open: boolean;
@@ -6,33 +6,30 @@ type Props = {
 };
 
 export default function SidebarDrawer({ open, onClose }: Props) {
+  const navigate = useNavigate();
+
   return (
     <>
-      {/* 오버레이 */}
-      <div
-        className={`fixed inset-0 bg-black/40 backdrop-blur-[1px] transition-opacity duration-200 z-40 ${
-          open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-        }`}
-        onClick={onClose}
-      />
+      <div className={`fixed inset-x-0 bottom-0 top-12 z-40`} />
 
       {/* 드로어 패널 */}
       <aside
         className={`
-          fixed top-12 left-0 h-dvh w-[260px] z-50
+          fixed top-12 left-0 h-[calc(100vh-3rem)] z-50
+          w-[200px] sm:w-[220px] md:w-[240px]
           bg-white text-[var(--color-jd-black)]
           shadow-[0_12px_30px_rgba(0,0,0,.25)]
           ring-1 ring-[var(--color-jd-violet)]/25
           rounded-r-2xl
-          translate-x-0 transition-transform duration-300
+          transition-transform duration-300 will-change-transform
           ${open ? 'translate-x-0' : '-translate-x-full'}
         `}
         aria-label="Side controller"
       >
         {/* 로고 + 슬로건 */}
-        <div className="px-4 pt-4 pb-3 flex flex-col items-start gap-1">
+        <div className="px-4 pt-4 pb-3 flex flex-col items-start gap-1 ">
           {/* 로고 */}
-          <img src="/logo/header-logo.png" alt="jobda" className="h-18 w-auto object-contain" />
+          <img src="/logo/header-logo.png" alt="jobda" className="h-18 w-auto object-containc" />
 
           {/* 슬로건 */}
           <span className="text-[12px] text-gray-500 font-medium text-left leading-tight">
@@ -118,7 +115,14 @@ export default function SidebarDrawer({ open, onClose }: Props) {
 
         {/* 하단 사용자 카드 */}
         <div className="absolute left-0 right-0 bottom-0 px-3 py-3">
-          <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-[var(--color-jd-white)] ring-1 ring-black/5">
+          <div
+            role="button"
+            onClick={() => {
+              onClose();
+              navigate('/mypage');
+            }}
+            className="flex items-center justify-between px-3 py-2 rounded-xl bg-[var(--color-jd-white)] ring-1 ring-black/5 cursor-pointer"
+          >
             <div className="flex items-center gap-3">
               <img
                 src="https://i.imgur.com/8Km9tLL.png"
@@ -130,24 +134,28 @@ export default function SidebarDrawer({ open, onClose }: Props) {
                 <div className="text-[11px] text-gray-500">abcd@d.d.kr</div>
               </div>
             </div>
-            <Link
-              to="/settings"
+
+            {/* 로그아웃 버튼 (아이콘) */}
+            <button
+              type="button"
+              aria-label="로그아웃"
+              onClick={(e) => {
+                e.stopPropagation(); // 카드 클릭으로 마이페이지 가는 것 방지
+              }}
               className="p-2 rounded-md hover:bg-[var(--color-jd-gray-light)]"
-              onClick={onClose}
-              aria-label="설정"
             >
+              {/* exit 아이콘 */}
               <svg
-                width="16"
-                height="16"
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
                 viewBox="0 0 24 24"
-                className="text-[var(--color-jd-black)]"
+                fill="currentColor"
               >
-                <path
-                  d="M12 15.5A3.5 3.5 0 1 0 8.5 12 3.5 3.5 0 0 0 12 15.5ZM19.4 13a7.5 7.5 0 0 0 0-2l2-1.5-2-3.5-2.4.8a7.7 7.7 0 0 0-1.7-1L14.8 2H9.2L8.7 4.8a7.7 7.7 0 0 0-1.7 1L4.6 4.9l-2 3.5L4.6 10a7.5 7.5 0 0 0 0 2l-2 1.5 2 3.5 2.4-.8a7.7 7.7 0 0 0 1.7 1l.5 2.8h5.6l.5-2.8a7.7 7.7 0 0 0 1.7-1l2.4.8 2-3.5Z"
-                  fill="currentColor"
-                />
+                <path d="M5 3C3.34315 3 2 4.34315 2 6V18C2 19.6569 3.34315 21 5 21H9C9.55228 21 10 20.5523 10 20C10 19.4477 9.55228 19 9 19H5C4.44772 19 4 18.5523 4 18V6C4 5.44772 4.44772 5 5 5H9C9.55228 5 10 4.55228 10 4C10 3.44772 9.55228 3 9 3H5Z" />
+                <path d="M16.2929 7.29289C16.6834 6.90237 17.3166 6.90237 17.7071 7.29289L21.7071 11.2929C22.0976 11.6834 22.0976 12.3166 21.7071 12.7071L17.7071 16.7071C17.3166 17.0976 16.6834 17.0976 16.2929 16.7071C15.9024 16.3166 15.9024 15.6834 16.2929 15.2929L18.5858 13H10C9.44772 13 9 12.5523 9 12C9 11.4477 9.44772 11 10 11H18.5858L16.2929 8.70711C15.9024 8.31658 15.9024 7.68342 16.2929 7.29289Z" />
               </svg>
-            </Link>
+            </button>
           </div>
         </div>
       </aside>

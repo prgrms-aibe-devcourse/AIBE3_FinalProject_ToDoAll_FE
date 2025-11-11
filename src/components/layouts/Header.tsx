@@ -18,7 +18,7 @@ const Header = () => {
       >
         {/* ☰ 햄버거 */}
         <div className="flex items-center gap-3">
-          <button type="button" aria-label="메뉴 열기" onClick={() => setLeftOpen(true)}>
+          <button type="button" aria-label="메뉴 열기" onClick={() => setLeftOpen((prev) => !prev)}>
             <svg width="20" height="18" viewBox="0 0 24 24" fill="none" className="text-white">
               <path d="M3 6h18v2H3V6Zm0 5h18v2H3v-2Zm0 5h18v2H3v-2Z" fill="currentColor" />
             </svg>
