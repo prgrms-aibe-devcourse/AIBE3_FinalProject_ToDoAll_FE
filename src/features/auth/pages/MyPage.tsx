@@ -1,12 +1,12 @@
 import React from 'react';
-import { useEffect, useMemo, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 type Focus = 'profile' | 'password' | undefined;
 
 export default function MyPage() {
   const navigate = useNavigate();
-  const { state } = useLocation() as { state?: { focus?: Focus } };
+  const [searchParams] = useSearchParams();
 
   // 목업 데이터
   const [user, setUser] = useState({
@@ -22,17 +22,33 @@ export default function MyPage() {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState(user);
 
-  // 재인증 5분 TTL (프론트 UX용)
-  const recentlyReauthed = useMemo(() => {
-    const at = Number(localStorage.getItem('reauthAt') || 0);
-    return Date.now() - at < 5 * 60 * 1000;
+  const [recentlyReauthed, setRecentlyReauthed] = useState(false); //TTL을 상태로 보유 → UI가 자동 갱신됨
+  useEffect(() => {
+    const checkReauth = () => {
+      const at = Number(localStorage.getItem('reauthAt') || 0); //현재 저장된 재인증 시각 읽기
+      setRecentlyReauthed(Date.now() - at < 5 * 60 * 1000); //5분 이내면 true
+    };
+
+    checkReauth(); //마운트 즉시 1회 평가 → 초기 표시 정확
+    const interval = setInterval(checkReauth, 60 * 1000); //  1분 주기로
+    const onStorage = (e: StorageEvent) => {
+      // 다른 탭에서 reauthAt 갱신 시 동기화
+      if (e.key === 'reauthAt') checkReauth();
+    };
+    window.addEventListener('storage', onStorage); // storage 이벤트 등록
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('storage', onStorage); // 이벤트 리스너 정리
+    };
   }, []);
 
   // 의도에 따라 비밀번호 섹션 자동 오픈
   const [expandPassword, setExpandPassword] = useState(false);
   useEffect(() => {
-    if (state?.focus === 'password') setExpandPassword(true);
-  }, [state?.focus]);
+    const focusParam = searchParams.get('focus') as Focus | null; //URL 쿼리에서 focus 읽기
+    if (focusParam === 'password') setExpandPassword(true); //  ?focus=password면 비번 섹션 자동 오픈
+  }, [searchParams]); //URL 쿼리가 바뀌면 다시 평가
 
   // 입력 핸들러 (이메일,회사 제외 나머지 편집 가능)
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
