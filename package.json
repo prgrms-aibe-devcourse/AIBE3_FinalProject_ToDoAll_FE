@@ -42,7 +42,10 @@
     "tailwindcss": "^4.1.16",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.2",
-    "vite": "^7.1.7"
+    "vite": "^7.1.7",
+    "tailwind-merge": "^3.4.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
