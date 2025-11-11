@@ -13,8 +13,6 @@ export default function SidebarDrawer({ open, onClose }: Props) {
 
   return (
     <>
-      <div className={`fixed inset-x-0 bottom-0 top-12 z-40`} />
-
       {/* 드로어 패널 */}
       <aside
         className={`
