@@ -52,7 +52,7 @@ export default function SidebarDrawer({ open, onClose }: Props) {
               width="18"
               height="18"
               viewBox="0 0 24 24"
-              className="text-[var(--color-jd-violet)]"
+              className="text-[var(--color-jd-gray-dark)]"
             >
               <path
                 d="M3 3h8v8H3V3Zm10 0h8v8h-8V3ZM3 13h8v8H3v-8Zm10 0h8v8h-8v-8Z"
@@ -71,15 +71,18 @@ export default function SidebarDrawer({ open, onClose }: Props) {
               width="18"
               height="18"
               viewBox="0 0 24 24"
-              className="text-[var(--color-jd-violet)]"
+              className="text-[var(--color-jd-gray-dark)]"
             >
-              <path d="M4 6h16v12H4V6Zm4-3h8v3H8V3Z" fill="currentColor" />
+              <path
+                d="M14 0H6a3 3 0 0 0-3 3v18a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V7.06L14.94 0H14Zm.75 5.25v-3l4.5 4.5h-3a1.5 1.5 0 0 1-1.5-1.5ZM6.75 12.75a.75.75 0 0 1 0-1.5h10.5a.75.75 0 0 1 0 1.5H6.75Zm0 3a.75.75 0 0 1 0-1.5h10.5a.75.75 0 0 1 0 1.5H6.75Zm0 3a.75.75 0 0 1 0-1.5h6a.75.75 0 0 1 0 1.5h-6Z"
+                fill="currentColor"
+              />
             </svg>
             <span className="text-sm">공고 관리</span>
           </Link>
 
           <Link
-            to="/candidates"
+            to="/jobs"
             className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[var(--color-jd-white)]"
             onClick={onClose}
           >
@@ -87,7 +90,7 @@ export default function SidebarDrawer({ open, onClose }: Props) {
               width="18"
               height="18"
               viewBox="0 0 24 24"
-              className="text-[var(--color-jd-violet)]"
+              className="text-[var(--color-jd-gray-dark)]"
             >
               <path
                 d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4 0-8 2-8 5v1h16v-1c0-3-4-5-8-5Z"
@@ -98,7 +101,7 @@ export default function SidebarDrawer({ open, onClose }: Props) {
           </Link>
 
           <Link
-            to="/interviews"
+            to="/interview/manage"
             className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[var(--color-jd-white)]"
             onClick={onClose}
           >
@@ -106,7 +109,7 @@ export default function SidebarDrawer({ open, onClose }: Props) {
               width="18"
               height="18"
               viewBox="0 0 24 24"
-              className="text-[var(--color-jd-violet)]"
+              className="text-[var(--color-jd-gray-dark)]"
             >
               <path d="M3 4h18v14H6l-3 3V4Z" fill="currentColor" />
             </svg>
