@@ -52,7 +52,7 @@ export default function MyPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start bg-[var(--color-jd-white)] font-[var(--default-font-family)] px-6 py-12">
+    <div className="min-h-screen flex flex-col items-center justify-start bg-[var(--color-jd-white)] font-[var(--default-font-family)] px-6 sm:px-6 md:px-8 py-10 sm:py-12">
       <div className="w-full max-w-[860px] mb-6 mt-10">
         <h2 className="text-xl sm:text-2xl font-bold text-[var(--color-jd-black)] text-left ml-2">
           기본 정보
@@ -60,7 +60,7 @@ export default function MyPage() {
       </div>
 
       {/* 메인 카드 */}
-      <div className="bg-white rounded-3xl shadow-[0_6px_12px_#00000025] w-full max-w-[900px] p-8 sm:p-10">
+      <div className="bg-white rounded-3xl shadow-[0_6px_12px_#00000025] w-full max-w-[900px] p-8 sm:p-10 md:p-10">
         {/* X → 이전 페이지로 */}
         <div className="w-full max-w-[860px] flex items-center justify-end mb-6 ">
           <button
@@ -76,8 +76,8 @@ export default function MyPage() {
         {/* 프로필 + 정보 */}
         <div className="flex flex-col sm:flex-row gap-8 sm:gap-12 mb-8">
           {/* 프로필 */}
-          <div className="w-40 self-center sm:self-start">
-            <div className="w-40 h-40 rounded-full bg-[var(--color-jd-gray-light)] overflow-hidden mb-3">
+          <div className="w-full sm:w-40 self-center sm:self-start">
+            <div className="mx-auto sm:mx-0 w-28 h-28 sm:w-40 sm:h-40 rounded-full bg-[var(--color-jd-gray-light)] overflow-hidden mb-3">
               <img src={user.profile} alt="profile" className="w-full h-full object-cover" />
             </div>
             <button className="w-full bg-[var(--color-jd-gray-light)] rounded-md py-2 text-sm mt-4">
@@ -86,7 +86,7 @@ export default function MyPage() {
           </div>
 
           {/* 정보 폼/뷰 */}
-          <div className="flex-1 grid grid-cols-[110px_1fr] gap-y-4 gap-x-4 text-[var(--color-jd-black)]">
+          <div className="flex-1 grid grid-cols-1 sm:grid-cols-[110px_1fr] gap-y-3 gap-x-4 text-[var(--color-jd-black)]">
             <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
               회사
             </label>
@@ -144,18 +144,18 @@ export default function MyPage() {
         </div>
 
         {/* 버튼 영역 */}
-        <div className="flex flex-wrap gap-8 justify-end">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-end">
           {editing ? (
             <>
               <button
                 onClick={onCancel}
-                className="px-6 py-2 rounded-md bg-[var(--color-jd-gray-light)]"
+                className="w-full sm:w-auto px-6 py-2 rounded-md bg-[var(--color-jd-gray-light)]"
               >
                 취소
               </button>
               <button
                 onClick={onSave}
-                className="px-6 py-2 rounded-md bg-[var(--color-jd-scarlet)] text-white"
+                className="w-full sm:w-auto px-6 py-2 rounded-md bg-[var(--color-jd-scarlet)] text-white"
               >
                 저장
               </button>
