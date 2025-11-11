@@ -83,10 +83,10 @@ export default function InterviewManagePage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#fbf9f9] px-12 py-8">
+    <div className="min-h-screen bg-jd-white px-12 py-8">
       {/* 상단 영역 */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-xl font-semibold">면접 관리</h1>
+        <h1 className="text-2xl font-semibold">면접 관리</h1>
         <InterviewSortDropdown jobPosts={jobPosts} onSelect={setSelectedJD} />
       </div>
 

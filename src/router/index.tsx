@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { mainRoutes, noLayoutRoutes } from './routes';
 
 import MainLayout from '../components/layouts/MainLayout';
@@ -7,6 +7,7 @@ import NoLayout from '../components/layouts/NoLayout';
 export default function AppRouter() {
   return (
     <Routes>
+      <Route path="/" element={<Navigate to="/login" replace />} />
       <Route element={<NoLayout />}>
         {noLayoutRoutes.map((route) => (
           <Route key={route.path} path={route.path} element={route.element} />
