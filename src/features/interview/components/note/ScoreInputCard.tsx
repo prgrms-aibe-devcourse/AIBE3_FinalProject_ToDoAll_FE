@@ -17,6 +17,12 @@ export default function ScoreInputCard({ initialScores }: ScoreInputCardProps) {
     initialScores || { tech: '', comm: '', total: '', comment: '' }
   );
 
+  useEffect(() => {
+    if (initialScores) {
+      setScores(initialScores);
+    }
+  }, [initialScores]);
+
   // 0~100 범위 제한
   const handleChange = (key: 'tech' | 'comm', value: string) => {
     const num = Number(value);
@@ -38,7 +44,7 @@ export default function ScoreInputCard({ initialScores }: ScoreInputCardProps) {
   }, [scores.tech, scores.comm]);
 
   const handleSave = () => {
-    if (scores.tech && scores.comm && scores.total) {
+    if (scores.tech !== '' && scores.comm !== '' && scores.total !== '') {
       setIsEditing(false);
     }
   };
