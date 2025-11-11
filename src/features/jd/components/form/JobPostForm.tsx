@@ -44,9 +44,10 @@ export default function JobPostForm({
     ...defaultValues,
   });
 
-  const update = (k: keyof JobPostFormValues, v: any) => setValues((s) => ({ ...s, [k]: v }));
+  const update = <K extends keyof JobPostFormValues>(k: K, v: JobPostFormValues[K]) =>
+    setValues((s) => ({ ...s, [k]: v }));
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     onSubmit(values);
   };
@@ -63,18 +64,21 @@ export default function JobPostForm({
           <Field label="제목">
             <Input
               value={values.title}
-              onChange={(e) => update('title', e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => update('title', e.target.value)}
               placeholder="제목"
             />
           </Field>
         </div>
       </div>
+
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-4">
         <div className="sm:col-span-1">
           <Field label="부서">
             <Input
               value={values.department}
-              onChange={(e) => update('department', e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                update('department', e.target.value)
+              }
               placeholder="부서"
             />
           </Field>
@@ -83,7 +87,9 @@ export default function JobPostForm({
           <Field label="근무 형태">
             <Input
               value={values.workType}
-              onChange={(e) => update('workType', e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                update('workType', e.target.value)
+              }
               placeholder="근무 형태"
             />
           </Field>
@@ -93,19 +99,24 @@ export default function JobPostForm({
           <Field label="경력">
             <Input
               value={values.experience}
-              onChange={(e) => update('experience', e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                update('experience', e.target.value)
+              }
               placeholder="경력"
             />
           </Field>
         </div>
       </div>
+
       <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-4">
         <div className="sm:col-span-1">
           <Field label="시작일">
             <Input
               type="date"
               value={values.postedAt}
-              onChange={(e) => update('postedAt', e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                update('postedAt', e.target.value)
+              }
             />
           </Field>
         </div>
@@ -114,7 +125,9 @@ export default function JobPostForm({
             <Input
               type="date"
               value={values.deadline}
-              onChange={(e) => update('deadline', e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                update('deadline', e.target.value)
+              }
             />
           </Field>
         </div>
@@ -122,7 +135,9 @@ export default function JobPostForm({
           <Field label="학력 요건">
             <Input
               value={values.education}
-              onChange={(e) => update('education', e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                update('education', e.target.value)
+              }
               placeholder="학력 요건"
             />
           </Field>
@@ -132,7 +147,9 @@ export default function JobPostForm({
           <Field label="근무 급여">
             <Input
               value={values.salary}
-              onChange={(e) => update('salary', e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                update('salary', e.target.value)
+              }
               placeholder="예: 연봉 4,000~6,000만원"
             />
           </Field>
@@ -141,7 +158,9 @@ export default function JobPostForm({
           <Field label="근무 지역">
             <Input
               value={values.location}
-              onChange={(e) => update('location', e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                update('location', e.target.value)
+              }
               placeholder="예: 서울 강남구"
             />
           </Field>
@@ -153,7 +172,9 @@ export default function JobPostForm({
           <TextArea
             rows={4}
             value={values.benefits}
-            onChange={(e) => update('benefits', e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+              update('benefits', e.target.value)
+            }
             placeholder="복리후생을 입력하세요"
           />
         </Field>
@@ -164,7 +185,9 @@ export default function JobPostForm({
           <TextArea
             rows={5}
             value={values.description}
-            onChange={(e) => update('description', e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+              update('description', e.target.value)
+            }
             placeholder="담당 업무를 입력하세요"
           />
         </Field>
@@ -174,7 +197,7 @@ export default function JobPostForm({
         <TagInput
           label="필수 스킬"
           value={values.requiredSkills}
-          onChange={(n) => update('requiredSkills', n)}
+          onChange={(next: string[]) => update('requiredSkills', next)}
           placeholder="Enter 또는 , 로 추가"
         />
       </div>
@@ -183,7 +206,7 @@ export default function JobPostForm({
         <TagInput
           label="우대 스킬"
           value={values.preferredSkills}
-          onChange={(n) => update('preferredSkills', n)}
+          onChange={(next: string[]) => update('preferredSkills', next)}
           placeholder="Enter 또는 , 로 추가"
         />
       </div>
