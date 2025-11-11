@@ -3,12 +3,14 @@
 import JDDetailDemoPage from '../pages/JDDetailDemoPage';
 import InterviewCreatePage from '../features/interview/pages/InterviewCreatePage';
 import InterviewManagePage from '../features/interview/pages/InterviewManagePage';
-import ResumeDetail from '../features/resumes/page/ResumeDetail';
+import ResumeDetail from '../features/resumes/pages/ResumeDetail';
 import DashBoard from '../pages/DashBoard.tsx';
 import JDCreatePage from '../pages/JDCreatePage.tsx';
 
 import JDPage from '../pages/JDPage.tsx';
 import InterviewQuestionCreatePage from '../features/interview/pages/InterviewQuestionCreatePage';
+
+import ResumeForm from '../features/resumes/pages/ResumeCreatePage.tsx';
 import InterviewChatRoomPage from '../features/interview/pages/InterviewChatRoomPage.tsx';
 import LoginPage from '../features/auth/pages/LoginPage';
 import SignupCompanyEmailPage from '../features/auth/pages/SignupCompanyEmailPage.tsx';
@@ -38,4 +40,5 @@ export const mainRoutes = [
   { path: '/dashboard', element: <DashBoard /> },
   { path: '/jobs/new', element: <JDCreatePage /> },
   { path: '/jobs', element: <JDPage /> },
+  { path: '/resumes/create', element: <ResumeForm /> },
 ];

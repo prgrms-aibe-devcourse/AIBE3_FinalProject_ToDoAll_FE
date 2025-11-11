@@ -41,7 +41,6 @@ export default function ApplicantInfo({ data }: ApplicantInfoProps) {
       </div>
 
       <div>
-        {/* 태그 제목 + 플러스 아이콘 한 줄 정렬 */}
         <div className="flex items-center gap-2">
           <span className="font-semibold text-[14px] text-[#413F3F]">태그</span>
           <img
