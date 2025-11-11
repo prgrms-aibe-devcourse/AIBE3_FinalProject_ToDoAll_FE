@@ -1,5 +1,6 @@
 import DetailButton from '../../components/dashboard/DetailButton.tsx';
 import type { ReactNode } from 'react';
+import cn from '../../lib/utils/cn.ts';
 
 export default function LongViewSection({
   className,
@@ -10,7 +11,10 @@ export default function LongViewSection({
 }) {
   return (
     <section
-      className={'w-full bg-white rounded-[20px] p-[30px] h-fit jd-dashboard-section ' + className}
+      className={cn(
+        'w-full bg-white rounded-[20px] p-[30px] h-fit jd-dashboard-section',
+        className
+      )}
     >
       <DetailButton className="mb-[15px]" />
       <section className="flex flex-col mb-[15px]">

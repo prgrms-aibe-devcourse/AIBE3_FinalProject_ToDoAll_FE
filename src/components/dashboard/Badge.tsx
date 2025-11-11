@@ -18,8 +18,9 @@ const BadgeVariants = cva(
 interface BadgeProps extends VariantProps<typeof BadgeVariants> {
   className?: string;
   text: string;
+  color?: 'default' | 'scarlet' | 'violet' | 'gray';
 }
 
-export default function Badge({ text, color, className }: BadgeProps) {
+export default function Badge({ text, color = 'default', className }: BadgeProps) {
   return <section className={cn(BadgeVariants({ color, className }))}>{text}</section>;
 }
