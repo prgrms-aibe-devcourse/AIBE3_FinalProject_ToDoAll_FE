@@ -13,14 +13,14 @@ export default function ResumeListPage() {
     let result = [...mockResumes];
 
     if (tab === 'recommended') {
-      result = result.filter((r) => r.skills.includes('React')); // 예시: React 스킬 있는 사람 추천
+      result = result.filter((r) => r.skills.some((s) => s.name === 'React')); // 예시: React 스킬 있는 사람 추천
     }
 
     if (keyword) {
       result = result.filter(
         (r) =>
           r.name.toLowerCase().includes(keyword.toLowerCase()) ||
-          r.skills.some((s) => s.toLowerCase().includes(keyword.toLowerCase()))
+          r.skills.some((s) => s.name.toLowerCase().includes(keyword.toLowerCase()))
       );
     }
 
