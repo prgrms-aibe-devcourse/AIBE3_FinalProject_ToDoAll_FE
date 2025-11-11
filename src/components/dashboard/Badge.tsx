@@ -2,7 +2,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import cn from '../../lib/utils/cn.ts';
 
 const BadgeVariants = cva(
-  `h-[30px] rounded-3xl text-sm font-light text-white pl-[20px] pr-[20px] pt-[5px] pb-[5px]`,
+  `w-fit h-[30px] rounded-3xl text-sm font-light text-white pl-[20px] pr-[20px] pt-[5px] pb-[5px]`,
   {
     variants: {
       color: {
