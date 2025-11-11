@@ -6,7 +6,7 @@ interface ProfileCardProps {
 
 export default function ProfileCard({ profileData, name, avatar }: ProfileCardProps) {
   return (
-    <div className="bg-white border border-gray-200 shadow-md rounded-2xl p-5 flex flex-col text-left text-sm">
+    <div className="bg-white border border-jd-gray-light shadow-md rounded-2xl p-5 flex flex-col text-left text-sm">
       <div className="flex items-center gap-3 mb-3">
         <img
           src={avatar || profileData.image}
