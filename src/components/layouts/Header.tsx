@@ -58,7 +58,7 @@ const Header = () => {
           h-12 w-full
           bg-[var(--color-jd-violet)]
           text-white
-          shadow-[0_6px_22px_rgba(0,0,0,.25)]
+          shadow-[0_6px_22px_rgba(0,0,0,.15)]
           flex items-center justify-between px-4
         "
       >
@@ -135,7 +135,7 @@ const Header = () => {
                         title="이 알림 지우기"
                         onClick={(e) => {
                           e.stopPropagation(); // 드문 케이스에서 부모 클릭 전파 방지
-                          removeNotice(n.id); // ✅ 해당 항목 삭제
+                          removeNotice(n.id);
                         }}
                         className="ml-1 mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full text-black/40 hover:bg-black/5"
                         aria-label="알림 삭제"
