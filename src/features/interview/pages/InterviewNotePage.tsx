@@ -1,9 +1,9 @@
-import { useLocation } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import InterviewSummarySection from '../components/chat/InterviewSummarySection';
 import type { QuestionSection, InterviewSummary } from '../types/chatroom';
 import ProfileCard from '../components/question-create/ProfileCard';
 import QuestionNoteSection from '../components/note/QuestionNoteSection';
+import ScoreInputCard from '../components/note/ScoreInputCard';
 
 export default function InterviewNotePage() {
   const navigate = useNavigate();
@@ -82,9 +82,10 @@ export default function InterviewNotePage() {
 
       {/* 본문 */}
       <div className="flex flex-1 overflow-hidden p-6 gap-6">
-        {/* 왼쪽: 지원자 정보 */}
-        <div className="w-1/4">
+        {/* 왼쪽: 지원자 정보 + 점수 */}
+        <div className="w-1/4 flex flex-col gap-4">
           <ProfileCard profileData={initialProfileData} name={name} avatar={avatar} />
+          <ScoreInputCard />
         </div>
 
         {/* 가운데: 질문 목록 */}
