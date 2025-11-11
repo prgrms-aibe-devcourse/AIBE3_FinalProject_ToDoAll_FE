@@ -15,7 +15,6 @@ import SignupCompanyEmailPage from '../features/auth/pages/SignupCompanyEmailPag
 import SignupFormPage from '../features/auth/pages/SignupFormPage.tsx';
 import ResetPasswordEmailPage from '../features/auth/pages/ResetPasswordEmailPage';
 
-
 // 레이아웃 없는 페이지 (로그인/회원가입 관련)
 export const noLayoutRoutes = [
   { path: '/login', element: <LoginPage /> },
@@ -28,7 +27,7 @@ export const noLayoutRoutes = [
 // 메인 레이아웃 적용되는 페이지
 export const mainRoutes = [
   { path: '/interview/create', element: <InterviewCreatePage /> },
-  { path: '/detail-demo', element: <JDDetailDemoPage /> },
+  { path: '/jobs/:id', element: <JDDetailDemoPage /> },
   { path: '/interview/manage', element: <InterviewManagePage /> },
   { path: '/interview/create', element: <InterviewCreatePage /> },
   { path: '/resumes/:id', element: <ResumeDetail /> },
@@ -37,5 +36,4 @@ export const mainRoutes = [
   { path: '/jobs', element: <JDPage /> },
   { path: '/interview/manage/question-create', element: <InterviewQuestionCreatePage /> },
   { path: '/interview/chat-room', element: <InterviewChatRoomPage /> },
-
 ];

@@ -1,6 +1,7 @@
 import JobPostCardContainer from '../jobpostcard/JobPostCard.container';
 import { JobPostCardSkeleton } from '../jobpostcard/JobPostCard';
 import type { JobPost, OpenHandler } from '../../types/JobPost.types';
+import { useNavigate } from 'react-router-dom';
 
 type Props = {
   items: JobPost[];
@@ -8,7 +9,11 @@ type Props = {
   onOpen?: OpenHandler; // ← 동일하게 별칭 사용
 };
 
-export default function JobPostList({ items, isLoading, onOpen }: Props) {
+export default function JobPostList({ items, isLoading }: Props) {
+  const navigate = useNavigate();
+  const onOpen: OpenHandler = (id) => {
+    navigate(`/jobs/${id}`);
+  };
   if (isLoading) {
     return (
       <div className="space-y-3 sm:space-y-4">

@@ -12,4 +12,4 @@ export interface JobPost {
   deadline?: string;
 }
 /* eslint-disable-next-line no-unused-vars */
-export type OpenHandler = (...args: [string]) => void;
+export type OpenHandler = (id: string | number) => void;
