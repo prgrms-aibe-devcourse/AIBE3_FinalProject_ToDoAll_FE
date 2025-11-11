@@ -54,10 +54,10 @@ export default function ResumeCard({ resume, matchRate = 50, onView }: Props) {
             <div className="flex flex-wrap gap-2 mb-3">
               {resume.skills.map((skill) => (
                 <span
-                  key={skill}
+                  key={skill.name}
                   className="text-xs bg-white border rounded-full px-2 py-1 text-[#837C7C] border-[#837C7C]"
                 >
-                  {skill}
+                  {skill.name}
                 </span>
               ))}
             </div>

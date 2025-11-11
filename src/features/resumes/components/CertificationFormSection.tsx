@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import plusImg from '../../../assets/Vector-2.png';
+import arrowImg from '../../../assets/Expand Arrow-2.png';
 
 type Certification = { type: string; title: string; hasScore: boolean; score?: string };
 
@@ -44,7 +45,10 @@ export default function CertificationFormSection({
 
       <div>
         {list.map((c, idx) => (
-          <div key={idx} className="flex gap-2 flex-wrap p-2 border-b border-[#837C7C]">
+          <div
+            key={idx}
+            className="flex gap-2 flex-wrap p-2 border-b border-[#837C7C] last:border-b-0"
+          >
             <span className="font-medium">{c.type}</span>
             <span>{c.title}</span>
             <span>{c.hasScore && c.score ? `${c.score}점` : ''}</span>
@@ -55,21 +59,28 @@ export default function CertificationFormSection({
       {showForm && (
         <div className="space-y-3 bg-[#FAFAFA] p-4 rounded-[10px] border border-[#E5E5E5]">
           <div className="flex flex-wrap gap-3 items-center mt-2">
-            <select
-              value={certInput.type}
-              onChange={(e) => setCertInput({ ...certInput, type: e.target.value })}
-              className="border py-2 px-3 rounded-[10px] w-32"
-            >
-              <option value="자격">자격</option>
-              <option value="어학">어학</option>
-              <option value="수상">수상</option>
-            </select>
+            <div className="relative w-32">
+              <select
+                value={certInput.type}
+                onChange={(e) => setCertInput({ ...certInput, type: e.target.value })}
+                className="border py-2 px-3 rounded-[10px] w-full appearance-none bg-[#faf8f8] text-[#413F3F] focus:outline-none"
+              >
+                <option value="자격">자격</option>
+                <option value="어학">어학</option>
+                <option value="수상">수상</option>
+              </select>
+              <img
+                src={arrowImg}
+                alt="arrow"
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none opacity-60"
+              />
+            </div>
             <input
               type="text"
               placeholder="항목 입력"
               value={certInput.title}
               onChange={(e) => setCertInput({ ...certInput, title: e.target.value })}
-              className="border py-2 px-3 rounded-[10px] flex-1"
+              className="border py-2 px-3 rounded-[10px] basis-1/2"
             />
             <label className="flex items-center gap-2">
               <input

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import plusImg from '../../../assets/Vector-2.png';
 import type { Skill } from '../types/resumes.types';
+import arrowImg from '../../../assets/Expand Arrow-2.png';
 
 export default function SkillFormSection({
   skills,
@@ -36,7 +37,10 @@ export default function SkillFormSection({
 
       <div>
         {skills.map((s, idx) => (
-          <div key={idx} className="flex gap-2 flex-wrap p-2 border-b border-[#837C7C]">
+          <div
+            key={idx}
+            className="flex gap-2 flex-wrap p-2 border-b border-[#837C7C] last:border-b-0"
+          >
             <span className="font-medium">{s.name}</span>
             <span>{s.level}</span>
           </div>
@@ -52,20 +56,27 @@ export default function SkillFormSection({
               value={skillInput.name}
               onChange={(e) => setSkillInput({ ...skillInput, name: e.target.value })}
             />
-            <select
-              value={skillInput.level}
-              onChange={(e) =>
-                setSkillInput({
-                  ...skillInput,
-                  level: e.target.value as '초급' | '중급' | '고급',
-                })
-              }
-              className="border py-2 px-3 rounded-[10px] w-36"
-            >
-              <option value="초급">초급</option>
-              <option value="중급">중급</option>
-              <option value="고급">고급</option>
-            </select>
+            <div className="relative w-36">
+              <select
+                value={skillInput.level}
+                onChange={(e) =>
+                  setSkillInput({
+                    ...skillInput,
+                    level: e.target.value as '초급' | '중급' | '고급',
+                  })
+                }
+                className="border py-2 px-3 rounded-[10px] w-full appearance-none bg-[#faf8f8] text-[#413F3F] focus:outline-none"
+              >
+                <option value="초급">초급</option>
+                <option value="중급">중급</option>
+                <option value="고급">고급</option>
+              </select>
+              <img
+                src={arrowImg}
+                alt="arrow"
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none opacity-60"
+              />
+            </div>
           </div>
 
           <div className="flex justify-end mt-3">
