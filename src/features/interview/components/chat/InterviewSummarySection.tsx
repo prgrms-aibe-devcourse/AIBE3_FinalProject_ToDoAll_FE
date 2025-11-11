@@ -1,25 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { InterviewSummary } from '../../types/chatroom';
 
 interface InterviewSummarySectionProps {
   summaries: InterviewSummary[];
-  currentUserId: number; // 현재 로그인된 사용자 ID
+  currentUserId: number;
 }
 
 export default function InterviewSummarySection({
   summaries,
   currentUserId,
 }: InterviewSummarySectionProps) {
-  console.log('🟢 props check:', { summaries, currentUserId });
   const [summaryList, setSummaryList] = useState<InterviewSummary[]>(summaries);
   const [editingIdx, setEditingIdx] = useState<number | null>(null);
   const [newSummary, setNewSummary] = useState({ title: '', content: '' });
 
+  useEffect(() => {
+    setSummaryList(summaries);
+  }, [summaries]);
+
   // 수정 핸들러
   const handleEdit = (idx: number, key: keyof InterviewSummary, value: string) => {
-    const updated = [...summaryList];
-    updated[idx] = { ...updated[idx], [key]: value };
-    setSummaryList(updated);
+    setSummaryList((prev) => prev.map((item, i) => (i === idx ? { ...item, [key]: value } : item)));
   };
 
   // 새 평가 추가

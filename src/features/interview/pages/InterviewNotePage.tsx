@@ -7,8 +7,7 @@ import QuestionNoteSection from '../components/note/QuestionNoteSection';
 
 export default function InterviewNotePage() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { name, avatar } = location.state || {};
+  const { state: { name, avatar } = {} } = useLocation();
 
   const initialProfileData = {
     name: '김철수',
