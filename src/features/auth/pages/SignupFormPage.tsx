@@ -20,6 +20,7 @@ export default function SignupFormPage() {
   const [companyName, setCompanyName] = useState('');
   const [position, setPosition] = useState('');
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [nickname, setNickname] = useState(''); // [추가]
 
   // 비밀번호 입력 상태
 
@@ -30,9 +31,11 @@ export default function SignupFormPage() {
   const openPrivacyBtnRef = useRef<HTMLButtonElement | null>(null);
 
   //  “개인정보 미포함” 판단에 사용할 PII 소스 구성 (이메일 local-part + 이름)
-  const piiSources = [(companyEmail?.split('@')[0] || '').toLowerCase(), name.toLowerCase()].filter(
-    Boolean
-  );
+  const piiSources = [
+    (companyEmail?.split('@')[0] || '').toLowerCase(),
+    name.toLowerCase(),
+    nickname.toLowerCase(),
+  ].filter(Boolean);
 
   // 공통 유틸로 4가지 체크 일괄 계산
   const checks = buildPasswordChecks(password, piiSources);
@@ -41,13 +44,15 @@ export default function SignupFormPage() {
   const isPasswordValid = checks.english && checks.digit && checks.length && checks.notContainsPII; // 공통 결과 사용
 
   const isPasswordMatch = password.length > 0 && password === passwordConfirm; // 일치
-  const isRequiredFilled = !!companyName.trim() && !!name.trim() && !!position.trim(); // 반드시 boolean
+  const isRequiredFilled =
+    !!companyName.trim() && !!name.trim() && !!position.trim() && !!nickname.trim(); // 반드시 boolean
 
   // touched 상태 추가
   const [touched, setTouched] = useState({
     companyName: false,
     name: false,
     position: false,
+    nickname: false,
     password: false,
     passwordConfirm: false,
   });
@@ -90,6 +95,7 @@ export default function SignupFormPage() {
     if (!companyName.trim()) newErrors.companyName = '회사명을 입력해주세요.';
     if (!name.trim()) newErrors.name = '이름을 입력해주세요.';
     if (!position.trim()) newErrors.position = '직책을 입력해주세요.';
+    if (!nickname.trim()) newErrors.nickname = '닉네임을 입력해주세요.';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors); //  필수값 미입력만 경고로 유지
@@ -105,6 +111,7 @@ export default function SignupFormPage() {
       companyEmail,
       companyName,
       name,
+      nickname,
       position,
       passwordLen: password.length,
     });
@@ -264,6 +271,50 @@ export default function SignupFormPage() {
               </p>
             )}
           </div>
+        </div>
+
+        {/* 닉네임 */}
+        <div className="flex flex-col gap-3">
+          <label className="block text-m font-semibold text-jd-black">닉네임</label>
+          <div className="relative">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#413F3F]">
+              {/* user icon */}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                fill="currentColor"
+                className="bi bi-person-lines-fill"
+                viewBox="0 0 16 16"
+              >
+                <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5m.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1zm0 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1z" />
+              </svg>
+            </div>
+            <input
+              value={nickname}
+              onChange={(e) => {
+                setNickname(e.target.value);
+                if (errors.nickname) setErrors((prev) => ({ ...prev, nickname: '' }));
+              }}
+              onBlur={() => {
+                setTouched((p) => ({ ...p, nickname: true }));
+                if (!nickname.trim())
+                  setErrors((prev) => ({ ...prev, nickname: '닉네임을 입력해주세요.' }));
+              }}
+              placeholder="닉네임을 입력하세요"
+              autoComplete="off"
+              name="signup-nickname"
+              className="h-12 w-full rounded-full border border-jd-gray-light bg-jd-white pl-12 pr-5 text-[#413F3F]
+      placeholder:text-jd-gray-dark/70 outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
+      focus:border-jd-gray-light focus:ring-0"
+              style={{ borderRadius: 15, paddingLeft: '3rem' }}
+            />
+          </div>
+          {(touched.nickname || didSubmit) && errors.nickname && (
+            <p className="text-xs text-red-600 flex items-center gap-1 mt-0.5">
+              <span aria-hidden>ⓘ</span> {errors.nickname}
+            </p>
+          )}
         </div>
 
         {/* 비밀번호 */}
