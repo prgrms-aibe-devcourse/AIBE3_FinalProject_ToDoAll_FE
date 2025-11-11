@@ -47,15 +47,21 @@ export default function InterviewNotePage() {
 
   const interviewSummary: InterviewSummary[] = [
     {
+      id: 1,
+      authorId: 101,
       title: '김영희 면접관',
       content:
         'React의 렌더링 메커니즘을 잘 이해하고 있으며 memo/useMemo/useCallback을 적절히 사용함.',
     },
     {
+      id: 2,
+      authorId: 102,
       title: '박영희 면접관 (나)',
       content: '답변이 명확하고 실무 경험이 반영되어 있음. 성능 모니터링 도구 활용 경험 확인 필요.',
     },
     {
+      id: 3,
+      authorId: 103,
       title: '김민식 면접관',
       content:
         '전체적으로 React 렌더링 최적화에 대한 깊은 이해를 가지고 있으며 실무 적용 경험이 충분함.',
@@ -86,7 +92,7 @@ export default function InterviewNotePage() {
         <QuestionNoteSection questionNotes={questionNotes} />
 
         {/* 오른쪽: 면접관 평가 */}
-        <InterviewSummarySection summaries={interviewSummary} />
+        <InterviewSummarySection summaries={interviewSummary} currentUserId={102} />
       </div>
     </div>
   );
