@@ -8,7 +8,7 @@ import DashBoard from '../pages/DashBoard.tsx';
 import JDCreatePage from '../pages/JDCreatePage.tsx';
 import InterviewQuestionCreatePage from '../features/interview/pages/InterviewQuestionCreatePage';
 import ResumeForm from '../features/resumes/pages/ResumeCreatePage.tsx';
-
+import ResumeList from '../features/resumes/pages/ResumeListPage.tsx';
 // 레이아웃 없는 페이지 (로그인/회원가입 관련)
 export const noLayoutRoutes = [
   { path: '/interview/create/test', element: <InterviewCreatePage /> },
@@ -25,4 +25,5 @@ export const mainRoutes = [
   { path: '/jobs/new', element: <JDCreatePage /> },
   { path: '/interview/manage/question-create', element: <InterviewQuestionCreatePage /> },
   { path: '/resumes/create', element: <ResumeForm /> },
+  { path: '/resumes', element: <ResumeList /> },
 ];
