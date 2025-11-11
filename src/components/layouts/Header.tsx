@@ -1,16 +1,17 @@
 import { useState } from 'react';
-import SidebarDrawer from '../../components/SidebarDrawer'; // 경로는 프로젝트 alias에 맞춰 조정
+import SidebarDrawer from '../../components/SidebarDrawer';
 
 const Header = () => {
-  const [leftOpen, setLeftOpen] = useState(false); // ↔ 왼쪽 드로어 열림/닫힘
+  const [leftOpen, setLeftOpen] = useState(false); // 왼쪽 드로어 열림/닫힘
 
   return (
     <>
       <header
         className="
+          fixed top-0 left-0 right-0 z-50
           h-12 w-full
           bg-[var(--color-jd-violet)]
-          text-white ring-1 ring-white/35
+          text-white
           shadow-[0_6px_22px_rgba(0,0,0,.25)]
           flex items-center justify-between px-4
         "
@@ -40,6 +41,10 @@ const Header = () => {
           <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-[var(--color-jd-scarlet)]" />
         </button>
       </header>
+
+      {/* 컨텐츠가 헤더 밑에서 시작되도록 스페이서 */}
+
+      <div className="h-12" />
 
       {/*  왼쪽 사이드 컨트롤러 패널 */}
       <SidebarDrawer open={leftOpen} onClose={() => setLeftOpen(false)} />
