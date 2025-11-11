@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import ConfirmLogoutModal from '../features/auth/components/ConfirmLogoutModal.tsx';
 
 type Props = {
   open: boolean;
@@ -7,6 +9,7 @@ type Props = {
 
 export default function SidebarDrawer({ open, onClose }: Props) {
   const navigate = useNavigate();
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   return (
     <>
@@ -141,6 +144,7 @@ export default function SidebarDrawer({ open, onClose }: Props) {
               aria-label="로그아웃"
               onClick={(e) => {
                 e.stopPropagation(); // 카드 클릭으로 마이페이지 가는 것 방지
+                setConfirmOpen(true);
               }}
               className="p-2 rounded-md hover:bg-[var(--color-jd-gray-light)]"
             >
@@ -159,6 +163,16 @@ export default function SidebarDrawer({ open, onClose }: Props) {
           </div>
         </div>
       </aside>
+      {/* 로그아웃 확인 모달 */}
+      <ConfirmLogoutModal
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={() => {
+          setConfirmOpen(false);
+          // TODO: 실제 로그아웃 로직(토큰 삭제 등)
+          navigate('/login');
+        }}
+      />
     </>
   );
 }
