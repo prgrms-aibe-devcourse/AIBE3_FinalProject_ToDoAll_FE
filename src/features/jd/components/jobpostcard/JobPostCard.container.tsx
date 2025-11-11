@@ -17,7 +17,7 @@ export default function JobPostCardContainer({ post, onOpen }: Props) {
     <JobPostCard
       title={post.title}
       location={post.location}
-      applicantsLabel={`${post.applicantsCount}명 지원`}
+      applicantsLabel={`${post.applicantCount}명 지원`}
       statusLabel={statusLabel}
       thumbnailUrl={post.thumbnailUrl}
       skills={post.skills}

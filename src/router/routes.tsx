@@ -2,6 +2,16 @@
 
 import JDDetailDemoPage from '../pages/JDDetailDemoPage';
 import InterviewCreatePage from '../features/interview/pages/InterviewCreatePage';
+import InterviewManagePage from '../features/interview/pages/InterviewManagePage';
+import ResumeDetail from '../features/resumes/pages/ResumeDetail';
+import DashBoard from '../pages/DashBoard.tsx';
+import JDCreatePage from '../pages/JDCreatePage.tsx';
+
+import JDPage from '../pages/JDPage.tsx';
+import InterviewQuestionCreatePage from '../features/interview/pages/InterviewQuestionCreatePage';
+
+import ResumeForm from '../features/resumes/pages/ResumeCreatePage.tsx';
+import InterviewChatRoomPage from '../features/interview/pages/InterviewChatRoomPage.tsx';
 import LoginPage from '../features/auth/pages/LoginPage';
 import SignupCompanyEmailPage from '../features/auth/pages/SignupCompanyEmailPage.tsx';
 import SignupFormPage from '../features/auth/pages/SignupFormPage.tsx';
@@ -22,4 +32,15 @@ export const mainRoutes = [
   { path: '/interview/create', element: <InterviewCreatePage /> },
   { path: '/detail-demo', element: <JDDetailDemoPage /> },
   { path: '/mypage', element: <MyPage /> },
+  { path: '/interview/manage', element: <InterviewManagePage /> },
+  { path: '/interview/create', element: <InterviewCreatePage /> },
+  { path: '/resumes/:id', element: <ResumeDetail /> },
+  { path: '/dashboard', element: <DashBoard /> },
+  { path: '/jobs/new', element: <JDCreatePage /> },
+  { path: '/jobs', element: <JDPage /> },
+  { path: '/interview/manage/question-create', element: <InterviewQuestionCreatePage /> },
+
+  { path: '/resumes/create', element: <ResumeForm /> },
+
+  { path: '/interview/chat-room', element: <InterviewChatRoomPage /> },
 ];
