@@ -1,4 +1,3 @@
-// src/features/auth/pages/ResetPasswordEmailPage.tsx
 import type { FormEvent } from 'react';
 import AuthShell from '../components/AuthShell';
 
