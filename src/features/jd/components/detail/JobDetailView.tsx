@@ -22,7 +22,7 @@ export default function JobDetailView({
       </div>
       <hr className="text-gray-500" />
       <div className="mt-4 flex items-end text-xs text-gray-500">
-        <ApplicantCount count={job.applicantsCount} className="ml-auto" />
+        <ApplicantCount count={job.applicantCount} className="ml-auto" />
       </div>
       <div className="my-4">
         <JobMedia src={job.thumbnailUrl} />

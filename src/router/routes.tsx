@@ -6,6 +6,8 @@ import InterviewManagePage from '../features/interview/pages/InterviewManagePage
 import ResumeDetail from '../features/resumes/page/ResumeDetail';
 import DashBoard from '../pages/DashBoard.tsx';
 import JDCreatePage from '../pages/JDCreatePage.tsx';
+
+import JDPage from '../pages/JDPage.tsx';
 import InterviewQuestionCreatePage from '../features/interview/pages/InterviewQuestionCreatePage';
 import InterviewChatRoomPage from '../features/interview/pages/InterviewChatRoomPage.tsx';
 import LoginPage from '../features/auth/pages/LoginPage';
@@ -35,4 +37,5 @@ export const mainRoutes = [
   { path: '/resumes/:id', element: <ResumeDetail /> },
   { path: '/dashboard', element: <DashBoard /> },
   { path: '/jobs/new', element: <JDCreatePage /> },
+  { path: '/jobs', element: <JDPage /> },
 ];
