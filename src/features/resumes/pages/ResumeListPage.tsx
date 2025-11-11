@@ -9,16 +9,13 @@ export default function ResumeListPage() {
   const [sortBy, setSortBy] = useState<'latest' | 'oldest' | 'name'>('latest');
   const [tab, setTab] = useState<'all' | 'recommended'>('all');
 
-  // 필터링 & 정렬
   const filteredResumes = useMemo(() => {
     let result = [...mockResumes];
 
-    // 🔹 탭 필터링
     if (tab === 'recommended') {
       result = result.filter((r) => r.skills.includes('React')); // 예시: React 스킬 있는 사람 추천
     }
 
-    // 🔹 검색 필터링
     if (keyword) {
       result = result.filter(
         (r) =>
@@ -27,7 +24,6 @@ export default function ResumeListPage() {
       );
     }
 
-    // 🔹 정렬
     result.sort((a, b) => {
       if (sortBy === 'latest')
         return new Date(b.applyDate).getTime() - new Date(a.applyDate).getTime();
@@ -41,13 +37,11 @@ export default function ResumeListPage() {
   }, [keyword, sortBy, tab]);
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-2xl font-bold mb-6">지원자 목록</h1>
+    <div className="p-6 bg-[#FAF8F8] min-h-screen">
+      <h1 className="text-2xl font-semibold mb-6 text-[#413F3F]">지원자 조회</h1>
 
-      {/* 🔹 필터 섹션 */}
       <ResumeFilterSection onSearch={setKeyword} onSortChange={setSortBy} onTabChange={setTab} />
 
-      {/* 🔹 지원자 카드 목록 */}
       <div className="flex flex-col gap-4 mt-6">
         {filteredResumes.length > 0 ? (
           filteredResumes.map((resume: ResumeData) => (
