@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import AuthShell from '../components/AuthShell';
 import PrivacyModal from '../components/PrivacyModal';
+import ReqBadge from '../components/ReqBadge';
+import { buildPasswordChecks } from '../utils/passwordChecks';
 
 export default function SignupFormPage() {
   const [searchParams] = useSearchParams();
@@ -27,24 +29,17 @@ export default function SignupFormPage() {
   // 모달 트리거 버튼 ref
   const openPrivacyBtnRef = useRef<HTMLButtonElement | null>(null);
 
-  // 검증 함수 먼저 선언
-  const validatePassword = (pw: string) => /[a-zA-Z]/.test(pw) && /\d/.test(pw) && pw.length >= 8;
-
-  // 비밀번호 요건 체크(대/소문자, 숫자, 특수문자, 길이)
-  const pwChecks = {
-    english: /[a-zA-Z]/.test(password),
-    digit: /\d/.test(password),
-    length: password.length >= 8,
-  };
-
-  // “개인정보 미포함” (회사 이메일/이름 조합이 비밀번호에 들어가면 위험)
-  const piiTokens = [companyEmail?.split('@')[0] || ''].filter(Boolean);
-  const notContainsPII = !piiTokens.some(
-    (t) => t && password.toLowerCase().includes(t.toLowerCase())
+  //  “개인정보 미포함” 판단에 사용할 PII 소스 구성 (이메일 local-part + 이름)
+  const piiSources = [(companyEmail?.split('@')[0] || '').toLowerCase(), name.toLowerCase()].filter(
+    Boolean
   );
 
+  // 공통 유틸로 4가지 체크 일괄 계산
+  const checks = buildPasswordChecks(password, piiSources);
+
   // 파생 상태: 이제야 최종 유효성 계산
-  const isPasswordValid = validatePassword(password); // 영어+숫자+8자
+  const isPasswordValid = checks.english && checks.digit && checks.length && checks.notContainsPII; // 공통 결과 사용
+
   const isPasswordMatch = password.length > 0 && password === passwordConfirm; // 일치
   const isRequiredFilled = !!companyName.trim() && !!name.trim() && !!position.trim(); // 반드시 boolean
 
@@ -62,7 +57,7 @@ export default function SignupFormPage() {
 
   //최종 유효성에 동의 포함
   const isFormValid = Boolean(
-    isRequiredFilled && isPasswordValid && isPasswordMatch && notContainsPII && consentChecked
+    isRequiredFilled && isPasswordValid && isPasswordMatch && consentChecked
   );
 
   // 공통 헬퍼: onBlur 시 즉석 에러 세팅
@@ -308,10 +303,10 @@ export default function SignupFormPage() {
           </div>
           {/* 요건 뱃지 */}
           <div className="mt-1 flex flex-wrap gap-2">
-            <ReqBadge ok={pwChecks.english} label="영문자" />
-            <ReqBadge ok={pwChecks.digit} label="숫자" />
-            <ReqBadge ok={pwChecks.length} label="8자 이상" />
-            <ReqBadge ok={notContainsPII} label="개인정보 미포함" />
+            <ReqBadge ok={checks.english} label="영문자" />
+            <ReqBadge ok={checks.digit} label="숫자" />
+            <ReqBadge ok={checks.length} label="8자 이상" />
+            <ReqBadge ok={checks.notContainsPII} label="개인정보 미포함" />
           </div>
         </div>
 
@@ -424,19 +419,5 @@ export default function SignupFormPage() {
         </div>
       </form>
     </AuthShell>
-  );
-}
-
-function ReqBadge({ ok, label }: { ok: boolean; label: string }) {
-  return (
-    <span
-      className={`inline-flex items-center justify-center rounded-full
-        !px-2.5 !py-1.5 text-[11.5px] font-medium leading-[1.1]
-        border border-transparent
-        ${ok ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}
-        shadow-sm`}
-    >
-      {ok ? '✓' : '✕'}&nbsp;{label}
-    </span>
   );
 }

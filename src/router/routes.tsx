@@ -18,6 +18,7 @@ import SignupFormPage from '../features/auth/pages/SignupFormPage.tsx';
 import ResetPasswordEmailPage from '../features/auth/pages/ResetPasswordEmailPage';
 import MyPage from '../features/auth/pages/MyPage';
 import InterviewNotePage from '../features/interview/pages/InterviewNotePage';
+import ResetPasswordPage from '../features/auth/pages/ResetPasswordPage.tsx';
 
 // 레이아웃 없는 페이지 (로그인/회원가입 관련)
 export const noLayoutRoutes = [
@@ -26,6 +27,7 @@ export const noLayoutRoutes = [
   { path: '/signup/email', element: <SignupCompanyEmailPage /> },
   { path: '/signup/form', element: <SignupFormPage /> },
   { path: '/forgot', element: <ResetPasswordEmailPage /> },
+  { path: '/reset-password', element: <ResetPasswordPage /> },
 ];
 
 // 메인 레이아웃 적용되는 페이지

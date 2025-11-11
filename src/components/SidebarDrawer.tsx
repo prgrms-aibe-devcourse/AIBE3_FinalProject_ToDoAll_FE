@@ -21,7 +21,7 @@ export default function SidebarDrawer({ open, onClose }: Props) {
           bg-white text-[var(--color-jd-black)]
           shadow-[0_12px_30px_rgba(0,0,0,.25)]
           ring-1 ring-[var(--color-jd-violet)]/25
-          rounded-r-2xl
+          
           transition-transform duration-300 will-change-transform
           ${open ? 'translate-x-0' : '-translate-x-full'}
         `}
