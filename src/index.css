@@ -24,6 +24,7 @@
   --color-jd-black: #413f3f;
   --color-jd-gray-light: #e3dbdb;
   --color-jd-gray-dark: #837c7c;
+  --color-jd-green: #5cc46f;
 }
 
 @layer utilities {

@@ -10,6 +10,8 @@ export interface QuestionSection {
 }
 
 export interface InterviewSummary {
+  id: number;
+  authorId: number;
   title: string;
   content: string;
 }

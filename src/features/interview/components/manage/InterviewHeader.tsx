@@ -14,11 +14,11 @@ interface InterviewHeaderProps {
 export default function InterviewHeader({ avatar, name, position, status }: InterviewHeaderProps) {
   // 상태별 스타일 매핑
   const statusStyle: Record<InterviewStatus, { bg: string; text: string; label?: string }> = {
-    예정: { bg: 'bg-purple-900', text: 'text-white', label: '면접 시작' },
+    예정: { bg: 'bg-jd-violet', text: 'text-jd-white', label: '면접 시작' },
     진행중: { bg: '', text: '', label: '' },
-    합격: { bg: 'bg-red-500', text: 'text-white', label: '합격' },
-    보류: { bg: 'bg-red-500', text: 'text-white', label: '보류' },
-    불합격: { bg: 'bg-red-500', text: 'text-white', label: '불합격' },
+    합격: { bg: 'bg-jd-scarlet', text: 'text-jd-white', label: '합격' },
+    보류: { bg: 'bg-jd-scarlet', text: 'text-jd-white', label: '보류' },
+    불합격: { bg: 'bg-jd-scarlet', text: 'text-jd-white', label: '불합격' },
     미정: { bg: '', text: '', label: '' },
   };
 
@@ -28,8 +28,8 @@ export default function InterviewHeader({ avatar, name, position, status }: Inte
     <div className="flex items-center gap-3 mb-3">
       <img src={avatar} alt={name} className="w-12 h-12 rounded-full object-cover" />
       <div className="flex flex-col">
-        <h3 className="font-semibold text-gray-900">{name}</h3>
-        <p className="text-sm text-gray-500">{position}</p>
+        <h3 className="font-semibold text-jd-black">{name}</h3>
+        <p className="text-sm text-jd-gray-dark">{position}</p>
       </div>
       <span className={`ml-auto px-3 py-1 text-xs font-medium rounded-full ${bg} ${text}`}>
         {label ?? status}

@@ -24,7 +24,13 @@ export default function InterviewActions({
   const handleCloseModal = () => setIsModalOpen(false);
 
   const handleOpenInterviewNote = () => {
-    navigate('/interview/manage/question-create', {
+    navigate('/interview/note', {
+      state: { name, avatar, interviewId },
+    });
+  };
+
+  const handleCreateQuestionSet = () => {
+    navigate('/interview/question-create', {
       state: { name, avatar, interviewId },
     });
   };
@@ -37,7 +43,7 @@ export default function InterviewActions({
 
   const actionButtons: Record<InterviewStatus, React.ReactNode[]> = {
     예정: [
-      <InterviewButton key="question" label="질문 세트 생성" />,
+      <InterviewButton key="question" label="질문 세트 생성" onClick={handleCreateQuestionSet} />,
       <InterviewButton key="resume" label="이력서 열람" />,
     ],
     미정: [
