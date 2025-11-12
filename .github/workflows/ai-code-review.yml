@@ -13,7 +13,7 @@ permissions:
 env:
   MODEL: gpt-4o-mini
   MAX_TOKENS: '2000'
-  MAX_FILES: '40'
+  MAX_FILES: '100'
   MAX_LINES: '1800'
   EXCLUDE_GLOBS: |
     **/*.lock
