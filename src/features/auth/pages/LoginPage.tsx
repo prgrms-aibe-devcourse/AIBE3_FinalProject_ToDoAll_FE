@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { login } from '../api/api.ts';
 
 export default function LoginPage() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -17,10 +18,21 @@ export default function LoginPage() {
     return () => document.removeEventListener('visibilitychange', onVisibility);
   }, []);
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
-    setTimeout(() => setSubmitting(false), 700);
+    e.preventDefault();
+    setSubmitting(true); // 중복 클릭을 방지
+    const form = new FormData(e.target as HTMLFormElement);
+    const email = String(form.get('email') || ''); // 비어 있으면 공백 문자열
+    const password = String(form.get('password') || '');
+    try {
+      await login({ email, password }); // 서버에서 accessToken을 받기
+      window.location.href = '/mypage'; // 다음 단계(E2E 스모크)를 바로 확인
+    } catch {
+      alert('이메일 또는 비밀번호를 확인해 주세요.');
+    } finally {
+      setSubmitting(false); // 버튼 비활성화를 해제
+    }
   };
 
   return (
