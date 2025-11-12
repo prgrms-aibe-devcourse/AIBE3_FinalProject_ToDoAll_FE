@@ -9,7 +9,7 @@ export default function DateInfoCard() {
       <p>11/1</p>
       <div className="text-center sm:text-left">
         <h3 className="font-bold">김상진 님과의 면접</h3>
-        <p className="text-jd-gray-dark mb-1">시니어 프론트엔드 개발자</p>
+        <p className="text-jd-gray-dark mb-1">시니어 프론트 엔드 개발자</p>
         <p className="text-jd-gray-dark">14:00 · 면접관 1, 면접관 2</p>
       </div>
     </section>
