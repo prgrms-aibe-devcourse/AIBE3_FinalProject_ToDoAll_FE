@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import http from '../../../lib/http.ts';
 
 interface PasswordCheckModalProps {
   onVerifySuccess: () => void;
@@ -8,12 +9,12 @@ interface PasswordCheckModalProps {
 export default function PasswordCheckModal({ onVerifySuccess, onClose }: PasswordCheckModalProps) {
   const [pw, setPw] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: 실제 검증 API 호출
-    if (pw.trim().length >= 4) {
+    try {
+      await http.post('/auth/password/verify', { password: pw }); // 서버 bcrypt 확인
       onVerifySuccess();
-    } else {
+    } catch {
       alert('비밀번호를 다시 확인해주세요.');
     }
   };
