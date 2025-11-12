@@ -130,7 +130,7 @@ export async function createJobPost(request: JobCreateRequest): Promise<string> 
     body: JSON.stringify(request),
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const body = (await res.json()) as ApiResponse<{ id: number }>;
+  const body = (await res.json()) as ApiResponse<number>;
   if (!body.data) throw new Error(body.message ?? 'Empty response');
-  return String(body.data.id);
+  return String(body.data);
 }
