@@ -1,4 +1,4 @@
-import type { ResumeData } from '../types/resumes.types';
+import type { ResumeData } from '../../resumes/types/resumes.types';
 
 export const mockResumes: ResumeData[] = [
   {

@@ -1,10 +1,10 @@
 import { useState, useMemo } from 'react';
-import ResumeFilterSection from '../components/ResumeFilterSection';
-import ResumeCard from '../components/ResumeCard';
+import MatchFilterSection from '../components/MatchFilterSection';
+import MatchCard from '../components/MatchCard';
 import { mockResumes } from '../data/mockResumes';
-import type { ResumeData } from '../types/resumes.types';
+import type { ResumeData } from '../../resumes/types/resumes.types';
 
-export default function ResumeListPage() {
+export default function MatchListPage() {
   const [keyword, setKeyword] = useState('');
   const [sortBy, setSortBy] = useState<'latest' | 'oldest' | 'name'>('latest');
   const [tab, setTab] = useState<'all' | 'recommended'>('all');
@@ -40,12 +40,12 @@ export default function ResumeListPage() {
     <div className="p-6 bg-[#FAF8F8] min-h-screen">
       <h1 className="text-2xl font-semibold mb-6 text-[#413F3F]">지원자 조회</h1>
 
-      <ResumeFilterSection onSearch={setKeyword} onSortChange={setSortBy} onTabChange={setTab} />
+      <MatchFilterSection onSearch={setKeyword} onSortChange={setSortBy} onTabChange={setTab} />
 
       <div className="flex flex-col gap-4 mt-6">
         {filteredResumes.length > 0 ? (
           filteredResumes.map((resume: ResumeData) => (
-            <ResumeCard
+            <MatchCard
               key={resume.id}
               resume={resume}
               matchRate={Math.floor(Math.random() * 50) + 50} // 매칭률 예시
