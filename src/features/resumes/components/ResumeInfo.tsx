@@ -1,4 +1,4 @@
-import type { ResumeData, EducationItem } from '../types/resumes.types';
+import type { ResumeData, EducationItem, Skill } from '../types/resumes.types';
 
 interface ResumeInfoProps {
   data: ResumeData;
@@ -9,12 +9,14 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
     <div>
       <h2 className="font-semibold text-[30px] text-[#413F3F]">지원서</h2>
       <div className="relative bg-white rounded-2xl shadow p-6">
+        {/* 프로필 이미지 */}
         <img
           src={data.profileImage}
           alt={`${data.name} 프로필`}
           className="absolute top-6 right-6 w-36 h-48 rounded-[10px] object-cover shadow-md"
         />
 
+        {/* 이름 / 직무 */}
         <header className="flex justify-between items-center mb-8">
           <div>
             <h2 className="text-[25px] font-regular text-[#413F3F]">{data.name}</h2>
@@ -22,6 +24,7 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
           </div>
         </header>
 
+        {/* 기본 정보 */}
         <div className="space-y-6 text-sm font-medium text-[#413F3F]">
           <div>
             <b>이메일:</b> {data.email}
@@ -43,6 +46,7 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
           </div>
         </div>
 
+        {/* 파일 섹션 */}
         <section className="mt-6 flex flex-row gap-2">
           <div className="border border-[#E3DBDB] rounded-[10px] p-5 flex-1">
             <h2 className="font-semibold text-[#413F3F]">자기소개서</h2>
@@ -73,6 +77,7 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
           </div>
         </section>
 
+        {/* 학력사항 */}
         <section className="mt-6">
           <h3 className="font-semibold text-[#413F3F] bg-[#FAF8F8] border-y border-[#837C7C] py-2 px-3 mb-3">
             학력사항
@@ -105,26 +110,20 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
           )}
         </section>
 
-        <section className="mt-4">
-          <h3 className="font-semibold text-[#413F3F] bg-[#FAF8F8] border-y border-[#837C7C] py-2 px-3 mb-3">
-            경력사항
-          </h3>
-          {data.experience ? (
-            <p className="px-3">{data.experience}</p>
-          ) : (
-            <p className="px-3 text-[#837C7C] text-sm">경력사항이 없습니다.</p>
-          )}
-        </section>
-
+        {/* 스킬 */}
         <section className="mt-4">
           <h3 className="font-semibold text-[#413F3F] bg-[#FAF8F8] border-y border-[#837C7C] py-2 px-3 mb-3">
             스킬
           </h3>
           {data.skills.length > 0 ? (
             <ul className="flex flex-wrap gap-2 px-3">
-              {data.skills.map((skill) => (
-                <li key={skill} className="px-3 py-1 bg-gray-100 rounded-lg text-gray-700">
-                  {skill}
+              {data.skills.map((skill: Skill, idx) => (
+                <li
+                  key={idx}
+                  className="px-3 py-1 bg-gray-100 rounded-lg text-gray-700 flex items-center gap-2"
+                >
+                  <span>{skill.name}</span>
+                  <span className="text-xs text-gray-500">({skill.level})</span>
                 </li>
               ))}
             </ul>
@@ -133,6 +132,7 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
           )}
         </section>
 
+        {/* 경험/활동/교육 */}
         <section className="mt-4">
           <h3 className="font-semibold text-[#413F3F] bg-[#FAF8F8] border-y border-[#837C7C] py-2 px-3 mb-3">
             경험/활동/교육
@@ -144,6 +144,7 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
           )}
         </section>
 
+        {/* 자격/어학/수상 */}
         <section className="mt-4">
           <h3 className="font-semibold text-[#413F3F] bg-[#FAF8F8] border-y border-[#837C7C] py-2 px-3 mb-3">
             자격/어학/수상

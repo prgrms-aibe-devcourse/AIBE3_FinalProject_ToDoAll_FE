@@ -9,7 +9,7 @@ type Props = {
   onTabChange: (_tab: 'all' | 'recommended') => void;
 };
 
-export default function ResumeFilterSection({ onSearch, onTabChange }: Props) {
+export default function MatchFilterSection({ onSearch, onTabChange }: Props) {
   const [activeTab, setActiveTab] = useState<'all' | 'recommended'>('all');
   const [keyword] = useState('');
 
