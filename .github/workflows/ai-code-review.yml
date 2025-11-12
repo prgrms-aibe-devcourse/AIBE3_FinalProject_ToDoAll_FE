@@ -164,7 +164,6 @@ jobs:
             echo "   - **문제 코드**와 그 코드가 문제가 되는 이유"
             echo "   - **개선 방법**과 수정 예시 코드"
             echo "   - 관련된 React 원칙, 성능 이슈, 타입 안정성 근거를 반드시 포함"
-            echo "   - **적어도 5개 이상의 주요 피드백을 생성하세요.**"
             echo ""
             echo "2. 코드가 좋은 경우에도 이유를 간단히 명시하세요. (예: 성능 최적화 패턴을 잘 사용함)"
             echo ""
@@ -176,7 +175,6 @@ jobs:
             echo "### ⚠️ 세부 코드 리뷰"
             echo "- [파일명:줄번호] 문제 설명 → 원인 → 개선 방안 (+ 코드 예시)"
             echo "- 실제 수정 가능한 형태로 작성할 것"
-            echo "- 가능한 한 많은 문제를 찾아서 작성하세요. 최소 5개 이상이 권장됩니다."
             echo ""
             echo "### 🧪 테스트 제안"
             echo "- 개선된 코드가 의도대로 동작함을 검증하기 위한 테스트 아이디어"
@@ -229,8 +227,8 @@ jobs:
 
           PAYLOAD=$(jq -n \
             --arg model "$MODEL" \
-            --arg sys "$(cat system.txt)" \
-            --arg usr "$(cat user.txt)" \
+            --rawfile sys system.txt \
+            --rawfile usr user.txt \
             --argjson mt ${MAX_TOKENS} \
             '{model:$model, messages:[{role:"system",content:$sys},{role:"user",content:$usr}], max_tokens:$mt, temperature:0.2}'
           )
