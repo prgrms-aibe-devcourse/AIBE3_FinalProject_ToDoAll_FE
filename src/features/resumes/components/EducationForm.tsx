@@ -60,21 +60,21 @@ export default function EducationForm({ formData, onChange }: Props) {
 
   return (
     <>
-      <div className="bg-[#FAF8F8] border-t border-b border-[#E0E0E0] p-2 flex items-center justify-between">
+      <div className="flex items-center justify-between border-t border-b border-[#E0E0E0] bg-[#FAF8F8] p-2">
         <h2 className="text-lg font-semibold text-[#413F3F]">최종 학력 사항</h2>
         <button
           type="button"
-          className="px-3 py-1 text-[#413F3F] flex items-center gap-1 hover:opacity-80 transition"
+          className="flex items-center gap-1 px-3 py-1 text-[#413F3F] transition hover:opacity-80"
           onClick={() => setShowForm(true)}
         >
-          <img src={plusImg} alt="plus" className="w-3 h-3" />
+          <img src={plusImg} alt="plus" className="h-3 w-3" />
           추가
         </button>
       </div>
 
       <div>
         {formData.education.map((edu, idx) => (
-          <div key={idx} className="flex gap-2 flex-wrap p-2 border-b border-[#837C7C]">
+          <div key={idx} className="flex flex-wrap gap-2 border-b border-[#837C7C] p-2">
             <span className="font-medium">{edu.type}</span>
             <span>{edu.name}</span>
             <span>
@@ -86,10 +86,10 @@ export default function EducationForm({ formData, onChange }: Props) {
       </div>
 
       {showForm && (
-        <div className="space-y-3 bg-[#FAFAFA] p-4 rounded-[10px] border border-[#E5E5E5]">
+        <div className="space-y-3 rounded-[10px] border border-[#E5E5E5] bg-[#FAFAFA] p-4">
           <div className="relative w-40">
             <select
-              className="border px-3 py-2 pr-10 rounded-[10px] w-full"
+              className="w-full rounded-[10px] border px-3 py-2 pr-10"
               value={newEdu.type ?? ''}
               onChange={(e) => handleTypeChange(e.target.value as EducationItem['type'])}
             >
@@ -105,35 +105,35 @@ export default function EducationForm({ formData, onChange }: Props) {
             <img
               src={dropImg}
               alt="drop-down"
-              className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 w-3 h-2"
+              className="pointer-events-none absolute top-1/2 right-3 h-2 w-3 -translate-y-1/2 transform"
             />
           </div>
 
           {newEdu.type && (
             <>
-              <div className="flex flex-wrap gap-3 items-center mt-2">
+              <div className="mt-2 flex flex-wrap items-center gap-3">
                 <input
-                  className="border py-2 px-3 rounded-[10px] w-48"
+                  className="w-48 rounded-[10px] border px-3 py-2"
                   placeholder="학교명"
                   value={newEdu.name ?? ''}
                   onChange={(e) => setNewEdu({ ...newEdu, name: e.target.value })}
                 />
                 <input
                   type="date"
-                  className="border p-2 rounded-[10px] w-36"
+                  className="w-36 rounded-[10px] border p-2"
                   value={newEdu.startDate ?? ''}
                   onChange={(e) => setNewEdu({ ...newEdu, startDate: e.target.value })}
                 />
                 <input
                   type="date"
-                  className="border p-2 rounded-[10px] w-36"
+                  className="w-36 rounded-[10px] border p-2"
                   value={newEdu.endDate ?? ''}
                   onChange={(e) => setNewEdu({ ...newEdu, endDate: e.target.value })}
                 />
                 <label className="flex items-center gap-2">
                   <input
                     type="checkbox"
-                    className="w-4 h-4 accent-purple-600"
+                    className="h-4 w-4 accent-purple-600"
                     checked={newEdu.graduated ?? false}
                     onChange={(e) => setNewEdu({ ...newEdu, graduated: e.target.checked })}
                   />
@@ -141,10 +141,10 @@ export default function EducationForm({ formData, onChange }: Props) {
                 </label>
               </div>
 
-              <div className="flex justify-end mt-3">
+              <div className="mt-3 flex justify-end">
                 <button
                   type="button"
-                  className="px-4 py-2 bg-[#E3DBDB] rounded-[8px] hover:bg-[#B1A0A0] transition"
+                  className="rounded-[8px] bg-[#E3DBDB] px-4 py-2 transition hover:bg-[#B1A0A0]"
                   onClick={addEducation}
                 >
                   입력

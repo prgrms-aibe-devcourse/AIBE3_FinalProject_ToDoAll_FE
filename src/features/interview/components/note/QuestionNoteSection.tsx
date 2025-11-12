@@ -18,18 +18,18 @@ export default function QuestionNoteSection({ questionNotes }: QuestionNoteSecti
   };
 
   return (
-    <div className="w-[35%] flex flex-col bg-white border border-jd-gray-light rounded-2xl shadow-md p-6 overflow-hidden">
-      <div className="flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+    <div className="border-jd-gray-light flex w-[35%] flex-col overflow-hidden rounded-2xl border bg-white p-6 shadow-md">
+      <div className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent flex-1 overflow-y-auto pr-2">
         {questionNotes.map((section, idx) => (
           <div key={idx} className="mb-8">
             {/* 섹션 제목 */}
-            <h3 className="font-semibold mb-3 text-[18px] text-jd-gray-dark">{section.topic}</h3>
+            <h3 className="text-jd-gray-dark mb-3 text-[18px] font-semibold">{section.topic}</h3>
 
-            <ul className="space-y-3 list-disc list-inside">
+            <ul className="list-inside list-disc space-y-3">
               {section.questions.map((q, i) => (
                 <li
                   key={i}
-                  className="relative flex items-start justify-between bg-jd-white transition rounded-xl p-4 border border-jd-gray-light text-sm"
+                  className="bg-jd-white border-jd-gray-light relative flex items-start justify-between rounded-xl border p-4 text-sm transition"
                 >
                   {/* 질문 내용 */}
                   <div className="flex-1 pr-3">
@@ -39,10 +39,10 @@ export default function QuestionNoteSection({ questionNotes }: QuestionNoteSecti
                   {/* 체크 버튼 */}
                   <button
                     onClick={() => toggleCheck(q)}
-                    className={`shrink-0 w-6 h-6 mt-1 flex items-center justify-center rounded-full border transition ${
+                    className={`mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition ${
                       checkedQuestions.has(q)
-                        ? 'bg-[#DE4F36] text-white border-[#DE4F36]'
-                        : 'bg-white border-gray-300 text-gray-400 hover:bg-gray-100'
+                        ? 'border-[#DE4F36] bg-[#DE4F36] text-white'
+                        : 'border-gray-300 bg-white text-gray-400 hover:bg-gray-100'
                     }`}
                   >
                     <Check size={14} />

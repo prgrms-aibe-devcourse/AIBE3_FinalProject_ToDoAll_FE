@@ -33,18 +33,18 @@ export default function JobPostCard({
         if (e.key === 'Enter' || e.key === ' ') onClick();
       }}
       className={
-        'group relative w-full overflow-hidden rounded-2xl bg-white p-3 sm:p-4 shadow-sm ring-1 ring-gray-200 transition hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer ' +
+        'group relative w-full cursor-pointer overflow-hidden rounded-2xl bg-white p-3 shadow-sm ring-1 ring-gray-200 transition hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 sm:p-4 ' +
         className
       }
     >
       <div className="flex gap-3 sm:gap-4">
-        <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl sm:h-20 sm:w-20 bg-gray-100">
+        <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-gray-100 sm:h-20 sm:w-20">
           <img src={thumbnailUrl} alt="공고 대표 이미지" className="h-full w-full object-cover" />
         </div>
 
         <div className="min-w-0 flex-1">
           <div className="flex items-start gap-2">
-            <h3 className="truncate text-base sm:text-lg font-semibold text-gray-900">{title}</h3>
+            <h3 className="truncate text-base font-semibold text-gray-900 sm:text-lg">{title}</h3>
             <span
               className={
                 'ml-1 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ' +
@@ -55,7 +55,7 @@ export default function JobPostCard({
             </span>
           </div>
 
-          <p className="mt-1 text-xs sm:text-sm text-gray-600">
+          <p className="mt-1 text-xs text-gray-600 sm:text-sm">
             {location}
             {applicantsLabel ? <span className="mx-2">·</span> : null}
             {applicantsLabel}
@@ -66,7 +66,7 @@ export default function JobPostCard({
               {skills.map((s, i) => (
                 <li
                   key={`${s}-${i}`}
-                  className="rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5 text-[10px] sm:text-xs text-gray-700"
+                  className="rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5 text-[10px] text-gray-700 sm:text-xs"
                 >
                   {s}
                 </li>
@@ -92,7 +92,7 @@ export function JobPostCardSkeleton() {
   return (
     <div className="w-full animate-pulse rounded-2xl border border-gray-200 bg-white p-3 sm:p-4">
       <div className="flex gap-3 sm:gap-4">
-        <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-xl bg-gray-200" />
+        <div className="h-16 w-16 rounded-xl bg-gray-200 sm:h-20 sm:w-20" />
         <div className="flex-1 space-y-2">
           <div className="h-4 w-1/2 rounded bg-gray-200" />
           <div className="h-3 w-1/3 rounded bg-gray-200" />

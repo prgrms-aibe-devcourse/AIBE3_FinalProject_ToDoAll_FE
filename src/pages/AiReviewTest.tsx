@@ -18,7 +18,7 @@ export default function AiReviewTest({ initial = 0 }: Props) {
 
   return (
     <div className="p-4">
-      <button className="bg-red-500 px-4 py-2 text-white rounded" onClick={increment}>
+      <button className="rounded bg-red-500 px-4 py-2 text-white" onClick={increment}>
         Count: {count}
       </button>
 

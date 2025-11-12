@@ -40,7 +40,12 @@ export default defineConfig([
           caughtErrorsIgnorePattern: '^_',
         },
       ],
-      'prettier/prettier': 'warn',
+      'prettier/prettier': [
+        'error',
+        {
+          endOfLine: 'auto',
+        },
+      ],
     },
     settings: {
       react: { version: 'detect' },

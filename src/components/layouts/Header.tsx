@@ -52,16 +52,7 @@ const Header = () => {
 
   return (
     <>
-      <header
-        className="
-          fixed top-0 left-0 right-0 z-50
-          h-12 w-full
-          bg-[var(--color-jd-violet)]
-          text-white
-          shadow-[0_6px_22px_rgba(0,0,0,.15)]
-          flex items-center justify-between px-4
-        "
-      >
+      <header className="fixed top-0 right-0 left-0 z-50 flex h-12 w-full items-center justify-between bg-[var(--color-jd-violet)] px-4 text-white shadow-[0_6px_22px_rgba(0,0,0,.15)]">
         {/* ☰ 햄버거 */}
         <div className="flex items-center gap-3">
           <button type="button" aria-label="메뉴 열기" onClick={() => setLeftOpen((prev) => !prev)}>
@@ -79,8 +70,7 @@ const Header = () => {
             aria-haspopup="menu"
             aria-expanded={notiOpen}
             onClick={() => setNotiOpen((v) => !v)}
-            className="relative inline-flex h-9 w-9 items-center justify-center rounded-full
-                       bg-white/10 hover:bg-white/15 transition  focus:outline-none focus:ring-2 focus:ring-white/30"
+            className="relative inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/10 transition hover:bg-white/15 focus:ring-2 focus:ring-white/30 focus:outline-none"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-white">
               <path
@@ -89,7 +79,7 @@ const Header = () => {
               />
             </svg>
             {notices.length > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-[var(--color-jd-scarlet)]" />
+              <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-[var(--color-jd-scarlet)]" />
             )}
           </button>
 
@@ -99,12 +89,7 @@ const Header = () => {
               ref={notiMenuRef}
               role="menu"
               aria-label="알림 목록"
-              className="
-                  absolute right-0 mt-2 w-[320px]
-                  rounded-2xl border border-black/10 bg-white
-                  shadow-[0_10px_30px_rgba(0,0,0,.15)]
-                  z-[60] overflow-hidden
-                "
+              className="absolute right-0 z-[60] mt-2 w-[320px] overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_10px_30px_rgba(0,0,0,.15)]"
             >
               <div className="flex items-center justify-between px-4 py-2">
                 <p className="text-sm font-semibold text-[var(--color-jd-black)]">알림</p>
@@ -137,7 +122,7 @@ const Header = () => {
                           e.stopPropagation(); // 드문 케이스에서 부모 클릭 전파 방지
                           removeNotice(n.id);
                         }}
-                        className="ml-1 mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full text-black/40 hover:bg-black/5"
+                        className="mt-0.5 ml-1 inline-flex h-6 w-6 items-center justify-center rounded-full text-black/40 hover:bg-black/5"
                         aria-label="알림 삭제"
                       >
                         <svg

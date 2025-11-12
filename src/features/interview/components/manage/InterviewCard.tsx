@@ -27,7 +27,7 @@ export default function InterviewCard({
   return (
     <div
       key={id}
-      className="relative bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition"
+      className="relative rounded-2xl bg-white p-6 shadow-md transition hover:shadow-lg"
     >
       <button className="absolute top-3 right-3 text-gray-400 hover:text-gray-600">×</button>
 

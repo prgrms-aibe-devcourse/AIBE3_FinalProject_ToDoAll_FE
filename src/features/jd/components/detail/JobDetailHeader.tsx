@@ -15,12 +15,12 @@ export function JobDetailHeader({
     <header className="flex items-start justify-between gap-4">
       <div className="min-w-0">
         <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold text-gray-900 truncate">{job.title}</h1>
+          <h1 className="truncate text-2xl font-bold text-gray-900">{job.title}</h1>
           <span
             className={
               statusLabel === '진행중'
-                ? 'rounded-full bg-red-100 text-red-700 text-xs px-2 py-0.5'
-                : 'rounded-full bg-gray-100 text-gray-600 text-xs px-2 py-0.5'
+                ? 'rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-700'
+                : 'rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600'
             }
           >
             {statusLabel}
@@ -36,7 +36,7 @@ export function JobDetailHeader({
         ) : null}
       </div>
 
-      <div className="shrink-0 flex items-center gap-2">
+      <div className="flex shrink-0 items-center gap-2">
         <button
           onClick={onEdit}
           className="rounded-full bg-white px-3 py-1.5 text-sm ring-1 ring-gray-200 hover:bg-gray-50"

@@ -52,18 +52,18 @@ export default function InterviewCreatePage() {
 
   return (
     <div className="flex min-h-screen bg-[#fbf9f9] px-12 py-8">
-      <h1 className="text-xl font-semibold w-40 mt-4">면접 생성</h1>
+      <h1 className="mt-4 w-40 text-xl font-semibold">면접 생성</h1>
 
-      <div className="flex flex-1 justify-center items-start bg-white rounded-3xl shadow-xl p-10 mt-16 mr-40">
-        <div className="flex gap-12 w-full max-w-5xl">
+      <div className="mt-16 mr-40 flex flex-1 items-start justify-center rounded-3xl bg-white p-10 shadow-xl">
+        <div className="flex w-full max-w-5xl gap-12">
           {/* 왼쪽 지원자 */}
           <div className="flex-1">
             <ApplicantProfileCard />
           </div>
 
           {/* 오른쪽 면접관 초대 */}
-          <div className="flex-[1.2] flex flex-col relative">
-            <h2 className="font-semibold text-lg mb-4">면접관 초대</h2>
+          <div className="relative flex flex-[1.2] flex-col">
+            <h2 className="mb-4 text-lg font-semibold">면접관 초대</h2>
             <InterviewerSearchBox
               search={search}
               setSearch={setSearch}
@@ -71,7 +71,7 @@ export default function InterviewCreatePage() {
               handleInvite={handleInvite}
             />
             <InvitedList invited={invited} handleRemove={handleRemove} />
-            <button className="mt-6 self-end bg-[#E35B43] text-white rounded-lg px-6 py-2.5 font-semibold hover:bg-[#d44f3a] transition">
+            <button className="mt-6 self-end rounded-lg bg-[#E35B43] px-6 py-2.5 font-semibold text-white transition hover:bg-[#d44f3a]">
               면접 초대
             </button>
           </div>
