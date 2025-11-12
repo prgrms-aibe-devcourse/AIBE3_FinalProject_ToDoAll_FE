@@ -1,7 +1,6 @@
 import http from '../../../lib/http.ts';
 
 export async function login(dto: { email: string; password: string }) {
-  // 로그인은 인증 전이지만, 서버가 body로 accessToken, 쿠키로 refreshToken을 준다고 가정
   const { data } = await http.post('/auth/login', dto); // baseURL + /auth/login
   if (data?.accessToken) {
     sessionStorage.setItem('accessToken', data.accessToken); // 새 토큰을 저장
@@ -44,4 +43,18 @@ export async function verifyCompanyEmailToken(token: string) {
     sessionStorage.setItem('verifiedCompanyEmail', data.email);
   }
   return data;
+}
+
+// 회원가입 요청
+export async function signup(payload: {
+  token: string;
+  email: string;
+  name: string;
+  nickname: string;
+  position: string;
+  companyName: string;
+  password: string;
+}) {
+  const res = await http.post('/auth/signup', payload);
+  return res.data;
 }

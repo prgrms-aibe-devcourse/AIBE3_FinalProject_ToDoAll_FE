@@ -100,7 +100,7 @@ export default function SignupCompanyEmailPage() {
           className="h-12 w-full !rounded-[15px] !text-white font-extrabold !bg-[#752F6D] [background-image:none]
           !opacity-100 shadow-[0_4px_12px_rgba(117,47,109,.25)] hover:brightness-[1.05] active:brightness-95 transition
           ${!email || invalid ? 'bg-[#752F6D]/60 cursor-not-allowed' : 'bg-[#752F6D] hover:brightness-[1.05] active:brightness-95'}`}
-          style={{ height: 44 }"
+          "
           style={{ height: 44 }}
         >
           {loading ? '전송 중...' : '이메일 인증'}

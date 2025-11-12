@@ -6,6 +6,7 @@ import PrivacyModal from '../components/PrivacyModal';
 import ReqBadge from '../components/ReqBadge';
 import { buildPasswordChecks } from '../utils/passwordChecks';
 import { verifyCompanyEmailToken } from '../api/auth.api.ts';
+import { signup } from '../api/auth.api.ts';
 
 export default function SignupFormPage() {
   const [searchParams] = useSearchParams();
@@ -21,7 +22,7 @@ export default function SignupFormPage() {
   const [companyName, setCompanyName] = useState('');
   const [position, setPosition] = useState('');
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [nickname, setNickname] = useState(''); // [추가]
+  const [nickname, setNickname] = useState('');
 
   // 비밀번호 입력 상태
 
@@ -60,6 +61,7 @@ export default function SignupFormPage() {
   const [didSubmit, setDidSubmit] = useState(false);
   const [consentChecked, setConsentChecked] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [submitting, setSubmitting] = useState(false); // 중복 제출 막는 스위치
 
   //최종 유효성에 동의 포함
   const isFormValid = Boolean(
@@ -107,9 +109,11 @@ export default function SignupFormPage() {
     })();
   }, [token, navigate]);
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setDidSubmit(true);
+
+    if (submitting) return;
 
     // 텍스트 필수값 에러 수집
     const newErrors: { [key: string]: string } = {};
@@ -127,17 +131,29 @@ export default function SignupFormPage() {
     if (!isFormValid || !token) return;
 
     setErrors({});
-    // TODO: 회원가입 요청 (token과 함께 전송)
-    // await signup({ token, email: companyEmail, name, nickname, position, companyName, password });
-    console.log('회원가입 제출:', {
-      token,
-      companyEmail,
-      companyName,
-      name,
-      nickname,
-      position,
-      passwordLen: password.length,
-    });
+    setSubmitting(true); // 전송 시작
+
+    try {
+      await signup({
+        token,
+        email: companyEmail,
+        name,
+        nickname,
+        position,
+        companyName,
+        password,
+      });
+
+      alert('가입이 완료되었습니다. 로그인 해주세요.');
+      navigate('/login', { replace: true });
+    } catch (e: any) {
+      //  서버에서 실패(중복 이메일, 만료 토큰 등) 시 사용자에게 안내
+      const msg =
+        e?.response?.data?.message ?? '회원가입에 실패했습니다. 잠시 후 다시 시도해주세요.';
+      alert(msg);
+    } finally {
+      setSubmitting(false); // 전송 끝
+    }
   };
 
   if (loading) {
@@ -167,8 +183,8 @@ export default function SignupFormPage() {
               >
                 <path
                   d="M4 22h16v-2h-1V4a1 1 0 0 0-1-1h-4V2h-4v1H6a1 1 0 0 0-1
-                1v16H4v2zm3-2V5h10v15H7zM9 7h2v2H9V7zm0 4h2v2H9v-2zm0 4h2v2H9v-2zm4-8h2v2h-2V7zm0
-                4h2v2h-2v-2zm0 4h2v2h-2v-2z"
+              1v16H4v2zm3-2V5h10v15H7zM9 7h2v2H9V7zm0 4h2v2H9v-2zm0 4h2v2H9v-2zm4-8h2v2h-2V7zm0
+              4h2v2h-2v-2zm0 4h2v2h-2v-2z"
                 />
               </svg>
             </div>
@@ -186,9 +202,9 @@ export default function SignupFormPage() {
               }}
               placeholder="회사명을 입력하세요"
               className="h-12 w-full rounded-full border border-jd-gray-light
-              bg-jd-white pl-12 pr-5 text-[#413F3F] placeholder:text-jd-gray-dark/70
-              outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
-              focus:border-jd-gray-light focus:ring-0"
+            bg-jd-white pl-12 pr-5 text-[#413F3F] placeholder:text-jd-gray-dark/70
+            outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
+            focus:border-jd-gray-light focus:ring-0"
               style={{ borderRadius: 15, paddingLeft: '3rem' }}
             />
           </div>
@@ -238,8 +254,8 @@ export default function SignupFormPage() {
                 autoComplete="off"
                 name="signup-name"
                 className="h-12 w-full rounded-full border border-jd-gray-light bg-jd-white pl-12 pr-5 text-[#413F3F]
-        placeholder:text-jd-gray-dark/70 outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
-        focus:border-jd-gray-light focus:ring-0"
+      placeholder:text-jd-gray-dark/70 outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
+      focus:border-jd-gray-light focus:ring-0"
                 style={{ borderRadius: 15, paddingLeft: '3rem' }}
               />
             </div>
@@ -283,8 +299,8 @@ export default function SignupFormPage() {
                 name="user_field"
                 autoComplete="off"
                 className="h-12 w-full rounded-full border border-jd-gray-light bg-jd-white pl-12 pr-5 text-[#413F3F]
-        placeholder:text-jd-gray-dark/70 outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
-        focus:border-jd-gray-light focus:ring-0"
+      placeholder:text-jd-gray-dark/70 outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
+      focus:border-jd-gray-light focus:ring-0"
                 style={{ borderRadius: 15, paddingLeft: '3rem' }}
               />
             </div>
@@ -328,8 +344,8 @@ export default function SignupFormPage() {
               autoComplete="off"
               name="signup-nickname"
               className="h-12 w-full rounded-full border border-jd-gray-light bg-jd-white pl-12 pr-5 text-[#413F3F]
-      placeholder:text-jd-gray-dark/70 outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
-      focus:border-jd-gray-light focus:ring-0"
+    placeholder:text-jd-gray-dark/70 outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
+    focus:border-jd-gray-light focus:ring-0"
               style={{ borderRadius: 15, paddingLeft: '3rem' }}
             />
           </div>
@@ -354,7 +370,7 @@ export default function SignupFormPage() {
               >
                 <path
                   d="M18 8h-1V6a5 5 0 0 0-10 0v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2
-                2 0 0 0-2-2Zm-6 9a2 2 0 1 1 0-4 2 2 0 0 1 0 4Zm3.1-9H8.9V6a3.1 3.1 0 1 1 6.2 0v2Z"
+              2 0 0 0-2-2Zm-6 9a2 2 0 1 1 0-4 2 2 0 0 1 0 4Zm3.1-9H8.9V6a3.1 3.1 0 1 1 6.2 0v2Z"
                 />
               </svg>
             </div>
@@ -369,9 +385,9 @@ export default function SignupFormPage() {
               autoCapitalize="none"
               spellCheck={false}
               className="h-12 w-full rounded-full border border-jd-gray-light
-              bg-jd-white pl-12 pr-5 text-[#413F3F] placeholder:text-jd-gray-dark/70
-              outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
-              focus:border-jd-gray-light focus:ring-0"
+            bg-jd-white pl-12 pr-5 text-[#413F3F] placeholder:text-jd-gray-dark/70
+            outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
+            focus:border-jd-gray-light focus:ring-0"
               style={{ borderRadius: 15, paddingLeft: '3rem' }}
             />
           </div>
@@ -398,7 +414,7 @@ export default function SignupFormPage() {
               >
                 <path
                   d="M18 8h-1V6a5 5 0 0 0-10 0v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2
-                2 0 0 0-2-2Zm-6 9a2 2 0 1 1 0-4 2 2 0 0 1 0 4Zm3.1-9H8.9V6a3.1 3.1 0 1 1 6.2 0v2Z"
+              2 0 0 0-2-2Zm-6 9a2 2 0 1 1 0-4 2 2 0 0 1 0 4Zm3.1-9H8.9V6a3.1 3.1 0 1 1 6.2 0v2Z"
                 />
               </svg>
             </div>
@@ -412,9 +428,9 @@ export default function SignupFormPage() {
               autoCapitalize="none"
               spellCheck={false}
               className="h-12 w-full rounded-full border border-jd-gray-light
-              bg-jd-white pl-12 pr-5 text-[#413F3F] placeholder:text-jd-gray-dark/70
-              outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
-              focus:border-jd-gray-light focus:ring-0"
+            bg-jd-white pl-12 pr-5 text-[#413F3F] placeholder:text-jd-gray-dark/70
+            outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
+            focus:border-jd-gray-light focus:ring-0"
               style={{ borderRadius: 15, paddingLeft: '3rem' }}
             />
           </div>
@@ -470,22 +486,22 @@ export default function SignupFormPage() {
         <div className="flex justify-end">
           <button
             type="submit"
-            disabled={!isFormValid}
-            aria-disabled={!isFormValid}
+            disabled={!isFormValid || submitting}
+            aria-disabled={!isFormValid || submitting}
             className={`
-              inline-flex items-center justify-center
-              h-12 w-40 select-none
-              !rounded-[15px] !text-white font-extrabold tracking-tight
-              [background-image:none] !opacity-100
-              transition will-change-transform outline-none
-              ${
-                isFormValid
-                  ? 'shadow-[0_4px_12px_rgba(117,47,109,.25)] !bg-[#752F6D] ' +
-                    'hover:brightness-[1.05] active:brightness-95 focus-visible:ring-2 ' +
-                    'focus-visible:ring-[#752F6D]/40'
-                  : '!bg-[#CDBFD4] text-[#413F3F]/60 cursor-not-allowed opacity-70'
-              }
-          `}
+            inline-flex items-center justify-center
+            h-12 w-40 select-none
+            !rounded-[15px] !text-white font-extrabold tracking-tight
+            [background-image:none] !opacity-100
+            transition will-change-transform outline-none
+            ${
+              isFormValid
+                ? 'shadow-[0_4px_12px_rgba(117,47,109,.25)] !bg-[#752F6D] ' +
+                  'hover:brightness-[1.05] active:brightness-95 focus-visible:ring-2 ' +
+                  'focus-visible:ring-[#752F6D]/40'
+                : '!bg-[#CDBFD4] text-[#413F3F]/60 cursor-not-allowed opacity-70'
+            }
+        `}
             style={{ appearance: 'none', WebkitAppearance: 'none' }}
           >
             회원가입
