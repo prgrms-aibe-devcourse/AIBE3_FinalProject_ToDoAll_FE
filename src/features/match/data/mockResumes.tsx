@@ -1,4 +1,4 @@
-import type { ResumeData } from '../types/resumes.types';
+import type { ResumeData } from '../../resumes/types/resumes.types';
 
 export const mockResumes: ResumeData[] = [
   {
@@ -155,3 +155,5 @@ export const mockResumes: ResumeData[] = [
     certifications: 'ADsP, GTQ 1급',
   },
 ];
+
+// export const mockResumes: ResumeData[] = [];  // 빈 배열 예시 (검색 결과 없음)

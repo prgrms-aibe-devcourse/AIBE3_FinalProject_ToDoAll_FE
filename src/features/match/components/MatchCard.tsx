@@ -1,4 +1,4 @@
-import type { ResumeData } from '../types/resumes.types';
+import type { ResumeData } from '../../resumes/types/resumes.types';
 import emptyHeartImg from '../../../assets/Favorite-2.png';
 import fullHeartImg from '../../../assets/Heart.png';
 import { useState } from 'react';
@@ -10,7 +10,7 @@ type Props = {
   onInvite?: () => void;
 };
 
-export default function ResumeCard({ resume, matchRate = 50, onView }: Props) {
+export default function MatchCard({ resume, matchRate = 50, onView }: Props) {
   const [checked, setChecked] = useState(false);
 
   const handleClick = () => {

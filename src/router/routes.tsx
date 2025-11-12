@@ -6,6 +6,7 @@ import InterviewManagePage from '../features/interview/pages/InterviewManagePage
 import ResumeDetail from '../features/resumes/pages/ResumeDetail';
 import DashBoard from '../pages/DashBoard.tsx';
 import JDCreatePage from '../pages/JDCreatePage.tsx';
+import MatchList from '../features/match/pages/MatchListPage.tsx';
 
 import JDPage from '../pages/JDPage.tsx';
 import InterviewQuestionCreatePage from '../features/interview/pages/InterviewQuestionCreatePage';
@@ -20,7 +21,6 @@ import MyPage from '../features/auth/pages/MyPage';
 import InterviewNotePage from '../features/interview/pages/InterviewNotePage';
 import ResetPasswordPage from '../features/auth/pages/ResetPasswordPage.tsx';
 
-import ResumeList from '../features/resumes/pages/ResumeListPage.tsx';
 // 레이아웃 없는 페이지 (로그인/회원가입 관련)
 export const noLayoutRoutes = [
   { path: '/login', element: <LoginPage /> },
@@ -36,9 +36,7 @@ export const mainRoutes = [
   { path: '/interview/create', element: <InterviewCreatePage /> },
   { path: '/detail-demo', element: <JDDetailDemoPage /> },
   { path: '/mypage', element: <MyPage /> },
-  { path: '/interview/create', element: <InterviewCreatePage /> },
   { path: '/interview/manage', element: <InterviewManagePage /> },
-  { path: '/interview/create', element: <InterviewCreatePage /> },
   { path: '/interview/question-create', element: <InterviewQuestionCreatePage /> },
   { path: '/interview/chat-room', element: <InterviewChatRoomPage /> },
   { path: '/interview/note', element: <InterviewNotePage /> },
@@ -49,7 +47,5 @@ export const mainRoutes = [
   { path: '/jobs/:id', element: <JDDetailDemoPage /> },
   { path: '/interview/manage/question-create', element: <InterviewQuestionCreatePage /> },
   { path: '/resumes/create', element: <ResumeForm /> },
-
-  { path: '/interview/chat-room', element: <InterviewChatRoomPage /> },
-  { path: '/resumes', element: <ResumeList /> },
+  { path: '/matches', element: <MatchList /> },
 ];
