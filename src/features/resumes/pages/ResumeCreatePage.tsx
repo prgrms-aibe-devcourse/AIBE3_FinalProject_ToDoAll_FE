@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { ResumeData } from '../types/resumes.types';
+import type { ResumeData, Skill } from '../types/resumes.types';
 import BasicInfoForm from '../components/BasicInfoForm';
 import ResumeForm from '../components/ResumeForm';
 
@@ -33,6 +33,7 @@ export default function ResumeCreatePage() {
       | string
       | boolean
       | string[]
+      | Skill[]
       | ResumeData['files']
       | ResumeData['address']
       | '남'
@@ -52,6 +53,8 @@ export default function ResumeCreatePage() {
           return { ...prev, education: value as ResumeData['education'] };
         case 'career':
           return { ...prev, career: value as ResumeData['career'] };
+        case 'skills':
+          return { ...prev, skills: value as Skill[] };
         default:
           return { ...prev, [field]: value };
       }
