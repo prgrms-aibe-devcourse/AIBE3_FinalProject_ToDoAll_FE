@@ -33,7 +33,7 @@ export default function JobPostCard({
         if (e.key === 'Enter' || e.key === ' ') onClick();
       }}
       className={
-        'group relative w-full overflow-hidden rounded-2xl bg-white p-3 sm:p-4 shadow-sm ring-1 ring-gray-200 transition hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ' +
+        'group relative w-full overflow-hidden rounded-2xl bg-white p-3 sm:p-4 shadow-sm ring-1 ring-gray-200 transition hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer ' +
         className
       }
     >
