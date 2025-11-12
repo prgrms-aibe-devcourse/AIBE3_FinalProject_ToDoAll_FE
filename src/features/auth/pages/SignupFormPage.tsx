@@ -1,16 +1,17 @@
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import AuthShell from '../components/AuthShell';
 import PrivacyModal from '../components/PrivacyModal';
 import ReqBadge from '../components/ReqBadge';
 import { buildPasswordChecks } from '../utils/passwordChecks';
+import { verifyCompanyEmailToken } from '../api/auth.api.ts';
 
 export default function SignupFormPage() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
-  // 개발용: 토큰 없으면 자동으로 'dev-token' 사용
-  const token = searchParams.get('token') || 'dev-token';
+  const token = searchParams.get('token'); // URL에서 토큰만 읽음
 
   const [companyEmail, setCompanyEmail] = useState('');
   const [loading, setLoading] = useState(true);
@@ -80,11 +81,31 @@ export default function SignupFormPage() {
   };
 
   useEffect(() => {
-    // 개발 중엔 서버 요청 대신 임시 이메일 세팅
-    const fakeEmail = 'developer@jobda.com';
-    setCompanyEmail(fakeEmail);
-    setLoading(false);
-  }, [token]);
+    //  1) 토큰 없으면 폼 진입 금지
+    if (!token) {
+      alert('이메일 인증이 필요합니다.');
+      navigate('/signup/email', { replace: true });
+      return;
+    }
+
+    //  2) 토큰 검증 → 성공 시 회사 이메일 고정, 실패 시 되돌리기
+    (async () => {
+      try {
+        const data = await verifyCompanyEmailToken(token);
+        if (!data?.verified || !data.email) {
+          alert('유효하지 않은 인증 링크입니다.');
+          navigate('/signup/email', { replace: true });
+          return;
+        }
+        setCompanyEmail(data.email); // 읽기전용 필드에 표시
+      } catch {
+        alert('인증 링크 확인에 실패했습니다. 다시 시도해주세요.');
+        navigate('/signup/email', { replace: true });
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [token, navigate]);
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,11 +124,13 @@ export default function SignupFormPage() {
     }
 
     //  최종 안전장치: 폼이 유효하지 않으면 전송 금지
-    if (!isFormValid) return;
+    if (!isFormValid || !token) return;
 
     setErrors({});
     // TODO: 회원가입 요청 (token과 함께 전송)
+    // await signup({ token, email: companyEmail, name, nickname, position, companyName, password });
     console.log('회원가입 제출:', {
+      token,
       companyEmail,
       companyName,
       name,
