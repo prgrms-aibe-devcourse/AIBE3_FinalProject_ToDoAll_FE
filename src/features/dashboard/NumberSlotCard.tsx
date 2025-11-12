@@ -3,7 +3,7 @@ import Badge from '@components/dashboard/Badge.tsx';
 function SlotCard() {
   return (
     <section className="flex flex-col justify-center text-center align-middle">
-      <p className="text-5xl font-bold">18</p>
+      <p className="text-5xl font-bold">19</p>
       <p className="font-semibold">지원자</p>
     </section>
   );
