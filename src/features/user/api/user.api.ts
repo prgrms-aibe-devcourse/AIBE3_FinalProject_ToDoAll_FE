@@ -1,4 +1,4 @@
-import http from '@/services/http'; // 공통 래퍼 사용
+import http from '../../../lib/http.ts'; // 공통 래퍼 사용
 
 export async function getMe() {
   // 로그인 후에만 접근 가능한 내 정보 API

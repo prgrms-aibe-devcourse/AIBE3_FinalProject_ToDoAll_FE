@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { getMe, updateMe, changePassword } from '../api/user.api.ts';
 
 type Focus = 'profile' | 'password' | undefined;
 
@@ -24,6 +25,39 @@ export default function MyPage() {
   // 편집 토글 & 폼 데이터
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState(user);
+
+  // 마운트 시 내 정보 실제 조회 → 화면/폼에 반영
+  useEffect(() => {
+    getMe()
+      .then((data) => {
+        setUser((prev) => ({
+          ...prev,
+          name: data.name,
+          email: data.email,
+          phone: data.phoneNumber ?? '',
+          company: data.companyName ?? '',
+          position: data.position ?? '',
+          birthDate: data.birthDate ?? '',
+          gender: (data.gender ?? '') as Gender,
+          profile: data.profileUrl || prev.profile,
+        }));
+        // 폼에도 동일값 반영
+        setForm((f) => ({
+          ...f,
+          name: data.name ?? f.name,
+          email: data.email ?? f.email,
+          phone: data.phoneNumber ?? f.phone,
+          company: data.companyName ?? f.company,
+          position: data.position ?? f.position,
+          birthDate: data.birthDate ?? f.birthDate,
+          gender: (data.gender ?? f.gender) as Gender,
+          profile: data.profileUrl || f.profile,
+        }));
+      })
+      .catch(() => {
+        // navigate('/login', { replace: true });
+      });
+  }, [navigate]);
 
   const [recentlyReauthed, setRecentlyReauthed] = useState(false); //TTL을 상태로 보유 → UI가 자동 갱신됨
   useEffect(() => {
@@ -76,10 +110,22 @@ export default function MyPage() {
     setEditing(false);
   };
 
-  const onSave = () => {
-    // TODO: 실제 API 연동 시 검증/요청
-    setUser(form);
-    setEditing(false);
+  //  API 연동: 내 정보 저장
+  const onSave = async () => {
+    try {
+      await updateMe({
+        name: form.name,
+        phone: form.phone,
+        position: form.position,
+        birthDate: form.birthDate,
+        gender: form.gender,
+      });
+      setUser(form);
+      setEditing(false);
+      alert('저장되었습니다.');
+    } catch {
+      alert('저장에 실패했습니다.');
+    }
   };
 
   return (
@@ -279,9 +325,28 @@ export default function MyPage() {
               </div>
             )}
             <form
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
-                alert('비밀번호 변경 완료 (mock)');
+                // 입력된 값들 순서대로 꺼내기
+                const cur = (e.currentTarget[0] as HTMLInputElement).value; // 현재 비밀번호
+                const next = (e.currentTarget[1] as HTMLInputElement).value; // 새 비밀번호
+                const next2 = (e.currentTarget[2] as HTMLInputElement).value; // 새 비밀번호 확인
+
+                // 새 비밀번호가 다르면 경고 후 중단
+                if (next !== next2) {
+                  alert('새 비밀번호가 일치하지 않습니다.');
+                  return;
+                }
+
+                try {
+                  // 실제 API 호출
+                  await changePassword(cur, next);
+                  // 재인증 시간 기록
+                  localStorage.setItem('reauthAt', String(Date.now()));
+                  alert('비밀번호가 변경되었습니다.');
+                } catch {
+                  alert('비밀번호 변경에 실패했습니다.');
+                }
               }}
               className="grid gap-3 max-w-md"
             >
