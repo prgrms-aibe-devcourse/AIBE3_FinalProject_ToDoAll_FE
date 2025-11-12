@@ -39,7 +39,7 @@ export default function LoginPage() {
       </video>
 
       {/* 글래스 카드 */}
-      <main className="relative z-10 grid min-h-dvh place-items-center px-4">
+      <main className="relative z-10 grid min-h-dvh place-items-center px-4 sm:px-6 md:px-8">
         <section
           className="
             w-full max-w-[1120px]
@@ -47,25 +47,25 @@ export default function LoginPage() {
             bg-white/[0.15] backdrop-blur-[20px]
             ring-1 ring-white/[0.15]
             shadow-[0_24px_70px_rgba(0,0,0,.28)]
-            px-10 py-12
-            min-h-[640px]
+            px-6 sm:px-8 md:px-10
+            py-10 md:py-12
+            min-h-[560px] md:min-h-[640px]
             flex flex-col justify-center
           "
         >
           {/* 좌측 520px / 우측 480px, 사이 간격 64px */}
-          <div className="grid items-center gap-16 md:grid-cols-[520px_480px]">
+          <div className="grid items-center gap-10 sm:gap-14 md:gap-16 md:[grid-template-columns:520px_minmax(0,1fr)]">
             {/* 좌측: 로고 + 카피 (정중앙 정렬) */}
             <div className="flex flex-col items-center justify-center text-center">
               <img
                 src="/logo/login-logo.png"
                 alt="jobda"
-                className="w-auto drop-shadow-[0_3px_10px_rgba(0,0,0,.35)]"
+                className="w-auto drop-shadow-[0_3px_10px_rgba(0,0,0,.35)] h-[120px] sm:h-[160px] md:h-[200px]"
                 style={{ height: '200px' }}
               />
               <h2
-                className="mt-6 text-white text-center font-black leading-tight tracking-tight"
+                className="mt-6 text-white text-center font-black leading-tight tracking-tight  text-2xl sm:text-[28px] md:text-[30px]"
                 style={{
-                  fontSize: '30px',
                   fontWeight: 600,
                   textShadow: '0 3px 18px rgba(0,0,0,0.4)',
                   WebkitFontSmoothing: 'antialiased',
@@ -78,10 +78,10 @@ export default function LoginPage() {
             </div>
 
             {/* 우측: 폼 */}
-            <div className="-translate-x-6 md:-translate-x-10">
+            <div className=" md:-translate-x-8">
               <form onSubmit={onSubmit} className="w-full flex flex-col gap-8">
                 {/* 입력 필드 그룹 */}
-                <div className="flex flex-col gap-10">
+                <div className="flex flex-col  gap-8 sm:gap-10">
                   {/* 이메일 */}
                   <div className="flex flex-col gap-3">
                     <label htmlFor="email" className="block text-m font-semibold text-jd-black">
@@ -128,7 +128,13 @@ export default function LoginPage() {
                     </label>
                     <div className="relative">
                       <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#413F3F] z-10">
-                        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+                        <svg
+                          width="18"
+                          height="18"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                          aria-hidden="true"
+                        >
                           <path
                             d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0
                           2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71

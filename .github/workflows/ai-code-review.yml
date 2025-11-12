@@ -174,7 +174,7 @@ jobs:
             echo ""
             echo "### ⚠️ 세부 코드 리뷰"
             echo "- [파일명:줄번호] 문제 설명 → 원인 → 개선 방안 (+ 코드 예시)"
-            echo "- 가능한 한 실제 수정 가능한 코드로 제시"
+            echo "- 실제 수정 가능한 형태로 작성할 것"
             echo ""
             echo "### 🧪 테스트 제안"
             echo "- 개선된 코드가 의도대로 동작함을 검증하기 위한 테스트 아이디어"
@@ -227,8 +227,8 @@ jobs:
 
           PAYLOAD=$(jq -n \
             --arg model "$MODEL" \
-            --arg sys "$(cat system.txt)" \
-            --arg usr "$(cat user.txt)" \
+            --rawfile sys system.txt \
+            --rawfile usr user.txt \
             --argjson mt ${MAX_TOKENS} \
             '{model:$model, messages:[{role:"system",content:$sys},{role:"user",content:$usr}], max_tokens:$mt, temperature:0.2}'
           )

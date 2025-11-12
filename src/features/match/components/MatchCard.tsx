@@ -1,4 +1,4 @@
-import type { ResumeData } from '../types/resumes.types';
+import type { ResumeData } from '../../resumes/types/resumes.types';
 import emptyHeartImg from '../../../assets/Favorite-2.png';
 import fullHeartImg from '../../../assets/Heart.png';
 import { useState } from 'react';
@@ -10,7 +10,7 @@ type Props = {
   onInvite?: () => void;
 };
 
-export default function ResumeCard({ resume, matchRate = 50, onView }: Props) {
+export default function MatchCard({ resume, matchRate = 50, onView }: Props) {
   const [checked, setChecked] = useState(false);
 
   const handleClick = () => {
@@ -54,10 +54,10 @@ export default function ResumeCard({ resume, matchRate = 50, onView }: Props) {
             <div className="flex flex-wrap gap-2 mb-3">
               {resume.skills.map((skill) => (
                 <span
-                  key={skill}
+                  key={skill.name}
                   className="text-xs bg-white border rounded-full px-2 py-1 text-[#837C7C] border-[#837C7C]"
                 >
-                  {skill}
+                  {skill.name}
                 </span>
               ))}
             </div>

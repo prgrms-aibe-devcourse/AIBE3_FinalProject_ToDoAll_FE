@@ -1,4 +1,4 @@
-import type { ResumeData } from '../types/resumes.types';
+import type { ResumeData } from '../../resumes/types/resumes.types';
 
 export const mockResumes: ResumeData[] = [
   {
@@ -43,7 +43,11 @@ export const mockResumes: ResumeData[] = [
         job: 'API 서버 개발 및 유지보수',
       },
     ],
-    skills: ['React', 'TypeScript', 'Node.js'],
+    skills: [
+      { name: 'React', level: '고급' },
+      { name: 'TypeScript', level: '고급' },
+      { name: 'Node.js', level: '중급' },
+    ],
     experience: '3년차 프론트엔드 및 백엔드 개발 경험 보유',
     activities: '멋쟁이사자처럼 10기 활동',
     certifications: '정보처리기사, TOEIC 890',
@@ -90,7 +94,11 @@ export const mockResumes: ResumeData[] = [
         job: '데이터 파이프라인 및 API 설계',
       },
     ],
-    skills: ['Python', 'Django', 'MySQL'],
+    skills: [
+      { name: 'Python', level: '고급' },
+      { name: 'Django', level: '고급' },
+      { name: 'MySQL', level: '중급' },
+    ],
     experience: '서버 개발 및 보안 인프라 구축 경험',
     activities: 'Google Developer Group 활동',
     certifications: '리눅스마스터 2급, SQLD',
@@ -137,9 +145,15 @@ export const mockResumes: ResumeData[] = [
         job: '모바일 서비스 디자인 및 사용자 경험 개선',
       },
     ],
-    skills: ['Figma', 'Illustrator', 'React'],
+    skills: [
+      { name: 'Figma', level: '고급' },
+      { name: 'Illustrator', level: '고급' },
+      { name: 'React', level: '중급' },
+    ],
     experience: '디자인 시스템 구축 및 UX 리서치 경험',
     activities: 'UX 스터디 모임 리더',
     certifications: 'ADsP, GTQ 1급',
   },
 ];
+
+// export const mockResumes: ResumeData[] = [];  // 빈 배열 예시 (검색 결과 없음)
