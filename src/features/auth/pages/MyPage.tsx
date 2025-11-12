@@ -1,5 +1,4 @@
-import React from 'react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 type Focus = 'profile' | 'password' | undefined;
@@ -71,7 +70,6 @@ export default function MyPage() {
     const { name, value } = e.target;
     updateForm(name as FormKeys, value);
   };
-  // ---------------------------
 
   const onCancel = () => {
     setForm(user);
@@ -125,8 +123,7 @@ export default function MyPage() {
               기본 정보
             </h3>
 
-            {/* 2열 그리드 */}
-            <div className="grid grid-cols-1 sm:grid-cols-[110px_1fr] gap-y-3 gap-x-4 text-[var(--color-jd-black)]">
+            <div className="grid grid-cols-1 sm:grid-cols-[110px_1fr] gap-y-6 md:gap-y-7 gap-x-4 text-[var(--color-jd-black)]">
               <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
                 이메일
               </label>
@@ -214,7 +211,7 @@ export default function MyPage() {
               조직 정보
             </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-[110px_1fr] gap-y-3 gap-x-4 text-[var(--color-jd-black)]">
+            <div className="grid grid-cols-1 sm:grid-cols-[110px_1fr] gap-y-6 md:gap-y-7 gap-x-4 text-[var(--color-jd-black)]">
               <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
                 회사
               </label>
