@@ -1,6 +1,6 @@
-import DetailButton from '../../components/dashboard/DetailButton.tsx';
+import DetailButton from '@components/dashboard/DetailButton.tsx';
 import type { ReactNode } from 'react';
-import cn from '../../lib/utils/cn.ts';
+import cn from '@lib/utils/cn.ts';
 
 export default function LongViewSection({
   className,

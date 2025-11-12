@@ -1,4 +1,4 @@
-import Badge from '../../components/dashboard/Badge.tsx';
+import Badge from '@components/dashboard/Badge.tsx';
 
 function SlotCard() {
   return (

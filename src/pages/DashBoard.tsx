@@ -1,9 +1,9 @@
-import SummationCard from '../features/dashboard/SummationCard.tsx';
-import LongViewSection from '../features/dashboard/LongViewSection.tsx';
-import NumberSlotsCard from '../features/dashboard/NumberSlotCard.tsx';
-import DateInfoCard from '../features/dashboard/DateInfoCard.tsx';
-import StatusCountCard from '../features/dashboard/StatusCountCard.tsx';
-import WeekendSection from '../features/dashboard/WeekendSection.tsx';
+import SummationCard from '@features/dashboard/SummationCard.tsx';
+import LongViewSection from '@features/dashboard/LongViewSection.tsx';
+import NumberSlotsCard from '@features/dashboard/NumberSlotCard.tsx';
+import DateInfoCard from '@features/dashboard/DateInfoCard.tsx';
+import StatusCountCard from '@features/dashboard/StatusCountCard.tsx';
+import WeekendSection from '@features/dashboard/WeekendSection.tsx';
 
 export default function DashBoard() {
   return (

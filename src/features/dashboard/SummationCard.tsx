@@ -1,4 +1,4 @@
-import DetailButton from '../../components/dashboard/DetailButton.tsx';
+import DetailButton from '@components/dashboard/DetailButton.tsx';
 import { BookText } from 'lucide-react';
 
 export default function SummationCard() {

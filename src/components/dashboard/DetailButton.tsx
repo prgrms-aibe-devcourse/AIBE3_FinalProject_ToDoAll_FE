@@ -1,5 +1,5 @@
 import { ArrowRight } from 'lucide-react';
-import cn from '../../lib/utils/cn.ts';
+import cn from '@lib/utils/cn.ts';
 
 export default function DetailButton({ className }: { className?: string }) {
   return (
