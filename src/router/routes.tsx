@@ -1,6 +1,6 @@
 // routes.tsx
 
-import JDDetailDemoPage from '../pages/JDDetailDemoPage';
+import JDDetailPage from '../pages/JDDetailPage';
 import InterviewCreatePage from '../features/interview/pages/InterviewCreatePage';
 import InterviewManagePage from '../features/interview/pages/InterviewManagePage';
 import ResumeDetail from '../features/resumes/pages/ResumeDetail';
@@ -34,7 +34,6 @@ export const noLayoutRoutes = [
 // 메인 레이아웃 적용되는 페이지
 export const mainRoutes = [
   { path: '/interview/create', element: <InterviewCreatePage /> },
-  { path: '/detail-demo', element: <JDDetailDemoPage /> },
   { path: '/mypage', element: <MyPage /> },
   { path: '/interview/manage', element: <InterviewManagePage /> },
   { path: '/interview/question-create', element: <InterviewQuestionCreatePage /> },
@@ -44,7 +43,7 @@ export const mainRoutes = [
   { path: '/dashboard', element: <DashBoard /> },
   { path: '/jobs/new', element: <JDCreatePage /> },
   { path: '/jobs', element: <JDPage /> },
-  { path: '/jobs/:id', element: <JDDetailDemoPage /> },
+  { path: '/jobs/:id', element: <JDDetailPage /> },
   { path: '/interview/manage/question-create', element: <InterviewQuestionCreatePage /> },
   { path: '/resumes/create', element: <ResumeForm /> },
   { path: '/matches', element: <MatchList /> },
