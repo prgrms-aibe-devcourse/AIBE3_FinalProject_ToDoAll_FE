@@ -4,6 +4,11 @@ export type Address = {
   detail: string;
 };
 
+export type Skill = {
+  name: string;
+  level: '초급' | '중급' | '고급';
+};
+
 export type EducationItem =
   | {
       type: '초등학교' | '중학교' | '고등학교';
@@ -51,8 +56,12 @@ export type ResumeData = {
   };
   education: EducationItem[];
   career?: CareerItem[];
-  skills: string[];
+  skills: Skill[];
   experience: string;
   activities: string;
   certifications: string;
 };
+
+// Generic onChange handler type that maps a ResumeData key to its value type.
+// Using underscore-prefixed param names to satisfy ESLint's unused-vars rule in type positions.
+export type OnResumeChange = <K extends keyof ResumeData>(_field: K, _value: ResumeData[K]) => void;

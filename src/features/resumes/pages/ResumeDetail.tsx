@@ -36,7 +36,11 @@ export default function ResumeDetail() {
     experience: '잡다 주식회사 (2021.01 ~ 현재, 프론트엔드 개발자)',
     activities: '동아리 활동: 웹 개발 동아리',
     certifications: '정보처리기사',
-    skills: ['React', 'TypeScript', 'TailwindCSS'],
+    skills: [
+      { name: 'React', level: '고급' },
+      { name: 'TypeScript', level: '고급' },
+      { name: 'TailwindCSS', level: '중급' },
+    ],
     files: {
       resume: '김잡다_자기소개서.pdf',
       portfolio: '김잡다_포트폴리오.pdf',
