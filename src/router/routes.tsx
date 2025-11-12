@@ -34,7 +34,6 @@ export const noLayoutRoutes = [
 // 메인 레이아웃 적용되는 페이지
 export const mainRoutes = [
   { path: '/interview/create', element: <InterviewCreatePage /> },
-  { path: '/detail-demo', element: <JDDetailDemoPage /> },
   { path: '/mypage', element: <MyPage /> },
   { path: '/interview/manage', element: <InterviewManagePage /> },
   { path: '/interview/question-create', element: <InterviewQuestionCreatePage /> },
