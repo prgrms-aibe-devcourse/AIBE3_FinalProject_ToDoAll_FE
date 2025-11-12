@@ -24,3 +24,24 @@ export async function resetPasswordByToken(token: string, newPassword: string) {
   // 메일 링크의 토큰으로 새 비번을 만든다.
   await http.patch('/auth/password/reset', { token, newPassword });
 }
+{
+  /* 회원가입 전 회사 이메일 인증*/
+}
+
+// 이메일 인증 링크 요청
+export async function sendCompanyVerifyLink(email: string) {
+  // 백엔드 엔드포인트: POST /auth/company-email/verify-link { email }
+  // 응답: 204 (성공) or { message: 'sent' }
+  await http.post('/auth/company-email/verify-link', { email });
+}
+
+// 이메일 토큰 검증
+export async function verifyCompanyEmailToken(token: string) {
+  // 백엔드 엔드포인트: GET /auth/company-email/verify?token=xxxx
+  const { data } = await http.get(`/auth/company-email/verify?token=${token}`);
+  // 서버가 { verified: true, email: 'user@company.com' } 형태로 내려준다고 가정
+  if (data?.verified && data.email) {
+    sessionStorage.setItem('verifiedCompanyEmail', data.email);
+  }
+  return data;
+}
