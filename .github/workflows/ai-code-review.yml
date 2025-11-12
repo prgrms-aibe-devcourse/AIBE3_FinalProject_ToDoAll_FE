@@ -122,7 +122,7 @@ jobs:
           LINES=$(git diff --unified=0 "$BASE" "$HEAD" | grep -E '^(\+|\-)' | wc -l | tr -d ' ')
 
           if (( LINES > ${MAX_LINES} )); then
-            jq -n --argjson files '${{ steps.files.outputs.list }}' '{oversize:true, files:$files}' > diff.json
+            jq -n --arg files '[]' '{oversize:true, files:($files | fromjson)}' > diff.json
             echo "oversize=true" >> "$GITHUB_OUTPUT"
           else
             git diff "$BASE" "$HEAD" > diff.patch
