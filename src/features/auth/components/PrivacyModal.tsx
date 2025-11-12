@@ -38,19 +38,15 @@ export default function PrivacyModal({
     >
       {/* 반투명 배경 */}
       <div
-        className="absolute inset-0
-        bg-black/4.5
-    backdrop-blur-[1.5px]
-    backdrop-saturate-125
-    transition-all duration-300"
+        className="absolute inset-0 bg-black/4.5 backdrop-blur-[1.5px] backdrop-saturate-125 transition-all duration-300"
         onClick={onClose}
         aria-hidden
       />
 
       {/* 모달 카드 */}
-      <div className="relative z-[101] w-full max-w-[720px] rounded-2xl bg-white ">
+      <div className="relative z-[101] w-full max-w-[720px] rounded-2xl bg-white">
         {/* 헤더 */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-black/5">
+        <div className="flex items-center justify-between border-b border-black/5 px-6 py-4">
           <h3 className="text-lg font-semibold text-[#413F3F]">{title}</h3>
           <button
             type="button"
@@ -63,7 +59,7 @@ export default function PrivacyModal({
 
         {/* 본문 */}
         <div className="px-6 py-5">
-          <div className="max-h-[360px] overflow-y-auto pr-2 leading-relaxed text-sm text-[#413F3F]">
+          <div className="max-h-[360px] overflow-y-auto pr-2 text-sm leading-relaxed text-[#413F3F]">
             <p className="mb-3">
               주식회사 잡다는 &quot;jobda&quot;를 통한 채용 절차 진행을 위하여 귀하의 정보를
               수집합니다. 수집하는 개인정보의 항목은 성명, 전화번호, 이메일주소, 회사명(직책)
@@ -83,7 +79,7 @@ export default function PrivacyModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-[12px] px-4 py-2 text-sm font-semibold text-white bg-[#752F6D] hover:brightness-110"
+            className="rounded-[12px] bg-[#752F6D] px-4 py-2 text-sm font-semibold text-white hover:brightness-110"
           >
             확인
           </button>

@@ -23,7 +23,7 @@ type Props = {
 
 export default function ResumeForm({ formData, onChange }: Props) {
   return (
-    <section className="bg-white p-6 space-y-6 mt-6 rounded-[10px] shadow-sm text-[#413F3F]">
+    <section className="mt-6 space-y-6 rounded-[10px] bg-white p-6 text-[#413F3F] shadow-sm">
       <FileUploadForm formData={formData} onChange={onChange} />
       <EducationForm formData={formData} onChange={onChange} />
       <CareerForm formData={formData} onChange={onChange} />

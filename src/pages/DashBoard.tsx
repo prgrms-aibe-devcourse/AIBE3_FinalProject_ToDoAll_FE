@@ -8,18 +8,18 @@ import WeekendSection from '../features/dashboard/WeekendSection.tsx';
 export default function DashBoard() {
   return (
     <section className="bg-jd-white flex justify-center">
-      <section className="xl:w-[1280px] md:w-[768px] sm:w-[640px] w-[337px] h-full flex flex-col p-[1rem] md:pl-[3rem] pt-[2rem] md:pr-[3rem]">
-        <h1 className="text-4xl font-bold mb-[5px] w-fit">대시보드</h1>
+      <section className="flex h-full w-[337px] flex-col p-[1rem] pt-[2rem] sm:w-[640px] md:w-[768px] md:pr-[3rem] md:pl-[3rem] xl:w-[1280px]">
+        <h1 className="mb-[5px] w-fit text-4xl font-bold">대시보드</h1>
         <p className="mb-[20px]">채용 현황을 한 눈에 확인하세요</p>
-        <section className="flex flex-col gap-5 items-center">
-          <section className="flex flex-row w-full gap-4 flex-wrap justify-center xl:justify-between">
+        <section className="flex flex-col items-center gap-5">
+          <section className="flex w-full flex-row flex-wrap justify-center gap-4 xl:justify-between">
             <SummationCard />
             <SummationCard />
             <SummationCard />
             <SummationCard />
           </section>
 
-          <section className="flex flex-row w-full gap-4 flex-wrap justify-center">
+          <section className="flex w-full flex-row flex-wrap justify-center gap-4">
             <LongViewSection className="jd-LongViewSection-RWD">
               <NumberSlotsCard />
               <NumberSlotsCard />
@@ -34,9 +34,9 @@ export default function DashBoard() {
             </LongViewSection>
           </section>
 
-          <section className="flex flex-row w-full gap-4 flex-wrap justify-center">
+          <section className="flex w-full flex-row flex-wrap justify-center gap-4">
             <LongViewSection className="jd-LongViewSection-RWD">
-              <div className="flex flex-col md:flex-row w-full gap-4 justify-between">
+              <div className="flex w-full flex-col justify-between gap-4 md:flex-row">
                 <StatusCountCard />
                 <StatusCountCard />
               </div>
@@ -44,7 +44,7 @@ export default function DashBoard() {
             </LongViewSection>
 
             <LongViewSection className="jd-LongViewSection-RWD">
-              <div className="flex flex-col md:flex-row w-full gap-4 justify-between">
+              <div className="flex w-full flex-col justify-between gap-4 md:flex-row">
                 <StatusCountCard />
                 <StatusCountCard />
               </div>

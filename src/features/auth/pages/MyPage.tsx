@@ -68,54 +68,53 @@ export default function MyPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start bg-[var(--color-jd-white)] font-[var(--default-font-family)] px-6 sm:px-6 md:px-8 py-10 sm:py-12">
-      <div className="w-full max-w-[860px] mb-6 mt-10">
-        <h2 className="text-xl sm:text-2xl font-bold text-[var(--color-jd-black)] text-left ml-2">
+    <div className="flex min-h-screen flex-col items-center justify-start bg-[var(--color-jd-white)] px-6 py-10 font-[var(--default-font-family)] sm:px-6 sm:py-12 md:px-8">
+      <div className="mt-10 mb-6 w-full max-w-[860px]">
+        <h2 className="ml-2 text-left text-xl font-bold text-[var(--color-jd-black)] sm:text-2xl">
           기본 정보
         </h2>
       </div>
 
       {/* 메인 카드 */}
-      <div className="bg-white rounded-3xl shadow-[0_6px_12px_#00000025] w-full max-w-[900px] p-8 sm:p-10 md:p-10">
+      <div className="w-full max-w-[900px] rounded-3xl bg-white p-8 shadow-[0_6px_12px_#00000025] sm:p-10 md:p-10">
         {/* X → 이전 페이지로 */}
-        <div className="w-full max-w-[860px] flex items-center justify-end mb-6 ">
+        <div className="mb-6 flex w-full max-w-[860px] items-center justify-end">
           <button
             aria-label="닫기"
             onClick={() => navigate(-1)}
-            className="w-9 h-9 rounded-full flex items-center justify-center
-               text-[var(--color-jd-black)] hover:bg-[var(--color-jd-gray-light)]"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-[var(--color-jd-black)] hover:bg-[var(--color-jd-gray-light)]"
           >
             X
           </button>
         </div>
 
         {/* 프로필 + 정보 */}
-        <div className="flex flex-col sm:flex-row gap-8 sm:gap-12 mb-8">
+        <div className="mb-8 flex flex-col gap-8 sm:flex-row sm:gap-12">
           {/* 프로필 */}
-          <div className="w-full sm:w-40 self-center sm:self-start">
-            <div className="mx-auto sm:mx-0 w-28 h-28 sm:w-40 sm:h-40 rounded-full bg-[var(--color-jd-gray-light)] overflow-hidden mb-3">
-              <img src={user.profile} alt="profile" className="w-full h-full object-cover" />
+          <div className="w-full self-center sm:w-40 sm:self-start">
+            <div className="mx-auto mb-3 h-28 w-28 overflow-hidden rounded-full bg-[var(--color-jd-gray-light)] sm:mx-0 sm:h-40 sm:w-40">
+              <img src={user.profile} alt="profile" className="h-full w-full object-cover" />
             </div>
-            <button className="w-full bg-[var(--color-jd-gray-light)] rounded-md py-2 text-sm mt-4">
+            <button className="mt-4 w-full rounded-md bg-[var(--color-jd-gray-light)] py-2 text-sm">
               사진 변경
             </button>
           </div>
 
           {/* 정보 폼/뷰 */}
-          <div className="flex-1 grid grid-cols-1 sm:grid-cols-[110px_1fr] gap-y-3 gap-x-4 text-[var(--color-jd-black)]">
-            <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
+          <div className="grid flex-1 grid-cols-1 gap-x-4 gap-y-3 text-[var(--color-jd-black)] sm:grid-cols-[110px_1fr]">
+            <label className="self-center font-semibold text-[var(--color-jd-gray-dark)]">
               회사
             </label>
             {/* 회사는 항상 읽기 전용 */}
             <div className="self-center font-semibold">{user.company}</div>
 
-            <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
+            <label className="self-center font-semibold text-[var(--color-jd-gray-dark)]">
               이메일
             </label>
             {/* 이메일도 항상 읽기 전용 */}
             <div className="self-center font-semibold">{user.email}</div>
 
-            <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
+            <label className="self-center font-semibold text-[var(--color-jd-gray-dark)]">
               이름
             </label>
             {editing ? (
@@ -123,13 +122,13 @@ export default function MyPage() {
                 name="name"
                 value={form.name}
                 onChange={onChange}
-                className="border rounded-md px-3 py-2"
+                className="rounded-md border px-3 py-2"
               />
             ) : (
               <div className="self-center font-semibold">{user.name}</div>
             )}
 
-            <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
+            <label className="self-center font-semibold text-[var(--color-jd-gray-dark)]">
               전화번호
             </label>
             {editing ? (
@@ -137,13 +136,13 @@ export default function MyPage() {
                 name="phone"
                 value={form.phone}
                 onChange={onChange}
-                className="border rounded-md px-3 py-2"
+                className="rounded-md border px-3 py-2"
               />
             ) : (
               <div className="self-center font-bold">{user.phone}</div>
             )}
 
-            <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
+            <label className="self-center font-semibold text-[var(--color-jd-gray-dark)]">
               직책
             </label>
             {editing ? (
@@ -151,7 +150,7 @@ export default function MyPage() {
                 name="position"
                 value={form.position}
                 onChange={onChange}
-                className="border rounded-md px-3 py-2"
+                className="rounded-md border px-3 py-2"
               />
             ) : (
               <div className="self-center font-semibold">{user.position}</div>
@@ -160,18 +159,18 @@ export default function MyPage() {
         </div>
 
         {/* 버튼 영역 */}
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-end">
+        <div className="flex flex-col justify-end gap-3 sm:flex-row sm:gap-4">
           {editing ? (
             <>
               <button
                 onClick={onCancel}
-                className="w-full sm:w-auto px-6 py-2 rounded-md bg-[var(--color-jd-gray-light)]"
+                className="w-full rounded-md bg-[var(--color-jd-gray-light)] px-6 py-2 sm:w-auto"
               >
                 취소
               </button>
               <button
                 onClick={onSave}
-                className="w-full sm:w-auto px-6 py-2 rounded-md bg-[var(--color-jd-scarlet)] text-white"
+                className="w-full rounded-md bg-[var(--color-jd-scarlet)] px-6 py-2 text-white sm:w-auto"
               >
                 저장
               </button>
@@ -180,13 +179,13 @@ export default function MyPage() {
             <>
               <button
                 onClick={() => setEditing(true)}
-                className="px-6 py-2 rounded-md bg-[var(--color-jd-scarlet)] text-white"
+                className="rounded-md bg-[var(--color-jd-scarlet)] px-6 py-2 text-white"
               >
                 회원 정보 수정
               </button>
               <button
                 onClick={() => setExpandPassword((v) => !v)}
-                className="px-6 py-2 rounded-md bg-[var(--color-jd-yellow)] !text-white"
+                className="rounded-md bg-[var(--color-jd-yellow)] px-6 py-2 !text-white"
               >
                 {expandPassword ? '비밀번호 변경 닫기' : '비밀번호 변경'}
               </button>
@@ -196,7 +195,7 @@ export default function MyPage() {
 
         {/* 비밀번호 변경 섹션 */}
         {expandPassword && (
-          <div className="mt-8 rounded-2xl border border-[var(--color-jd-gray-light)] p-6 bg-[var(--color-jd-white)]">
+          <div className="mt-8 rounded-2xl border border-[var(--color-jd-gray-light)] bg-[var(--color-jd-white)] p-6">
             {!recentlyReauthed && (
               <div className="mb-3 text-sm text-[var(--color-jd-gray-dark)]">
                 보안을 위해 다시 한 번 비밀번호를 확인해야 합니다. (5분 경과)
@@ -207,27 +206,27 @@ export default function MyPage() {
                 e.preventDefault();
                 alert('비밀번호 변경 완료 (mock)');
               }}
-              className="grid gap-3 max-w-md"
+              className="grid max-w-md gap-3"
             >
               <input
                 type="password"
                 placeholder="현재 비밀번호"
-                className="border rounded-md px-4 py-2"
+                className="rounded-md border px-4 py-2"
                 required
               />
               <input
                 type="password"
                 placeholder="새 비밀번호"
-                className="border rounded-md px-4 py-2"
+                className="rounded-md border px-4 py-2"
                 required
               />
               <input
                 type="password"
                 placeholder="새 비밀번호 확인"
-                className="border rounded-md px-4 py-2"
+                className="rounded-md border px-4 py-2"
                 required
               />
-              <button className="mt-2 bg-[var(--color-jd-violet)] hover:bg-[var(--color-jd-violet-hover)] text-white rounded-md px-5 py-2">
+              <button className="mt-2 rounded-md bg-[var(--color-jd-violet)] px-5 py-2 text-white hover:bg-[var(--color-jd-violet-hover)]">
                 비밀번호 변경 저장
               </button>
             </form>

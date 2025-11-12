@@ -54,7 +54,7 @@ export default function AuthShell({
       ) : (
         <div className="fixed inset-0 -z-10 bg-[radial-gradient(100%_100%_at_50%_0%,#eeeeef_0%,#dcdcdc_35%,#d6d6d6_60%,#cfcfcf_100%)]">
           <div
-            className="absolute inset-0 bg-center bg-cover opacity-30"
+            className="absolute inset-0 bg-cover bg-center opacity-30"
             style={{
               backgroundImage: "url('/images/auth-still.jpg')",
               filter: 'blur(2px)',
@@ -75,18 +75,10 @@ export default function AuthShell({
       {/* 글래스 카드 */}
       <main className="relative z-10 grid min-h-dvh place-items-center px-4">
         <section
-          className={`w-full max-w-[1120px] rounded-[25px]
-            bg-white/30 backdrop-blur-[30px] ring-1 ring-white/30
-            shadow-[0_8px_40px_rgba(0,0,0,.10)]
-            px-10 py-[80px] md:py-[100px] min-h-[640px]
-            flex flex-col ${showLeftPane ? 'justify-center' : 'justify-start'}
-            ${cardClassName}`}
+          className={`flex min-h-[640px] w-full max-w-[1120px] flex-col rounded-[25px] bg-white/30 px-10 py-[80px] shadow-[0_8px_40px_rgba(0,0,0,.10)] ring-1 ring-white/30 backdrop-blur-[30px] md:py-[100px] ${showLeftPane ? 'justify-center' : 'justify-start'} ${cardClassName}`}
         >
           <div
-            className={`
-            grid items-center gap-16
-            ${showLeftPane ? 'md:grid-cols-[520px_480px]' : ''}
-          `}
+            className={`grid items-center gap-16 ${showLeftPane ? 'md:grid-cols-[520px_480px]' : ''} `}
           >
             {/* 좌측 로고/카피 */}
             {showLeftPane && (
@@ -95,13 +87,12 @@ export default function AuthShell({
                   src="/logo/login-logo.png"
                   alt="jobda"
                   onClick={() => navigate('/login')}
-                  className="w-auto cursor-pointer drop-shadow-[0_3px_10px_rgba(0,0,0,.25)]
-                             transition-transform "
+                  className="w-auto cursor-pointer drop-shadow-[0_3px_10px_rgba(0,0,0,.25)] transition-transform"
                   style={{ height: '200px' }}
                 />
                 {caption ? (
                   <h2
-                    className="mt-6 text-center font-black leading-tight tracking-tight text-white"
+                    className="mt-6 text-center leading-tight font-black tracking-tight text-white"
                     style={{
                       fontSize: '30px',
                       fontWeight: 600,

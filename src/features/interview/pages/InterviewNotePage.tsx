@@ -68,20 +68,20 @@ export default function InterviewNotePage() {
   ];
 
   return (
-    <div className="flex flex-col h-screen bg-jd-white text-jd-black overflow-hidden">
+    <div className="bg-jd-white text-jd-black flex h-screen flex-col overflow-hidden">
       {/* 헤더 */}
-      <header className="flex items-center justify-between px-10 pt-6 shrink-0">
-        <h1 className="text-2xl font-bold text-jd-black">면접 노트</h1>
+      <header className="flex shrink-0 items-center justify-between px-10 pt-6">
+        <h1 className="text-jd-black text-2xl font-bold">면접 노트</h1>
         <button
           onClick={() => navigate('/interview/manage')}
-          className="text-sm text-jd-gray-dark hover:text-jd-black transition"
+          className="text-jd-gray-dark hover:text-jd-black text-sm transition"
         >
           ← 돌아가기
         </button>
       </header>
 
       {/* 본문 */}
-      <div className="flex flex-1 overflow-hidden p-6 gap-6">
+      <div className="flex flex-1 gap-6 overflow-hidden p-6">
         {/* 왼쪽: 지원자 정보 */}
         <div className="w-1/4">
           <ProfileCard profileData={initialProfileData} name={name} avatar={avatar} />

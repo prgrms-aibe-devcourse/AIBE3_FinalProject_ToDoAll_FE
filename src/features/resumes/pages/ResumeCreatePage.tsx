@@ -60,14 +60,14 @@ export default function ResumeCreatePage() {
 
   return (
     <div className="min-h-screen bg-[#FAF8F8]">
-      <div className="max-w-5xl mx-auto p-8">
-        <h2 className="text-[20px] font-light text-[#837C7C] text-center mb-2">
+      <div className="mx-auto max-w-5xl p-8">
+        <h2 className="mb-2 text-center text-[20px] font-light text-[#837C7C]">
           잡다컴퍼니 백엔드 개발자 채용
         </h2>
-        <h1 className="text-[30px] font-semibold text-[#413F3F] text-center mb-8">지원서</h1>
+        <h1 className="mb-8 text-center text-[30px] font-semibold text-[#413F3F]">지원서</h1>
 
-        <h2 className="text-[20px] font-medium text-[#413F3F] mb-2">
-          기본 정보 <span className="text-[14px] font-medium text-[#DE4F36] mb-3">*필수</span>
+        <h2 className="mb-2 text-[20px] font-medium text-[#413F3F]">
+          기본 정보 <span className="mb-3 text-[14px] font-medium text-[#DE4F36]">*필수</span>
         </h2>
 
         <BasicInfoForm formData={formData} onChange={handleChange} />

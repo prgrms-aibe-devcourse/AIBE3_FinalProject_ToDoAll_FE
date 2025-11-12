@@ -2,7 +2,7 @@ import Badge from '../../components/dashboard/Badge.tsx';
 
 function SlotCard() {
   return (
-    <section className="flex flex-col justify-center align-middle text-center">
+    <section className="flex flex-col justify-center text-center align-middle">
       <p className="text-5xl font-bold">18</p>
       <p className="font-semibold">지원자</p>
     </section>
@@ -11,16 +11,16 @@ function SlotCard() {
 
 export default function NumberSlotsCard() {
   return (
-    <section className="relative bg-white rounded-[10px] flex flex-col items-center sm:items-start gap-2 p-[20px] border-1 border-jd-gray-light">
-      <Badge text="진행중" color="scarlet" className="sm:absolute static top-[20px] right-[20px]" />
-      <h3 className="font-bold text-jd-black">시니어 프론트엔드 개발자</h3>
-      <section className="flex flex-row justify-around mb-[10px] w-full flex-wrap gap-6 sm:gap-4">
+    <section className="border-jd-gray-light relative flex flex-col items-center gap-2 rounded-[10px] border-1 bg-white p-[20px] sm:items-start">
+      <Badge text="진행중" color="scarlet" className="static top-[20px] right-[20px] sm:absolute" />
+      <h3 className="text-jd-black font-bold">시니어 프론트엔드 개발자</h3>
+      <section className="mb-[10px] flex w-full flex-row flex-wrap justify-around gap-6 sm:gap-4">
         <SlotCard />
         <SlotCard />
         <SlotCard />
         <SlotCard />
       </section>
-      <section className="w-full h-[10px] rounded-[90px] bg-jd-scarlet opacity-25"></section>
+      <section className="bg-jd-scarlet h-[10px] w-full rounded-[90px] opacity-25"></section>
     </section>
   );
 }

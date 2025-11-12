@@ -27,26 +27,26 @@ export default function QuestionSection({
   return (
     <div className="mb-6 border-b border-gray-100 pb-4">
       {/* 주제 제목 */}
-      <div className="flex items-center justify-between mb-2">
+      <div className="mb-2 flex items-center justify-between">
         {isEditing ? (
           <input
             type="text"
             value={section.title}
             onChange={(e) => onTitleChange(sectionIdx, e.target.value)}
             placeholder="새로운 주제를 입력하세요"
-            className="font-semibold text-[20px] text-jd-gray-dark w-full border-b border-jd-gray-light focus:outline-jd-gray-dark"
+            className="text-jd-gray-dark border-jd-gray-light focus:outline-jd-gray-dark w-full border-b text-[20px] font-semibold"
           />
         ) : section.title ? (
-          <h3 className="font-semibold text-[20px] text-jd-gray-dark">{section.title}</h3>
+          <h3 className="text-jd-gray-dark text-[20px] font-semibold">{section.title}</h3>
         ) : (
-          <h3 className="italic text-jd-gray-dark text-[20px]">주제가 입력되지 않았습니다</h3>
+          <h3 className="text-jd-gray-dark text-[20px] italic">주제가 입력되지 않았습니다</h3>
         )}
 
         {/* 주제 삭제 버튼 */}
         {isEditing && (
           <button
             onClick={() => onDeleteSection(sectionIdx)}
-            className="text-jd-gray-dark hover:text-jd-scarlet text-[13px] ml-3"
+            className="text-jd-gray-dark hover:text-jd-scarlet ml-3 text-[13px]"
           >
             ✕
           </button>
@@ -54,7 +54,7 @@ export default function QuestionSection({
       </div>
 
       {/* 질문 목록 */}
-      <ul className="space-y-1 text-jd-black list-disc pl-8 ml-4">
+      <ul className="text-jd-black ml-4 list-disc space-y-1 pl-8">
         {section.questions.map((q, i) => (
           <li key={i} className="flex items-center gap-2">
             {isEditing ? (
@@ -64,7 +64,7 @@ export default function QuestionSection({
                   value={q}
                   onChange={(e) => onQuestionChange(sectionIdx, i, e.target.value)}
                   placeholder="새로운 질문을 입력하세요"
-                  className="border border-jd-gray-light rounded px-2 py-1 w-full text-sm focus:outline-jd-gray-dark"
+                  className="border-jd-gray-light focus:outline-jd-gray-dark w-full rounded border px-2 py-1 text-sm"
                 />
                 {/* 질문 삭제 버튼 */}
                 <button
@@ -87,7 +87,7 @@ export default function QuestionSection({
       {isEditing && (
         <button
           onClick={() => onAddQuestion(sectionIdx)}
-          className="mt-2 ml-4 text-[13px] text-jd-violet hover:text-jd-violet-hover transition"
+          className="text-jd-violet hover:text-jd-violet-hover mt-2 ml-4 text-[13px] transition"
         >
           ＋ 질문 추가
         </button>

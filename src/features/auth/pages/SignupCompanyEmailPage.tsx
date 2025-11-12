@@ -38,10 +38,10 @@ export default function SignupCompanyEmailPage() {
     <AuthShell>
       <form onSubmit={onSubmit} className="flex flex-col gap-6">
         <div className="flex flex-col gap-3">
-          <label className="block text-m font-semibold text-jd-black">회사 이메일</label>
+          <label className="text-m text-jd-black block font-semibold">회사 이메일</label>
 
           <div className="relative">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#413F3F]">
+            <div className="absolute top-1/2 left-4 -translate-y-1/2 text-[#413F3F]">
               {/* mail icon */}
               <svg
                 width="18"
@@ -59,10 +59,7 @@ export default function SignupCompanyEmailPage() {
               value={email}
               onChange={handleChange}
               placeholder="name@jobda.com"
-              className="h-12 w-full rounded-full border border-jd-gray-light
-              bg-jd-white pl-12 pr-5 text-[#413F3F] placeholder:text-jd-gray-dark/70
-              outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
-              focus:border-jd-gray-light focus:ring-0"
+              className="border-jd-gray-light bg-jd-white placeholder:text-jd-gray-dark/70 focus:border-jd-gray-light h-12 w-full rounded-full border pr-5 pl-12 text-[#413F3F] shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)] outline-none focus:ring-0"
               style={{ borderRadius: 15, paddingLeft: '3rem' }}
             />
           </div>
@@ -70,7 +67,7 @@ export default function SignupCompanyEmailPage() {
           {invalid && (
             <div
               id="email-warning"
-              className="flex items-start gap-1 text-[14px] text-[#D13B3B] leading-tight border-t border-[#D13B3B]/30 pt-2"
+              className="flex items-start gap-1 border-t border-[#D13B3B]/30 pt-2 text-[14px] leading-tight text-[#D13B3B]"
             >
               <span className="mt-[1px]">ⓘ</span>
               <span>

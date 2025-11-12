@@ -95,8 +95,8 @@ export default function InterviewQuestionCreatePage() {
   };
 
   return (
-    <div className="mx-auto p-8 min-h-screen bg-[#fbf9f9] font-sans font-semibold">
-      <h1 className="text-2xl font-bold mb-6 text-jd-black">질문 노트</h1>
+    <div className="mx-auto min-h-screen bg-[#fbf9f9] p-8 font-sans font-semibold">
+      <h1 className="text-jd-black mb-6 text-2xl font-bold">질문 노트</h1>
 
       <div className="flex gap-8">
         <div className="w-1/4">
@@ -104,7 +104,7 @@ export default function InterviewQuestionCreatePage() {
         </div>
 
         <div className="w-3/4">
-          <div className="bg-white border border-gray-200 shadow-md rounded-2xl p-8 text-sm leading-relaxed">
+          <div className="rounded-2xl border border-gray-200 bg-white p-8 text-sm leading-relaxed shadow-md">
             {questionData.map((section, idx) => (
               <QuestionSection
                 key={idx}
@@ -123,7 +123,7 @@ export default function InterviewQuestionCreatePage() {
             {isEditing && (
               <button
                 onClick={handleAddSection}
-                className="mt-4 text-[14px] text-jd-violet hover:text-jd-violet-hover transition"
+                className="text-jd-violet hover:text-jd-violet-hover mt-4 text-[14px] transition"
               >
                 ＋ 주제 추가
               </button>

@@ -5,7 +5,7 @@ export default function DetailButton({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        'flex justify-center items-center w-fit font-semibold text-jd-gray-dark',
+        'text-jd-gray-dark flex w-fit items-center justify-center font-semibold',
         className
       )}
     >

@@ -59,7 +59,7 @@ export default function ResumeDetail() {
         <ResumeMemo />
       </aside>
 
-      <main className="flex-1 p-8 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto p-8">
         <ResumeInfo data={dummyResume} />
       </main>
     </div>

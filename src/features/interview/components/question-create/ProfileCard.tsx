@@ -6,39 +6,39 @@ interface ProfileCardProps {
 
 export default function ProfileCard({ profileData, name, avatar }: ProfileCardProps) {
   return (
-    <div className="bg-white border border-jd-gray-light shadow-md rounded-2xl p-5 flex flex-col text-left text-sm">
-      <div className="flex items-center gap-3 mb-3">
+    <div className="border-jd-gray-light flex flex-col rounded-2xl border bg-white p-5 text-left text-sm shadow-md">
+      <div className="mb-3 flex items-center gap-3">
         <img
           src={avatar || profileData.image}
           alt={name || profileData.name}
-          className="w-12 h-12 rounded-full object-cover"
+          className="h-12 w-12 rounded-full object-cover"
         />
         <div>
-          <h2 className="text-sm text-jd-black">{name || profileData.name}</h2>
-          <p className="text-xs text-jd-gray-dark">{profileData.title}</p>
+          <h2 className="text-jd-black text-sm">{name || profileData.name}</h2>
+          <p className="text-jd-gray-dark text-xs">{profileData.title}</p>
         </div>
       </div>
 
-      <div className="flex items-start text-[12px] text-jd-black mb-2 mt-1">
-        <div className="flex flex-col basis-1/3">
-          <span className="font-medium text-jd-gray-dark mb-0.5">일자</span>
+      <div className="text-jd-black mt-1 mb-2 flex items-start text-[12px]">
+        <div className="flex basis-1/3 flex-col">
+          <span className="text-jd-gray-dark mb-0.5 font-medium">일자</span>
           <span>{profileData.date}</span>
         </div>
-        <div className="flex flex-col basis-1/3">
-          <span className="font-medium text-jd-gray-dark mb-0.5">시간</span>
+        <div className="flex basis-1/3 flex-col">
+          <span className="text-jd-gray-dark mb-0.5 font-medium">시간</span>
           <span>{profileData.time}</span>
         </div>
-        <div className="flex flex-col basis-1/3">
-          <span className="font-medium text-jd-gray-dark mb-0.5">면접관</span>
+        <div className="flex basis-1/3 flex-col">
+          <span className="text-jd-gray-dark mb-0.5 font-medium">면접관</span>
           <span>{profileData.interviewers.join(', ')}</span>
         </div>
       </div>
 
       <div className="mb-2">
-        <p className="text-[12px] font-medium text-jd-gray-dark mb-1 mt-2">보유 스킬</p>
-        <div className="flex gap-2 flex-wrap">
+        <p className="text-jd-gray-dark mt-2 mb-1 text-[12px] font-medium">보유 스킬</p>
+        <div className="flex flex-wrap gap-2">
           {profileData.skills.map((skill: string) => (
-            <span key={skill} className="px-2 py-0.5 text-jd-gray-dark rounded-full text-xs border">
+            <span key={skill} className="text-jd-gray-dark rounded-full border px-2 py-0.5 text-xs">
               {skill}
             </span>
           ))}
@@ -46,17 +46,17 @@ export default function ProfileCard({ profileData, name, avatar }: ProfileCardPr
       </div>
 
       <div className="mb-2">
-        <p className="text-[12px] font-medium text-jd-gray-dark mb-1 mt-2">부족 스킬</p>
-        <div className="flex gap-2 flex-wrap">
+        <p className="text-jd-gray-dark mt-2 mb-1 text-[12px] font-medium">부족 스킬</p>
+        <div className="flex flex-wrap gap-2">
           {profileData.missingSkills.map((s: string) => (
-            <span key={s} className="px-2 py-0.5 text-jd-gray-dark rounded-full text-xs border">
+            <span key={s} className="text-jd-gray-dark rounded-full border px-2 py-0.5 text-xs">
               {s}
             </span>
           ))}
         </div>
       </div>
 
-      <ul className="list-disc pl-4 text-xs text-jd-gray-dark space-y-1 mt-2">
+      <ul className="text-jd-gray-dark mt-2 list-disc space-y-1 pl-4 text-xs">
         {profileData.experiences.map((exp: string, i: number) => (
           <li key={i}>{exp}</li>
         ))}
