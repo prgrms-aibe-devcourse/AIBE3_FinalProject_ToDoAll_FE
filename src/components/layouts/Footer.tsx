@@ -12,7 +12,7 @@ const Footer = () => {
       >
         <div className="mx-auto max-w-6xl px-6 py-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
           {/* 로고 / 좌측 */}
-          <div className="flex items-center justify-start h-full gap-4">
+          <div className=" flex items-center justify-start h-full gap-4">
             <img src="/logo/login-logo.png" alt="jobda" className="h-18 w-auto " />
           </div>
 
