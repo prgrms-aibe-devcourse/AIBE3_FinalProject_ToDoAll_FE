@@ -1,6 +1,23 @@
 import type { JobPost } from '../types/JobPost.types';
 import type { JobDetail } from '../types/JobDetail.types';
 
+type ApiResponse<T> = {
+  errorCode?: number;
+  message?: string;
+  data?: T;
+};
+
+type SpringPage<T> = {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  first: boolean;
+  last: boolean;
+  empty: boolean;
+};
+
 type JobPostListItemResponse = {
   id: number;
   title: string;
@@ -15,8 +32,9 @@ type JobPostListItemResponse = {
 
 export async function fetchJobPosts(page = 0, size = 10): Promise<JobPost[]> {
   const res = await fetch(`http://localhost:8080/api/v1/jd?page=${page}&size=${size}`);
-  const data = (await res.json()) as { content: JobPostListItemResponse[] };
-  return data.content.map((it) => ({
+  const body = (await res.json()) as ApiResponse<SpringPage<JobPostListItemResponse>>;
+  if (!body.data) throw new Error(body.message ?? 'Empty response');
+  return body.data.content.map((it) => ({
     id: String(it.id),
     title: it.title,
     location: it.location ?? '—(location 미정)—',
@@ -60,7 +78,8 @@ const toArray = (v?: string[] | string | null): string[] => {
 export async function fetchJobDetail(id: string): Promise<JobDetail> {
   const res = await fetch(`http://localhost:8080/api/v1/jd/${id}`);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const dto = (await res.json()) as JobDetailResponse;
+  const body = (await res.json()) as ApiResponse<JobDetailResponse>;
+  const dto = body.data!;
   return {
     id: String(dto.id),
     title: dto.title,

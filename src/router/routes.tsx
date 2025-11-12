@@ -1,6 +1,6 @@
 // routes.tsx
 
-import JDDetailPage from '../pages/JDDetailPage.tsx';
+import JDDetailPage from '../pages/JDDetailPage';
 import InterviewCreatePage from '../features/interview/pages/InterviewCreatePage';
 import InterviewManagePage from '../features/interview/pages/InterviewManagePage';
 import ResumeDetail from '../features/resumes/pages/ResumeDetail';
@@ -19,7 +19,6 @@ import ResetPasswordEmailPage from '../features/auth/pages/ResetPasswordEmailPag
 import MyPage from '../features/auth/pages/MyPage';
 import InterviewNotePage from '../features/interview/pages/InterviewNotePage';
 
-import ResumeList from '../features/resumes/pages/ResumeListPage.tsx';
 // 레이아웃 없는 페이지 (로그인/회원가입 관련)
 export const noLayoutRoutes = [
   { path: '/login', element: <LoginPage /> },
@@ -33,9 +32,7 @@ export const noLayoutRoutes = [
 export const mainRoutes = [
   { path: '/interview/create', element: <InterviewCreatePage /> },
   { path: '/mypage', element: <MyPage /> },
-  { path: '/interview/create', element: <InterviewCreatePage /> },
   { path: '/interview/manage', element: <InterviewManagePage /> },
-  { path: '/interview/create', element: <InterviewCreatePage /> },
   { path: '/interview/question-create', element: <InterviewQuestionCreatePage /> },
   { path: '/interview/chat-room', element: <InterviewChatRoomPage /> },
   { path: '/interview/note', element: <InterviewNotePage /> },
@@ -43,9 +40,7 @@ export const mainRoutes = [
   { path: '/dashboard', element: <DashBoard /> },
   { path: '/jobs/new', element: <JDCreatePage /> },
   { path: '/jobs', element: <JDPage /> },
-  { path: '/resumes/create', element: <ResumeForm /> },
-
-  { path: '/interview/chat-room', element: <InterviewChatRoomPage /> },
-  { path: '/resumes', element: <ResumeList /> },
   { path: '/jobs/:id', element: <JDDetailPage /> },
+  { path: '/interview/manage/question-create', element: <InterviewQuestionCreatePage /> },
+  { path: '/resumes/create', element: <ResumeForm /> },
 ];
