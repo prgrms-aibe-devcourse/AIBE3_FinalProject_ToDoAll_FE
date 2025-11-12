@@ -1,19 +1,58 @@
+export type Address = {
+  country: string;
+  city: string;
+  detail: string;
+};
+
+export type EducationItem =
+  | {
+      type: '초등학교' | '중학교' | '고등학교';
+      name: string;
+      graduated: boolean;
+      startDate: string;
+      endDate: string;
+    }
+  | {
+      type: '대학' | '대학원';
+      universityType: string;
+      name: string;
+      transferred: boolean;
+      major: string;
+      graduated: boolean;
+      startDate: string;
+      endDate: string;
+      dayTime: '주간' | '야간';
+      gpa?: number;
+    };
+
+export type CareerItem = {
+  company: string;
+  startDate: string;
+  endDate: string;
+  position: string;
+  department: string;
+  job: string;
+};
+
 export type ResumeData = {
   id: string;
   name: string;
+  gender: '남' | '여';
+  birth: string;
+  profileImage: string;
   email: string;
   phone: string;
   applyDate: string;
-  birth: string;
-  address: string;
-  profileImage: string;
-  education: string;
-  experience: string;
-  activities?: string;
-  certifications?: string;
-  skills: string[];
+  address: Address;
   files: {
     resume: string;
     portfolio: string;
+    etc?: string[];
   };
+  education: EducationItem[];
+  career?: CareerItem[];
+  skills: string[];
+  experience: string;
+  activities: string;
+  certifications: string;
 };

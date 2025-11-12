@@ -24,6 +24,12 @@
   --color-jd-black: #413f3f;
   --color-jd-gray-light: #e3dbdb;
   --color-jd-gray-dark: #837c7c;
+  --color-jd-green: #5cc46f;
+}
+
+@layer components {
+  .jd-LongViewSection-RWD { @apply max-w-sm md:max-w-[584px] }
+  .jd-LongViewSection-RWD-full { @apply max-w-sm md:max-w-[584px] xl:max-w-full }
 }
 
 @layer utilities {
