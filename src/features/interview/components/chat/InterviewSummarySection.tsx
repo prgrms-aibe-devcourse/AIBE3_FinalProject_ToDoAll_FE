@@ -12,7 +12,6 @@ export default function InterviewSummarySection({
 }: InterviewSummarySectionProps) {
   const [summaryList, setSummaryList] = useState<InterviewSummary[]>(summaries);
   const [editingIdx, setEditingIdx] = useState<number | null>(null);
-  const [newSummary, setNewSummary] = useState({ title: '', content: '' });
 
   useEffect(() => {
     setSummaryList(summaries);
@@ -21,19 +20,6 @@ export default function InterviewSummarySection({
   // 수정 핸들러
   const handleEdit = (idx: number, key: keyof InterviewSummary, value: string) => {
     setSummaryList((prev) => prev.map((item, i) => (i === idx ? { ...item, [key]: value } : item)));
-  };
-
-  // 새 평가 추가
-  const handleAddSummary = () => {
-    if (!newSummary.title.trim() || !newSummary.content.trim()) return;
-    const newItem: InterviewSummary = {
-      id: Date.now(),
-      authorId: currentUserId, // 내가 작성한 것으로 표시
-      title: newSummary.title,
-      content: newSummary.content,
-    };
-    setSummaryList([...summaryList, newItem]);
-    setNewSummary({ title: '', content: '' });
   };
 
   // 수정 종료
@@ -86,31 +72,6 @@ export default function InterviewSummarySection({
             </div>
           );
         })}
-      </div>
-
-      {/* 새 평가 추가 */}
-      <div className="border-t border-jd-gray-light p-4">
-        <h4 className="text-sm font-semibold mb-2 text-jd-gray-dark">새 면접 평가 추가</h4>
-        <input
-          type="text"
-          value={newSummary.title}
-          onChange={(e) => setNewSummary({ ...newSummary, title: e.target.value })}
-          placeholder="면접관 이름"
-          className="w-full mb-2 text-sm border border-jd-gray-light rounded px-2 py-1 focus:outline-jd-violet"
-        />
-        <textarea
-          value={newSummary.content}
-          onChange={(e) => setNewSummary({ ...newSummary, content: e.target.value })}
-          placeholder="평가 내용을 입력하세요"
-          rows={3}
-          className="w-full text-sm border border-jd-gray-light rounded px-2 py-1 focus:outline-jd-violet resize-none"
-        />
-        <button
-          onClick={handleAddSummary}
-          className="mt-2 w-full bg-jd-violet text-white rounded-md py-1.5 text-sm hover:bg-jd-violet-hover transition"
-        >
-          추가
-        </button>
       </div>
     </div>
   );
