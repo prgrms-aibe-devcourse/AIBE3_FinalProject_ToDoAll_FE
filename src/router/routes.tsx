@@ -15,8 +15,8 @@ import InterviewChatRoomPage from '../features/interview/pages/InterviewChatRoom
 import LoginPage from '../features/auth/pages/LoginPage';
 import SignupCompanyEmailPage from '../features/auth/pages/SignupCompanyEmailPage.tsx';
 import SignupFormPage from '../features/auth/pages/SignupFormPage.tsx';
-import ResetPasswordEmailPage from '../features/auth/pages/ResetPasswordEmailPage';
-import MyPage from '../features/auth/pages/MyPage';
+import ResetPasswordEmailPage from '../features/auth/pages/ResetPasswordEmailPage.tsx';
+import MyPage from '../features/user/pages/MyPage.tsx';
 import InterviewNotePage from '../features/interview/pages/InterviewNotePage';
 import ResetPasswordPage from '../features/auth/pages/ResetPasswordPage.tsx';
 

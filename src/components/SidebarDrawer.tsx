@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import ConfirmLogoutModal from '../features/auth/components/ConfirmLogoutModal.tsx';
+import ConfirmLogoutModal from '../features/user/components/ConfirmLogoutModal.tsx';
 
 type Props = {
   open: boolean;

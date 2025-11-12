@@ -1,5 +1,5 @@
 import type { FormEvent } from 'react';
-import AuthShell from '../components/AuthShell';
+import AuthShell from '../components/AuthShell.tsx';
 
 export default function ResetPasswordEmailPage() {
   const onSubmit = (e: FormEvent) => {
