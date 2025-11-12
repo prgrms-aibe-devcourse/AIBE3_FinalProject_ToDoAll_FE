@@ -82,7 +82,7 @@ export default function SidebarDrawer({ open, onClose }: Props) {
           </Link>
 
           <Link
-            to="/jobs"
+            to="/resumes"
             className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[var(--color-jd-white)]"
             onClick={onClose}
           >
