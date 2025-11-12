@@ -3,6 +3,7 @@ import MatchFilterSection from '../components/MatchFilterSection';
 import MatchCard from '../components/MatchCard';
 import { mockResumes } from '../data/mockResumes';
 import type { ResumeData } from '../../resumes/types/resumes.types';
+import NoSearchResult from '../components/NoSearchResult';
 
 export default function MatchListPage() {
   const [keyword, setKeyword] = useState('');
@@ -54,7 +55,7 @@ export default function MatchListPage() {
             />
           ))
         ) : (
-          <p className="text-gray-500 text-center mt-6">검색 결과가 없습니다.</p>
+          <NoSearchResult />
         )}
       </div>
     </div>
