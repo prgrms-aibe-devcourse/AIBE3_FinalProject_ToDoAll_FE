@@ -4,6 +4,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 type Focus = 'profile' | 'password' | undefined;
 
+type Gender = '' | 'MALE' | 'FEMALE' | 'OTHER';
+
 export default function MyPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -16,6 +18,8 @@ export default function MyPage() {
     company: '잡다 컴퍼니',
     position: '매니저',
     profile: 'https://i.imgur.com/8Km9tLL.png',
+    birthDate: '',
+    gender: '' as Gender,
   });
 
   // 편집 토글 & 폼 데이터
@@ -50,11 +54,24 @@ export default function MyPage() {
     if (focusParam === 'password') setExpandPassword(true); //  ?focus=password면 비번 섹션 자동 오픈
   }, [searchParams]); //URL 쿼리가 바뀌면 다시 평가
 
-  // 입력 핸들러 (이메일,회사 제외 나머지 편집 가능)
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // 타입 분리된 onChange 핸들러
+
+  //  공통 업데이트 도우미(안전하게 키 제한)
+  type FormKeys = 'name' | 'phone' | 'position' | 'birthDate' | 'gender';
+  const updateForm = (name: FormKeys, value: string) => setForm((f) => ({ ...f, [name]: value }));
+
+  // input 전용
+  const onInputChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value }));
+    updateForm(name as FormKeys, value);
   };
+
+  // select 전용
+  const onSelectChange: React.ChangeEventHandler<HTMLSelectElement> = (e) => {
+    const { name, value } = e.target;
+    updateForm(name as FormKeys, value);
+  };
+  // ---------------------------
 
   const onCancel = () => {
     setForm(user);
@@ -71,7 +88,7 @@ export default function MyPage() {
     <div className="min-h-screen flex flex-col items-center justify-start bg-[var(--color-jd-white)] font-[var(--default-font-family)] px-6 sm:px-6 md:px-8 py-10 sm:py-12">
       <div className="w-full max-w-[860px] mb-6 mt-10">
         <h2 className="text-xl sm:text-2xl font-bold text-[var(--color-jd-black)] text-left ml-2">
-          기본 정보
+          마이페이지
         </h2>
       </div>
 
@@ -102,60 +119,122 @@ export default function MyPage() {
           </div>
 
           {/* 정보 폼/뷰 */}
-          <div className="flex-1 grid grid-cols-1 sm:grid-cols-[110px_1fr] gap-y-3 gap-x-4 text-[var(--color-jd-black)]">
-            <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
-              회사
-            </label>
-            {/* 회사는 항상 읽기 전용 */}
-            <div className="self-center font-semibold">{user.company}</div>
+          {/* ===== 기본 정보 섹션 ===== */}
+          <div className="flex-1">
+            <h3 className="text-sm font-semibold text-[var(--color-jd-gray-dark)] pb-2 mb-4 border-b border-black/10">
+              기본 정보
+            </h3>
 
-            <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
-              이메일
-            </label>
-            {/* 이메일도 항상 읽기 전용 */}
-            <div className="self-center font-semibold">{user.email}</div>
+            {/* 2열 그리드 */}
+            <div className="grid grid-cols-1 sm:grid-cols-[110px_1fr] gap-y-3 gap-x-4 text-[var(--color-jd-black)]">
+              <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
+                이메일
+              </label>
+              {/* 이메일도 항상 읽기 전용 */}
+              <div className="self-center font-semibold">{user.email}</div>
 
-            <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
-              이름
-            </label>
-            {editing ? (
-              <input
-                name="name"
-                value={form.name}
-                onChange={onChange}
-                className="border rounded-md px-3 py-2"
-              />
-            ) : (
-              <div className="self-center font-semibold">{user.name}</div>
-            )}
+              <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
+                이름
+              </label>
+              {editing ? (
+                <input
+                  name="name"
+                  value={form.name}
+                  onChange={onInputChange}
+                  className="border rounded-md px-3 py-2"
+                />
+              ) : (
+                <div className="self-center font-semibold">{user.name}</div>
+              )}
 
-            <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
-              전화번호
-            </label>
-            {editing ? (
-              <input
-                name="phone"
-                value={form.phone}
-                onChange={onChange}
-                className="border rounded-md px-3 py-2"
-              />
-            ) : (
-              <div className="self-center font-bold">{user.phone}</div>
-            )}
+              <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
+                전화번호 (선택)
+              </label>
+              {editing ? (
+                <input
+                  name="phone"
+                  value={form.phone}
+                  onChange={onInputChange}
+                  className="border rounded-md px-3 py-2"
+                  type="tel"
+                  placeholder="예: 010-1234-5678"
+                />
+              ) : (
+                <div className="self-center font-bold">{user.phone || ''}</div> // 미입력 시 빈칸
+              )}
 
-            <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
-              직책
-            </label>
-            {editing ? (
-              <input
-                name="position"
-                value={form.position}
-                onChange={onChange}
-                className="border rounded-md px-3 py-2"
-              />
-            ) : (
-              <div className="self-center font-semibold">{user.position}</div>
-            )}
+              {/* [추가] 생일 */}
+              <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
+                생일 (선택)
+              </label>
+              {editing ? (
+                <input
+                  name="birthDate"
+                  value={form.birthDate}
+                  onChange={onInputChange}
+                  className="border rounded-md px-3 py-2"
+                  type="date"
+                  placeholder="예: 1999-02-15" // [추가] 예시 표기(브라우저에 따라 미표시될 수 있음)
+                />
+              ) : (
+                <div className="self-center font-semibold">{user.birthDate || ''}</div> // [변경] 미입력 시 빈칸
+              )}
+
+              {/* [추가] 성별 */}
+              <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
+                성별 (선택)
+              </label>
+              {editing ? (
+                <select
+                  name="gender"
+                  value={form.gender}
+                  onChange={onSelectChange}
+                  className="border rounded-md px-3 py-2 bg-white"
+                >
+                  <option value="">(선택 없음)</option>
+                  <option value="MALE">남성</option>
+                  <option value="FEMALE">여성</option>
+                  <option value="OTHER">기타</option>
+                </select>
+              ) : (
+                <div className="self-center font-semibold">
+                  {user.gender === 'MALE'
+                    ? '남성'
+                    : user.gender === 'FEMALE'
+                      ? '여성'
+                      : user.gender === 'OTHER'
+                        ? '기타'
+                        : ''}
+                </div> // [변경] 미입력 시 빈칸
+              )}
+            </div>
+
+            {/* ===== 조직 정보 섹션 ===== */}
+            <h3 className="text-sm font-semibold text-[var(--color-jd-gray-dark)] pb-2 mt-8 mb-4 border-b border-black/10">
+              조직 정보
+            </h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-[110px_1fr] gap-y-3 gap-x-4 text-[var(--color-jd-black)]">
+              <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
+                회사
+              </label>
+              <div className="self-center font-semibold">{user.company}</div>
+
+              <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
+                직책
+              </label>
+              {editing ? (
+                <input
+                  name="position"
+                  value={form.position}
+                  onChange={onInputChange}
+                  className="border rounded-md px-3 py-2"
+                  placeholder="예: 매니저"
+                />
+              ) : (
+                <div className="self-center font-semibold">{user.position}</div>
+              )}
+            </div>
           </div>
         </div>
 
