@@ -225,22 +225,28 @@ jobs:
         run: |
           set -euo pipefail
 
-          PAYLOAD=$(jq -n \
+          jq -n \
             --arg model "$MODEL" \
             --rawfile sys system.txt \
             --rawfile usr user.txt \
             --argjson mt ${MAX_TOKENS} \
-            '{model:$model, messages:[{role:"system",content:$sys},{role:"user",content:$usr}], max_tokens:$mt, temperature:0.2}'
-          )
+            '{
+              model: $model,
+              messages: [
+                { role: "system", content: $sys },
+                { role: "user", content: $usr }
+              ],
+              max_tokens: $mt,
+              temperature: 0.2
+            }' > payload.json
 
-          RESP=$(curl -sS https://api.openai.com/v1/chat/completions \
+          curl -sS https://api.openai.com/v1/chat/completions \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $OPENAI_API_KEY" \
-            -d "$PAYLOAD"
-          )
+            --data-binary @payload.json \
+            -o llm_response.json
 
-          echo "$RESP" > llm_response.json
-          jq -r '.choices[0].message.content // "⚠️ Model returned empty response"' < llm_response.json > llm_content.txt
+          jq -r '.choices[0].message.content // "⚠️ 모델이 빈 응답을 반환했습니다."' < llm_response.json > llm_content.txt
 
       - name: Comment PR
         env:
