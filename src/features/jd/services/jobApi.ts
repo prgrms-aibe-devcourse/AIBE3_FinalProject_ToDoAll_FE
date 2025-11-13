@@ -117,12 +117,12 @@ type JobCreateRequest = {
   location?: string | null;
   thumbnailUrl?: string | null;
   authorId: number;
-  requiredSkillIds?: number[];
-  preferredSkillIds?: number[];
+  requiredSkills?: string[];
+  preferredSkills?: string[];
 };
 
 export async function createJobPost(request: JobCreateRequest): Promise<string> {
-  const res = await fetch(`http://localhost:8080/api/v1/jd/create`, {
+  const res = await fetch(`http://localhost:8080/api/v1/jd`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
