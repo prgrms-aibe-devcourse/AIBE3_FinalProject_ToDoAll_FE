@@ -1,25 +1,9 @@
 // JDCreatePage.tsx
 import React, { useEffect, useState } from 'react';
 import JobPostForm, { type JobPostFormValues } from '../features/jd/components/form/JobPostForm';
-import { createJobPost, type ApiResponse } from '../features/jd/services/jobApi';
-// import type ApiResponse from '../features/jd/services/jobApi';
+import { createJobPost, fetchSkills } from '../features/jd/services/jobApi';
+import type { JobCreateRequest } from '../features/jd/services/jobApi';
 
-type JobCreateRequest = {
-  title: string;
-  department?: string | null;
-  workType?: string | null;
-  experience?: string | null;
-  education?: string | null;
-  salary?: string | null;
-  description: string | null;
-  deadline?: string | null;
-  benefits?: string | null;
-  location?: string | null;
-  thumbnailUrl?: string | null;
-  authorId: number;
-  requiredSkills?: string[];
-  preferredSkills?: string[];
-};
 type Skill = {
   id: number;
   name: string;
@@ -28,23 +12,15 @@ const JDCreatePage: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [skills, setSkills] = useState<Skill[]>([]);
   useEffect(() => {
-    const fetchSkills = async () => {
+    const loadSkills = async () => {
       try {
-        const res = await fetch('http://localhost:8080/api/v1/jd/skills');
-        if (!res.ok) {
-          throw new Error(`HTTP ${res.status}`);
-        }
-        const body = (await res.json()) as ApiResponse<Skill[]>;
-        if (body.data) {
-          setSkills(body.data);
-        } else {
-          console.warn('skills empty:', body.message);
-        }
+        const data = await fetchSkills();
+        setSkills(data);
       } catch (err) {
-        console.error('스킬 목록 조회 실패:', err);
+        console.error('fetchSkills error:', err);
       }
     };
-    fetchSkills();
+    loadSkills();
   }, []);
 
   // TODO: 나중에 로그인 붙으면 실제 로그인 유저의 ID로 교체

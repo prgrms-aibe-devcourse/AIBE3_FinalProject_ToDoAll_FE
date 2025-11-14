@@ -104,7 +104,7 @@ export async function fetchJobDetail(id: string): Promise<JobDetail> {
   };
 }
 
-type JobCreateRequest = {
+export type JobCreateRequest = {
   title: string;
   department?: string | null;
   workType?: string | null;
@@ -133,4 +133,20 @@ export async function createJobPost(request: JobCreateRequest): Promise<string> 
   const body = (await res.json()) as ApiResponse<number>;
   if (!body.data) throw new Error(body.message ?? 'Empty response');
   return String(body.data);
+}
+
+export type Skill = {
+  id: number;
+  name: string;
+};
+
+export async function fetchSkills(): Promise<Skill[]> {
+  const res = await fetch('http://localhost:8080/api/v1/jd/skills');
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+  const body = (await res.json()) as ApiResponse<Skill[]>;
+  if (!body.data) {
+    throw new Error(body.message ?? 'Empty skills response');
+  }
+  return body.data;
 }
