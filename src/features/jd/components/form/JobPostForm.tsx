@@ -21,11 +21,13 @@ export default function JobPostForm({
   defaultValues,
   onSubmit,
   submitting = false,
+  skillOptions = [],
 }: {
   defaultValues?: Partial<JobPostFormValues>;
   // eslint-disable-next-line no-unused-vars
   onSubmit: (values: JobPostFormValues) => void;
   submitting?: boolean;
+  skillOptions?: string[];
 }) {
   const [values, setValues] = useState<JobPostFormValues>({
     title: '',
@@ -199,6 +201,7 @@ export default function JobPostForm({
           value={values.requiredSkills}
           onChange={(next: string[]) => update('requiredSkills', next)}
           placeholder="Enter 또는 , 로 추가"
+          options={skillOptions}
         />
       </div>
 
@@ -208,6 +211,7 @@ export default function JobPostForm({
           value={values.preferredSkills}
           onChange={(next: string[]) => update('preferredSkills', next)}
           placeholder="Enter 또는 , 로 추가"
+          options={skillOptions}
         />
       </div>
 

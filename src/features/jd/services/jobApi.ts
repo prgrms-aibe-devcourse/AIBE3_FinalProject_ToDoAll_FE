@@ -1,7 +1,7 @@
-import type { JobPost } from '../types/JobPost.types';
+import type { JobPost, JobStatus } from '../types/JobPost.types';
 import type { JobDetail } from '../types/JobDetail.types';
 
-type ApiResponse<T> = {
+export type ApiResponse<T> = {
   errorCode?: number;
   message?: string;
   data?: T;
@@ -102,4 +102,66 @@ export async function fetchJobDetail(id: string): Promise<JobDetail> {
     department: dto.department ?? '',
     images: dto.images ?? [],
   };
+}
+
+export type JobCreateRequest = {
+  title: string;
+  department?: string | null;
+  workType?: string | null;
+  experience?: string | null;
+  education?: string | null;
+  salary?: string | null;
+  description: string | null;
+  deadline?: string | null;
+  benefits?: string | null;
+  location?: string | null;
+  thumbnailUrl?: string | null;
+  authorId: number;
+  requiredSkills?: string[];
+  preferredSkills?: string[];
+};
+
+export async function createJobPost(request: JobCreateRequest): Promise<string> {
+  const res = await fetch(`http://localhost:8080/api/v1/jd`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(request),
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const body = (await res.json()) as ApiResponse<number>;
+  if (!body.data) throw new Error(body.message ?? 'Empty response');
+  return String(body.data);
+}
+
+export type Skill = {
+  id: number;
+  name: string;
+};
+
+export async function fetchSkills(): Promise<Skill[]> {
+  const res = await fetch('http://localhost:8080/api/v1/jd/skills');
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+  const body = (await res.json()) as ApiResponse<Skill[]>;
+  if (!body.data) {
+    throw new Error(body.message ?? 'Empty skills response');
+  }
+  return body.data;
+}
+
+export async function updateJobStatus(id: string | number, status: JobStatus) {
+  const res = await fetch(`http://localhost:8080/api/v1/jd/${id}/status`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status }),
+  });
+
+  if (!res.ok) {
+    throw new Error('상태 변경 실패');
+  }
+
+  const body = (await res.json()) as ApiResponse<{ id: number; status: JobStatus }>;
+  return body.data;
 }
