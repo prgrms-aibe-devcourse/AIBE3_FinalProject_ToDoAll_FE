@@ -17,11 +17,7 @@ export default function JDDetailPage() {
       <div className="mb-3 flex items-center justify-between">
         <h1 className="text-lg font-semibold">공고 관리</h1>
       </div>
-      <JobDetailView
-        job={data}
-        onEdit={() => alert('정보 변경')}
-        onClose={() => alert('마감 처리')}
-      />
+      <JobDetailView job={data} onEdit={() => alert('정보 변경')} />
     </main>
   );
 }
