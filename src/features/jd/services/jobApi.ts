@@ -103,3 +103,34 @@ export async function fetchJobDetail(id: string): Promise<JobDetail> {
     images: dto.images ?? [],
   };
 }
+
+type JobCreateRequest = {
+  title: string;
+  department?: string | null;
+  workType?: string | null;
+  experience?: string | null;
+  education?: string | null;
+  salary?: string | null;
+  description: string | null;
+  deadline?: string | null;
+  benefits?: string | null;
+  location?: string | null;
+  thumbnailUrl?: string | null;
+  authorId: number;
+  requiredSkills?: string[];
+  preferredSkills?: string[];
+};
+
+export async function createJobPost(request: JobCreateRequest): Promise<string> {
+  const res = await fetch(`http://localhost:8080/api/v1/jd`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(request),
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const body = (await res.json()) as ApiResponse<number>;
+  if (!body.data) throw new Error(body.message ?? 'Empty response');
+  return String(body.data);
+}
