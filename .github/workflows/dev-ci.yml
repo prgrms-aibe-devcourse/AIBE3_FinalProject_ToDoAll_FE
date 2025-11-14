@@ -33,14 +33,12 @@ jobs:
           set -euo pipefail
           
           EVENT="${{ github.event_name }}"
+          BASE="${{ github.event.before }}"
+          HEAD="${{ github.sha }}"
           
           if [[ "$EVENT" == "pull_request" ]]; then
             BASE="${{ github.event.pull_request.base.sha }}"
             HEAD="${{ github.event.pull_request.head.sha }}"
-          else
-            # push 이벤트일 때: 'before' → 'after(=github.sha)'
-            BASE="${{ github.event.before }}"
-            HEAD="${{ github.sha }}"
           fi
           
           # act 환경에서 PR SHA가 비거나 merge-base 불가하면 develop 기준으로 강제 3-dot
