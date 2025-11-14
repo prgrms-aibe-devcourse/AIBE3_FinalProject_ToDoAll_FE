@@ -1,7 +1,7 @@
 import type { JobPost } from '../types/JobPost.types';
 import type { JobDetail } from '../types/JobDetail.types';
 
-type ApiResponse<T> = {
+export type ApiResponse<T> = {
   errorCode?: number;
   message?: string;
   data?: T;
