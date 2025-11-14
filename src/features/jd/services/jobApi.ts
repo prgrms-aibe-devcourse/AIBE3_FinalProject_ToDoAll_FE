@@ -1,4 +1,4 @@
-import type { JobPost } from '../types/JobPost.types';
+import type { JobPost, JobStatus } from '../types/JobPost.types';
 import type { JobDetail } from '../types/JobDetail.types';
 
 export type ApiResponse<T> = {
@@ -148,5 +148,20 @@ export async function fetchSkills(): Promise<Skill[]> {
   if (!body.data) {
     throw new Error(body.message ?? 'Empty skills response');
   }
+  return body.data;
+}
+
+export async function updateJobStatus(id: string | number, status: JobStatus) {
+  const res = await fetch(`http://localhost:8080/api/v1/jd/${id}/status`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status }),
+  });
+
+  if (!res.ok) {
+    throw new Error('상태 변경 실패');
+  }
+
+  const body = (await res.json()) as ApiResponse<{ id: number; status: JobStatus }>;
   return body.data;
 }

@@ -1,6 +1,7 @@
 import { Pill } from '../shared/Pill';
 import type { JobDetail } from '../../types/JobDetail.types';
 import JobStatusDropdown from './JobStatusDropdown';
+import { updateJobStatus } from '../../services/jobApi';
 
 export function JobDetailHeader({ job, onEdit }: { job: JobDetail; onEdit?: () => void }) {
   const statusLabel = job.status === 'OPEN' ? '진행중' : '마감';
@@ -33,9 +34,14 @@ export function JobDetailHeader({ job, onEdit }: { job: JobDetail; onEdit?: () =
       <div className="flex shrink-0 items-center gap-2">
         <JobStatusDropdown
           value={job.status}
-          onChange={(next) => {
-            // 지금은 UI만: 일단 콘솔만
-            console.log('status change clicked:', job.status, '->', next);
+          onChange={async (next) => {
+            try {
+              await updateJobStatus(job.id, next);
+              alert('상태가 변경되었습니다.');
+              window.location.reload();
+            } catch (error) {
+              alert('상태 변경에 실패했습니다.' + error);
+            }
           }}
         />
         <button
