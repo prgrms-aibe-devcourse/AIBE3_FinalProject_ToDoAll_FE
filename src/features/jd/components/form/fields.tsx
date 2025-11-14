@@ -45,14 +45,19 @@ export function TagInput({
   onChange,
   placeholder,
   label,
+  options = [],
 }: {
   value: string[];
   // eslint-disable-next-line no-unused-vars
   onChange: (value: string[]) => void;
   placeholder?: string;
   label?: string;
+  options?: string[];
 }) {
   const [draft, setDraft] = useState('');
+  const [open, setOpen] = useState(false);
+
+  const normalize = (s: string) => s.trim().toLowerCase();
 
   const add = (v: string) => {
     const t = v.trim();
@@ -72,18 +77,50 @@ export function TagInput({
     }
   };
 
+  const filteredOptions = options
+    .filter((opt) => !value.includes(opt))
+    .filter((opt) => normalize(opt).includes(normalize(draft)));
+
   return (
     <div>
       {label ? <div className="mb-1 text-[12px] font-medium text-gray-600">{label}</div> : null}
-      <div className="flex flex-wrap items-center gap-2 rounded-xl border border-gray-200 bg-white px-2 py-2">
-        <input
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={onKeyDown}
-          placeholder={placeholder}
-          className="flex-1 min-w-[120px] border-none bg-transparent px-2 py-1 text-sm focus:outline-none"
-        />
+      <div className="relative">
+        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-gray-200 bg-white px-2 py-2">
+          <input
+            value={draft}
+            onChange={(e) => {
+              setDraft(e.target.value);
+              setOpen(true);
+            }}
+            onFocus={() => setOpen(true)}
+            onBlur={() => {
+              setTimeout(() => setOpen(false), 100);
+            }}
+            onKeyDown={onKeyDown}
+            placeholder={placeholder}
+            className="flex-1 min-w-[120px] border-none bg-transparent px-2 py-1 text-sm focus:outline-none"
+          />
+        </div>
+        {open && filteredOptions.length > 0 && (
+          <div className="absolute z-10 mt-1 max-h-48 w-full overflow-auto rounded-md border border-gray-200 bg-white shadow">
+            {filteredOptions.map((opt) => (
+              <button
+                key={opt}
+                type="button"
+                className="flex w-full px-3 py-1.5 text-left text-sm hover:bg-gray-100"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  add(opt);
+                  setOpen(false);
+                }}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
+
       <div className="mt-2 flex flex-wrap gap-2">
         {value.map((t, i) => (
           <Pill key={t + i} className="bg-white">

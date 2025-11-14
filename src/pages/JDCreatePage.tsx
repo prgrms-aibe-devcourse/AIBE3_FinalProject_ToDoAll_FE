@@ -113,7 +113,11 @@ const JDCreatePage: React.FC = () => {
     <main className="min-h-screen bg-gray-50 p-4 sm:p-6">
       <div className="mx-auto max-w-5xl">
         <h1 className="mb-4 text-xl font-semibold text-gray-800">채용 공고 등록</h1>
-        <JobPostForm onSubmit={handleSubmit} submitting={submitting} />
+        <JobPostForm
+          onSubmit={handleSubmit}
+          submitting={submitting}
+          skillOptions={skills.map((s) => s.name)}
+        />
       </div>
     </main>
   );
