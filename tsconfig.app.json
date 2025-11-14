@@ -22,7 +22,18 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    /* 경로 설정 */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@assets/*" : ["src/assets/*"],
+      "@components/*" : ["src/components/*"],
+      "@features/*" : ["src/features/*"],
+      "@lib/*" : ["src/lib/*"],
+      "@pages/*" : ["src/pages/*"]
+    }
   },
   "include": ["src"]
 }

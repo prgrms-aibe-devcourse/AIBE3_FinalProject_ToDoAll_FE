@@ -1,26 +1,17 @@
-
 const Footer = () => {
   return (
     <>
-      <footer
-        className="
-        bg-[#F6EFEF]
-        text-[#413F3F]
-        ring-1 ring-[#E3DBDB]
-        shadow-[0_6px_22px_rgba(0,0,0,.1)]
-        font-[var(--default-font-family)]
-        "
-      >
-        <div className="mx-auto max-w-6xl px-6 py-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+      <footer className="bg-[#F6EFEF] font-[var(--default-font-family)] text-[#413F3F] shadow-[0_6px_22px_rgba(0,0,0,.1)] ring-1 ring-[#E3DBDB]">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 items-start gap-6 px-6 py-6 md:grid-cols-2">
           {/* 로고 / 좌측 */}
-          <div className=" flex items-center justify-start h-full gap-4">
-            <img src="/logo/login-logo.png" alt="jobda" className="h-16 w-auto " />
+          <div className="flex h-full items-center justify-start gap-4">
+            <img src="/logo/login-logo.png" alt="jobda" className="h-16 w-auto" />
           </div>
 
           {/* 링크 / 우측 */}
           <div className="flex md:justify-end">
             <ul className="text-base leading-8">
-              <li className="font-bold mb-2 text-[var(--color-jd-violet)] ">Jobda</li>
+              <li className="mb-2 font-bold text-[var(--color-jd-violet)]">Jobda</li>
               <li>
                 <a className="text-sm text-[var(--color-jd-violet)] transition" href="/dashboard">
                   대시보드
@@ -50,7 +41,7 @@ const Footer = () => {
 
         {/* 하단 저작권 영역 */}
         <div className="border-t border-[#E3DBDB]">
-          <div className="text-sm text-[var(--color-jd-violet)] font-semibold mx-auto max-w-6xl px-6 py-5 text-right">
+          <div className="mx-auto max-w-6xl px-6 py-5 text-right text-sm font-semibold text-[var(--color-jd-violet)]">
             © 2025 <span className="!font-bold">Jobda Inc.</span> All rights reserved.
           </div>
         </div>

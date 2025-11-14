@@ -83,9 +83,9 @@ export default function InterviewManagePage() {
   });
 
   return (
-    <div className="min-h-screen bg-jd-white px-12 py-8">
+    <div className="bg-jd-white min-h-screen px-12 py-8">
       {/* 상단 영역 */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-semibold">면접 관리</h1>
         <InterviewSortDropdown jobPosts={jobPosts} onSelect={setSelectedJD} />
       </div>
@@ -94,13 +94,13 @@ export default function InterviewManagePage() {
       <InterviewFilterTabs activeTab={activeTab} onChange={setActiveTab} />
 
       {/* 카드 리스트 */}
-      <div className="grid grid-cols-3 gap-8 mt-6">
+      <div className="mt-6 grid grid-cols-3 gap-8">
         {filtered.map((item) => (
           <InterviewCard key={item.id} {...item} />
         ))}
 
         {filtered.length === 0 && (
-          <div className="col-span-3 text-center text-gray-500 py-16">
+          <div className="col-span-3 py-16 text-center text-gray-500">
             해당 조건에 맞는 면접이 없습니다.
           </div>
         )}

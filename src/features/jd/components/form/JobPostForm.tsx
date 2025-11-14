@@ -57,7 +57,7 @@ export default function JobPostForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="mx-auto max-w-5xl rounded-2xl bg-white p-4 sm:p-6 shadow-sm ring-1 ring-gray-200"
+      className="mx-auto max-w-5xl rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-200 sm:p-6"
     >
       <h2 className="mb-4 text-sm font-semibold text-gray-700">공고 등록</h2>
 

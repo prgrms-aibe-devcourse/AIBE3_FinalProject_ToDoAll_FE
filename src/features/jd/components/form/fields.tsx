@@ -16,7 +16,7 @@ export function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
     <input
       {...rest}
       className={
-        'w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-200 ' +
+        'w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-orange-400 focus:ring-2 focus:ring-orange-200 focus:outline-none ' +
         className
       }
     />
@@ -33,7 +33,7 @@ export function TextArea({
       {...rest}
       rows={rows}
       className={
-        'w-full rounded-xl border border-gray-200 bg-[#f2eae6] px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-200 ' +
+        'w-full rounded-xl border border-gray-200 bg-[#f2eae6] px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-orange-400 focus:ring-2 focus:ring-orange-200 focus:outline-none ' +
         className
       }
     />

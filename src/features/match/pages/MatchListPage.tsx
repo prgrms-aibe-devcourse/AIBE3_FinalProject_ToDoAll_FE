@@ -38,12 +38,12 @@ export default function MatchListPage() {
   }, [keyword, sortBy, tab]);
 
   return (
-    <div className="p-6 bg-[#FAF8F8] min-h-screen">
-      <h1 className="text-2xl font-semibold mb-6 text-[#413F3F]">지원자 조회</h1>
+    <div className="min-h-screen bg-[#FAF8F8] p-6">
+      <h1 className="mb-6 text-2xl font-semibold text-[#413F3F]">지원자 조회</h1>
 
       <MatchFilterSection onSearch={setKeyword} onSortChange={setSortBy} onTabChange={setTab} />
 
-      <div className="flex flex-col gap-4 mt-6">
+      <div className="mt-6 flex flex-col gap-4">
         {filteredResumes.length > 0 ? (
           filteredResumes.map((resume: ResumeData) => (
             <MatchCard

@@ -130,9 +130,9 @@ export default function SignupFormPage() {
       <form onSubmit={onSubmit} className="flex flex-col gap-6">
         {/* 기업명 */}
         <div className="flex flex-col gap-3">
-          <label className="block text-m font-semibold text-jd-black">기업명</label>
+          <label className="text-m text-jd-black block font-semibold">기업명</label>
           <div className="relative">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#413F3F]">
+            <div className="absolute top-1/2 left-4 -translate-y-1/2 text-[#413F3F]">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="18"
@@ -162,27 +162,24 @@ export default function SignupFormPage() {
                 setFieldError('companyName', companyName);
               }}
               placeholder="회사명을 입력하세요"
-              className="h-12 w-full rounded-full border border-jd-gray-light
-              bg-jd-white pl-12 pr-5 text-[#413F3F] placeholder:text-jd-gray-dark/70
-              outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
-              focus:border-jd-gray-light focus:ring-0"
+              className="border-jd-gray-light bg-jd-white placeholder:text-jd-gray-dark/70 focus:border-jd-gray-light h-12 w-full rounded-full border pr-5 pl-12 text-[#413F3F] shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)] outline-none focus:ring-0"
               style={{ borderRadius: 15, paddingLeft: '3rem' }}
             />
           </div>
           {(touched.companyName || didSubmit) && errors.companyName && (
-            <p className="text-xs text-red-600 flex items-center gap-1 mt-0.5">
+            <p className="mt-0.5 flex items-center gap-1 text-xs text-red-600">
               <span aria-hidden>ⓘ</span> {errors.companyName}
             </p>
           )}
         </div>
 
         {/* 이름 + 직책 (2열) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {/* 이름 */}
           <div className="flex flex-col gap-3">
-            <label className="block text-m font-semibold text-jd-black">이름</label>
+            <label className="text-m text-jd-black block font-semibold">이름</label>
             <div className="relative">
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#413F3F]">
+              <div className="absolute top-1/2 left-4 -translate-y-1/2 text-[#413F3F]">
                 {/* user icon */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -192,7 +189,7 @@ export default function SignupFormPage() {
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="w-5 h-5"
+                  className="h-5 w-5"
                   aria-hidden="true"
                 >
                   <path d="M20 21v-2a4 4 0 0 0-3-3.87M4 21v-2a4 4 0 0 1 3-3.87m9-7.13a4 4 0 1 0-8 0 4 4 0 0 0 8 0Z" />
@@ -214,14 +211,12 @@ export default function SignupFormPage() {
                 placeholder="이름을 입력하세요"
                 autoComplete="off"
                 name="signup-name"
-                className="h-12 w-full rounded-full border border-jd-gray-light bg-jd-white pl-12 pr-5 text-[#413F3F]
-        placeholder:text-jd-gray-dark/70 outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
-        focus:border-jd-gray-light focus:ring-0"
+                className="border-jd-gray-light bg-jd-white placeholder:text-jd-gray-dark/70 focus:border-jd-gray-light h-12 w-full rounded-full border pr-5 pl-12 text-[#413F3F] shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)] outline-none focus:ring-0"
                 style={{ borderRadius: 15, paddingLeft: '3rem' }}
               />
             </div>
             {(touched.name || didSubmit) && errors.name && (
-              <p className="text-xs text-red-600 flex items-center gap-1 mt-0.5">
+              <p className="mt-0.5 flex items-center gap-1 text-xs text-red-600">
                 <span aria-hidden>ⓘ</span> {errors.name}
               </p>
             )}
@@ -229,9 +224,9 @@ export default function SignupFormPage() {
 
           {/* 직책 */}
           <div className="flex flex-col gap-3">
-            <label className="block text-m font-semibold text-jd-black">직책</label>
+            <label className="text-m text-jd-black block font-semibold">직책</label>
             <div className="relative">
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#413F3F]">
+              <div className="absolute top-1/2 left-4 -translate-y-1/2 text-[#413F3F]">
                 {/* briefcase icon (18x18, currentColor) */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -259,14 +254,12 @@ export default function SignupFormPage() {
                 placeholder="예: 매니저"
                 name="user_field"
                 autoComplete="off"
-                className="h-12 w-full rounded-full border border-jd-gray-light bg-jd-white pl-12 pr-5 text-[#413F3F]
-        placeholder:text-jd-gray-dark/70 outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
-        focus:border-jd-gray-light focus:ring-0"
+                className="border-jd-gray-light bg-jd-white placeholder:text-jd-gray-dark/70 focus:border-jd-gray-light h-12 w-full rounded-full border pr-5 pl-12 text-[#413F3F] shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)] outline-none focus:ring-0"
                 style={{ borderRadius: 15, paddingLeft: '3rem' }}
               />
             </div>
             {(touched.position || didSubmit) && errors.position && (
-              <p className="text-xs text-red-600 flex items-center gap-1 mt-0.5">
+              <p className="mt-0.5 flex items-center gap-1 text-xs text-red-600">
                 <span aria-hidden>ⓘ</span> {errors.position}
               </p>
             )}
@@ -275,9 +268,9 @@ export default function SignupFormPage() {
 
         {/* 닉네임 */}
         <div className="flex flex-col gap-3">
-          <label className="block text-m font-semibold text-jd-black">닉네임</label>
+          <label className="text-m text-jd-black block font-semibold">닉네임</label>
           <div className="relative">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#413F3F]">
+            <div className="absolute top-1/2 left-4 -translate-y-1/2 text-[#413F3F]">
               {/* user icon */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -304,14 +297,12 @@ export default function SignupFormPage() {
               placeholder="닉네임을 입력하세요"
               autoComplete="off"
               name="signup-nickname"
-              className="h-12 w-full rounded-full border border-jd-gray-light bg-jd-white pl-12 pr-5 text-[#413F3F]
-      placeholder:text-jd-gray-dark/70 outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
-      focus:border-jd-gray-light focus:ring-0"
+              className="border-jd-gray-light bg-jd-white placeholder:text-jd-gray-dark/70 focus:border-jd-gray-light h-12 w-full rounded-full border pr-5 pl-12 text-[#413F3F] shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)] outline-none focus:ring-0"
               style={{ borderRadius: 15, paddingLeft: '3rem' }}
             />
           </div>
           {(touched.nickname || didSubmit) && errors.nickname && (
-            <p className="text-xs text-red-600 flex items-center gap-1 mt-0.5">
+            <p className="mt-0.5 flex items-center gap-1 text-xs text-red-600">
               <span aria-hidden>ⓘ</span> {errors.nickname}
             </p>
           )}
@@ -319,9 +310,9 @@ export default function SignupFormPage() {
 
         {/* 비밀번호 */}
         <div className="flex flex-col gap-3">
-          <label className="block text-m font-semibold text-jd-black">비밀번호</label>
+          <label className="text-m text-jd-black block font-semibold">비밀번호</label>
           <div className="relative">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#413F3F]">
+            <div className="absolute top-1/2 left-4 -translate-y-1/2 text-[#413F3F]">
               <svg
                 width="18"
                 height="18"
@@ -345,10 +336,7 @@ export default function SignupFormPage() {
               autoComplete="new-password"
               autoCapitalize="none"
               spellCheck={false}
-              className="h-12 w-full rounded-full border border-jd-gray-light
-              bg-jd-white pl-12 pr-5 text-[#413F3F] placeholder:text-jd-gray-dark/70
-              outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
-              focus:border-jd-gray-light focus:ring-0"
+              className="border-jd-gray-light bg-jd-white placeholder:text-jd-gray-dark/70 focus:border-jd-gray-light h-12 w-full rounded-full border pr-5 pl-12 text-[#413F3F] shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)] outline-none focus:ring-0"
               style={{ borderRadius: 15, paddingLeft: '3rem' }}
             />
           </div>
@@ -363,9 +351,9 @@ export default function SignupFormPage() {
 
         {/* 비밀번호 확인 */}
         <div className="flex flex-col gap-3">
-          <label className="block text-m font-semibold text-jd-black">비밀번호 확인</label>
+          <label className="text-m text-jd-black block font-semibold">비밀번호 확인</label>
           <div className="relative">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#413F3F]">
+            <div className="absolute top-1/2 left-4 -translate-y-1/2 text-[#413F3F]">
               <svg
                 width="18"
                 height="18"
@@ -388,10 +376,7 @@ export default function SignupFormPage() {
               autoComplete="new-password"
               autoCapitalize="none"
               spellCheck={false}
-              className="h-12 w-full rounded-full border border-jd-gray-light
-              bg-jd-white pl-12 pr-5 text-[#413F3F] placeholder:text-jd-gray-dark/70
-              outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
-              focus:border-jd-gray-light focus:ring-0"
+              className="border-jd-gray-light bg-jd-white placeholder:text-jd-gray-dark/70 focus:border-jd-gray-light h-12 w-full rounded-full border pr-5 pl-12 text-[#413F3F] shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)] outline-none focus:ring-0"
               style={{ borderRadius: 15, paddingLeft: '3rem' }}
             />
           </div>
@@ -400,7 +385,7 @@ export default function SignupFormPage() {
         {(touched.passwordConfirm || didSubmit) &&
           passwordConfirm &&
           password !== passwordConfirm && (
-            <p className="text-xs text-red-600 flex items-center gap-1">
+            <p className="flex items-center gap-1 text-xs text-red-600">
               <span aria-hidden>ⓘ</span> 비밀번호가 일치하지 않습니다
             </p>
           )}
@@ -411,7 +396,7 @@ export default function SignupFormPage() {
               type="checkbox"
               checked={consentChecked}
               onChange={(e) => setConsentChecked(e.target.checked)}
-              className="mt-1 h-4 w-4 rounded border-jd-gray-light text-[#752F6D] focus:ring-[#752F6D]"
+              className="border-jd-gray-light mt-1 h-4 w-4 rounded text-[#752F6D] focus:ring-[#752F6D]"
               required
             />
             <span>
@@ -420,7 +405,7 @@ export default function SignupFormPage() {
                 type="button"
                 ref={openPrivacyBtnRef} // 트리거 버튼 ref 저장
                 onClick={() => setShowPrivacyModal(true)}
-                className="ml-2 underline text-[#752F6D] hover:brightness-110"
+                className="ml-2 text-[#752F6D] underline hover:brightness-110"
               >
                 자세히 보기
               </button>
@@ -428,7 +413,7 @@ export default function SignupFormPage() {
           </label>
 
           {didSubmit && !consentChecked && (
-            <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
+            <p className="mt-1 flex items-center gap-1 text-xs text-red-600">
               <span aria-hidden>ⓘ</span> 동의가 필요합니다.
             </p>
           )}
@@ -449,20 +434,13 @@ export default function SignupFormPage() {
             type="submit"
             disabled={!isFormValid}
             aria-disabled={!isFormValid}
-            className={`
-              inline-flex items-center justify-center
-              h-12 w-40 select-none
-              !rounded-[15px] !text-white font-extrabold tracking-tight
-              [background-image:none] !opacity-100
-              transition will-change-transform outline-none
-              ${
-                isFormValid
-                  ? 'shadow-[0_4px_12px_rgba(117,47,109,.25)] !bg-[#752F6D] ' +
-                    'hover:brightness-[1.05] active:brightness-95 focus-visible:ring-2 ' +
-                    'focus-visible:ring-[#752F6D]/40'
-                  : '!bg-[#CDBFD4] text-[#413F3F]/60 cursor-not-allowed opacity-70'
-              }
-          `}
+            className={`inline-flex h-12 w-40 items-center justify-center !rounded-[15px] [background-image:none] font-extrabold tracking-tight !text-white !opacity-100 transition will-change-transform outline-none select-none ${
+              isFormValid
+                ? '!bg-[#752F6D] shadow-[0_4px_12px_rgba(117,47,109,.25)] ' +
+                  'hover:brightness-[1.05] focus-visible:ring-2 active:brightness-95 ' +
+                  'focus-visible:ring-[#752F6D]/40'
+                : 'cursor-not-allowed !bg-[#CDBFD4] text-[#413F3F]/60 opacity-70'
+            } `}
             style={{ appearance: 'none', WebkitAppearance: 'none' }}
           >
             회원가입

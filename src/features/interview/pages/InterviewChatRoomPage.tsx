@@ -65,21 +65,21 @@ export default function InterviewChatRoomPage() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-jd-white text-jd-black overflow-hidden">
+    <div className="bg-jd-white text-jd-black flex h-screen flex-col overflow-hidden">
       {/* 헤더 */}
-      <header className="flex justify-between items-center px-10 py-6 h-20 shrink-0">
-        <h1 className="text-3xl font-semibold text-jd-black">면접</h1>
+      <header className="flex h-20 shrink-0 items-center justify-between px-10 py-6">
+        <h1 className="text-jd-black text-3xl font-semibold">면접</h1>
         <button
           onClick={handleEndInterview}
-          className="bg-jd-yellow text-white px-6 py-2 rounded-lg hover:bg-jd-yellow-hover transition text-m font-semibold"
+          className="bg-jd-yellow hover:bg-jd-yellow-hover text-m rounded-lg px-6 py-2 font-semibold text-white transition"
         >
           면접 종료
         </button>
       </header>
 
       {/* 본문 (3열 레이아웃) */}
-      <div className="flex flex-1 gap-6 px-8 pb-8 overflow-hidden">
-        <div className="flex flex-1 gap-6 h-full overflow-hidden">
+      <div className="flex flex-1 gap-6 overflow-hidden px-8 pb-8">
+        <div className="flex h-full flex-1 gap-6 overflow-hidden">
           <ChatSection initialMessages={initialMessages} avatar={avatar} />
           <QuestionNoteSection questionNotes={questionNotes} />
           <InterviewSummarySection summaries={interviewSummary} currentUserId={102} />

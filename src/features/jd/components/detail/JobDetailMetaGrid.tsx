@@ -3,7 +3,7 @@ import type { JobDetail } from '../../types/JobDetail.types';
 
 export function JobDetailMetaGrid({ job }: { job: JobDetail }) {
   return (
-    <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+    <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
       <MetaCard label="업무 설명">{job.description}</MetaCard>
       <MetaCard label="우대 스킬">{job.preferredSkills?.join(', ') || '-'}</MetaCard>
       <MetaCard label="복리후생">{job.benefits?.join(', ') || '-'}</MetaCard>

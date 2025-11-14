@@ -17,8 +17,7 @@ export default function JDPage() {
       <header className="mb-4 flex items-center justify-between">
         <h1 className="text-xl font-bold text-gray-900">공고 관리</h1>
         <button
-          className="rounded-full bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow
-           hover:bg-indigo-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          className="cursor-pointer rounded-full bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none"
           onClick={() => navigate('/jobs/new')}
         >
           공고 등록
