@@ -1,15 +1,8 @@
 import { Pill } from '../shared/Pill';
 import type { JobDetail } from '../../types/JobDetail.types';
+import JobStatusDropdown from './JobStatusDropdown';
 
-export function JobDetailHeader({
-  job,
-  onEdit,
-  onClose,
-}: {
-  job: JobDetail;
-  onEdit?: () => void;
-  onClose?: () => void;
-}) {
+export function JobDetailHeader({ job, onEdit }: { job: JobDetail; onEdit?: () => void }) {
   const statusLabel = job.status === 'OPEN' ? '진행중' : '마감';
   return (
     <header className="flex items-start justify-between gap-4">
@@ -26,6 +19,7 @@ export function JobDetailHeader({
             {statusLabel}
           </span>
         </div>
+
         <p className="mt-1 text-sm text-gray-600">{job.location}</p>
         {job.skills?.length ? (
           <div className="mt-2 flex flex-wrap gap-1.5">
@@ -37,14 +31,15 @@ export function JobDetailHeader({
       </div>
 
       <div className="flex shrink-0 items-center gap-2">
+        <JobStatusDropdown
+          value={job.status}
+          onChange={(next) => {
+            // 지금은 UI만: 일단 콘솔만
+            console.log('status change clicked:', job.status, '->', next);
+          }}
+        />
         <button
           onClick={onEdit}
-          className="rounded-full bg-white px-3 py-1.5 text-sm ring-1 ring-gray-200 hover:bg-gray-50"
-        >
-          진행 상태 변경
-        </button>
-        <button
-          onClick={onClose}
           className="rounded-full bg-orange-500 px-3 py-1.5 text-sm text-white shadow hover:bg-orange-600"
         >
           수정
