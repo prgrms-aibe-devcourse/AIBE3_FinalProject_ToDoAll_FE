@@ -98,7 +98,7 @@ export function TagInput({
             }}
             onKeyDown={onKeyDown}
             placeholder={placeholder}
-            className="flex-1 min-w-[120px] border-none bg-transparent px-2 py-1 text-sm focus:outline-none"
+            className="min-w-[120px] flex-1 border-none bg-transparent px-2 py-1 text-sm focus:outline-none"
           />
         </div>
         {open && filteredOptions.length > 0 && (
