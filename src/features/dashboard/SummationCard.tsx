@@ -1,15 +1,27 @@
 import DetailButton from '@components/dashboard/DetailButton.tsx';
 import { BookText } from 'lucide-react';
 
-export default function SummationCard() {
+export type SummationCardProps = {
+  title: string;
+  description: string;
+  value: string;
+  detailUrl: string;
+};
+
+export default function SummationCard({
+  title,
+  description,
+  value,
+  detailUrl,
+}: SummationCardProps) {
   return (
     <div className="jd-dashboard-section relative flex aspect-[12/8] w-full max-w-sm flex-col justify-between rounded-[20px] bg-white p-[30px] md:max-w-[279px]">
-      <h2 className="text-jd-gray-dark mb-[20px] font-bold">활성 공고</h2>
+      <h2 className="text-jd-gray-dark mb-[20px] font-bold">{title}</h2>
       <div>
-        <h3 className="text-4xl font-semibold text-gray-700">12</h3>
-        <p className="text-sm font-light text-gray-500">진행 중인 채용 공고</p>
+        <h3 className="text-4xl font-semibold text-gray-700">{value}</h3>
+        <p className="text-sm font-light text-gray-500">{description}</p>
       </div>
-      <DetailButton className="relative top-3" />
+      <DetailButton className="relative top-3" url={detailUrl} />
       <BookText className="text-jd-gray-dark absolute top-[30px] right-[30px]" size="20px" />
     </div>
   );
