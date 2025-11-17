@@ -1,6 +1,18 @@
-// src/features/resumes/data/resume.mapper.ts
-
 import type { ResumeData } from '../types/resumes.types';
+
+function mapProficiency(level: string) {
+  if (level === '초급') return 'BEGINNER';
+  if (level === '중급') return 'INTERMEDIATE';
+  return 'EXPERT';
+}
+
+function mapActivityType() {
+  return 'ACTIVITY';
+}
+
+function mapCertificationType() {
+  return 'LICENSE';
+}
 
 export function convertToBackendRequest(form: ResumeData) {
   return {
@@ -20,15 +32,26 @@ export function convertToBackendRequest(form: ResumeData) {
     portfolioFileUrl: form.files.portfolio,
 
     education: form.education.map((e) => ({
-      educationLevel: 'UNIVERSITY_ABOVE',
+      educationLevel:
+        e.type === '초등학교'
+          ? 'ELEMENTARY'
+          : e.type === '중학교'
+            ? 'MIDDLE'
+            : e.type === '고등학교'
+              ? 'HIGH'
+              : 'UNIVERSITY_ABOVE',
+
       schoolName: e.name,
-      major: '기타전공',
+      major: e.type === '대학' || e.type === '대학원' ? e.major : null,
       isGraduated: e.graduated,
       admissionDate: e.startDate,
       graduationDate: e.endDate,
-      attendanceType: 'FULL',
-      gpa: (e as any).gpa ?? null,
-      gpaScale: 4.5,
+
+      attendanceType:
+        e.type === '대학' || e.type === '대학원' ? (e.dayTime === 'DAY' ? 'DAY' : 'NIGHT') : null,
+
+      gpa: e.type === '대학' || e.type === '대학원' ? (e.grade ?? null) : null,
+      gpaScale: e.type === '대학' || e.type === '대학원' ? (e.maxGrade ?? null) : null,
     })),
 
     experience:
@@ -41,8 +64,7 @@ export function convertToBackendRequest(form: ResumeData) {
 
     skills: form.skills.map((s) => ({
       skillName: s.name,
-      proficiencyLevel:
-        s.level === '초급' ? 'BEGINNER' : s.level === '중급' ? 'INTERMEDIATE' : 'ADVANCED',
+      proficiencyLevel: mapProficiency(s.level),
     })),
 
     activities:
@@ -51,7 +73,7 @@ export function convertToBackendRequest(form: ResumeData) {
         .filter((v) => v.trim() !== '')
         .map((t) => ({
           title: t,
-          type: 'ETC',
+          type: mapActivityType(),
           organization: '',
         })) ?? [],
 
@@ -60,7 +82,7 @@ export function convertToBackendRequest(form: ResumeData) {
         ?.split('\n')
         .filter((v) => v.trim() !== '')
         .map((t) => ({
-          type: 'ETC',
+          type: mapCertificationType(),
           name: t,
           scoreOrLevel: '',
         })) ?? [],
