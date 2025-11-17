@@ -26,8 +26,9 @@ export type EducationItem =
       graduated: boolean;
       startDate: string;
       endDate: string;
-      dayTime: '주간' | '야간';
+      dayTime: 'DAY' | 'NIGHT';
       gpa?: number;
+      maxGpa?: number;
     };
 
 export type CareerItem = {
@@ -41,6 +42,7 @@ export type CareerItem = {
 
 export type ResumeData = {
   id: string;
+  jdId: number;
   name: string;
   gender: '남' | '여';
   birth: string;
@@ -62,6 +64,4 @@ export type ResumeData = {
   certifications: string;
 };
 
-// Generic onChange handler type that maps a ResumeData key to its value type.
-// Using underscore-prefixed param names to satisfy ESLint's unused-vars rule in type positions.
 export type OnResumeChange = <K extends keyof ResumeData>(_field: K, _value: ResumeData[K]) => void;

@@ -1,11 +1,21 @@
-import { useState } from 'react';
-import type { ResumeData, Skill } from '../types/resumes.types';
+// src/features/resumes/pages/ResumeCreatePage.tsx
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import type { ResumeData } from '../types/resumes.types';
 import BasicInfoForm from '../components/BasicInfoForm';
 import ResumeForm from '../components/ResumeForm';
+import { createResume } from '../data/resumes.api';
+import { getJobDescription } from '../data/jd.api';
 
 export default function ResumeCreatePage() {
+  const { id } = useParams();
+  const jdId = Number(id);
+  const navigate = useNavigate();
+
+  const [jobTitle, setJobTitle] = useState('');
   const [formData, setFormData] = useState<ResumeData>({
     id: '',
+    jdId: jdId,
     name: '',
     gender: '남',
     birth: '',
@@ -13,11 +23,7 @@ export default function ResumeCreatePage() {
     email: '',
     phone: '',
     applyDate: '',
-    address: {
-      country: '대한민국',
-      city: '',
-      detail: '',
-    },
+    address: { country: '대한민국', city: '', detail: '' },
     files: { resume: '', portfolio: '', etc: [] },
     education: [],
     career: [],
@@ -27,45 +33,48 @@ export default function ResumeCreatePage() {
     certifications: '',
   });
 
-  const handleChange = (
-    field: keyof ResumeData,
-    value:
-      | string
-      | boolean
-      | string[]
-      | Skill[]
-      | ResumeData['files']
-      | ResumeData['address']
-      | '남'
-      | '여'
-      | ResumeData['education']
-      | ResumeData['career']
-  ) => {
-    setFormData((prev) => {
-      switch (field) {
-        case 'files':
-          return { ...prev, files: value as ResumeData['files'] };
-        case 'address':
-          return { ...prev, address: value as ResumeData['address'] };
-        case 'gender':
-          return { ...prev, gender: value as '남' | '여' };
-        case 'education':
-          return { ...prev, education: value as ResumeData['education'] };
-        case 'career':
-          return { ...prev, career: value as ResumeData['career'] };
-        case 'skills':
-          return { ...prev, skills: value as Skill[] };
-        default:
-          return { ...prev, [field]: value };
+  useEffect(() => {
+    async function fetchJD() {
+      if (!jdId || isNaN(jdId)) {
+        console.error('유효하지 않은 공고 ID입니다.');
+        return;
       }
-    });
+      try {
+        const jd = await getJobDescription(jdId);
+        setJobTitle(jd.title);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    fetchJD();
+  }, [jdId]);
+
+  const handleChange = (field: keyof ResumeData, value: any) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
+
+  const handleSubmit = async () => {
+    try {
+      const result = await createResume(formData);
+      alert('제출 성공! 이력서 ID = ' + result.id);
+    } catch (e: any) {
+      alert('제출 실패: ' + e.message);
+    }
+  };
+
+  const handlePreview = () => {
+    navigate('/resume/preview', { state: { formData } });
+  };
+
+  if (!jdId || isNaN(jdId)) {
+    return <p>유효하지 않은 공고 ID입니다.</p>;
+  }
 
   return (
     <div className="min-h-screen bg-[#FAF8F8]">
       <div className="mx-auto max-w-5xl p-8">
         <h2 className="mb-2 text-center text-[20px] font-light text-[#837C7C]">
-          잡다컴퍼니 백엔드 개발자 채용
+          {jobTitle || '공고 불러오는 중...'}
         </h2>
         <h1 className="mb-8 text-center text-[30px] font-semibold text-[#413F3F]">지원서</h1>
 
@@ -75,6 +84,21 @@ export default function ResumeCreatePage() {
 
         <BasicInfoForm formData={formData} onChange={handleChange} />
         <ResumeForm formData={formData} onChange={handleChange} />
+
+        <div className="mt-8 flex justify-end gap-2">
+          <button
+            onClick={handlePreview}
+            className="rounded-lg bg-[#837C7C] px-5 py-3 text-[#faf8f8] hover:bg-[#6E6767]"
+          >
+            미리보기
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="rounded-lg bg-[#752F6D] px-5 py-3 text-[#faf8f8] hover:bg-[#5E2558]"
+          >
+            저장하기
+          </button>
+        </div>
       </div>
     </div>
   );

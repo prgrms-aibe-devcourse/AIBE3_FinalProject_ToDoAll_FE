@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import plusImg from '../../../assets/Vector-2.png';
-import arrowImg from '../../../assets/Expand Arrow-2.png';
+import CustomSelect from './CustomSelect'; // CustomSelect import
 
 type Certification = { type: string; title: string; hasScore: boolean; score?: string };
 
@@ -59,29 +59,26 @@ export default function CertificationFormSection({
       {showForm && (
         <div className="space-y-3 rounded-[10px] border border-[#E5E5E5] bg-[#FAFAFA] p-4">
           <div className="mt-2 flex flex-wrap items-center gap-3">
-            <div className="relative w-32">
-              <select
+            <div className="flex-1">
+              <CustomSelect
                 value={certInput.type}
-                onChange={(e) => setCertInput({ ...certInput, type: e.target.value })}
-                className="w-full appearance-none rounded-[10px] border bg-[#faf8f8] px-3 py-2 text-[#413F3F] focus:outline-none"
-              >
-                <option value="자격">자격</option>
-                <option value="어학">어학</option>
-                <option value="수상">수상</option>
-              </select>
-              <img
-                src={arrowImg}
-                alt="arrow"
-                className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 opacity-60"
+                onChange={(val) => setCertInput({ ...certInput, type: val })}
+                options={[
+                  { value: '자격', label: '자격' },
+                  { value: '어학', label: '어학' },
+                  { value: '수상', label: '수상' },
+                ]}
               />
             </div>
+
             <input
               type="text"
               placeholder="항목 입력"
               value={certInput.title}
               onChange={(e) => setCertInput({ ...certInput, title: e.target.value })}
-              className="basis-1/2 rounded-[10px] border px-3 py-2"
+              className="flex-1 rounded-[10px] border px-3 py-2"
             />
+
             <label className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -90,6 +87,7 @@ export default function CertificationFormSection({
               />
               <span>점수</span>
             </label>
+
             {certInput.hasScore && (
               <input
                 type="text"
