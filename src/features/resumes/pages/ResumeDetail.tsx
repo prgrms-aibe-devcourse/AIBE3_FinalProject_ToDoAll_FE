@@ -7,6 +7,7 @@ import ApplicantStatus from '../components/ApplicantStatus';
 export default function ResumeDetail() {
   const dummyResume: ResumeData = {
     id: '1',
+    jdId: 2,
     name: '김잡다',
     gender: '남',
     birth: '1997-04-03',
@@ -29,8 +30,7 @@ export default function ResumeDetail() {
         graduated: true,
         startDate: '2016-03-01',
         endDate: '2020-02-28',
-        dayTime: '주간',
-        gpa: 3.8,
+        dayTime: 'DAY',
       },
     ],
     experience: '잡다 주식회사 (2021.01 ~ 현재, 프론트엔드 개발자)',

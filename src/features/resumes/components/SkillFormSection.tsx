@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import plusImg from '../../../assets/Vector-2.png';
 import type { Skill } from '../types/resumes.types';
-import arrowImg from '../../../assets/Expand Arrow-2.png';
+import CustomSelect from './CustomSelect';
 
 export default function SkillFormSection({
   skills,
@@ -56,27 +56,20 @@ export default function SkillFormSection({
               value={skillInput.name}
               onChange={(e) => setSkillInput({ ...skillInput, name: e.target.value })}
             />
-            <div className="relative w-36">
-              <select
-                value={skillInput.level}
-                onChange={(e) =>
-                  setSkillInput({
-                    ...skillInput,
-                    level: e.target.value as '초급' | '중급' | '고급',
-                  })
-                }
-                className="w-full appearance-none rounded-[10px] border bg-[#faf8f8] px-3 py-2 text-[#413F3F] focus:outline-none"
-              >
-                <option value="초급">초급</option>
-                <option value="중급">중급</option>
-                <option value="고급">고급</option>
-              </select>
-              <img
-                src={arrowImg}
-                alt="arrow"
-                className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 opacity-60"
-              />
-            </div>
+
+            {/* CustomSelect 사용 */}
+            <CustomSelect
+              value={skillInput.level}
+              onChange={(val) =>
+                setSkillInput({ ...skillInput, level: val as '초급' | '중급' | '고급' })
+              }
+              options={[
+                { value: '초급', label: '초급' },
+                { value: '중급', label: '중급' },
+                { value: '고급', label: '고급' },
+              ]}
+              className="w-36"
+            />
           </div>
 
           <div className="mt-3 flex justify-end">

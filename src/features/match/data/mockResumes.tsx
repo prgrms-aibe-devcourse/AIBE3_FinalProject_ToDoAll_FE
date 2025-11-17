@@ -3,6 +3,7 @@ import type { ResumeData } from '../../resumes/types/resumes.types';
 export const mockResumes: ResumeData[] = [
   {
     id: '1',
+    jdId: 1,
     name: '김수민',
     gender: '여',
     birth: '1999-05-12',
@@ -29,8 +30,9 @@ export const mockResumes: ResumeData[] = [
         graduated: true,
         startDate: '2018-03-01',
         endDate: '2022-02-20',
-        dayTime: '주간',
+        dayTime: 'DAY',
         gpa: 4.1,
+        maxGpa: 4.5,
       },
     ],
     career: [
@@ -54,6 +56,7 @@ export const mockResumes: ResumeData[] = [
   },
   {
     id: '2',
+    jdId: 1,
     name: '이정훈',
     gender: '남',
     birth: '1997-08-21',
@@ -80,8 +83,9 @@ export const mockResumes: ResumeData[] = [
         graduated: true,
         startDate: '2016-03-01',
         endDate: '2020-02-20',
-        dayTime: '주간',
+        dayTime: 'DAY',
         gpa: 3.9,
+        maxGpa: 4.5, // maxGpa 추가
       },
     ],
     career: [
@@ -105,6 +109,7 @@ export const mockResumes: ResumeData[] = [
   },
   {
     id: '3',
+    jdId: 1,
     name: '정윤아',
     gender: '여',
     birth: '1998-11-15',
@@ -131,8 +136,9 @@ export const mockResumes: ResumeData[] = [
         graduated: true,
         startDate: '2017-03-01',
         endDate: '2021-02-20',
-        dayTime: '주간',
+        dayTime: 'DAY',
         gpa: 4.3,
+        maxGpa: 4.5,
       },
     ],
     career: [
@@ -156,4 +162,5 @@ export const mockResumes: ResumeData[] = [
   },
 ];
 
-// export const mockResumes: ResumeData[] = [];  // 빈 배열 예시 (검색 결과 없음)
+// 빈 배열 예시 (검색 결과 없음)
+export const mockResumesEmpty: ResumeData[] = [];

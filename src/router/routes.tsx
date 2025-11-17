@@ -11,7 +11,7 @@ import MatchList from '@features/match/pages/MatchListPage.tsx';
 import JDPage from '@pages/JDPage.tsx';
 import InterviewQuestionCreatePage from '@features/interview/pages/InterviewQuestionCreatePage';
 
-import ResumeForm from '@features/resumes/pages/ResumeCreatePage.tsx';
+import ResumeCreatePage from '@features/resumes/pages/ResumeCreatePage.tsx';
 import InterviewChatRoomPage from '@features/interview/pages/InterviewChatRoomPage.tsx';
 import LoginPage from '@features/auth/pages/LoginPage';
 import SignupCompanyEmailPage from '@features/auth/pages/SignupCompanyEmailPage.tsx';
@@ -20,6 +20,8 @@ import ResetPasswordEmailPage from '@features/auth/pages/ResetPasswordEmailPage'
 import MyPage from '@features/auth/pages/MyPage';
 import InterviewNotePage from '@features/interview/pages/InterviewNotePage';
 import ResetPasswordPage from '@features/auth/pages/ResetPasswordPage.tsx';
+import JDEditPage from '@pages/JDEditPage.tsx';
+import ResumePreviewPage from '@features/resumes/pages/ResumePreviewPage';
 
 // 레이아웃 없는 페이지 (로그인/회원가입 관련)
 export const noLayoutRoutes = [
@@ -29,6 +31,8 @@ export const noLayoutRoutes = [
   { path: '/signup/form', element: <SignupFormPage /> },
   { path: '/forgot', element: <ResetPasswordEmailPage /> },
   { path: '/reset-password', element: <ResetPasswordPage /> },
+  { path: '/resume/create/:id', element: <ResumeCreatePage /> },
+  { path: '/resume/preview', element: <ResumePreviewPage /> },
 ];
 
 // 메인 레이아웃 적용되는 페이지
@@ -44,7 +48,7 @@ export const mainRoutes = [
   { path: '/jobs/new', element: <JDCreatePage /> },
   { path: '/jobs', element: <JDPage /> },
   { path: '/jobs/:id', element: <JDDetailPage /> },
+  { path: '/jobs/:id/update', element: <JDEditPage /> },
   { path: '/interview/manage/question-create', element: <InterviewQuestionCreatePage /> },
-  { path: '/resumes/create', element: <ResumeForm /> },
   { path: '/matches', element: <MatchList /> },
 ];

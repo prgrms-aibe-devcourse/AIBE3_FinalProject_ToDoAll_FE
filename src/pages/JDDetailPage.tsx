@@ -1,12 +1,13 @@
 import type { JobDetail } from '../features/jd/types/JobDetail.types';
 import JobDetailView from '../features/jd/components/detail/JobDetailView';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { fetchJobDetail } from '../features/jd/services/jobApi';
 
 export default function JDDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [data, setData] = useState<JobDetail | null>(null);
+  const navigate = useNavigate();
   useEffect(() => {
     if (!id) return;
     fetchJobDetail(id).then(setData);
@@ -17,7 +18,7 @@ export default function JDDetailPage() {
       <div className="mb-3 flex items-center justify-between">
         <h1 className="text-lg font-semibold">공고 관리</h1>
       </div>
-      <JobDetailView job={data} onEdit={() => alert('정보 변경')} />
+      <JobDetailView job={data} onEdit={() => navigate(`/jobs/${id}/update`)} />
     </main>
   );
 }
