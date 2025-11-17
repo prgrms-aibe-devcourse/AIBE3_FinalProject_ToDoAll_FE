@@ -35,8 +35,8 @@ export default function EducationForm({ formData, onChange }: Props) {
         startDate: '',
         endDate: '',
         dayTime: 'DAY',
-        grade: '',
-        maxGrade: '',
+        gpa: '',
+        maxGpa: '',
       });
     } else {
       setNewEdu({
@@ -96,9 +96,9 @@ export default function EducationForm({ formData, onChange }: Props) {
             {edu.type === '대학' || edu.type === '대학원' ? (
               <>
                 <span>{displayDayTime(edu.dayTime)}</span>
-                {edu.grade && edu.maxGrade && (
+                {edu.gpa && edu.maxGpa && (
                   <span>
-                    {edu.grade} / {edu.maxGrade}
+                    {edu.gpa} / {edu.maxGpa}
                   </span>
                 )}
               </>
@@ -184,15 +184,15 @@ export default function EducationForm({ formData, onChange }: Props) {
                     type="number"
                     className="w-24 rounded-[10px] border px-3 py-2"
                     placeholder="학점"
-                    value={newEdu.grade ?? ''}
-                    onChange={(e) => setNewEdu({ ...newEdu, grade: e.target.value })}
+                    value={newEdu.gpa ?? ''}
+                    onChange={(e) => setNewEdu({ ...newEdu, gpa: e.target.value })}
                   />
                   <input
                     type="number"
                     className="w-28 rounded-[10px] border px-3 py-2"
                     placeholder="기준학점"
-                    value={newEdu.maxGrade ?? ''}
-                    onChange={(e) => setNewEdu({ ...newEdu, maxGrade: e.target.value })}
+                    value={newEdu.maxGpa ?? ''}
+                    onChange={(e) => setNewEdu({ ...newEdu, maxGpa: e.target.value })}
                   />
                 </div>
               )}

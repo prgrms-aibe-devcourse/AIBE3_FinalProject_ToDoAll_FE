@@ -57,8 +57,8 @@ export function convertToBackendRequest(form: ResumeData) {
       graduationDate: e.endDate,
       attendanceType:
         e.type === '대학' || e.type === '대학원' ? mapAttendanceType(e.dayTime) : null,
-      gpa: e.type === '대학' || e.type === '대학원' ? Number(e.grade) || null : null,
-      gpaScale: e.type === '대학' || e.type === '대학원' ? Number(e.maxGrade) || null : null,
+      gpa: e.type === '대학' || e.type === '대학원' ? Number(e.gpa) || null : null,
+      gpaScale: e.type === '대학' || e.type === '대학원' ? Number(e.maxGpa) || null : null,
     })),
 
     experience:
