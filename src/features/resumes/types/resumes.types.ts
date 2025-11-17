@@ -27,8 +27,8 @@ export type EducationItem =
       startDate: string;
       endDate: string;
       dayTime: 'DAY' | 'NIGHT';
-      gpa?: string;
-      maxGpa?: string;
+      gpa?: number;
+      maxGpa?: number;
     };
 
 export type CareerItem = {
