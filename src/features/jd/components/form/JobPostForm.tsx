@@ -22,12 +22,14 @@ export default function JobPostForm({
   onSubmit,
   submitting = false,
   skillOptions = [],
+  submitLabel,
 }: {
   defaultValues?: Partial<JobPostFormValues>;
   // eslint-disable-next-line no-unused-vars
   onSubmit: (values: JobPostFormValues) => void;
   submitting?: boolean;
   skillOptions?: string[];
+  submitLabel?: string;
 }) {
   const [values, setValues] = useState<JobPostFormValues>({
     title: '',
@@ -221,7 +223,7 @@ export default function JobPostForm({
           disabled={submitting}
           className="rounded-full bg-orange-500 px-4 py-2 text-sm font-medium text-white shadow hover:bg-orange-600 disabled:opacity-60"
         >
-          공고 등록
+          {submitLabel}
         </button>
       </div>
     </form>

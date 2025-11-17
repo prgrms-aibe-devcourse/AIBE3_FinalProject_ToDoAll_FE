@@ -165,3 +165,18 @@ export async function updateJobStatus(id: string | number, status: JobStatus) {
   const body = (await res.json()) as ApiResponse<{ id: number; status: JobStatus }>;
   return body.data;
 }
+
+export async function updateJobPost(id: string | number, request: JobCreateRequest): Promise<void> {
+  const res = await fetch(`http://localhost:8080/api/v1/jd/${id}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(request),
+  });
+
+  if (!res.ok) {
+    const body = (await res.json().catch(() => null)) as ApiResponse<unknown> | null;
+    throw new Error(body?.message ?? `공고 수정 실패 (HTTP ${res.status})`);
+  }
+}

@@ -20,6 +20,7 @@ import ResetPasswordEmailPage from '@features/auth/pages/ResetPasswordEmailPage'
 import MyPage from '@features/auth/pages/MyPage';
 import InterviewNotePage from '@features/interview/pages/InterviewNotePage';
 import ResetPasswordPage from '@features/auth/pages/ResetPasswordPage.tsx';
+import JDEditPage from '@pages/JDEditPage.tsx';
 
 // 레이아웃 없는 페이지 (로그인/회원가입 관련)
 export const noLayoutRoutes = [
@@ -44,6 +45,7 @@ export const mainRoutes = [
   { path: '/jobs/new', element: <JDCreatePage /> },
   { path: '/jobs', element: <JDPage /> },
   { path: '/jobs/:id', element: <JDDetailPage /> },
+  { path: '/jobs/:id/update', element: <JDEditPage /> },
   { path: '/interview/manage/question-create', element: <InterviewQuestionCreatePage /> },
   { path: '/resumes/create', element: <ResumeForm /> },
   { path: '/matches', element: <MatchList /> },
