@@ -4,7 +4,11 @@ import type { ResumeData } from '../types/resumes.types';
 
 type Props = {
   formData: ResumeData;
-  onChange: (_field: keyof ResumeData, _value: ResumeData['files']) => void;
+  onChange: (
+    _field: keyof ResumeData,
+
+    _value: ResumeData['files']
+  ) => void;
 };
 
 export default function FileUploadForm({ formData, onChange }: Props) {

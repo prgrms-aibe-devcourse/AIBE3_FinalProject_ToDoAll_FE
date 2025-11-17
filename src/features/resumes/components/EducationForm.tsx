@@ -5,7 +5,11 @@ import CustomSelect from './CustomSelect';
 
 type Props = {
   formData: ResumeData;
-  onChange: (_field: keyof ResumeData, _value: EducationItem[]) => void;
+  onChange: (
+    _field: keyof ResumeData,
+
+    _value: EducationItem[]
+  ) => void;
 };
 
 export default function EducationForm({ formData, onChange }: Props) {

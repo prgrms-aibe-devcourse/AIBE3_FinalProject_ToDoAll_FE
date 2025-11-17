@@ -4,7 +4,11 @@ import type { ResumeData, CareerItem } from '../types/resumes.types';
 
 type Props = {
   formData: ResumeData;
-  onChange: (_field: keyof ResumeData, _value: CareerItem[]) => void;
+  onChange: (
+    _field: keyof ResumeData,
+
+    _value: CareerItem[]
+  ) => void;
 };
 
 export default function CareerForm({ formData, onChange }: Props) {

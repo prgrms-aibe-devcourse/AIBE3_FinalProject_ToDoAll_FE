@@ -1,11 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { ResumeData, Skill } from '../types/resumes.types';
 import BasicInfoForm from '../components/BasicInfoForm';
 import ResumeForm from '../components/ResumeForm';
+import { useParams } from 'react-router-dom';
 
-import { createResume } from '../data/resumes.api'; // ⬅️ 중요!
+import { createResume } from '../data/resumes.api';
+import { getJobDescription } from '../data/jd.api';
 
 export default function ResumeCreatePage() {
+  const { id } = useParams();
+  const jdId = Number(id);
+
+  const [jobTitle, setJobTitle] = useState('');
   const [formData, setFormData] = useState<ResumeData>({
     id: '',
     name: '',
@@ -29,15 +35,21 @@ export default function ResumeCreatePage() {
     certifications: '',
   });
 
-  // 제출 처리
-  async function handleSubmit() {
-    try {
-      const result = await createResume(formData);
-      alert('제출 성공! id = ' + result.id);
-    } catch (e: any) {
-      alert('제출 실패: ' + e.message);
+  useEffect(() => {
+    async function fetchJD() {
+      if (!jdId || isNaN(jdId)) {
+        console.error('유효하지 않은 공고 ID입니다.');
+        return;
+      }
+      try {
+        const jd = await getJobDescription(jdId);
+        setJobTitle(jd.title);
+      } catch (e) {
+        console.error(e);
+      }
     }
-  }
+    fetchJD();
+  }, [jdId]);
 
   const handleChange = (
     field: keyof ResumeData,
@@ -73,11 +85,24 @@ export default function ResumeCreatePage() {
     });
   };
 
+  async function handleSubmit() {
+    try {
+      const result = await createResume(formData);
+      alert('제출 성공! id = ' + result.id);
+    } catch (e: any) {
+      alert('제출 실패: ' + e.message);
+    }
+  }
+  if (!jdId || isNaN(jdId)) {
+    console.error('유효하지 않은 공고 ID입니다.');
+    return;
+  }
+
   return (
     <div className="min-h-screen bg-[#FAF8F8]">
       <div className="mx-auto max-w-5xl p-8">
         <h2 className="mb-2 text-center text-[20px] font-light text-[#837C7C]">
-          잡다컴퍼니 백엔드 개발자 채용
+          {jobTitle || '공고 불러오는 중...'}
         </h2>
         <h1 className="mb-8 text-center text-[30px] font-semibold text-[#413F3F]">지원서</h1>
 

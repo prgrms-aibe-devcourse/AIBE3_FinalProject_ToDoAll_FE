@@ -1,9 +1,31 @@
-import type { ResumeData } from '../types/resumes.types';
+import type { ResumeData, EducationItem, Skill } from '../types/resumes.types';
 
-function mapProficiency(level: string) {
-  if (level === '초급') return 'BEGINNER';
-  if (level === '중급') return 'INTERMEDIATE';
-  return 'EXPERT';
+function mapEducationLevel(type: EducationItem['type']) {
+  switch (type) {
+    case '초등학교':
+      return 'ELEMENTARY';
+    case '중학교':
+      return 'MIDDLE';
+    case '고등학교':
+      return 'HIGH';
+    default:
+      return 'UNIVERSITY_ABOVE';
+  }
+}
+
+function mapAttendanceType(dayTime?: 'DAY' | 'NIGHT') {
+  return dayTime === 'NIGHT' ? 'NIGHT' : 'DAY';
+}
+
+function mapProficiencyLevel(level: Skill['level']) {
+  switch (level) {
+    case '초급':
+      return 'BEGINNER';
+    case '중급':
+      return 'INTERMEDIATE';
+    default:
+      return 'EXPERT';
+  }
 }
 
 function mapActivityType() {
@@ -32,26 +54,21 @@ export function convertToBackendRequest(form: ResumeData) {
     portfolioFileUrl: form.files.portfolio,
 
     education: form.education.map((e) => ({
-      educationLevel:
-        e.type === '초등학교'
-          ? 'ELEMENTARY'
-          : e.type === '중학교'
-            ? 'MIDDLE'
-            : e.type === '고등학교'
-              ? 'HIGH'
-              : 'UNIVERSITY_ABOVE',
-
+      educationLevel: mapEducationLevel(e.type),
       schoolName: e.name,
+
       major: e.type === '대학' || e.type === '대학원' ? e.major : null,
+
       isGraduated: e.graduated,
       admissionDate: e.startDate,
       graduationDate: e.endDate,
 
       attendanceType:
-        e.type === '대학' || e.type === '대학원' ? (e.dayTime === 'DAY' ? 'DAY' : 'NIGHT') : null,
+        e.type === '대학' || e.type === '대학원' ? mapAttendanceType(e.dayTime) : null,
 
-      gpa: e.type === '대학' || e.type === '대학원' ? (e.grade ?? null) : null,
-      gpaScale: e.type === '대학' || e.type === '대학원' ? (e.maxGrade ?? null) : null,
+      gpa: e.type === '대학' || e.type === '대학원' ? Number(e.grade) || null : null,
+
+      gpaScale: e.type === '대학' || e.type === '대학원' ? Number(e.maxGrade) || null : null,
     })),
 
     experience:
@@ -59,12 +76,13 @@ export function convertToBackendRequest(form: ResumeData) {
         companyName: c.company,
         department: c.department,
         position: c.position,
+        startDate: c.startDate,
         endDate: c.endDate,
       })) ?? [],
 
     skills: form.skills.map((s) => ({
       skillName: s.name,
-      proficiencyLevel: mapProficiency(s.level),
+      proficiencyLevel: mapProficiencyLevel(s.level),
     })),
 
     activities:
