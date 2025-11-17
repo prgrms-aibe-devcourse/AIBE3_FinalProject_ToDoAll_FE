@@ -31,6 +31,7 @@ export default function ResumeCreatePage() {
     experience: '',
     activities: '',
     certifications: '',
+    memo: '',
   });
 
   useEffect(() => {

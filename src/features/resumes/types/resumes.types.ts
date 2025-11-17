@@ -62,6 +62,7 @@ export type ResumeData = {
   experience: string;
   activities: string;
   certifications: string;
+  memo: string;
 };
 
 export type OnResumeChange = <K extends keyof ResumeData>(_field: K, _value: ResumeData[K]) => void;
