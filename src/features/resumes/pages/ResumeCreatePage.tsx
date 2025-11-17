@@ -3,6 +3,8 @@ import type { ResumeData, Skill } from '../types/resumes.types';
 import BasicInfoForm from '../components/BasicInfoForm';
 import ResumeForm from '../components/ResumeForm';
 
+import { createResume } from '../data/resumes.api'; // ⬅️ 중요!
+
 export default function ResumeCreatePage() {
   const [formData, setFormData] = useState<ResumeData>({
     id: '',
@@ -26,6 +28,16 @@ export default function ResumeCreatePage() {
     activities: '',
     certifications: '',
   });
+
+  // 제출 처리
+  async function handleSubmit() {
+    try {
+      const result = await createResume(formData);
+      alert('제출 성공! id = ' + result.id);
+    } catch (e: any) {
+      alert('제출 실패: ' + e.message);
+    }
+  }
 
   const handleChange = (
     field: keyof ResumeData,
@@ -75,6 +87,22 @@ export default function ResumeCreatePage() {
 
         <BasicInfoForm formData={formData} onChange={handleChange} />
         <ResumeForm formData={formData} onChange={handleChange} />
+
+        <div className="mt-8 flex justify-end gap-2">
+          <button
+            onClick={handleSubmit}
+            className="rounded-lg bg-[#B1A0A0] px-5 py-3 text-[#faf8f8] hover:bg-[#8C7A7A]"
+          >
+            미리보기
+          </button>
+
+          <button
+            onClick={handleSubmit}
+            className="rounded-lg bg-[#752F6D] px-5 py-3 text-[#faf8f8] hover:bg-[#5E2558]"
+          >
+            제출하기
+          </button>
+        </div>
       </div>
     </div>
   );

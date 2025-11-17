@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import plusImg from '../../../assets/Vector-2.png';
-import dropImg from '../../../assets/Vector.png';
 import type { ResumeData, EducationItem } from '../types/resumes.types';
+import CustomSelect from './CustomSelect';
 
 type Props = {
   formData: ResumeData;
@@ -10,6 +10,7 @@ type Props = {
 
 export default function EducationForm({ formData, onChange }: Props) {
   const [showForm, setShowForm] = useState(false);
+
   const [newEdu, setNewEdu] = useState<Partial<EducationItem>>({
     type: undefined,
     name: '',
@@ -22,14 +23,16 @@ export default function EducationForm({ formData, onChange }: Props) {
     if (type === '대학' || type === '대학원') {
       setNewEdu({
         type,
-        name: '',
         universityType: '',
-        major: '',
+        name: '',
         transferred: false,
+        major: '',
         graduated: false,
         startDate: '',
         endDate: '',
-        dayTime: '주간',
+        dayTime: 'DAY',
+        grade: '',
+        maxGrade: '',
       });
     } else {
       setNewEdu({
@@ -47,8 +50,10 @@ export default function EducationForm({ formData, onChange }: Props) {
       alert('학력 구분, 학교명, 입학일, 졸업일을 모두 입력해주세요.');
       return;
     }
+
     onChange('education', [...formData.education, newEdu as EducationItem]);
     setShowForm(false);
+
     setNewEdu({
       type: undefined,
       name: '',
@@ -57,6 +62,8 @@ export default function EducationForm({ formData, onChange }: Props) {
       endDate: '',
     });
   };
+
+  const displayDayTime = (value: 'DAY' | 'NIGHT') => (value === 'DAY' ? '주간' : '야간');
 
   return (
     <>
@@ -81,33 +88,36 @@ export default function EducationForm({ formData, onChange }: Props) {
               {edu.startDate} ~ {edu.endDate}
             </span>
             <span>{edu.graduated ? '졸업' : '재학'}</span>
+
+            {edu.type === '대학' || edu.type === '대학원' ? (
+              <>
+                <span>{displayDayTime(edu.dayTime)}</span>
+                {edu.grade && edu.maxGrade && (
+                  <span>
+                    {edu.grade} / {edu.maxGrade}
+                  </span>
+                )}
+              </>
+            ) : null}
           </div>
         ))}
       </div>
 
       {showForm && (
         <div className="space-y-3 rounded-[10px] border border-[#E5E5E5] bg-[#FAFAFA] p-4">
-          <div className="relative w-40">
-            <select
-              className="w-full rounded-[10px] border px-3 py-2 pr-10"
-              value={newEdu.type ?? ''}
-              onChange={(e) => handleTypeChange(e.target.value as EducationItem['type'])}
-            >
-              <option value="" disabled>
-                학력 구분 선택
-              </option>
-              <option value="초등학교">초등학교</option>
-              <option value="중학교">중학교</option>
-              <option value="고등학교">고등학교</option>
-              <option value="대학">대학</option>
-              <option value="대학원">대학원</option>
-            </select>
-            <img
-              src={dropImg}
-              alt="drop-down"
-              className="pointer-events-none absolute top-1/2 right-3 h-2 w-3 -translate-y-1/2 transform"
-            />
-          </div>
+          <CustomSelect
+            className="w-55"
+            value={newEdu.type ?? ''}
+            onChange={(v) => handleTypeChange(v as EducationItem['type'])}
+            options={[
+              { value: '초등학교', label: '초등학교 졸업' },
+              { value: '중학교', label: '중학교 졸업' },
+              { value: '고등학교', label: '고등학교 졸업' },
+              { value: '대학', label: '대학 · 대학원 이상 졸업' },
+              { value: '대학원', label: '대학원 졸업' },
+            ]}
+            placeholder="학력 구분 선택"
+          />
 
           {newEdu.type && (
             <>
@@ -118,18 +128,21 @@ export default function EducationForm({ formData, onChange }: Props) {
                   value={newEdu.name ?? ''}
                   onChange={(e) => setNewEdu({ ...newEdu, name: e.target.value })}
                 />
+
                 <input
                   type="date"
                   className="w-36 rounded-[10px] border p-2"
                   value={newEdu.startDate ?? ''}
                   onChange={(e) => setNewEdu({ ...newEdu, startDate: e.target.value })}
                 />
+
                 <input
                   type="date"
                   className="w-36 rounded-[10px] border p-2"
                   value={newEdu.endDate ?? ''}
                   onChange={(e) => setNewEdu({ ...newEdu, endDate: e.target.value })}
                 />
+
                 <label className="flex items-center gap-2">
                   <input
                     type="checkbox"
@@ -141,6 +154,44 @@ export default function EducationForm({ formData, onChange }: Props) {
                 </label>
               </div>
 
+              {(newEdu.type === '대학' || newEdu.type === '대학원') && (
+                <div className="mt-3 flex flex-wrap items-center gap-3">
+                  <CustomSelect
+                    className="w-28"
+                    value={newEdu.dayTime ?? 'DAY'}
+                    onChange={(v) =>
+                      setNewEdu({
+                        ...newEdu,
+                        dayTime: v as 'DAY' | 'NIGHT',
+                      })
+                    }
+                    options={[
+                      { value: 'DAY', label: '주간' },
+                      { value: 'NIGHT', label: '야간' },
+                    ]}
+                  />
+                  <input
+                    className="w-32 rounded-[10px] border px-3 py-2"
+                    placeholder="전공"
+                    value={newEdu.major ?? ''}
+                    onChange={(e) => setNewEdu({ ...newEdu, major: e.target.value })}
+                  />
+                  <input
+                    type="number"
+                    className="w-24 rounded-[10px] border px-3 py-2"
+                    placeholder="학점"
+                    value={newEdu.grade ?? ''}
+                    onChange={(e) => setNewEdu({ ...newEdu, grade: e.target.value })}
+                  />
+                  <input
+                    type="number"
+                    className="w-28 rounded-[10px] border px-3 py-2"
+                    placeholder="기준학점"
+                    value={newEdu.maxGrade ?? ''}
+                    onChange={(e) => setNewEdu({ ...newEdu, maxGrade: e.target.value })}
+                  />
+                </div>
+              )}
               <div className="mt-3 flex justify-end">
                 <button
                   type="button"
