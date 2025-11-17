@@ -1,31 +1,55 @@
-// JDCreatePage.tsx
 import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import JobPostForm, { type JobPostFormValues } from '../features/jd/components/form/JobPostForm';
-import { createJobPost, fetchSkills } from '../features/jd/services/jobApi';
-import type { JobCreateRequest } from '../features/jd/services/jobApi';
+import {
+  fetchSkills,
+  fetchJobDetail,
+  updateJobPost,
+  type JobCreateRequest,
+} from '../features/jd/services/jobApi';
 
 type Skill = {
   id: number;
   name: string;
 };
-const JDCreatePage: React.FC = () => {
+
+const JDEditPage: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
   const [submitting, setSubmitting] = useState(false);
   const [skills, setSkills] = useState<Skill[]>([]);
+  const [initialValues, setInitialValues] = useState<JobPostFormValues | null>(null);
+
   useEffect(() => {
-    const loadSkills = async () => {
+    const load = async () => {
       try {
-        const data = await fetchSkills();
-        setSkills(data);
+        const [skillsRes, job] = await Promise.all([fetchSkills(), fetchJobDetail(id as string)]);
+        setSkills(skillsRes);
+
+        setInitialValues({
+          title: job.title,
+          department: job.department || '',
+          workType: job.workType || '',
+          experience: job.experience || '',
+          education: job.education || '',
+          salary: job.salary || '',
+          description: job.description || '',
+          deadline: job.deadline || '',
+          benefits: job.benefits ? job.benefits.join(', ') : '',
+          location: job.location || '',
+          requiredSkills: job.skills ?? [],
+          preferredSkills: job.preferredSkills ?? [],
+          postedAt: job.postedAt || '',
+        });
       } catch (err) {
-        console.error('fetchSkills error:', err);
+        console.error('JDEditPage load error:', err);
+        alert('공고 정보를 불러오는 중 오류가 발생했습니다.');
       }
     };
-    loadSkills();
-  }, []);
 
-  // TODO: 나중에 로그인 붙으면 실제 로그인 유저의 ID로 교체
-  const authorId = 1;
-  const mapToJobCreateRequest = (values: JobPostFormValues): JobCreateRequest => {
+    if (id) load();
+  }, [id]);
+
+  const mapToJobUpdateRequest = (values: JobPostFormValues): JobCreateRequest => {
     const emptyToNull = (v?: string): string | null => (v && v.trim().length > 0 ? v : null);
 
     return {
@@ -39,16 +63,19 @@ const JDCreatePage: React.FC = () => {
       deadline: values.deadline && values.deadline.length > 0 ? values.deadline : null,
       benefits: emptyToNull(values.benefits),
       location: emptyToNull(values.location),
-      thumbnailUrl: null,
-      authorId,
+      thumbnailUrl: null, // 아직 업로드 안 붙였으면 그대로
+      authorId: 1, // TODO: 로그인 붙으면 교체
       requiredSkills: values.requiredSkills ?? [],
       preferredSkills: values.preferredSkills ?? [],
     };
   };
 
   const handleSubmit = async (values: JobPostFormValues) => {
+    if (!id) return;
+
     try {
       setSubmitting(true);
+
       const normalize = (s: string) => s.trim().toLowerCase();
       const knownSkillNames = new Set(skills.map((s) => normalize(s.name)));
 
@@ -73,31 +100,41 @@ const JDCreatePage: React.FC = () => {
         return;
       }
 
-      const request = mapToJobCreateRequest(values);
-      const id = await createJobPost(request);
+      const request = mapToJobUpdateRequest(values);
+      await updateJobPost(id, request);
 
-      alert(`공고가 등록되었습니다. ID: ${id}`);
+      alert('공고가 수정되었습니다.');
+      // 필요하면 상세 페이지로 이동 등
     } catch (error) {
-      console.error('createJobPost error:', error);
-      alert('공고 등록 중 오류가 발생했습니다.');
+      console.error('updateJobPost error:', error);
+      alert('공고 수정 중 오류가 발생했습니다.');
     } finally {
       setSubmitting(false);
     }
   };
 
+  if (!initialValues) {
+    return (
+      <main className="min-h-screen bg-gray-50 p-4 sm:p-6">
+        <div className="mx-auto max-w-5xl">로딩 중...</div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-gray-50 p-4 sm:p-6">
       <div className="mx-auto max-w-5xl">
-        <h1 className="mb-4 text-xl font-semibold text-gray-800">채용 공고 등록</h1>
+        <h1 className="mb-4 text-xl font-semibold text-gray-800">채용 공고 수정</h1>
         <JobPostForm
           onSubmit={handleSubmit}
           submitting={submitting}
           skillOptions={skills.map((s) => s.name)}
-          submitLabel="공고 등록"
+          defaultValues={initialValues}
+          submitLabel="공고 수정"
         />
       </div>
     </main>
   );
 };
 
-export default JDCreatePage;
+export default JDEditPage;
