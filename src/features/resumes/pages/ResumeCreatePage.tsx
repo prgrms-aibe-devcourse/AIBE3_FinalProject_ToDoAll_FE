@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
-import type { ResumeData, Skill } from '../types/resumes.types';
+import { useParams } from 'react-router-dom';
+import type { ResumeData } from '../types/resumes.types';
 import BasicInfoForm from '../components/BasicInfoForm';
 import ResumeForm from '../components/ResumeForm';
-import { useParams } from 'react-router-dom';
-
 import { createResume } from '../data/resumes.api';
 import { getJobDescription } from '../data/jd.api';
 
@@ -14,6 +13,7 @@ export default function ResumeCreatePage() {
   const [jobTitle, setJobTitle] = useState('');
   const [formData, setFormData] = useState<ResumeData>({
     id: '',
+    jdId: jdId, // URL에서 받은 id를 기본값으로 넣어줌
     name: '',
     gender: '남',
     birth: '',
@@ -21,11 +21,7 @@ export default function ResumeCreatePage() {
     email: '',
     phone: '',
     applyDate: '',
-    address: {
-      country: '대한민국',
-      city: '',
-      detail: '',
-    },
+    address: { country: '대한민국', city: '', detail: '' },
     files: { resume: '', portfolio: '', etc: [] },
     education: [],
     career: [],
@@ -51,51 +47,21 @@ export default function ResumeCreatePage() {
     fetchJD();
   }, [jdId]);
 
-  const handleChange = (
-    field: keyof ResumeData,
-    value:
-      | string
-      | boolean
-      | string[]
-      | Skill[]
-      | ResumeData['files']
-      | ResumeData['address']
-      | '남'
-      | '여'
-      | ResumeData['education']
-      | ResumeData['career']
-  ) => {
-    setFormData((prev) => {
-      switch (field) {
-        case 'files':
-          return { ...prev, files: value as ResumeData['files'] };
-        case 'address':
-          return { ...prev, address: value as ResumeData['address'] };
-        case 'gender':
-          return { ...prev, gender: value as '남' | '여' };
-        case 'education':
-          return { ...prev, education: value as ResumeData['education'] };
-        case 'career':
-          return { ...prev, career: value as ResumeData['career'] };
-        case 'skills':
-          return { ...prev, skills: value as Skill[] };
-        default:
-          return { ...prev, [field]: value };
-      }
-    });
+  const handleChange = (field: keyof ResumeData, value: any) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  async function handleSubmit() {
+  const handleSubmit = async () => {
     try {
       const result = await createResume(formData);
-      alert('제출 성공! id = ' + result.id);
+      alert('제출 성공! 이력서 ID = ' + result.id);
     } catch (e: any) {
       alert('제출 실패: ' + e.message);
     }
-  }
+  };
+
   if (!jdId || isNaN(jdId)) {
-    console.error('유효하지 않은 공고 ID입니다.');
-    return;
+    return <p>유효하지 않은 공고 ID입니다.</p>;
   }
 
   return (
@@ -116,11 +82,10 @@ export default function ResumeCreatePage() {
         <div className="mt-8 flex justify-end gap-2">
           <button
             onClick={handleSubmit}
-            className="rounded-lg bg-[#B1A0A0] px-5 py-3 text-[#faf8f8] hover:bg-[#8C7A7A]"
+            className="rounded-lg bg-[#837C7C] px-5 py-3 text-[#faf8f8] hover:bg-[#6E6767]"
           >
-            미리보기
+            저장하기
           </button>
-
           <button
             onClick={handleSubmit}
             className="rounded-lg bg-[#752F6D] px-5 py-3 text-[#faf8f8] hover:bg-[#5E2558]"

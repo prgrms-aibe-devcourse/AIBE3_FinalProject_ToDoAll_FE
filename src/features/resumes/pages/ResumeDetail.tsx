@@ -7,6 +7,7 @@ import ApplicantStatus from '../components/ApplicantStatus';
 export default function ResumeDetail() {
   const dummyResume: ResumeData = {
     id: '1',
+    jdId: 2,
     name: '김잡다',
     gender: '남',
     birth: '1997-04-03',

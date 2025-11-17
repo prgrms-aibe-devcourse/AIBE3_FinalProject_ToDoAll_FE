@@ -31,7 +31,6 @@ function mapProficiencyLevel(level: Skill['level']) {
 function mapActivityType() {
   return 'ACTIVITY';
 }
-
 function mapCertificationType() {
   return 'LICENSE';
 }
@@ -39,35 +38,26 @@ function mapCertificationType() {
 export function convertToBackendRequest(form: ResumeData) {
   return {
     name: form.name,
-    jobDescriptionId: 10,
-
+    jobDescriptionId: form.jdId,
     gender: form.gender === '남' ? 'M' : 'F',
     birthDate: form.birth,
-
     email: form.email,
     phone: form.phone,
-
     address: form.address.city,
     detailAddress: form.address.detail,
-
     resumeFileUrl: form.files.resume,
     portfolioFileUrl: form.files.portfolio,
 
     education: form.education.map((e) => ({
       educationLevel: mapEducationLevel(e.type),
       schoolName: e.name,
-
       major: e.type === '대학' || e.type === '대학원' ? e.major : null,
-
       isGraduated: e.graduated,
       admissionDate: e.startDate,
       graduationDate: e.endDate,
-
       attendanceType:
         e.type === '대학' || e.type === '대학원' ? mapAttendanceType(e.dayTime) : null,
-
       gpa: e.type === '대학' || e.type === '대학원' ? Number(e.grade) || null : null,
-
       gpaScale: e.type === '대학' || e.type === '대학원' ? Number(e.maxGrade) || null : null,
     })),
 
@@ -88,7 +78,7 @@ export function convertToBackendRequest(form: ResumeData) {
     activities:
       form.activities
         ?.split('\n')
-        .filter((v) => v.trim() !== '')
+        .filter(Boolean)
         .map((t) => ({
           title: t,
           type: mapActivityType(),
@@ -98,10 +88,10 @@ export function convertToBackendRequest(form: ResumeData) {
     certifications:
       form.certifications
         ?.split('\n')
-        .filter((v) => v.trim() !== '')
+        .filter(Boolean)
         .map((t) => ({
-          type: mapCertificationType(),
           name: t,
+          type: mapCertificationType(),
           scoreOrLevel: '',
         })) ?? [],
   };

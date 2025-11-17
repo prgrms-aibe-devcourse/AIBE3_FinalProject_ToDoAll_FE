@@ -42,6 +42,7 @@ export type CareerItem = {
 
 export type ResumeData = {
   id: string;
+  jdId: number;
   name: string;
   gender: '남' | '여';
   birth: string;
