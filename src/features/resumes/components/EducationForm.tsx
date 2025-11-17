@@ -186,7 +186,7 @@ export default function EducationForm({ formData, onChange }: Props) {
                     type="number"
                     className="w-24 rounded-[10px] border px-3 py-2 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                     placeholder="학점"
-                    value={newEdu.gpa ?? ''}
+                    value={newEdu.gpa !== undefined ? newEdu.gpa : ''}
                     onChange={(e) =>
                       setNewEdu({
                         ...newEdu,
@@ -199,7 +199,7 @@ export default function EducationForm({ formData, onChange }: Props) {
                     type="number"
                     className="w-24 rounded-[10px] border px-3 py-2 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                     placeholder="기준학점"
-                    value={newEdu.maxGpa ?? ''}
+                    value={newEdu.maxGpa !== undefined ? newEdu.maxGpa : ''}
                     onChange={(e) =>
                       setNewEdu({
                         ...newEdu,
