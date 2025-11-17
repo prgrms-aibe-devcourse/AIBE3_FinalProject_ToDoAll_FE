@@ -139,7 +139,7 @@ export default function EducationForm({ formData, onChange }: Props) {
                   value={newEdu.startDate ?? ''}
                   onChange={(e) => setNewEdu({ ...newEdu, startDate: e.target.value })}
                 />
-
+                <label>-</label>
                 <input
                   type="date"
                   className="w-36 rounded-[10px] border p-2"

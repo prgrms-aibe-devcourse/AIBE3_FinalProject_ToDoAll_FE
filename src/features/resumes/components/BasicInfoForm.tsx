@@ -1,6 +1,6 @@
 import type { ResumeData } from '../types/resumes.types';
-import vectorImg from '../../../assets/Vector.png';
 
+import CustomSelect from './CustomSelect';
 type Props = {
   formData: ResumeData;
   onChange: (_field: keyof ResumeData, _value: ResumeData[keyof ResumeData]) => void;
@@ -18,19 +18,15 @@ export default function BasicInfoForm({ formData, onChange }: Props) {
               value={formData.name}
               onChange={(e) => onChange('name', e.target.value)}
             />
-            <div className="relative w-[92px]">
-              <select
-                className="w-full appearance-none rounded-[10px] border bg-white px-4 py-2"
+
+            <div className="w-[92px]">
+              <CustomSelect
                 value={formData.gender}
-                onChange={(e) => onChange('gender', e.target.value as '남' | '여')}
-              >
-                <option value="남">남</option>
-                <option value="여">여</option>
-              </select>
-              <img
-                src={vectorImg}
-                alt="dropdown"
-                className="pointer-events-none absolute top-1/2 right-2 h-2 w-3 -translate-y-1/2"
+                onChange={(val) => onChange('gender', val as '남' | '여')}
+                options={[
+                  { value: '남', label: '남' },
+                  { value: '여', label: '여' },
+                ]}
               />
             </div>
 
