@@ -1,7 +1,28 @@
 import { useState } from 'react';
+import { updateResumeMemo } from '../data/resumes.api';
 
-export default function ResumeMemo() {
-  const [memo, setMemo] = useState('');
+export default function ResumeMemo({
+  resumeId,
+  initialMemo,
+}: {
+  resumeId: string;
+  initialMemo: string;
+}) {
+  const [memo, setMemo] = useState(initialMemo || '');
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      const result = await updateResumeMemo(resumeId, memo);
+      console.log('메모 저장 성공:', result);
+      alert('메모가 저장되었습니다.');
+    } catch (err: any) {
+      alert(err.message || '메모 저장 중 오류가 발생했습니다.');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className="flex flex-col">
@@ -16,10 +37,11 @@ export default function ResumeMemo() {
         />
 
         <button
-          onClick={() => console.log('메모 저장:', memo)}
-          className="absolute right-2 bottom-4 rounded-[90px] bg-[#F7B534] px-3 py-1 text-[12px] text-[#FAF8F8] transition hover:opacity-90"
+          disabled={saving}
+          onClick={handleSave}
+          className="absolute right-2 bottom-4 rounded-[90px] bg-[#F7B534] px-3 py-1 text-[12px] text-[#FAF8F8] transition hover:opacity-90 disabled:opacity-50"
         >
-          저장
+          {saving ? '저장중...' : '저장'}
         </button>
       </div>
     </div>

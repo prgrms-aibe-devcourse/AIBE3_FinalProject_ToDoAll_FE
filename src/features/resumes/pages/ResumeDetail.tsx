@@ -47,7 +47,7 @@ export default function ResumeDetail() {
             applyDate: resume.applyDate,
           }}
         />
-        <ResumeMemo />
+        <ResumeMemo resumeId={resume.id} initialMemo={resume.memo} />
       </aside>
 
       <main className="flex-1 overflow-y-auto p-8">
