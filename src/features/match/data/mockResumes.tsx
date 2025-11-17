@@ -30,7 +30,7 @@ export const mockResumes: ResumeData[] = [
         graduated: true,
         startDate: '2018-03-01',
         endDate: '2022-02-20',
-        dayTime: 'DAY', // 반드시 "DAY" | "NIGHT"
+        dayTime: 'DAY',
         gpa: 4.1,
         maxGpa: 4.5,
       },
