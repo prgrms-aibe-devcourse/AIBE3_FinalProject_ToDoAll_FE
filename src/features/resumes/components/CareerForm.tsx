@@ -4,19 +4,21 @@ import type { ResumeData, CareerItem } from '../types/resumes.types';
 
 type Props = {
   formData: ResumeData;
-  onChange: (
-    _field: keyof ResumeData,
-
-    _value: CareerItem[]
-  ) => void;
+  onChange: (_field: keyof ResumeData, _value: CareerItem[]) => void;
 };
+function getTodayDate() {
+  const today = new Date();
+  const month = (today.getMonth() + 1).toString().padStart(2, '0');
+  const day = today.getDate().toString().padStart(2, '0');
+  return `${today.getFullYear()}-${month}-${day}`;
+}
 
 export default function CareerForm({ formData, onChange }: Props) {
   const [showForm, setShowForm] = useState(false);
   const [newCareer, setNewCareer] = useState<CareerItem>({
     company: '',
-    startDate: '',
-    endDate: '',
+    startDate: getTodayDate(),
+    endDate: getTodayDate(),
     position: '',
     department: '',
     job: '',
@@ -32,8 +34,8 @@ export default function CareerForm({ formData, onChange }: Props) {
     setShowForm(false);
     setNewCareer({
       company: '',
-      startDate: '',
-      endDate: '',
+      startDate: getTodayDate(),
+      endDate: getTodayDate(),
       position: '',
       department: '',
       job: '',
@@ -70,43 +72,68 @@ export default function CareerForm({ formData, onChange }: Props) {
 
       {showForm && (
         <div className="space-y-3 rounded-[10px] border border-[#E5E5E5] bg-[#FAFAFA] p-4">
-          <div className="mt-2 flex flex-wrap items-center gap-3">
+          <div className="flex flex-col">
+            <label className="mb-1 text-sm text-gray-500">회사명</label>
             <input
-              className="w-48 rounded-[10px] border px-3 py-2"
+              className="w-full rounded-[10px] border px-3 py-2"
               placeholder="회사명"
               value={newCareer.company}
               onChange={(e) => setNewCareer({ ...newCareer, company: e.target.value })}
             />
-            <input
-              type="month"
-              className="w-36 rounded-[10px] border p-2"
-              value={newCareer.startDate}
-              onChange={(e) => setNewCareer({ ...newCareer, startDate: e.target.value })}
-            />
-            <input
-              type="month"
-              className="w-36 rounded-[10px] border p-2"
-              value={newCareer.endDate}
-              onChange={(e) => setNewCareer({ ...newCareer, endDate: e.target.value })}
-            />
-            <input
-              className="w-36 rounded-[10px] border px-3 py-2"
-              placeholder="직무"
-              value={newCareer.job}
-              onChange={(e) => setNewCareer({ ...newCareer, job: e.target.value })}
-            />
-            <input
-              className="w-36 rounded-[10px] border px-3 py-2"
-              placeholder="근무부서"
-              value={newCareer.department}
-              onChange={(e) => setNewCareer({ ...newCareer, department: e.target.value })}
-            />
-            <input
-              className="w-36 rounded-[10px] border px-3 py-2"
-              placeholder="직급/직책"
-              value={newCareer.position}
-              onChange={(e) => setNewCareer({ ...newCareer, position: e.target.value })}
-            />
+          </div>
+
+          <div className="flex gap-3">
+            <div className="flex flex-1 flex-col">
+              <label className="mb-1 text-sm text-gray-500">입사일</label>
+              <input
+                type="date"
+                className="w-full rounded-[10px] border px-3 py-2"
+                value={newCareer.startDate}
+                onChange={(e) => setNewCareer({ ...newCareer, startDate: e.target.value })}
+              />
+            </div>
+
+            <div className="flex flex-1 flex-col">
+              <label className="mb-1 text-sm text-gray-500">퇴사일</label>
+              <input
+                type="date"
+                className="w-full rounded-[10px] border px-3 py-2"
+                value={newCareer.endDate}
+                onChange={(e) => setNewCareer({ ...newCareer, endDate: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <div className="flex flex-1 flex-col">
+              <label className="mb-1 text-sm text-gray-500">직무</label>
+              <input
+                className="w-full rounded-[10px] border px-3 py-2"
+                placeholder="직무"
+                value={newCareer.job}
+                onChange={(e) => setNewCareer({ ...newCareer, job: e.target.value })}
+              />
+            </div>
+
+            <div className="flex flex-1 flex-col">
+              <label className="mb-1 text-sm text-gray-500">근무부서</label>
+              <input
+                className="w-full rounded-[10px] border px-3 py-2"
+                placeholder="근무부서"
+                value={newCareer.department}
+                onChange={(e) => setNewCareer({ ...newCareer, department: e.target.value })}
+              />
+            </div>
+
+            <div className="flex flex-1 flex-col">
+              <label className="mb-1 text-sm text-gray-500">직급/직책</label>
+              <input
+                className="w-full rounded-[10px] border px-3 py-2"
+                placeholder="직급/직책"
+                value={newCareer.position}
+                onChange={(e) => setNewCareer({ ...newCareer, position: e.target.value })}
+              />
+            </div>
           </div>
 
           <div className="mt-3 flex justify-end">
