@@ -5,11 +5,7 @@ import CustomSelect from './CustomSelect';
 
 type Props = {
   formData: ResumeData;
-  onChange: (
-    _field: keyof ResumeData,
-
-    _value: EducationItem[]
-  ) => void;
+  onChange: (_field: keyof ResumeData, _value: EducationItem[]) => void;
 };
 
 export default function EducationForm({ formData, onChange }: Props) {
@@ -21,6 +17,9 @@ export default function EducationForm({ formData, onChange }: Props) {
     graduated: false,
     startDate: '',
     endDate: '',
+    gpa: undefined,
+    maxGpa: undefined,
+    dayTime: 'DAY',
   });
 
   const handleTypeChange = (type: EducationItem['type']) => {
@@ -35,8 +34,8 @@ export default function EducationForm({ formData, onChange }: Props) {
         startDate: '',
         endDate: '',
         dayTime: 'DAY',
-        gpa: '',
-        maxGpa: '',
+        gpa: undefined,
+        maxGpa: undefined,
       });
     } else {
       setNewEdu({
@@ -64,6 +63,9 @@ export default function EducationForm({ formData, onChange }: Props) {
       graduated: false,
       startDate: '',
       endDate: '',
+      gpa: undefined,
+      maxGpa: undefined,
+      dayTime: 'DAY',
     });
   };
 
@@ -96,7 +98,7 @@ export default function EducationForm({ formData, onChange }: Props) {
             {edu.type === '대학' || edu.type === '대학원' ? (
               <>
                 <span>{displayDayTime(edu.dayTime)}</span>
-                {edu.gpa && edu.maxGpa && (
+                {edu.gpa !== undefined && edu.maxGpa !== undefined && (
                   <span>
                     {edu.gpa} / {edu.maxGpa}
                   </span>
@@ -182,20 +184,32 @@ export default function EducationForm({ formData, onChange }: Props) {
                   />
                   <input
                     type="number"
-                    className="w-24 rounded-[10px] border px-3 py-2"
+                    className="w-24 rounded-[10px] border px-3 py-2 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                     placeholder="학점"
                     value={newEdu.gpa ?? ''}
-                    onChange={(e) => setNewEdu({ ...newEdu, gpa: e.target.value })}
+                    onChange={(e) =>
+                      setNewEdu({
+                        ...newEdu,
+                        gpa: e.target.value ? Number(e.target.value) : undefined,
+                      })
+                    }
                   />
+
                   <input
                     type="number"
-                    className="w-28 rounded-[10px] border px-3 py-2"
+                    className="w-24 rounded-[10px] border px-3 py-2 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                     placeholder="기준학점"
                     value={newEdu.maxGpa ?? ''}
-                    onChange={(e) => setNewEdu({ ...newEdu, maxGpa: e.target.value })}
+                    onChange={(e) =>
+                      setNewEdu({
+                        ...newEdu,
+                        maxGpa: e.target.value ? Number(e.target.value) : undefined,
+                      })
+                    }
                   />
                 </div>
               )}
+
               <div className="mt-3 flex justify-end">
                 <button
                   type="button"
