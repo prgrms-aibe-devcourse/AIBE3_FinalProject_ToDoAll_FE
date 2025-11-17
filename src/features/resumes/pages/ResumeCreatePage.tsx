@@ -1,5 +1,6 @@
+// src/features/resumes/pages/ResumeCreatePage.tsx
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import type { ResumeData } from '../types/resumes.types';
 import BasicInfoForm from '../components/BasicInfoForm';
 import ResumeForm from '../components/ResumeForm';
@@ -9,11 +10,12 @@ import { getJobDescription } from '../data/jd.api';
 export default function ResumeCreatePage() {
   const { id } = useParams();
   const jdId = Number(id);
+  const navigate = useNavigate();
 
   const [jobTitle, setJobTitle] = useState('');
   const [formData, setFormData] = useState<ResumeData>({
     id: '',
-    jdId: jdId, // URL에서 받은 id를 기본값으로 넣어줌
+    jdId: jdId,
     name: '',
     gender: '남',
     birth: '',
@@ -60,6 +62,10 @@ export default function ResumeCreatePage() {
     }
   };
 
+  const handlePreview = () => {
+    navigate('/resume/preview', { state: { formData } });
+  };
+
   if (!jdId || isNaN(jdId)) {
     return <p>유효하지 않은 공고 ID입니다.</p>;
   }
@@ -81,16 +87,16 @@ export default function ResumeCreatePage() {
 
         <div className="mt-8 flex justify-end gap-2">
           <button
-            onClick={handleSubmit}
+            onClick={handlePreview}
             className="rounded-lg bg-[#837C7C] px-5 py-3 text-[#faf8f8] hover:bg-[#6E6767]"
           >
-            저장하기
+            미리보기
           </button>
           <button
             onClick={handleSubmit}
             className="rounded-lg bg-[#752F6D] px-5 py-3 text-[#faf8f8] hover:bg-[#5E2558]"
           >
-            제출하기
+            저장하기
           </button>
         </div>
       </div>
