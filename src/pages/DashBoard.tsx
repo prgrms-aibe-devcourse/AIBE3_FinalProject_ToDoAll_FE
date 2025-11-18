@@ -3,53 +3,54 @@ import LongViewSection from '@features/dashboard/LongViewSection.tsx';
 import NumberSlotsCard, { type NumberSlotsCardProps } from '@features/dashboard/NumberSlotCard.tsx';
 import DateInfoCard, { type DataInfoCardProps } from '@features/dashboard/DateInfoCard.tsx';
 import StatusCountCard from '@features/dashboard/StatusCountCard.tsx';
-import WeekendSection from '@features/dashboard/WeekendSection.tsx';
+import WeekendSection, { type WeeklyCalendarType } from '@features/dashboard/WeekendSection.tsx';
 
-const ProgressStatusByJob: NumberSlotsCardProps[] = [
-  { title: '시니어 프론트엔드 개발자', slotData: [1, 2, 3, 4], status: 'document' },
-  { title: '백엔드 개발자', slotData: [5, 6, 7, 11], status: 'interview' },
-  { title: '주니어 풀스택 개발자', slotData: [12, 12, 13, 14], status: 'finished' },
-];
+import useFetch from '@/hooks/useFetch.ts';
 
-const ComingInterview: DataInfoCardProps[] = [
-  {
-    interviewDate: '11/01',
-    applicantName: '김상진',
-    jobTitle: '시니어 프론트엔드 개발자',
-    interviewTime: '15:00',
-    interviewers: '면접관 1, 면접관 2',
-  },
-  {
-    interviewDate: '12/01',
-    applicantName: '김상일',
-    jobTitle: '시니어 프론트엔드 개발자',
-    interviewTime: '14:00',
-    interviewers: '면접관 1, 면접관 2',
-  },
-  {
-    interviewDate: '10/11',
-    applicantName: '김상이',
-    jobTitle: '시니어 프론트엔드 개발자 육성 담당관',
-    interviewTime: '10:00',
-    interviewers: '면접관 1, 면접관 2',
-  },
-  {
-    interviewDate: '09/11',
-    applicantName: '김중진',
-    jobTitle: '백엔드 개발자 모집',
-    interviewTime: '11:00',
-    interviewers: '면접관 1, 면접관 2',
-  },
-  {
-    interviewDate: '02/27',
-    applicantName: '김하진',
-    jobTitle: '시니어 프론트엔드 개발자',
-    interviewTime: '22:00',
-    interviewers: '면접관 1, 면접관 2',
-  },
-];
+type NumByProgressStatus = {
+  in: number;
+  before: number;
+  close: number;
+};
 
 export default function DashBoard() {
+  const { resData: summaryActive } = useFetch<number>('api/v1/dashboard/summary/active');
+  const { resData: summaryApplicant } = useFetch<number>('api/v1/dashboard/summary/applicant');
+  const { resData: summaryInterview } = useFetch<number>('api/v1/dashboard/summary/interview');
+  const { resData: summaryHired } = useFetch<number>('api/v1/dashboard/summary/hired');
+
+  const { resData: jobResults } = useFetch<NumberSlotsCardProps[]>(
+    'api/v1/dashboard/detail/job-result'
+  );
+  const { resData: upcomingInterviews } = useFetch<DataInfoCardProps[]>(
+    'api/v1/dashboard/detail/upcoming-interview'
+  );
+
+  const { resData: jobStatus } = useFetch<NumByProgressStatus>(
+    'api/v1/dashboard/detail/job-status'
+  );
+  const { resData: interviewStatus } = useFetch<NumByProgressStatus>(
+    'api/v1/dashboard/detail/interview-status'
+  );
+
+  const { resData: weeklyCalendar } = useFetch<WeeklyCalendarType>(
+    'api/v1/dashboard/week-calendar'
+  );
+
+  //TODO : 로딩 프로그레스나 스켈레톤 처리
+  if (
+    !summaryActive ||
+    !summaryApplicant ||
+    !summaryInterview ||
+    !summaryHired ||
+    !jobResults ||
+    !upcomingInterviews ||
+    !jobStatus ||
+    !interviewStatus ||
+    !weeklyCalendar
+  )
+    return <div></div>;
+
   return (
     <section className="bg-jd-white flex justify-center">
       <section className="flex h-full w-[337px] flex-col p-[1rem] pt-[2rem] sm:w-[640px] md:w-[768px] md:pr-[3rem] md:pl-[3rem] xl:w-[1280px]">
@@ -60,25 +61,25 @@ export default function DashBoard() {
             <SummationCard
               title={'활성 공고'}
               description={'진행 중인 채용 공고'}
-              value={'12'}
+              value={summaryActive}
               detailUrl={'#'}
             />
             <SummationCard
               title={'총 지원자'}
               description={'전체 지원자 수'}
-              value={'248'}
+              value={summaryApplicant}
               detailUrl={'#'}
             />
             <SummationCard
               title={'예정된 면접'}
               description={'이번 주 면접 일정'}
-              value={'20'}
+              value={summaryInterview}
               detailUrl={'#'}
             />
             <SummationCard
               title={'채용 완료'}
               description={'이번 달 채용 완료'}
-              value={'8'}
+              value={summaryHired}
               detailUrl={'#'}
             />
           </section>
@@ -90,7 +91,7 @@ export default function DashBoard() {
               className="jd-LongViewSection-RWD"
               detailUrl={'#'}
             >
-              {ProgressStatusByJob.map((item, i) => (
+              {jobResults.map((item, i) => (
                 <NumberSlotsCard key={i} {...item} />
               ))}
             </LongViewSection>
@@ -101,7 +102,7 @@ export default function DashBoard() {
               className="jd-LongViewSection-RWD"
               detailUrl={'#'}
             >
-              {ComingInterview.map((item, i) => (
+              {upcomingInterviews.map((item, i) => (
                 <DateInfoCard key={i} {...item} />
               ))}
             </LongViewSection>
@@ -115,10 +116,14 @@ export default function DashBoard() {
               detailUrl={'#'}
             >
               <div className="flex w-full flex-col justify-between gap-4 md:flex-row">
-                <StatusCountCard count={5} dataType={'byJob'} statusType={'in'} />
-                <StatusCountCard count={6} dataType={'byJob'} statusType={'before'} />
+                <StatusCountCard count={jobStatus.in} dataType={'byJob'} statusType={'in'} />
+                <StatusCountCard
+                  count={jobStatus.before}
+                  dataType={'byJob'}
+                  statusType={'before'}
+                />
               </div>
-              <StatusCountCard count={11} dataType={'byJob'} statusType={'closed'} />
+              <StatusCountCard count={jobStatus.close} dataType={'byJob'} statusType={'closed'} />
             </LongViewSection>
 
             <LongViewSection
@@ -128,10 +133,22 @@ export default function DashBoard() {
               detailUrl={'#'}
             >
               <div className="flex w-full flex-col justify-between gap-4 md:flex-row">
-                <StatusCountCard count={20} dataType={'byInterview'} statusType={'in'} />
-                <StatusCountCard count={2} dataType={'byInterview'} statusType={'before'} />
+                <StatusCountCard
+                  count={interviewStatus.in}
+                  dataType={'byInterview'}
+                  statusType={'in'}
+                />
+                <StatusCountCard
+                  count={interviewStatus.before}
+                  dataType={'byInterview'}
+                  statusType={'before'}
+                />
               </div>
-              <StatusCountCard count={7} dataType={'byInterview'} statusType={'closed'} />
+              <StatusCountCard
+                count={interviewStatus.close}
+                dataType={'byInterview'}
+                statusType={'closed'}
+              />
             </LongViewSection>
           </section>
 
@@ -141,7 +158,7 @@ export default function DashBoard() {
             className="jd-LongViewSection-RWD-full"
             detailUrl={'#'}
           >
-            <WeekendSection />
+            <WeekendSection calendarData={weeklyCalendar} />
           </LongViewSection>
         </section>
       </section>
