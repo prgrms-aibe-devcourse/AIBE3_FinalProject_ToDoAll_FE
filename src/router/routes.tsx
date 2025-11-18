@@ -22,6 +22,7 @@ import InterviewNotePage from '@features/interview/pages/InterviewNotePage';
 import ResetPasswordPage from '@features/auth/pages/ResetPasswordPage.tsx';
 import JDEditPage from '@pages/JDEditPage.tsx';
 import ResumePreviewPage from '@features/resumes/pages/ResumePreviewPage';
+import ResumeSubmitSuccessPage from '@features/resumes/pages/ResumeSubmitSuccessPage';
 
 // 레이아웃 없는 페이지 (로그인/회원가입 관련)
 export const noLayoutRoutes = [
@@ -33,6 +34,7 @@ export const noLayoutRoutes = [
   { path: '/reset-password', element: <ResetPasswordPage /> },
   { path: '/resume/create/:id', element: <ResumeCreatePage /> },
   { path: '/resume/preview', element: <ResumePreviewPage /> },
+  { path: '/resume/submit-success', element: <ResumeSubmitSuccessPage /> },
 ];
 
 // 메인 레이아웃 적용되는 페이지
