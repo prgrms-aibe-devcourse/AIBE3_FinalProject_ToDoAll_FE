@@ -96,7 +96,7 @@ export async function getResume(resumeId: string): Promise<ResumeData> {
 }
 
 export async function updateResumeMemo(resumeId: string, memo: string) {
-  const res = await fetch(`http://localhost:8080/api/resumes/${resumeId}/memo`, {
+  const res = await fetch(`http://localhost:8080/api/v1/resumes/${resumeId}/memo`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
