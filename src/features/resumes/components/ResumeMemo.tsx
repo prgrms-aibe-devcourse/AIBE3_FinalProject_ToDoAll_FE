@@ -1,24 +1,31 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { updateResumeMemo } from '../data/resumes.api';
 
 export default function ResumeMemo({
   resumeId,
   initialMemo,
+  onMemoUpdated,
 }: {
   resumeId: string;
   initialMemo: string;
+  onMemoUpdated?: (_newMemo: string) => void;
 }) {
   const [memo, setMemo] = useState(initialMemo || '');
   const [saving, setSaving] = useState(false);
 
+  useEffect(() => {
+    setMemo(initialMemo || '');
+  }, [initialMemo]);
+
   const handleSave = async () => {
     try {
       setSaving(true);
+
       const result = await updateResumeMemo(resumeId, memo);
-      console.log('메모 저장 성공:', result);
-      alert('메모가 저장되었습니다.');
+
+      if (onMemoUpdated) onMemoUpdated(result.memo);
     } catch (err: any) {
-      alert(err.message || '메모 저장 중 오류가 발생했습니다.');
+      console.error('메모 저장 오류:', err);
     } finally {
       setSaving(false);
     }
@@ -26,7 +33,7 @@ export default function ResumeMemo({
 
   return (
     <div className="flex flex-col">
-      <h3 className="mb-2 text-[14px] font-semibold text-[#413F3F]">memo</h3>
+      <h3 className="mb-2 text-[14px] font-semibold text-[#413F3F]">메모</h3>
 
       <div className="relative">
         <textarea

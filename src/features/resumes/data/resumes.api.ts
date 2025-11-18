@@ -48,7 +48,7 @@ export async function getResume(resumeId: string): Promise<ResumeData> {
     profileImage: 'https://via.placeholder.com/150?text=Profile',
     email: data.email,
     phone: data.phone,
-    applyDate: '',
+    applyDate: data.applyDate || '',
     address: {
       country: data.address || '대한민국',
       city: data.detailAddress || '',
