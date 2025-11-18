@@ -13,6 +13,7 @@ type NumByProgressStatus = {
   close: number;
 };
 
+// TODO : 리렌더링 최적화 (요청 별 컴포넌트 분리)
 export default function DashBoard() {
   const { resData: summaryActive } = useFetch<number>('api/v1/dashboard/summary/active');
   const { resData: summaryApplicant } = useFetch<number>('api/v1/dashboard/summary/applicant');
