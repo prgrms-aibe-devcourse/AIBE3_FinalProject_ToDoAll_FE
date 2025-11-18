@@ -1,11 +1,11 @@
 import { cva, type VariantProps } from 'class-variance-authority';
 import cn from '@lib/utils/cn.ts';
 
-export type TimeSlotType = 'interview' | 'job_close';
+export type TimeSlotType = 'INTERVIEW' | 'JOB_CLOSE';
 
 const SLOT_STATUS = {
-  interview: '면접',
-  job_close: '공고 마감',
+  INTERVIEW: '면접',
+  JOB_CLOSE: '공고 마감',
 } as const satisfies Record<TimeSlotType, string>;
 
 const TimeSlotVariants = cva(
@@ -13,8 +13,8 @@ const TimeSlotVariants = cva(
   {
     variants: {
       type: {
-        interview: 'bg-[#F8DCD7]',
-        job_close: 'bg-[#E1D5E1]',
+        INTERVIEW: 'bg-[#F8DCD7]',
+        JOB_CLOSE: 'bg-[#E1D5E1]',
       },
     },
   }
@@ -26,7 +26,7 @@ interface TimeSlotProps extends VariantProps<typeof TimeSlotVariants> {
   type: TimeSlotType;
 }
 
-export default function TimeSlot({ time, count, type = 'interview' }: TimeSlotProps) {
+export default function TimeSlot({ time, count, type = 'INTERVIEW' }: TimeSlotProps) {
   return (
     <div className={cn(TimeSlotVariants({ type }))}>
       <p className="text-xl font-semibold">{time}</p>
