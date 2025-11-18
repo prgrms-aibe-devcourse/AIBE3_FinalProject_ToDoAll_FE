@@ -53,6 +53,7 @@ export const mockResumes: ResumeData[] = [
     experience: '3년차 프론트엔드 및 백엔드 개발 경험 보유',
     activities: '멋쟁이사자처럼 10기 활동',
     certifications: '정보처리기사, TOEIC 890',
+    memo: '',
   },
   {
     id: '2',
@@ -106,6 +107,7 @@ export const mockResumes: ResumeData[] = [
     experience: '서버 개발 및 보안 인프라 구축 경험',
     activities: 'Google Developer Group 활동',
     certifications: '리눅스마스터 2급, SQLD',
+    memo: '',
   },
   {
     id: '3',
@@ -159,6 +161,7 @@ export const mockResumes: ResumeData[] = [
     experience: '디자인 시스템 구축 및 UX 리서치 경험',
     activities: 'UX 스터디 모임 리더',
     certifications: 'ADsP, GTQ 1급',
+    memo: '',
   },
 ];
 

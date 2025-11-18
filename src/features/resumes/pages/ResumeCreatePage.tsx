@@ -31,6 +31,7 @@ export default function ResumeCreatePage() {
     experience: '',
     activities: '',
     certifications: '',
+    memo: '',
   });
 
   useEffect(() => {
@@ -56,7 +57,13 @@ export default function ResumeCreatePage() {
   const handleSubmit = async () => {
     try {
       const result = await createResume(formData);
-      alert('제출 성공! 이력서 ID = ' + result.id);
+
+      navigate('/resume/submit-success', {
+        state: {
+          resumeId: result.id,
+          formData: formData,
+        },
+      });
     } catch (e: any) {
       alert('제출 실패: ' + e.message);
     }
