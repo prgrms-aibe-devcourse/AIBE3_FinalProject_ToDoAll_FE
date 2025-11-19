@@ -1,6 +1,6 @@
 import type { ResumeData } from '../types/resumes.types';
-import vectorImg from '../../../assets/Vector.png';
 
+import CustomSelect from './CustomSelect';
 type Props = {
   formData: ResumeData;
   onChange: (_field: keyof ResumeData, _value: ResumeData[keyof ResumeData]) => void;
@@ -8,49 +8,45 @@ type Props = {
 
 export default function BasicInfoForm({ formData, onChange }: Props) {
   return (
-    <section className="bg-white p-6 shadow-md rounded-2xl mb-6">
-      <div className="flex flex-col md:flex-row gap-6">
-        <div className="flex-1 grid grid-cols-1 gap-4">
+    <section className="mb-6 rounded-2xl bg-white p-6 shadow-md">
+      <div className="flex flex-col gap-6 md:flex-row">
+        <div className="grid flex-1 grid-cols-1 gap-4">
           <div className="flex gap-4">
             <input
-              className="border p-2 rounded-[10px] w-46 px-4"
+              className="w-46 rounded-[10px] border p-2 px-4"
               placeholder="이름"
               value={formData.name}
               onChange={(e) => onChange('name', e.target.value)}
             />
-            <div className="relative w-[92px]">
-              <select
-                className="border py-2 px-4 rounded-[10px] w-full appearance-none bg-white"
+
+            <div className="w-[92px]">
+              <CustomSelect
                 value={formData.gender}
-                onChange={(e) => onChange('gender', e.target.value as '남' | '여')}
-              >
-                <option value="남">남</option>
-                <option value="여">여</option>
-              </select>
-              <img
-                src={vectorImg}
-                alt="dropdown"
-                className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-2 pointer-events-none"
+                onChange={(val) => onChange('gender', val as '남' | '여')}
+                options={[
+                  { value: '남', label: '남' },
+                  { value: '여', label: '여' },
+                ]}
               />
             </div>
 
             <input
               type="date"
-              className="border p-2 rounded-[10px] w-46 px-4"
+              className="w-46 rounded-[10px] border p-2 px-4"
               value={formData.birth}
               onChange={(e) => onChange('birth', e.target.value)}
             />
           </div>
 
           <input
-            className="border p-2 rounded-[10px] w-46 px-4"
+            className="w-46 rounded-[10px] border p-2 px-4"
             placeholder="이메일"
             value={formData.email}
             onChange={(e) => onChange('email', e.target.value)}
           />
 
           <input
-            className="border p-2 rounded-[10px] w-46 px-4"
+            className="w-46 rounded-[10px] border p-2 px-4"
             placeholder="연락처"
             value={formData.phone}
             onChange={(e) => onChange('phone', e.target.value)}
@@ -58,14 +54,14 @@ export default function BasicInfoForm({ formData, onChange }: Props) {
 
           <div className="flex gap-4">
             <input
-              className="border p-2 rounded-[10px] w-46 px-4"
+              className="w-46 rounded-[10px] border p-2 px-4"
               placeholder="주소"
               value={formData.address.detail}
               onChange={(e) => onChange('address', { ...formData.address, detail: e.target.value })}
             />
 
             <input
-              className="border p-2 rounded-[10px] w-46 px-4"
+              className="w-46 rounded-[10px] border p-2 px-4"
               placeholder="상세주소"
               value={formData.address.city}
               onChange={(e) => onChange('address', { ...formData.address, city: e.target.value })}
@@ -87,16 +83,16 @@ export default function BasicInfoForm({ formData, onChange }: Props) {
           </div>
         </div>
 
-        <div className="w-48 h-48 flex-shrink-0">
-          <label className="block w-full h-full border rounded-lg overflow-hidden cursor-pointer">
+        <div className="h-48 w-48 flex-shrink-0">
+          <label className="block h-full w-full cursor-pointer overflow-hidden rounded-lg border">
             {formData.profileImage ? (
               <img
                 src={formData.profileImage}
                 alt="이미지 추가"
-                className="w-full h-full object-cover"
+                className="h-full w-full object-cover"
               />
             ) : (
-              <div className="flex flex-col items-center justify-center w-full h-full text-gray-400">
+              <div className="flex h-full w-full flex-col items-center justify-center text-gray-400">
                 <span className="text-[20px]">+</span>
                 <span>이미지 추가</span>
               </div>

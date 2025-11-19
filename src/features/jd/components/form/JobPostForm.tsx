@@ -21,11 +21,15 @@ export default function JobPostForm({
   defaultValues,
   onSubmit,
   submitting = false,
+  skillOptions = [],
+  submitLabel,
 }: {
   defaultValues?: Partial<JobPostFormValues>;
   // eslint-disable-next-line no-unused-vars
   onSubmit: (values: JobPostFormValues) => void;
   submitting?: boolean;
+  skillOptions?: string[];
+  submitLabel?: string;
 }) {
   const [values, setValues] = useState<JobPostFormValues>({
     title: '',
@@ -55,7 +59,7 @@ export default function JobPostForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="mx-auto max-w-5xl rounded-2xl bg-white p-4 sm:p-6 shadow-sm ring-1 ring-gray-200"
+      className="mx-auto max-w-5xl rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-200 sm:p-6"
     >
       <h2 className="mb-4 text-sm font-semibold text-gray-700">공고 등록</h2>
 
@@ -199,6 +203,7 @@ export default function JobPostForm({
           value={values.requiredSkills}
           onChange={(next: string[]) => update('requiredSkills', next)}
           placeholder="Enter 또는 , 로 추가"
+          options={skillOptions}
         />
       </div>
 
@@ -208,6 +213,7 @@ export default function JobPostForm({
           value={values.preferredSkills}
           onChange={(next: string[]) => update('preferredSkills', next)}
           placeholder="Enter 또는 , 로 추가"
+          options={skillOptions}
         />
       </div>
 
@@ -217,7 +223,7 @@ export default function JobPostForm({
           disabled={submitting}
           className="rounded-full bg-orange-500 px-4 py-2 text-sm font-medium text-white shadow hover:bg-orange-600 disabled:opacity-60"
         >
-          공고 등록
+          {submitLabel}
         </button>
       </div>
     </form>

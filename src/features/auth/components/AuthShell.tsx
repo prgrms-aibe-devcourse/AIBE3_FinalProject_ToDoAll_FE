@@ -24,7 +24,7 @@ export default function AuthShell({
     <div className="relative min-h-dvh w-full overflow-hidden">
       <div className="fixed inset-0 -z-10 bg-[radial-gradient(100%_100%_at_50%_0%,#eeeeef_0%,#dcdcdc_35%,#d6d6d6_60%,#cfcfcf_100%)]">
         <div
-          className="absolute inset-0 bg-center bg-cover opacity-30"
+          className="absolute inset-0 bg-cover bg-center opacity-30"
           style={{
             backgroundImage: "url('/images/auth-still.jpg')",
             filter: 'blur(2px)',
@@ -44,18 +44,10 @@ export default function AuthShell({
       {/* 글래스 카드 */}
       <main className="relative z-10 grid min-h-dvh place-items-center px-4 sm:px-6 md:px-8">
         <section
-          className={`w-full max-w-[1120px] rounded-[25px]
-            bg-white/30 backdrop-blur-[30px] ring-1 ring-white/30
-            shadow-[0_8px_40px_rgba(0,0,0,.10)]
-            px-6 sm:px-8 md:px-10 py-10 md:py-[100px] min-h-[560px] md:min-h-[640px]
-            flex flex-col ${showLeftPane ? 'justify-center' : 'justify-start'}
-            ${cardClassName}`}
+          className={`flex min-h-[560px] w-full max-w-[1120px] flex-col rounded-[25px] bg-white/30 px-6 py-10 shadow-[0_8px_40px_rgba(0,0,0,.10)] ring-1 ring-white/30 backdrop-blur-[30px] sm:px-8 md:min-h-[640px] md:px-10 md:py-[100px] ${showLeftPane ? 'justify-center' : 'justify-start'} ${cardClassName}`}
         >
           <div
-            className={`
-            grid items-center gap-10 sm:gap-14 md:gap-16
-            ${showLeftPane ? 'md:[grid-template-columns:520px_minmax(0,1fr)]' : ''}
-          `}
+            className={`grid items-center gap-10 sm:gap-14 md:gap-16 ${showLeftPane ? 'md:[grid-template-columns:520px_minmax(0,1fr)]' : ''} `}
           >
             {/* 좌측 로고/카피 */}
             {showLeftPane && (
@@ -64,13 +56,12 @@ export default function AuthShell({
                   src="/logo/login-logo.png"
                   alt="jobda"
                   onClick={() => navigate('/login')}
-                  className="w-auto cursor-pointer drop-shadow-[0_3px_10px_rgba(0,0,0,.25)]
-                             transition-transform h-[120px] sm:h-[160px] md:h-[200px]"
+                  className="h-[120px] w-auto cursor-pointer drop-shadow-[0_3px_10px_rgba(0,0,0,.25)] transition-transform sm:h-[160px] md:h-[200px]"
                   style={{ height: '200px' }}
                 />
                 {caption ? (
                   <h2
-                    className="mt-6 text-center font-black leading-tight tracking-tight text-white text-2xl sm:text-[28px] md:text-[30px]"
+                    className="mt-6 text-center text-2xl leading-tight font-black tracking-tight text-white sm:text-[28px] md:text-[30px]"
                     style={{
                       fontSize: '30px',
                       fontWeight: 600,

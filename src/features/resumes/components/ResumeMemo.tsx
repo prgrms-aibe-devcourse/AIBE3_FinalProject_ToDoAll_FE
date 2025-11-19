@@ -1,25 +1,54 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { updateResumeMemo } from '../data/resumes.api';
 
-export default function ResumeMemo() {
-  const [memo, setMemo] = useState('');
+export default function ResumeMemo({
+  resumeId,
+  initialMemo,
+  onMemoUpdated,
+}: {
+  resumeId: string;
+  initialMemo: string;
+  onMemoUpdated?: (_newMemo: string) => void;
+}) {
+  const [memo, setMemo] = useState(initialMemo || '');
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setMemo(initialMemo || '');
+  }, [initialMemo]);
+
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+
+      const result = await updateResumeMemo(resumeId, memo);
+
+      if (onMemoUpdated) onMemoUpdated(result.memo);
+    } catch (err: any) {
+      console.error('메모 저장 오류:', err);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className="flex flex-col">
-      <h3 className="font-semibold mb-2 text-[#413F3F] text-[14px]">memo</h3>
+      <h3 className="mb-2 text-[14px] font-semibold text-[#413F3F]">메모</h3>
 
       <div className="relative">
         <textarea
-          className="w-full h-32 bg-white rounded-lg p-3 pr-16 shadow-md focus:shadow-lg transition-shadow resize-none border-[#837C7C] text-[#413F3F] text-[14px]"
+          className="h-32 w-full resize-none rounded-lg border-[#837C7C] bg-white p-3 pr-16 text-[14px] text-[#413F3F] shadow-md transition-shadow focus:shadow-lg"
           placeholder="메모를 입력하세요..."
           value={memo}
           onChange={(e) => setMemo(e.target.value)}
         />
 
         <button
-          onClick={() => console.log('메모 저장:', memo)}
-          className="absolute bottom-4 right-2 bg-[#F7B534] text-[#FAF8F8] px-3 py-1 rounded-[90px] text-[12px] hover:opacity-90 transition"
+          disabled={saving}
+          onClick={handleSave}
+          className="absolute right-2 bottom-4 rounded-[90px] bg-[#F7B534] px-3 py-1 text-[12px] text-[#FAF8F8] transition hover:opacity-90 disabled:opacity-50"
         >
-          저장
+          {saving ? '저장중...' : '저장'}
         </button>
       </div>
     </div>

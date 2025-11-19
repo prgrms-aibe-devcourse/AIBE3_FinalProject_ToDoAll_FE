@@ -15,25 +15,16 @@ export default function SidebarDrawer({ open, onClose }: Props) {
     <>
       {/* 드로어 패널 */}
       <aside
-        className={`
-          fixed top-12 left-0 h-[calc(100vh-3rem)] z-50
-          w-[200px] sm:w-[220px] md:w-[240px]
-          bg-white text-[var(--color-jd-black)]
-          shadow-[0_12px_30px_rgba(0,0,0,.25)]
-          ring-1 ring-[var(--color-jd-violet)]/25
-          
-          transition-transform duration-300 will-change-transform
-          ${open ? 'translate-x-0' : '-translate-x-full'}
-        `}
+        className={`fixed top-12 left-0 z-50 h-[calc(100vh-3rem)] w-[200px] bg-white text-[var(--color-jd-black)] shadow-[0_12px_30px_rgba(0,0,0,.25)] ring-1 ring-[var(--color-jd-violet)]/25 transition-transform duration-300 will-change-transform sm:w-[220px] md:w-[240px] ${open ? 'translate-x-0' : '-translate-x-full'} `}
         aria-label="Side controller"
       >
         {/* 로고 + 슬로건 */}
-        <div className="px-4 pt-4 pb-3 flex flex-col items-start gap-1 ">
+        <div className="flex flex-col items-start gap-1 px-4 pt-4 pb-3">
           {/* 로고 */}
-          <img src="/logo/header-logo.png" alt="jobda" className="h-18 w-auto object-containc" />
+          <img src="/logo/header-logo.png" alt="jobda" className="object-containc h-18 w-auto" />
 
           {/* 슬로건 */}
-          <span className="text-[12px] text-gray-500 font-medium text-left leading-tight">
+          <span className="text-left text-[12px] leading-tight font-medium text-gray-500">
             당신의 채용 여정에 함께하는 AI 코파일럿
           </span>
         </div>
@@ -41,10 +32,10 @@ export default function SidebarDrawer({ open, onClose }: Props) {
         <div className="h-px bg-[var(--color-jd-gray-light)]" />
 
         {/* 메뉴 */}
-        <nav className="px-3 py-3 space-y-1">
+        <nav className="space-y-1 px-3 py-3">
           <Link
             to="/dashboard"
-            className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[var(--color-jd-white)]"
+            className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-[var(--color-jd-white)]"
             onClick={onClose}
           >
             {/* 아이콘 */}
@@ -64,7 +55,7 @@ export default function SidebarDrawer({ open, onClose }: Props) {
 
           <Link
             to="/jobs"
-            className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[var(--color-jd-white)]"
+            className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-[var(--color-jd-white)]"
             onClick={onClose}
           >
             <svg
@@ -83,7 +74,7 @@ export default function SidebarDrawer({ open, onClose }: Props) {
 
           <Link
             to="/resumes"
-            className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[var(--color-jd-white)]"
+            className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-[var(--color-jd-white)]"
             onClick={onClose}
           >
             <svg
@@ -102,7 +93,7 @@ export default function SidebarDrawer({ open, onClose }: Props) {
 
           <Link
             to="/interview/manage"
-            className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[var(--color-jd-white)]"
+            className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-[var(--color-jd-white)]"
             onClick={onClose}
           >
             <svg
@@ -118,14 +109,14 @@ export default function SidebarDrawer({ open, onClose }: Props) {
         </nav>
 
         {/* 하단 사용자 카드 */}
-        <div className="absolute left-0 right-0 bottom-0 px-3 py-3">
+        <div className="absolute right-0 bottom-0 left-0 px-3 py-3">
           <div
             role="button"
             onClick={() => {
               onClose();
               navigate('/mypage');
             }}
-            className="flex items-center justify-between px-3 py-2 rounded-xl bg-[var(--color-jd-white)] ring-1 ring-black/5 cursor-pointer"
+            className="flex cursor-pointer items-center justify-between rounded-xl bg-[var(--color-jd-white)] px-3 py-2 ring-1 ring-black/5"
           >
             <div className="flex items-center gap-3">
               <img
@@ -147,7 +138,7 @@ export default function SidebarDrawer({ open, onClose }: Props) {
                 e.stopPropagation(); // 카드 클릭으로 마이페이지 가는 것 방지
                 setConfirmOpen(true);
               }}
-              className="p-2 rounded-md hover:bg-[var(--color-jd-gray-light)]"
+              className="rounded-md p-2 hover:bg-[var(--color-jd-gray-light)]"
             >
               {/* exit 아이콘 */}
               <svg

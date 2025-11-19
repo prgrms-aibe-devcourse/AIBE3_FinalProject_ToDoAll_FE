@@ -71,10 +71,10 @@ export default function SignupCompanyEmailPage() {
     <AuthShell>
       <form onSubmit={onSubmit} className="flex flex-col gap-6">
         <div className="flex flex-col gap-3">
-          <label className="block text-m font-semibold text-jd-black">회사 이메일</label>
+          <label className="text-m text-jd-black block font-semibold">회사 이메일</label>
 
           <div className="relative">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#413F3F]">
+            <div className="absolute top-1/2 left-4 -translate-y-1/2 text-[#413F3F]">
               {/* mail icon */}
               <svg
                 width="18"
@@ -92,10 +92,7 @@ export default function SignupCompanyEmailPage() {
               value={email}
               onChange={handleChange}
               placeholder="name@jobda.com"
-              className="h-12 w-full rounded-full border border-jd-gray-light
-              bg-jd-white pl-12 pr-5 text-[#413F3F] placeholder:text-jd-gray-dark/70
-              outline-none shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
-              focus:border-jd-gray-light focus:ring-0"
+              className="border-jd-gray-light bg-jd-white placeholder:text-jd-gray-dark/70 focus:border-jd-gray-light h-12 w-full rounded-full border pr-5 pl-12 text-[#413F3F] shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)] outline-none focus:ring-0"
               style={{ borderRadius: 15, paddingLeft: '3rem' }}
             />
           </div>
@@ -103,7 +100,7 @@ export default function SignupCompanyEmailPage() {
           {invalid && (
             <div
               id="email-warning"
-              className="flex items-start gap-1 text-[14px] text-[#D13B3B] leading-tight border-t border-[#D13B3B]/30 pt-2"
+              className="flex items-start gap-1 border-t border-[#D13B3B]/30 pt-2 text-[14px] leading-tight text-[#D13B3B]"
             >
               <span className="mt-[1px]">ⓘ</span>
               <span>
@@ -115,9 +112,9 @@ export default function SignupCompanyEmailPage() {
 
           {/* 에러 메시지 */}
           {error && (
-            <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3">
               <svg
-                className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0"
+                className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -127,15 +124,15 @@ export default function SignupCompanyEmailPage() {
                   clipRule="evenodd"
                 />
               </svg>
-              <p className="text-sm text-red-800 leading-relaxed">{error}</p>
+              <p className="text-sm leading-relaxed text-red-800">{error}</p>
             </div>
           )}
 
           {/* 성공 메시지 */}
           {sent && !invalid && !error && (
-            <div className="flex items-start gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
+            <div className="flex items-start gap-2 rounded-lg border border-green-200 bg-green-50 p-3">
               <svg
-                className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0"
+                className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -147,7 +144,7 @@ export default function SignupCompanyEmailPage() {
               </svg>
               <div>
                 <p className="text-sm font-medium text-green-800">인증 이메일이 발송되었습니다!</p>
-                <p className="text-xs text-green-700 mt-1">
+                <p className="mt-1 text-xs text-green-700">
                   <strong>{email}</strong>로 발송된 이메일을 확인하고 인증 버튼을 눌러주세요.
                 </p>
               </div>
@@ -162,10 +159,7 @@ export default function SignupCompanyEmailPage() {
         <button
           type="submit"
           disabled={!email || invalid || loading}
-          className="h-12 w-full !rounded-[15px] !text-white font-extrabold !bg-[#752F6D] [background-image:none]
-          !opacity-100 shadow-[0_4px_12px_rgba(117,47,109,.25)] hover:brightness-[1.05] active:brightness-95 transition
-          ${!email || invalid || loading ? 'bg-[#752F6D]/60 cursor-not-allowed' : 'bg-[#752F6D] hover:brightness-[1.05] active:brightness-95'}`}
-          "
+          className="${!email || invalid || loading ? 'bg-[#752F6D]/60 cursor-not-allowed' : 'bg-[#752F6D] active:brightness-95'}`} h-12 w-full !rounded-[15px] !bg-[#752F6D] [background-image:none] font-extrabold !text-white !opacity-100 shadow-[0_4px_12px_rgba(117,47,109,.25)] transition hover:brightness-[1.05] active:brightness-95"
           style={{ height: 44 }}
         >
           {loading ? '전송 중...' : '이메일 인증'}

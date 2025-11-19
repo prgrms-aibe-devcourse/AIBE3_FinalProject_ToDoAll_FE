@@ -42,29 +42,29 @@ export default function InterviewSortDropdown({ jobPosts, onSelect }: InterviewS
     <div ref={dropdownRef} className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="translate-y-17 text-sm text-jd-gray-black hover:text-jd-black border border-gray-300 rounded-md px-3 py-1.5 bg-white transition"
+        className="text-jd-gray-black hover:text-jd-black translate-y-17 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm transition"
       >
         {selected}
       </button>
 
       {isOpen && (
-        <div className="absolute translate-y-17 right-0 mt-2 w-56 bg-white border border-gray-200 rounded-md shadow-lg z-10">
+        <div className="absolute right-0 z-10 mt-2 w-56 translate-y-17 rounded-md border border-gray-200 bg-white shadow-lg">
           {/* 전체 보기 */}
           <button
             onClick={() => handleSelect(null)}
-            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
           >
             전체 보기
           </button>
 
-          <div className="border-t border-gray-100 my-1" />
+          <div className="my-1 border-t border-gray-100" />
 
           {/* 공고 리스트 */}
           {jobPosts.map((post) => (
             <button
               key={post.id}
               onClick={() => handleSelect(post)}
-              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
             >
               {post.title}
             </button>

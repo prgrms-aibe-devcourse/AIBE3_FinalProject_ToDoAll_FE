@@ -1,16 +1,32 @@
 import { Calendar } from 'lucide-react';
 
-export default function DateInfoCard() {
+export type DataInfoCardProps = {
+  interviewDate: string;
+  applicantName: string;
+  jobTitle: string;
+  interviewTime: string;
+  interviewers: string;
+};
+
+export default function DateInfoCard({
+  interviewDate,
+  applicantName,
+  jobTitle,
+  interviewTime,
+  interviewers,
+}: DataInfoCardProps) {
   return (
-    <section className="flex items-center flex-col sm:flex-row gap-4 md:gap-7 border border-jd-gray-light rounded-[10px] p-[20px]">
-      <div className="flex items-center justify-center w-[36px] h-[36px] relative before:absolute before:z-0 before:opacity-25 before:block before:w-[36px] before:h-[36px] before:rounded-4xl before:bg-jd-scarlet">
+    <section className="border-jd-gray-light flex flex-col items-center gap-4 rounded-[10px] border p-[20px] sm:flex-row md:gap-7">
+      <div className="before:bg-jd-scarlet relative flex h-[36px] w-[36px] items-center justify-center before:absolute before:z-0 before:block before:h-[36px] before:w-[36px] before:rounded-4xl before:opacity-25">
         <Calendar size="20px" className="text-jd-scarlet" />
       </div>
-      <p>11/1</p>
+      <p>{interviewDate}</p>
       <div className="text-center sm:text-left">
-        <h3 className="font-bold">김상진 님과의 면접</h3>
-        <p className="text-jd-gray-dark mb-1">시니어 프론트엔드 개발자</p>
-        <p className="text-jd-gray-dark">14:00 · 면접관 1, 면접관 2</p>
+        <h3 className="font-bold">{applicantName} 님과의 면접</h3>
+        <p className="text-jd-gray-dark mb-1">{jobTitle}</p>
+        <p className="text-jd-gray-dark">
+          {interviewTime} · {interviewers}
+        </p>
       </div>
     </section>
   );

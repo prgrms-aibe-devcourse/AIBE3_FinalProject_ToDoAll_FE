@@ -65,19 +65,19 @@ export default function ResetPasswordPage() {
   return (
     <AuthShell showLeftPane={false} caption={null} cardClassName="max-w-2xl">
       <form onSubmit={onSubmit} className="w-full px-6 py-8">
-        <h3 className="text-2xl font-semibold mb-4 text-[#413D3D]">계정 비밀번호 재설정</h3>
+        <h3 className="mb-4 text-2xl font-semibold text-[#413D3D]">계정 비밀번호 재설정</h3>
 
         {!serverError ? (
-          <p className="text-l font-semibold text-[#837C7C] mb-6">
+          <p className="text-l mb-6 font-semibold text-[#837C7C]">
             이메일에서 받은 버튼을 통해 접속했습니다. 안전한 비밀번호를 입력해주세요.
           </p>
         ) : (
-          <div className="mb-4 text-l font-semibold text-red-600">{serverError}</div>
+          <div className="text-l mb-4 font-semibold text-red-600">{serverError}</div>
         )}
 
         {/* 새 비밀번호 */}
         <div className="mb-4">
-          <label className="block text-sm text-[#413D3D] mb-2">새 비밀번호</label>
+          <label className="mb-2 block text-sm text-[#413D3D]">새 비밀번호</label>
           <input
             type="password"
             value={password}
@@ -98,7 +98,7 @@ export default function ResetPasswordPage() {
 
         {/* 새 비밀번호 확인 */}
         <div className="mb-6">
-          <label className="block text-sm text-[#413D3D] mb-2">새 비밀번호 확인</label>
+          <label className="mb-2 block text-sm text-[#413D3D]">새 비밀번호 확인</label>
           <input
             type="password"
             value={passwordConfirm}
@@ -113,7 +113,7 @@ export default function ResetPasswordPage() {
           {(touched.passwordConfirm || didSubmit) &&
             passwordConfirm &&
             password !== passwordConfirm && (
-              <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
+              <p className="mt-1 flex items-center gap-1 text-xs text-red-600">
                 <span aria-hidden>ⓘ</span> 비밀번호가 일치하지 않습니다
               </p>
             )}
@@ -131,7 +131,7 @@ export default function ResetPasswordPage() {
         <button
           type="submit"
           disabled={!canSubmit || submitting || success}
-          className="w-full rounded-xl py-3 font-semibold text-white bg-[#752F6D] disabled:opacity-50"
+          className="w-full rounded-xl bg-[#752F6D] py-3 font-semibold text-white disabled:opacity-50"
         >
           {submitting ? '처리중...' : success ? '완료' : '비밀번호 변경하기'}
         </button>

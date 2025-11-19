@@ -1,111 +1,53 @@
-export default function WeekendSection() {
+import TimeSlot, { type TimeSlotType } from '@components/dashboard/TimeSlot.tsx';
+
+const WeekName = {
+  mon: '월',
+  tue: '화',
+  wed: '수',
+  thu: '목',
+  fri: '금',
+  sat: '토',
+  sun: '일',
+} as const;
+
+interface DailyCalendarType {
+  date: string; // 0000-00-00
+  events: {
+    time: 'string'; // 오전 10:00
+    type: TimeSlotType;
+    count: number;
+  }[];
+}
+
+export interface WeeklyCalendarType {
+  weekStart: string; // 0000-00-00
+  weekEnd: string; // 0000-00-00
+  dailyCalendars: {
+    mon: DailyCalendarType;
+    tue: DailyCalendarType;
+    wed: DailyCalendarType;
+    thu: DailyCalendarType;
+    fri: DailyCalendarType;
+    sat: DailyCalendarType;
+    sun: DailyCalendarType;
+  };
+}
+
+export default function WeekendSection({ calendarData }: { calendarData: WeeklyCalendarType }) {
   return (
-    <section className="flex justify-between gap-4 flex-wrap">
-      <div className="grow flex flex-col gap-5">
-        <div className="w-full h-[40px] text-2xl font-semibold flex justify-center items-center bg-jd-gray-light rounded-[10px]">
-          월
-        </div>
-        <div className="flex flex-col gap-2">
-          <div className="flex flex-col rounded-[10px] bg-[#F8DCD7] justify-center items-center p-[10px] text-center">
-            <p className="text-xl font-semibold">오전 10:00</p>
-            <p>면접 1건</p>
+    <section className="flex flex-wrap justify-between gap-4">
+      {Object.entries(calendarData.dailyCalendars).map(([week, data], i) => (
+        <div key={i} className="flex grow flex-col gap-5">
+          <div className="bg-jd-gray-light flex h-[40px] w-full items-center justify-center rounded-[10px] text-2xl font-semibold">
+            {WeekName[week as keyof typeof WeekName]}
           </div>
-          <div className="flex flex-col rounded-[10px] bg-[#F8DCD7] justify-center items-center p-[10px] text-center">
-            <p className="text-xl font-semibold">오전 10:00</p>
-            <p>면접 1건</p>
+          <div className="flex flex-col gap-2">
+            {data.events.map((item, i) => (
+              <TimeSlot key={i} {...item} />
+            ))}
           </div>
         </div>
-      </div>
-      <div className="grow flex flex-col gap-5">
-        <div className="w-full h-[40px] text-2xl font-semibold flex justify-center items-center bg-jd-gray-light rounded-[10px]">
-          월
-        </div>
-        <div className="flex flex-col gap-2">
-          <div className="flex flex-col rounded-[10px] bg-[#F8DCD7] justify-center items-center p-[10px] text-center">
-            <p className="text-xl font-semibold">오전 10:00</p>
-            <p>면접 1건</p>
-          </div>
-          <div className="flex flex-col rounded-[10px] bg-[#F8DCD7] justify-center items-center p-[10px] text-center">
-            <p className="text-xl font-semibold">오전 10:00</p>
-            <p>면접 1건</p>
-          </div>
-        </div>
-      </div>
-      <div className="grow flex flex-col gap-5">
-        <div className="w-full h-[40px] text-2xl font-semibold flex justify-center items-center bg-jd-gray-light rounded-[10px]">
-          월
-        </div>
-        <div className="flex flex-col gap-2">
-          <div className="flex flex-col rounded-[10px] bg-[#F8DCD7] justify-center items-center p-[10px] text-center">
-            <p className="text-xl font-semibold">오전 10:00</p>
-            <p>면접 1건</p>
-          </div>
-          <div className="flex flex-col rounded-[10px] bg-[#F8DCD7] justify-center items-center p-[10px] text-center">
-            <p className="text-xl font-semibold">오전 10:00</p>
-            <p>면접 1건</p>
-          </div>
-        </div>
-      </div>
-      <div className="grow flex flex-col gap-5">
-        <div className="w-full h-[40px] text-2xl font-semibold flex justify-center items-center bg-jd-gray-light rounded-[10px]">
-          월
-        </div>
-        <div className="flex flex-col gap-2">
-          <div className="flex flex-col rounded-[10px] bg-[#F8DCD7] justify-center items-center p-[10px] text-center">
-            <p className="text-xl font-semibold">오전 10:00</p>
-            <p>면접 1건</p>
-          </div>
-          <div className="flex flex-col rounded-[10px] bg-[#F8DCD7] justify-center items-center p-[10px] text-center">
-            <p className="text-xl font-semibold">오전 10:00</p>
-            <p>면접 1건</p>
-          </div>
-        </div>
-      </div>
-      <div className="grow flex flex-col gap-5">
-        <div className="w-full h-[40px] text-2xl font-semibold flex justify-center items-center bg-jd-gray-light rounded-[10px]">
-          월
-        </div>
-        <div className="flex flex-col gap-2">
-          <div className="flex flex-col rounded-[10px] bg-[#F8DCD7] justify-center items-center p-[10px] text-center">
-            <p className="text-xl font-semibold">오전 10:00</p>
-            <p>면접 1건</p>
-          </div>
-          <div className="flex flex-col rounded-[10px] bg-[#F8DCD7] justify-center items-center p-[10px] text-center">
-            <p className="text-xl font-semibold">오전 10:00</p>
-            <p>면접 1건</p>
-          </div>
-        </div>
-      </div>
-      <div className="grow flex flex-col gap-5">
-        <div className="w-full h-[40px] text-2xl font-semibold flex justify-center items-center bg-jd-gray-light rounded-[10px]">
-          월
-        </div>
-        <div className="flex flex-col gap-2">
-          <div className="flex flex-col rounded-[10px] bg-[#F8DCD7] justify-center items-center p-[10px] text-center">
-            <p className="text-xl font-semibold">오전 10:00</p>
-            <p>면접 1건</p>
-          </div>
-          <div className="flex flex-col rounded-[10px] bg-[#F8DCD7] justify-center items-center p-[10px] text-center">
-            <p className="text-xl font-semibold">오전 10:00</p>
-            <p>면접 1건</p>
-          </div>
-        </div>
-      </div>
-      <div className="grow flex flex-col gap-5">
-        <div className="w-full h-[40px] text-2xl font-semibold flex justify-center items-center bg-jd-gray-light rounded-[10px]">
-          월
-        </div>
-        <div className="flex flex-col gap-2">
-          <div className="flex flex-col rounded-[10px] bg-[#F8DCD7] justify-center items-center p-[10px] text-center">
-            <p className="text-xl font-semibold">오전 10:00</p>
-            <p>면접 1건</p>
-          </div>
-          <div className="flex flex-col rounded-[10px] bg-[#F8DCD7] justify-center items-center p-[10px] text-center">
-            <p className="text-xl font-semibold">오전 10:00</p>
-            <p>면접 1건</p>
-          </div>
-        </div>
-      </div>
+      ))}
     </section>
   );
 }

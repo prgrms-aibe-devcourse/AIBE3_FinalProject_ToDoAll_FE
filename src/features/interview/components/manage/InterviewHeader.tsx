@@ -25,13 +25,13 @@ export default function InterviewHeader({ avatar, name, position, status }: Inte
   const { bg, text, label } = statusStyle[status];
 
   return (
-    <div className="flex items-center gap-3 mb-3">
-      <img src={avatar} alt={name} className="w-12 h-12 rounded-full object-cover" />
+    <div className="mb-3 flex items-center gap-3">
+      <img src={avatar} alt={name} className="h-12 w-12 rounded-full object-cover" />
       <div className="flex flex-col">
-        <h3 className="font-semibold text-jd-black">{name}</h3>
-        <p className="text-sm text-jd-gray-dark">{position}</p>
+        <h3 className="text-jd-black font-semibold">{name}</h3>
+        <p className="text-jd-gray-dark text-sm">{position}</p>
       </div>
-      <span className={`ml-auto px-3 py-1 text-xs font-medium rounded-full ${bg} ${text}`}>
+      <span className={`ml-auto rounded-full px-3 py-1 text-xs font-medium ${bg} ${text}`}>
         {label ?? status}
       </span>
     </div>

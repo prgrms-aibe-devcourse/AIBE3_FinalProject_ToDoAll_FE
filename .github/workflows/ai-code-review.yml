@@ -13,7 +13,7 @@ permissions:
 env:
   MODEL: gpt-4o-mini
   MAX_TOKENS: '2000'
-  MAX_FILES: '40'
+  MAX_FILES: '100'
   MAX_LINES: '1800'
   EXCLUDE_GLOBS: |
     **/*.lock
@@ -122,7 +122,7 @@ jobs:
           LINES=$(git diff --unified=0 "$BASE" "$HEAD" | grep -E '^(\+|\-)' | wc -l | tr -d ' ')
 
           if (( LINES > ${MAX_LINES} )); then
-            jq -n --argjson files '${{ steps.files.outputs.list }}' '{oversize:true, files:$files}' > diff.json
+            jq -n --arg files '[]' '{oversize:true, files:($files | fromjson)}' > diff.json
             echo "oversize=true" >> "$GITHUB_OUTPUT"
           else
             git diff "$BASE" "$HEAD" > diff.patch
@@ -174,7 +174,7 @@ jobs:
             echo ""
             echo "### ⚠️ 세부 코드 리뷰"
             echo "- [파일명:줄번호] 문제 설명 → 원인 → 개선 방안 (+ 코드 예시)"
-            echo "- 가능한 한 실제 수정 가능한 코드로 제시"
+            echo "- 실제 수정 가능한 형태로 작성할 것"
             echo ""
             echo "### 🧪 테스트 제안"
             echo "- 개선된 코드가 의도대로 동작함을 검증하기 위한 테스트 아이디어"
@@ -225,22 +225,28 @@ jobs:
         run: |
           set -euo pipefail
 
-          PAYLOAD=$(jq -n \
+          jq -n \
             --arg model "$MODEL" \
-            --arg sys "$(cat system.txt)" \
-            --arg usr "$(cat user.txt)" \
+            --rawfile sys system.txt \
+            --rawfile usr user.txt \
             --argjson mt ${MAX_TOKENS} \
-            '{model:$model, messages:[{role:"system",content:$sys},{role:"user",content:$usr}], max_tokens:$mt, temperature:0.2}'
-          )
+            '{
+              model: $model,
+              messages: [
+                { role: "system", content: $sys },
+                { role: "user", content: $usr }
+              ],
+              max_tokens: $mt,
+              temperature: 0.2
+            }' > payload.json
 
-          RESP=$(curl -sS https://api.openai.com/v1/chat/completions \
+          curl -sS https://api.openai.com/v1/chat/completions \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $OPENAI_API_KEY" \
-            -d "$PAYLOAD"
-          )
+            --data-binary @payload.json \
+            -o llm_response.json
 
-          echo "$RESP" > llm_response.json
-          jq -r '.choices[0].message.content // "⚠️ Model returned empty response"' < llm_response.json > llm_content.txt
+          jq -r '.choices[0].message.content // "⚠️ 모델이 빈 응답을 반환했습니다."' < llm_response.json > llm_content.txt
 
       - name: Comment PR
         env:

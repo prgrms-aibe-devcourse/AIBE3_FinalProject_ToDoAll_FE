@@ -1,70 +1,57 @@
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { getResume } from '../data/resumes.api';
 import type { ResumeData } from '../types/resumes.types';
-import ResumeInfo from '../components/ResumeInfo';
-import ResumeMemo from '../components/ResumeMemo';
-import ApplicantInfo from '../components/ApplicantInfo';
 import ApplicantStatus from '../components/ApplicantStatus';
+import ApplicantInfo from '../components/ApplicantInfo';
+import ResumeMemo from '../components/ResumeMemo';
+import ResumeInfo from '../components/ResumeInfo';
 
 export default function ResumeDetail() {
-  const dummyResume: ResumeData = {
-    id: '1',
-    name: '김잡다',
-    gender: '남',
-    birth: '1997-04-03',
-    profileImage: 'https://via.placeholder.com/150?text=Profile',
-    email: 'jobdal@gmail.com',
-    phone: '010-1234-5678',
-    applyDate: '2025-11-01',
-    address: {
-      country: '대한민국',
-      city: '서울특별시 강남구',
-      detail: '강남대로 282',
-    },
-    education: [
-      {
-        type: '대학',
-        universityType: '일반대',
-        name: '잡다 대학교',
-        transferred: false,
-        major: '컴퓨터공학',
-        graduated: true,
-        startDate: '2016-03-01',
-        endDate: '2020-02-28',
-        dayTime: '주간',
-        gpa: 3.8,
-      },
-    ],
-    experience: '잡다 주식회사 (2021.01 ~ 현재, 프론트엔드 개발자)',
-    activities: '동아리 활동: 웹 개발 동아리',
-    certifications: '정보처리기사',
-    skills: [
-      { name: 'React', level: '고급' },
-      { name: 'TypeScript', level: '고급' },
-      { name: 'TailwindCSS', level: '중급' },
-    ],
-    files: {
-      resume: '김잡다_자기소개서.pdf',
-      portfolio: '김잡다_포트폴리오.pdf',
-      etc: ['기타문서1.pdf', '기타문서2.pdf'],
-    },
-  };
+  const { resumeId } = useParams<{ resumeId: string }>();
+  const [resume, setResume] = useState<ResumeData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    console.log('resumeId:', resumeId);
+    if (!resumeId) return;
+
+    async function fetchResume() {
+      try {
+        const data = await getResume(resumeId!);
+        console.log('받은 데이터:', data);
+        setResume(data);
+      } catch (err: any) {
+        setError(err.message || '이력서를 불러오는 중 오류가 발생했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchResume();
+  }, [resumeId]);
+
+  if (loading) return <p className="p-8">이력서를 불러오는 중...</p>;
+  if (error) return <p className="p-8 text-red-500">{error}</p>;
+  if (!resume) return <p className="p-8">이력서 데이터가 없습니다.</p>;
 
   return (
     <div className="flex h-screen bg-[#FAF8F8]">
       <aside className="w-1/4 p-4">
-        <ApplicantStatus data={dummyResume} />
+        <ApplicantStatus data={resume} />
         <ApplicantInfo
           data={{
-            email: dummyResume.email,
-            phone: dummyResume.phone,
-            applyDate: dummyResume.applyDate,
+            email: resume.email,
+            phone: resume.phone,
+            applyDate: resume.applyDate,
           }}
         />
-
-        <ResumeMemo />
+        <ResumeMemo resumeId={resume.id} initialMemo={resume.memo} />
       </aside>
 
-      <main className="flex-1 p-8 overflow-y-auto">
-        <ResumeInfo data={dummyResume} />
+      <main className="flex-1 overflow-y-auto p-8">
+        <ResumeInfo data={resume} />
       </main>
     </div>
   );

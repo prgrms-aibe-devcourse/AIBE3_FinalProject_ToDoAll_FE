@@ -1,8 +1,9 @@
-import type { ResumeData } from '../types/resumes.types';
+import type { ResumeData } from '../../resumes/types/resumes.types';
 
 export const mockResumes: ResumeData[] = [
   {
     id: '1',
+    jdId: 1,
     name: '김수민',
     gender: '여',
     birth: '1999-05-12',
@@ -29,8 +30,9 @@ export const mockResumes: ResumeData[] = [
         graduated: true,
         startDate: '2018-03-01',
         endDate: '2022-02-20',
-        dayTime: '주간',
+        dayTime: 'DAY',
         gpa: 4.1,
+        maxGpa: 4.5,
       },
     ],
     career: [
@@ -51,9 +53,11 @@ export const mockResumes: ResumeData[] = [
     experience: '3년차 프론트엔드 및 백엔드 개발 경험 보유',
     activities: '멋쟁이사자처럼 10기 활동',
     certifications: '정보처리기사, TOEIC 890',
+    memo: '',
   },
   {
     id: '2',
+    jdId: 1,
     name: '이정훈',
     gender: '남',
     birth: '1997-08-21',
@@ -80,8 +84,9 @@ export const mockResumes: ResumeData[] = [
         graduated: true,
         startDate: '2016-03-01',
         endDate: '2020-02-20',
-        dayTime: '주간',
+        dayTime: 'DAY',
         gpa: 3.9,
+        maxGpa: 4.5, // maxGpa 추가
       },
     ],
     career: [
@@ -102,9 +107,11 @@ export const mockResumes: ResumeData[] = [
     experience: '서버 개발 및 보안 인프라 구축 경험',
     activities: 'Google Developer Group 활동',
     certifications: '리눅스마스터 2급, SQLD',
+    memo: '',
   },
   {
     id: '3',
+    jdId: 1,
     name: '정윤아',
     gender: '여',
     birth: '1998-11-15',
@@ -131,8 +138,9 @@ export const mockResumes: ResumeData[] = [
         graduated: true,
         startDate: '2017-03-01',
         endDate: '2021-02-20',
-        dayTime: '주간',
+        dayTime: 'DAY',
         gpa: 4.3,
+        maxGpa: 4.5,
       },
     ],
     career: [
@@ -153,5 +161,9 @@ export const mockResumes: ResumeData[] = [
     experience: '디자인 시스템 구축 및 UX 리서치 경험',
     activities: 'UX 스터디 모임 리더',
     certifications: 'ADsP, GTQ 1급',
+    memo: '',
   },
 ];
+
+// 빈 배열 예시 (검색 결과 없음)
+export const mockResumesEmpty: ResumeData[] = [];

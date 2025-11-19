@@ -52,31 +52,19 @@ export default function LoginPage() {
 
       {/* 글래스 카드 */}
       <main className="relative z-10 grid min-h-dvh place-items-center px-4 sm:px-6 md:px-8">
-        <section
-          className="
-            w-full max-w-[1120px]
-            rounded-[24px]
-            bg-white/[0.15] backdrop-blur-[20px]
-            ring-1 ring-white/[0.15]
-            shadow-[0_24px_70px_rgba(0,0,0,.28)]
-            px-6 sm:px-8 md:px-10
-            py-10 md:py-12
-            min-h-[560px] md:min-h-[640px]
-            flex flex-col justify-center
-          "
-        >
+        <section className="flex min-h-[560px] w-full max-w-[1120px] flex-col justify-center rounded-[24px] bg-white/[0.15] px-6 py-10 shadow-[0_24px_70px_rgba(0,0,0,.28)] ring-1 ring-white/[0.15] backdrop-blur-[20px] sm:px-8 md:min-h-[640px] md:px-10 md:py-12">
           {/* 좌측 520px / 우측 480px, 사이 간격 64px */}
-          <div className="grid items-center gap-10 sm:gap-14 md:gap-16 md:[grid-template-columns:520px_minmax(0,1fr)]">
+          <div className="grid items-center gap-10 sm:gap-14 md:[grid-template-columns:520px_minmax(0,1fr)] md:gap-16">
             {/* 좌측: 로고 + 카피 (정중앙 정렬) */}
             <div className="flex flex-col items-center justify-center text-center">
               <img
                 src="/logo/login-logo.png"
                 alt="jobda"
-                className="w-auto drop-shadow-[0_3px_10px_rgba(0,0,0,.35)] h-[120px] sm:h-[160px] md:h-[200px]"
+                className="h-[120px] w-auto drop-shadow-[0_3px_10px_rgba(0,0,0,.35)] sm:h-[160px] md:h-[200px]"
                 style={{ height: '200px' }}
               />
               <h2
-                className="mt-6 text-white text-center font-black leading-tight tracking-tight  text-2xl sm:text-[28px] md:text-[30px]"
+                className="mt-6 text-center text-2xl leading-tight font-black tracking-tight text-white sm:text-[28px] md:text-[30px]"
                 style={{
                   fontWeight: 600,
                   textShadow: '0 3px 18px rgba(0,0,0,0.4)',
@@ -90,17 +78,17 @@ export default function LoginPage() {
             </div>
 
             {/* 우측: 폼 */}
-            <div className=" md:-translate-x-8">
-              <form onSubmit={onSubmit} className="w-full flex flex-col gap-8">
+            <div className="md:-translate-x-8">
+              <form onSubmit={onSubmit} className="flex w-full flex-col gap-8">
                 {/* 입력 필드 그룹 */}
-                <div className="flex flex-col  gap-8 sm:gap-10">
+                <div className="flex flex-col gap-8 sm:gap-10">
                   {/* 이메일 */}
                   <div className="flex flex-col gap-3">
-                    <label htmlFor="email" className="block text-m font-semibold text-jd-black">
+                    <label htmlFor="email" className="text-m text-jd-black block font-semibold">
                       계정 이메일
                     </label>
                     <div className="relative">
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#413F3F] z-10">
+                      <div className="absolute top-1/2 left-4 z-10 -translate-y-1/2 text-[#413F3F]">
                         <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
                         </svg>
@@ -112,18 +100,7 @@ export default function LoginPage() {
                         autoComplete="email"
                         required
                         placeholder="name@jobda.com"
-                        className="
-                          h-12 w-full
-                          rounded-full
-                          border border-jd-gray-light
-                          bg-transparent focus:bg-transparent
-                          backdrop-blur-md
-                          pl-12 pr-5
-                          text-jd-black placeholder:text-jd-gray-dark/70
-                          outline-none
-                          shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
-                          focus:border-jd-gray-light focus:ring-0
-                        "
+                        className="border-jd-gray-light text-jd-black placeholder:text-jd-gray-dark/70 focus:border-jd-gray-light h-12 w-full rounded-full border bg-transparent pr-5 pl-12 shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)] backdrop-blur-md outline-none focus:bg-transparent focus:ring-0"
                         style={{
                           borderRadius: 15,
                           paddingLeft: '3rem',
@@ -135,11 +112,11 @@ export default function LoginPage() {
 
                   {/* 비밀번호 */}
                   <div className="flex flex-col gap-3">
-                    <label htmlFor="password" className="block text-m font-semibold text-jd-black">
+                    <label htmlFor="password" className="text-m text-jd-black block font-semibold">
                       비밀번호
                     </label>
                     <div className="relative">
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#413F3F] z-10">
+                      <div className="absolute top-1/2 left-4 z-10 -translate-y-1/2 text-[#413F3F]">
                         <svg
                           width="18"
                           height="18"
@@ -161,18 +138,7 @@ export default function LoginPage() {
                         autoComplete="current-password"
                         required
                         placeholder="••••••••"
-                        className="
-                          h-12 w-full
-                          rounded-full
-                          border border-jd-gray-light
-                          bg-transparent focus:bg-transparent
-                          backdrop-blur-md
-                          pl-12 pr-5
-                          text-jd-black placeholder:text-jd-gray-dark/70
-                          outline-none
-                          shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)]
-                          focus:border-jd-gray-light focus:ring-0
-                        "
+                        className="border-jd-gray-light text-jd-black placeholder:text-jd-gray-dark/70 focus:border-jd-gray-light h-12 w-full rounded-full border bg-transparent pr-5 pl-12 shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)] backdrop-blur-md outline-none focus:bg-transparent focus:ring-0"
                         style={{
                           borderRadius: 15,
                           paddingLeft: '3rem',
@@ -187,22 +153,10 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="
-                  relative z-10
-                  h-[44px] w-full
-                  !rounded-[15px]
-                  !text-white
-                  !bg-[#F7A534]
-                  [background-image:none]
-                  opacity-100
-                  shadow-[0_4px_12px_rgba(247,165,52,.25)]
-                  hover:brightness-[1.05]
-                  active:brightness-95
-                  transition
-                "
+                  className="relative z-10 h-[44px] w-full !rounded-[15px] !bg-[#F7A534] [background-image:none] !text-white opacity-100 shadow-[0_4px_12px_rgba(247,165,52,.25)] transition hover:brightness-[1.05] active:brightness-95"
                 >
                   <span
-                    className="login-btn-text font-semibold text-[17px]"
+                    className="login-btn-text text-[17px] font-semibold"
                     style={{ fontVariationSettings: "'wght' 800" }}
                   >
                     {submitting ? '로그인 중...' : '로그인'}
@@ -214,7 +168,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => navigate('/forgot')}
-                    className="underline-offset-2 hover:underline cursor-pointer"
+                    className="cursor-pointer underline-offset-2 hover:underline"
                   >
                     비밀번호 찾기
                   </button>
@@ -224,7 +178,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => navigate('/signup/email')}
-                    className="underline-offset-2 hover:underline cursor-pointer"
+                    className="cursor-pointer underline-offset-2 hover:underline"
                   >
                     회원가입
                   </button>

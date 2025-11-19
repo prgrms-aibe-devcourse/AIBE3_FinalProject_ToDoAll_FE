@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import plusImg from '../../../assets/Vector-2.png';
 import type { Skill } from '../types/resumes.types';
-import arrowImg from '../../../assets/Expand Arrow-2.png';
+import CustomSelect from './CustomSelect';
 
 export default function SkillFormSection({
   skills,
@@ -23,14 +23,14 @@ export default function SkillFormSection({
 
   return (
     <>
-      <div className="bg-[#FAF8F8] border-t border-b border-[#E0E0E0] p-2 flex items-center justify-between">
+      <div className="flex items-center justify-between border-t border-b border-[#E0E0E0] bg-[#FAF8F8] p-2">
         <h2 className="text-lg font-semibold">스킬</h2>
         <button
           type="button"
-          className="px-3 py-1 flex items-center gap-1 hover:opacity-80"
+          className="flex items-center gap-1 px-3 py-1 hover:opacity-80"
           onClick={() => setShowForm(true)}
         >
-          <img src={plusImg} alt="plus" className="w-3 h-3" />
+          <img src={plusImg} alt="plus" className="h-3 w-3" />
           추가
         </button>
       </div>
@@ -39,7 +39,7 @@ export default function SkillFormSection({
         {skills.map((s, idx) => (
           <div
             key={idx}
-            className="flex gap-2 flex-wrap p-2 border-b border-[#837C7C] last:border-b-0"
+            className="flex flex-wrap gap-2 border-b border-[#837C7C] p-2 last:border-b-0"
           >
             <span className="font-medium">{s.name}</span>
             <span>{s.level}</span>
@@ -48,41 +48,34 @@ export default function SkillFormSection({
       </div>
 
       {showForm && (
-        <div className="space-y-3 bg-[#FAFAFA] p-4 rounded-[10px] border border-[#E5E5E5]">
-          <div className="flex flex-wrap gap-3 items-center mt-2">
+        <div className="space-y-3 rounded-[10px] border border-[#E5E5E5] bg-[#FAFAFA] p-4">
+          <div className="mt-2 flex flex-wrap items-center gap-3">
             <input
-              className="border py-2 px-3 rounded-[10px] flex-1 min-w-[200px]"
+              className="min-w-[200px] flex-1 rounded-[10px] border px-3 py-2"
               placeholder="스킬 입력"
               value={skillInput.name}
               onChange={(e) => setSkillInput({ ...skillInput, name: e.target.value })}
             />
-            <div className="relative w-36">
-              <select
-                value={skillInput.level}
-                onChange={(e) =>
-                  setSkillInput({
-                    ...skillInput,
-                    level: e.target.value as '초급' | '중급' | '고급',
-                  })
-                }
-                className="border py-2 px-3 rounded-[10px] w-full appearance-none bg-[#faf8f8] text-[#413F3F] focus:outline-none"
-              >
-                <option value="초급">초급</option>
-                <option value="중급">중급</option>
-                <option value="고급">고급</option>
-              </select>
-              <img
-                src={arrowImg}
-                alt="arrow"
-                className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none opacity-60"
-              />
-            </div>
+
+            {/* CustomSelect 사용 */}
+            <CustomSelect
+              value={skillInput.level}
+              onChange={(val) =>
+                setSkillInput({ ...skillInput, level: val as '초급' | '중급' | '고급' })
+              }
+              options={[
+                { value: '초급', label: '초급' },
+                { value: '중급', label: '중급' },
+                { value: '고급', label: '고급' },
+              ]}
+              className="w-36"
+            />
           </div>
 
-          <div className="flex justify-end mt-3">
+          <div className="mt-3 flex justify-end">
             <button
               type="button"
-              className="px-4 py-2 bg-[#E3DBDB] rounded-[8px] hover:bg-[#B1A0A0] transition"
+              className="rounded-[8px] bg-[#E3DBDB] px-4 py-2 transition hover:bg-[#B1A0A0]"
               onClick={addSkill}
             >
               입력
