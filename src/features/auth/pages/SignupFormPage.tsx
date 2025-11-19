@@ -12,9 +12,11 @@ export default function SignupFormPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
+  // URL에서 email + token 둘 다 읽기
   const token = searchParams.get('token'); // URL에서 토큰만 읽음
+  const emailFromUrl = searchParams.get('email') ?? ''; // 인증된 회사 이메일
 
-  const [companyEmail, setCompanyEmail] = useState('');
+  const [companyEmail, setCompanyEmail] = useState(emailFromUrl);
   const [loading, setLoading] = useState(true);
 
   // 필수 입력값 상태들 — 컴포넌트 "안"에서 선언
@@ -99,6 +101,11 @@ export default function SignupFormPage() {
           navigate('/signup/email', { replace: true });
           return;
         }
+        if (emailFromUrl && emailFromUrl !== data.email) {
+          alert('인증 정보가 일치하지 않습니다. 다시 이메일 인증을 진행해주세요.');
+          navigate('/signup/email', { replace: true });
+          return;
+        }
         setCompanyEmail(data.email); // 읽기전용 필드에 표시
       } catch {
         alert('인증 링크 확인에 실패했습니다. 다시 시도해주세요.');
@@ -107,7 +114,7 @@ export default function SignupFormPage() {
         setLoading(false);
       }
     })();
-  }, [token, navigate]);
+  }, [token, navigate, emailFromUrl]);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
