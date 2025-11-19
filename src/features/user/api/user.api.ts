@@ -8,11 +8,11 @@ export async function getMe() {
 
 export async function updateMe(payload: {
   name?: string;
+  nickname?: string;
   phoneNumber?: string;
   position?: string;
   birthDate?: string;
   gender?: 'MALE' | 'FEMALE' | 'OTHER';
-  nickname?: string;
 }) {
   const { data } = await http.patch('/v1/users/me', payload);
   return data.data; // 서버가 최신 데이터를 다시 내려주면 그대로 반영할 수 있음

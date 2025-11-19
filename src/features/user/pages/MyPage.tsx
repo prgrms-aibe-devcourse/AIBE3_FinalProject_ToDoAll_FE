@@ -15,6 +15,7 @@ export default function MyPage() {
   const [user, setUser] = useState({
     name: '',
     email: '',
+    nickname: '',
     phone: '',
     company: '',
     position: '',
@@ -34,6 +35,7 @@ export default function MyPage() {
           ...prev,
           name: data.name,
           email: data.email,
+          nickname: data.nickname,
           phone: data.phoneNumber ?? '',
           company: data.companyName ?? '',
           position: data.position ?? '',
@@ -46,6 +48,7 @@ export default function MyPage() {
           ...f,
           name: data.name ?? f.name,
           email: data.email ?? f.email,
+          nickname: data.nickname ?? f.nickname,
           phone: data.phoneNumber ?? f.phone,
           company: data.companyName ?? f.company,
           position: data.position ?? f.position,
@@ -91,7 +94,7 @@ export default function MyPage() {
   // 타입 분리된 onChange 핸들러
 
   //  공통 업데이트 도우미(안전하게 키 제한)
-  type FormKeys = 'name' | 'phone' | 'position' | 'birthDate' | 'gender';
+  type FormKeys = 'name' | 'nickname' | 'phone' | 'position' | 'birthDate' | 'gender';
   const updateForm = (name: FormKeys, value: string) => setForm((f) => ({ ...f, [name]: value }));
 
   // input 전용
@@ -116,6 +119,7 @@ export default function MyPage() {
     try {
       await updateMe({
         name: form.name,
+        nickname: form.nickname,
         phoneNumber: form.phone,
         position: form.position,
         birthDate: form.birthDate,
@@ -127,6 +131,41 @@ export default function MyPage() {
     } catch {
       alert('저장에 실패했습니다.');
     }
+  };
+  // 비밀번호 변경 관련 상태 & 로직
+
+  const [currentPassword, setCurrentPassword] = useState(''); // 현재 비밀번호 입력값
+  const [newPassword, setNewPassword] = useState(''); // 새 비밀번호 입력값
+  const [newPasswordConfirm, setNewPasswordConfirm] = useState(''); // 새 비밀번호 확인 입력값
+
+  const [passwordError, setPasswordError] = useState<string | null>(null); // 비밀번호 관련 에러 메시지
+  const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null); // 비밀번호 관련 성공/안내 메시지
+
+  // 비밀번호 입력 검증 함수
+  const validatePasswords = (cur: string, next: string, nextConfirm: string) => {
+    // 먼저 메시지 초기화
+    setPasswordError(null);
+    setPasswordSuccess(null);
+
+    // 새 비밀번호/확인 비밀번호 둘 중 하나라도 비어 있으면 아직 판단하지 않음
+    if (!next || !nextConfirm) {
+      return; // 아무 메시지도 띄우지 않음
+    }
+
+    // 새 비밀번호와 확인 비밀번호가 다를 때
+    if (next !== nextConfirm) {
+      setPasswordError('새 비밀번호와 확인 비밀번호가 일치하지 않습니다.');
+      return;
+    }
+
+    // 새 비밀번호가 현재 비밀번호와 같을 때
+    if (cur && cur === next) {
+      setPasswordError('현재 비밀번호와 새 비밀번호가 같습니다. 다른 비밀번호를 입력해주세요.');
+      return;
+    }
+
+    // 위 조건을 다 통과하면 사용 가능한 비밀번호로 판단
+    setPasswordSuccess('사용 가능한 비밀번호입니다.');
   };
 
   return (
@@ -174,7 +213,6 @@ export default function MyPage() {
               <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
                 이메일
               </label>
-              {/* 이메일도 항상 읽기 전용 */}
               <div className="self-center font-semibold">{user.email}</div>
 
               <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
@@ -189,6 +227,22 @@ export default function MyPage() {
                 />
               ) : (
                 <div className="self-center font-semibold">{user.name}</div>
+              )}
+
+              <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
+                닉네임
+              </label>
+              {editing ? (
+                <input
+                  name="nickname"
+                  value={form.nickname}
+                  onChange={onInputChange}
+                  className="border rounded-md px-3 py-2"
+                  type="nickname"
+                  placeholder="예: 잡다닉"
+                />
+              ) : (
+                <div className="self-center font-bold">{user.nickname}</div>
               )}
 
               <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
@@ -327,48 +381,103 @@ export default function MyPage() {
             )}
             <form
               onSubmit={async (e) => {
-                e.preventDefault();
-                // 입력된 값들 순서대로 꺼내기
-                const cur = (e.currentTarget[0] as HTMLInputElement).value; // 현재 비밀번호
-                const next = (e.currentTarget[1] as HTMLInputElement).value; // 새 비밀번호
-                const next2 = (e.currentTarget[2] as HTMLInputElement).value; // 새 비밀번호 확인
+                e.preventDefault(); // 기본 submit 동작 막기
 
-                // 새 비밀번호가 다르면 경고 후 중단
-                if (next !== next2) {
-                  alert('새 비밀번호가 일치하지 않습니다.');
+                // 제출 시 최종 검증: 새 비밀번호 일치 여부
+                if (newPassword !== newPasswordConfirm) {
+                  setPasswordError('새 비밀번호와 확인 비밀번호가 일치하지 않습니다.');
+                  setPasswordSuccess(null);
+                  return;
+                }
+
+                // 제출 시 최종 검증: 현재 비밀번호와 새 비밀번호 동일 여부
+                if (currentPassword && currentPassword === newPassword) {
+                  setPasswordError(
+                    '현재 비밀번호와 새 비밀번호가 같습니다. 다른 비밀번호를 입력해주세요.'
+                  );
+                  setPasswordSuccess(null);
                   return;
                 }
 
                 try {
-                  // 실제 API 호출
-                  await changePassword(cur, next);
+                  // 실제 비밀번호 변경 API 호출
+                  await changePassword(currentPassword, newPassword);
+
                   // 재인증 시간 기록
                   localStorage.setItem('reauthAt', String(Date.now()));
-                  alert('비밀번호가 변경되었습니다.');
-                } catch {
-                  alert('비밀번호 변경에 실패했습니다.');
+
+                  alert('비밀번호가 변경되었습니다.'); // 성공 알림
+
+                  // 입력값 및 메시지 초기화
+                  setCurrentPassword('');
+                  setNewPassword('');
+                  setNewPasswordConfirm('');
+                  setPasswordError(null);
+                  setPasswordSuccess(null);
+
+                  // 비밀번호 변경 섹션 자동으로 닫기
+                  setExpandPassword(false);
+                } catch (err) {
+                  console.log('비밀번호 변경 에러:', err); // 콘솔 로그
+                  setPasswordError(
+                    '비밀번호 변경에 실패했습니다. 현재 비밀번호를 다시 확인해주세요.'
+                  );
+                  setPasswordSuccess(null);
                 }
               }}
               className="grid gap-3 max-w-md"
             >
+              {/* 현재 비밀번호 입력 */}
               <input
                 type="password"
                 placeholder="현재 비밀번호"
                 className="border rounded-md px-4 py-2"
                 required
+                value={currentPassword} // state와 연결
+                onChange={(e) => {
+                  const value = e.target.value; // 입력값
+                  setCurrentPassword(value); // 상태 업데이트
+                  // 새 비밀번호 검증 재실행
+                  validatePasswords(value, newPassword, newPasswordConfirm);
+                }}
               />
+
+              {/* 새 비밀번호 입력 */}
               <input
                 type="password"
                 placeholder="새 비밀번호"
                 className="border rounded-md px-4 py-2"
                 required
+                value={newPassword} // state와 연결
+                onChange={(e) => {
+                  const value = e.target.value; // 입력값
+                  setNewPassword(value); // 상태 업데이트
+                  // 새 비밀번호 검증 재실행
+                  validatePasswords(currentPassword, value, newPasswordConfirm);
+                }}
               />
+
+              {/* 새 비밀번호 확인 입력 */}
               <input
                 type="password"
                 placeholder="새 비밀번호 확인"
                 className="border rounded-md px-4 py-2"
                 required
+                value={newPasswordConfirm} // state와 연결
+                onChange={(e) => {
+                  const value = e.target.value; // 입력값
+                  setNewPasswordConfirm(value); // 상태 업데이트
+                  // 새 비밀번호 검증 재실행
+                  validatePasswords(currentPassword, newPassword, value);
+                }}
               />
+
+              {/* 비밀번호 검증 메시지 영역 */}
+              {passwordError && <p className="text-sm text-red-500 mt-1">{passwordError}</p>}
+              {!passwordError && passwordSuccess && (
+                <p className="text-sm text-green-600 mt-1">{passwordSuccess}</p>
+              )}
+
               <button className="mt-2 bg-[var(--color-jd-violet)] hover:bg-[var(--color-jd-violet-hover)] text-white rounded-md px-5 py-2">
                 비밀번호 변경 저장
               </button>
