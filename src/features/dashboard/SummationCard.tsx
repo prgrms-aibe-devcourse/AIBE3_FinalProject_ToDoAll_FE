@@ -1,10 +1,10 @@
 import DetailButton from '@components/dashboard/DetailButton.tsx';
 import { BookText } from 'lucide-react';
 
-export type SummationCardProps = {
+type SummationCardProps = {
   title: string;
   description: string;
-  value: string;
+  value: number;
   detailUrl: string;
 };
 

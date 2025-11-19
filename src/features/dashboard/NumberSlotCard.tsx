@@ -1,15 +1,15 @@
 import Badge, { type BadgeType } from '@components/dashboard/Badge.tsx';
 
 const STATUS_INFO = {
-  document: {
+  DOCUMENT: {
     text: '서류 접수',
     color: 'scarlet',
   },
-  interview: {
+  INTERVIEW: {
     text: '면접',
     color: 'violet',
   },
-  finished: {
+  FINISHED: {
     text: '마감',
     color: 'gray',
   },
