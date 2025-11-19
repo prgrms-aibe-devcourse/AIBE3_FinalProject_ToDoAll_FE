@@ -10,26 +10,26 @@ export default function MyPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  // 목업 데이터
-  const [user, setUser] = useState({
-    name: '김민수',
-    email: 'abck@gmail.com',
-    phone: '010-1111-2222',
-    company: '잡다 컴퍼니',
-    position: '매니저',
-    profile: 'https://i.imgur.com/8Km9tLL.png',
-    birthDate: '',
-    gender: '' as Gender,
-  });
-
   // 편집 토글 & 폼 데이터
   const [editing, setEditing] = useState(false);
+  const [user, setUser] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    company: '',
+    position: '',
+    birthDate: '',
+    gender: '' as Gender,
+    profile: '/default-profile.png',
+  });
+
   const [form, setForm] = useState(user);
 
   // 마운트 시 내 정보 실제 조회 → 화면/폼에 반영
   useEffect(() => {
     getMe()
       .then((data) => {
+        console.log('getMe 응답:', data);
         setUser((prev) => ({
           ...prev,
           name: data.name,
@@ -54,8 +54,9 @@ export default function MyPage() {
           profile: data.profileUrl || f.profile,
         }));
       })
-      .catch(() => {
-        // navigate('/login', { replace: true });
+      .catch((err) => {
+        console.log('getMe 응답:', err);
+        alert('내 정보 조회에 실패했습니다.');
       });
   }, [navigate]);
 
@@ -115,10 +116,10 @@ export default function MyPage() {
     try {
       await updateMe({
         name: form.name,
-        phone: form.phone,
+        phoneNumber: form.phone,
         position: form.position,
         birthDate: form.birthDate,
-        gender: form.gender,
+        gender: form.gender || undefined,
       });
       setUser(form);
       setEditing(false);
