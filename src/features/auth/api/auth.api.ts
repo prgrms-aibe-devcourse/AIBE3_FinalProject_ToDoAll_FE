@@ -49,6 +49,6 @@ export async function signup(payload: {
   companyName: string;
   password: string;
 }) {
-  const res = await http.post('/v1/auth/signup', payload);
+  const res = await http.post('/v1/users', payload);
   return res.data;
 }

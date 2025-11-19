@@ -5,7 +5,6 @@ import AuthShell from '../components/AuthShell';
 import PrivacyModal from '../components/PrivacyModal';
 import ReqBadge from '../components/ReqBadge';
 import { buildPasswordChecks } from '../utils/passwordChecks';
-import { verifyCompanyEmailToken } from '../api/auth.api.ts';
 import { signup } from '../api/auth.api.ts';
 
 export default function SignupFormPage() {
@@ -86,35 +85,15 @@ export default function SignupFormPage() {
 
   useEffect(() => {
     //  1) 토큰 없으면 폼 진입 금지
-    if (!token) {
-      alert('이메일 인증이 필요합니다.');
+    if (!token || !emailFromUrl) {
+      alert('유효하지 않은 회원가입 링크입니다. 다시 이메일 인증을 진행해주세요.');
       navigate('/signup/email', { replace: true });
       return;
     }
-
-    //  2) 토큰 검증 → 성공 시 회사 이메일 고정, 실패 시 되돌리기
-    (async () => {
-      try {
-        const data = await verifyCompanyEmailToken(token);
-        if (!data?.verified || !data.email) {
-          alert('유효하지 않은 인증 링크입니다.');
-          navigate('/signup/email', { replace: true });
-          return;
-        }
-        if (emailFromUrl && emailFromUrl !== data.email) {
-          alert('인증 정보가 일치하지 않습니다. 다시 이메일 인증을 진행해주세요.');
-          navigate('/signup/email', { replace: true });
-          return;
-        }
-        setCompanyEmail(data.email); // 읽기전용 필드에 표시
-      } catch {
-        alert('인증 링크 확인에 실패했습니다. 다시 시도해주세요.');
-        navigate('/signup/email', { replace: true });
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [token, navigate, emailFromUrl]);
+    // URL에서 받은 이메일을 그대로 고정
+    setCompanyEmail(emailFromUrl);
+    setLoading(false);
+  }, [token, emailFromUrl, navigate]);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
