@@ -1,4 +1,4 @@
-import http from '../../../lib/http.ts';
+import { request, unwrap } from '@lib/utils/base.ts';
 
 // 타입 정의
 export interface LoginRequest {
@@ -11,11 +11,14 @@ export interface LoginResponse {
   refreshToken?: string;
 }
 
-//  로그인
+//  로그인 API
 export async function login(dto: LoginRequest): Promise<LoginResponse> {
-  const { data } = await http.post('/v1/auth/token', dto);
+  const raw = await request<any>('/v1/auth/token', {
+    method: 'POST',
+    body: JSON.stringify(dto),
+  });
 
-  const { accessToken, refreshToken } = data.data ?? {};
+  const { accessToken, refreshToken } = unwrap<LoginResponse>(raw) ?? {};
 
   if (accessToken) {
     sessionStorage.setItem('accessToken', accessToken);
@@ -27,37 +30,55 @@ export async function login(dto: LoginRequest): Promise<LoginResponse> {
   return { accessToken, refreshToken };
 }
 
-//  로그아웃
+//  로그아웃 API
 export async function logout() {
-  await http.post('/v1/auth/logout', {});
+  await request<void>('/v1/auth/logout', {
+    method: 'POST',
+    body: JSON.stringify({}), // 바디가 필요 없더라도 빈 객체를 보내주던 기존 동작 유지
+  });
   sessionStorage.removeItem('accessToken');
   sessionStorage.removeItem('refreshToken');
 }
 
 // 로그인 전 비번 찾기
 export async function requestResetEmail(email: string) {
-  await http.post('/v1/auth/password/reset-requests', { email });
+  await request<void>('/v1/auth/password/reset-requests', {
+    method: 'POST',
+    body: JSON.stringify({ email }),
+  });
 }
-
+// 토큰으로 비번 찾기
 export async function resetPasswordByToken(token: string, newPassword: string) {
-  await http.post('/v1/auth/password/reset', { token, newPassword });
+  await request<void>('/v1/auth/password/reset', {
+    method: 'POST',
+    body: JSON.stringify({ token, newPassword }),
+  });
 }
 
 //  회원가입 전 회사 이메일 인증
 
 // 이메일 인증 링크 요청
 export async function sendCompanyVerifyLink(email: string) {
-  await http.post('/v1/auth/email-verifications', { email });
+  await request<void>('/v1/auth/email-verifications', {
+    method: 'POST',
+    body: JSON.stringify({ email }),
+  });
 }
 
 // 이메일 토큰 검증
 export async function verifyCompanyEmailToken(token: string) {
-  const { data } = await http.get('/v1/auth/email-verifications/complete', { params: { token } });
+  const path = `/v1/auth/email-verifications/complete?token=${encodeURIComponent(token)}`;
+  // GET 요청 보내기
+  const raw = await request<any>(path, {
+    method: 'GET',
+  });
 
-  if (data?.verified && data.email) {
-    sessionStorage.setItem('verifiedCompanyEmail', data.email);
+  // 응답에서 verified + email을 보고, 인증된 이메일 저장
+  if (raw?.verified && raw.email) {
+    // 이메일 인증이 완료된 회사 이메일을 세션 스토리지에 저장
+    sessionStorage.setItem('verifiedCompanyEmail', raw.email);
   }
-  return data;
+  return raw;
 }
 
 // 회원가입 요청
@@ -70,6 +91,10 @@ export async function signup(payload: {
   companyName: string;
   password: string;
 }) {
-  const res = await http.post('/v1/users', payload);
-  return res.data.data ?? res.data;
+  const raw = await request<any>('/v1/users', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+
+  return raw?.data ?? raw;
 }

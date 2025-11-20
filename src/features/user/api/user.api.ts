@@ -1,11 +1,6 @@
-import http from '../../../lib/http.ts'; // 공통 래퍼 사용
+import { request } from '@lib/utils/base.ts';
 
-export async function getMe() {
-  // 로그인 후에만 접근 가능한 내 정보 API
-  const { data } = await http.get('/v1/users/me');
-  return data.data; // 페이지에서 그대로 setState하기 쉽도록 raw로 반환
-}
-
+// 내 정보 수정 API
 export async function updateMe(payload: {
   name?: string;
   nickname?: string;
@@ -13,12 +8,27 @@ export async function updateMe(payload: {
   position?: string;
   birthDate?: string;
   gender?: 'MALE' | 'FEMALE' | 'OTHER';
-}) {
-  const { data } = await http.patch('/v1/users/me', payload);
-  return data.data; // 서버가 최신 데이터를 다시 내려주면 그대로 반영할 수 있음
+  profileUrl?: string;
+}): Promise<any> {
+  const raw = await request<any>('/v1/users/me', {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+  return raw?.data ?? raw;
 }
 
-export async function changePassword(currentPassword: string, newPassword: string) {
-  // 로그인 후 "내 비번 변경" — 인증 필요
-  await http.patch('/v1/users/me/password', { currentPassword, newPassword });
+//  내 정보 조회 API
+export async function getMe(): Promise<unknown> {
+  const data = await request<any>('/v1/users/me', {
+    method: 'GET',
+  });
+
+  return data?.data ?? data;
+}
+// 비밀번호 변경 API
+export async function changePassword(currentPassword: string, newPassword: string): Promise<void> {
+  await request<void>('/v1/users/me/password', {
+    method: 'PATCH',
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
 }

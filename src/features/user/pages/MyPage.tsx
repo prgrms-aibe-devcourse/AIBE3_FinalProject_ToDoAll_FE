@@ -23,6 +23,17 @@ export default function MyPage() {
     gender: '' as Gender,
     profile: '/default-profile.png',
   });
+  type MeResponse = {
+    name?: string | null;
+    email?: string | null;
+    nickname?: string | null;
+    phoneNumber?: string | null;
+    companyName?: string | null;
+    position?: string | null;
+    birthDate?: string | null;
+    gender?: 'MALE' | 'FEMALE' | 'OTHER' | null;
+    profileUrl?: string | null;
+  };
 
   const [form, setForm] = useState(user);
 
@@ -31,30 +42,31 @@ export default function MyPage() {
     getMe()
       .then((data) => {
         console.log('getMe 응답:', data);
+        const me = data as MeResponse;
         setUser((prev) => ({
           ...prev,
-          name: data.name,
-          email: data.email,
-          nickname: data.nickname,
-          phone: data.phoneNumber ?? '',
-          company: data.companyName ?? '',
-          position: data.position ?? '',
-          birthDate: data.birthDate ?? '',
-          gender: (data.gender ?? '') as Gender,
-          profile: data.profileUrl || prev.profile,
+          name: me.name ?? prev.name,
+          email: me.email ?? prev.email,
+          nickname: me.nickname ?? prev.nickname,
+          phone: me.phoneNumber ?? prev.phone,
+          company: me.companyName ?? prev.company,
+          position: me.position ?? prev.position,
+          birthDate: me.birthDate ?? prev.birthDate,
+          gender: (me.gender ?? prev.gender) as Gender,
+          profile: me.profileUrl || prev.profile,
         }));
         // 폼에도 동일값 반영
         setForm((f) => ({
           ...f,
-          name: data.name ?? f.name,
-          email: data.email ?? f.email,
-          nickname: data.nickname ?? f.nickname,
-          phone: data.phoneNumber ?? f.phone,
-          company: data.companyName ?? f.company,
-          position: data.position ?? f.position,
-          birthDate: data.birthDate ?? f.birthDate,
-          gender: (data.gender ?? f.gender) as Gender,
-          profile: data.profileUrl || f.profile,
+          name: me.name ?? f.name,
+          email: me.email ?? f.email,
+          nickname: me.nickname ?? f.nickname,
+          phone: me.phoneNumber ?? f.phone,
+          company: me.companyName ?? f.company,
+          position: me.position ?? f.position,
+          birthDate: me.birthDate ?? f.birthDate,
+          gender: (me.gender ?? f.gender) as Gender,
+          profile: me.profileUrl || f.profile,
         }));
       })
       .catch((err) => {
@@ -132,6 +144,7 @@ export default function MyPage() {
       alert('저장에 실패했습니다.');
     }
   };
+
   // 비밀번호 변경 관련 상태 & 로직
 
   const [currentPassword, setCurrentPassword] = useState(''); // 현재 비밀번호 입력값
@@ -169,35 +182,34 @@ export default function MyPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start bg-[var(--color-jd-white)] font-[var(--default-font-family)] px-6 sm:px-6 md:px-8 py-10 sm:py-12">
-      <div className="w-full max-w-[860px] mb-6 mt-10">
-        <h2 className="text-xl sm:text-2xl font-bold text-[var(--color-jd-black)] text-left ml-2">
+    <div className="flex min-h-screen flex-col items-center justify-start bg-[var(--color-jd-white)] px-6 py-10 font-[var(--default-font-family)] sm:px-6 sm:py-12 md:px-8">
+      <div className="mt-10 mb-6 w-full max-w-[860px]">
+        <h2 className="ml-2 text-left text-xl font-bold text-[var(--color-jd-black)] sm:text-2xl">
           마이페이지
         </h2>
       </div>
 
       {/* 메인 카드 */}
-      <div className="bg-white rounded-3xl shadow-[0_6px_12px_#00000025] w-full max-w-[900px] p-8 sm:p-10 md:p-10">
+      <div className="w-full max-w-[900px] rounded-3xl bg-white p-8 shadow-[0_6px_12px_#00000025] sm:p-10 md:p-10">
         {/* X → 이전 페이지로 */}
-        <div className="w-full max-w-[860px] flex items-center justify-end mb-6 ">
+        <div className="mb-6 flex w-full max-w-[860px] items-center justify-end">
           <button
             aria-label="닫기"
             onClick={() => navigate(-1)}
-            className="w-9 h-9 rounded-full flex items-center justify-center
-               text-[var(--color-jd-black)] hover:bg-[var(--color-jd-gray-light)]"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-[var(--color-jd-black)] hover:bg-[var(--color-jd-gray-light)]"
           >
             X
           </button>
         </div>
 
         {/* 프로필 + 정보 */}
-        <div className="flex flex-col sm:flex-row gap-8 sm:gap-12 mb-8">
+        <div className="mb-8 flex flex-col gap-8 sm:flex-row sm:gap-12">
           {/* 프로필 */}
-          <div className="w-full sm:w-40 self-center sm:self-start">
-            <div className="mx-auto sm:mx-0 w-28 h-28 sm:w-40 sm:h-40 rounded-full bg-[var(--color-jd-gray-light)] overflow-hidden mb-3">
-              <img src={user.profile} alt="profile" className="w-full h-full object-cover" />
+          <div className="w-full self-center sm:w-40 sm:self-start">
+            <div className="mx-auto mb-3 h-28 w-28 overflow-hidden rounded-full bg-[var(--color-jd-gray-light)] sm:mx-0 sm:h-40 sm:w-40">
+              <img src={user.profile} alt="profile" className="h-full w-full object-cover" />
             </div>
-            <button className="w-full bg-[var(--color-jd-gray-light)] rounded-md py-2 text-sm mt-4">
+            <button className="mt-4 w-full rounded-md bg-[var(--color-jd-gray-light)] py-2 text-sm">
               사진 변경
             </button>
           </div>
@@ -205,17 +217,17 @@ export default function MyPage() {
           {/* 정보 폼/뷰 */}
           {/* ===== 기본 정보 섹션 ===== */}
           <div className="flex-1">
-            <h3 className="text-sm font-semibold text-[var(--color-jd-gray-dark)] pb-2 mb-4 border-b border-black/10">
+            <h3 className="mb-4 border-b border-black/10 pb-2 text-sm font-semibold text-[var(--color-jd-gray-dark)]">
               기본 정보
             </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-[110px_1fr] gap-y-6 md:gap-y-7 gap-x-4 text-[var(--color-jd-black)]">
-              <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
+            <div className="grid grid-cols-1 gap-x-4 gap-y-6 text-[var(--color-jd-black)] sm:grid-cols-[110px_1fr] md:gap-y-7">
+              <label className="self-center font-semibold text-[var(--color-jd-gray-dark)]">
                 이메일
               </label>
               <div className="self-center font-semibold">{user.email}</div>
 
-              <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
+              <label className="self-center font-semibold text-[var(--color-jd-gray-dark)]">
                 이름
               </label>
               {editing ? (
@@ -223,13 +235,13 @@ export default function MyPage() {
                   name="name"
                   value={form.name}
                   onChange={onInputChange}
-                  className="border rounded-md px-3 py-2"
+                  className="rounded-md border px-3 py-2"
                 />
               ) : (
                 <div className="self-center font-semibold">{user.name}</div>
               )}
 
-              <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
+              <label className="self-center font-semibold text-[var(--color-jd-gray-dark)]">
                 닉네임
               </label>
               {editing ? (
@@ -237,7 +249,7 @@ export default function MyPage() {
                   name="nickname"
                   value={form.nickname}
                   onChange={onInputChange}
-                  className="border rounded-md px-3 py-2"
+                  className="rounded-md border px-3 py-2"
                   type="nickname"
                   placeholder="예: 잡다닉"
                 />
@@ -245,7 +257,7 @@ export default function MyPage() {
                 <div className="self-center font-bold">{user.nickname}</div>
               )}
 
-              <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
+              <label className="self-center font-semibold text-[var(--color-jd-gray-dark)]">
                 전화번호 (선택)
               </label>
               {editing ? (
@@ -253,7 +265,7 @@ export default function MyPage() {
                   name="phone"
                   value={form.phone}
                   onChange={onInputChange}
-                  className="border rounded-md px-3 py-2"
+                  className="rounded-md border px-3 py-2"
                   type="tel"
                   placeholder="예: 010-1234-5678"
                 />
@@ -262,7 +274,7 @@ export default function MyPage() {
               )}
 
               {/* [추가] 생일 */}
-              <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
+              <label className="self-center font-semibold text-[var(--color-jd-gray-dark)]">
                 생일 (선택)
               </label>
               {editing ? (
@@ -270,7 +282,7 @@ export default function MyPage() {
                   name="birthDate"
                   value={form.birthDate}
                   onChange={onInputChange}
-                  className="border rounded-md px-3 py-2"
+                  className="rounded-md border px-3 py-2"
                   type="date"
                   placeholder="예: 1999-02-15" // [추가] 예시 표기(브라우저에 따라 미표시될 수 있음)
                 />
@@ -279,7 +291,7 @@ export default function MyPage() {
               )}
 
               {/* [추가] 성별 */}
-              <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
+              <label className="self-center font-semibold text-[var(--color-jd-gray-dark)]">
                 성별 (선택)
               </label>
               {editing ? (
@@ -287,7 +299,7 @@ export default function MyPage() {
                   name="gender"
                   value={form.gender}
                   onChange={onSelectChange}
-                  className="border rounded-md px-3 py-2 bg-white"
+                  className="rounded-md border bg-white px-3 py-2"
                 >
                   <option value="">(선택 없음)</option>
                   <option value="MALE">남성</option>
@@ -308,17 +320,17 @@ export default function MyPage() {
             </div>
 
             {/* ===== 조직 정보 섹션 ===== */}
-            <h3 className="text-sm font-semibold text-[var(--color-jd-gray-dark)] pb-2 mt-8 mb-4 border-b border-black/10">
+            <h3 className="mt-8 mb-4 border-b border-black/10 pb-2 text-sm font-semibold text-[var(--color-jd-gray-dark)]">
               조직 정보
             </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-[110px_1fr] gap-y-6 md:gap-y-7 gap-x-4 text-[var(--color-jd-black)]">
-              <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
+            <div className="grid grid-cols-1 gap-x-4 gap-y-6 text-[var(--color-jd-black)] sm:grid-cols-[110px_1fr] md:gap-y-7">
+              <label className="self-center font-semibold text-[var(--color-jd-gray-dark)]">
                 회사
               </label>
               <div className="self-center font-semibold">{user.company}</div>
 
-              <label className="text-[var(--color-jd-gray-dark)] font-semibold self-center">
+              <label className="self-center font-semibold text-[var(--color-jd-gray-dark)]">
                 직책
               </label>
               {editing ? (
@@ -326,7 +338,7 @@ export default function MyPage() {
                   name="position"
                   value={form.position}
                   onChange={onInputChange}
-                  className="border rounded-md px-3 py-2"
+                  className="rounded-md border px-3 py-2"
                   placeholder="예: 매니저"
                 />
               ) : (
@@ -337,18 +349,18 @@ export default function MyPage() {
         </div>
 
         {/* 버튼 영역 */}
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-end">
+        <div className="flex flex-col justify-end gap-3 sm:flex-row sm:gap-4">
           {editing ? (
             <>
               <button
                 onClick={onCancel}
-                className="w-full sm:w-auto px-6 py-2 rounded-md bg-[var(--color-jd-gray-light)]"
+                className="w-full rounded-md bg-[var(--color-jd-gray-light)] px-6 py-2 sm:w-auto"
               >
                 취소
               </button>
               <button
                 onClick={onSave}
-                className="w-full sm:w-auto px-6 py-2 rounded-md bg-[var(--color-jd-scarlet)] text-white"
+                className="w-full rounded-md bg-[var(--color-jd-scarlet)] px-6 py-2 text-white sm:w-auto"
               >
                 저장
               </button>
@@ -357,13 +369,13 @@ export default function MyPage() {
             <>
               <button
                 onClick={() => setEditing(true)}
-                className="px-6 py-2 rounded-md bg-[var(--color-jd-scarlet)] text-white"
+                className="rounded-md bg-[var(--color-jd-scarlet)] px-6 py-2 text-white"
               >
                 회원 정보 수정
               </button>
               <button
                 onClick={() => setExpandPassword((v) => !v)}
-                className="px-6 py-2 rounded-md bg-[var(--color-jd-yellow)] !text-white"
+                className="rounded-md bg-[var(--color-jd-yellow)] px-6 py-2 !text-white"
               >
                 {expandPassword ? '비밀번호 변경 닫기' : '비밀번호 변경'}
               </button>
@@ -373,7 +385,7 @@ export default function MyPage() {
 
         {/* 비밀번호 변경 섹션 */}
         {expandPassword && (
-          <div className="mt-8 rounded-2xl border border-[var(--color-jd-gray-light)] p-6 bg-[var(--color-jd-white)]">
+          <div className="mt-8 rounded-2xl border border-[var(--color-jd-gray-light)] bg-[var(--color-jd-white)] p-6">
             {!recentlyReauthed && (
               <div className="mb-3 text-sm text-[var(--color-jd-gray-dark)]">
                 보안을 위해 다시 한 번 비밀번호를 확인해야 합니다. (5분 경과)
@@ -425,13 +437,13 @@ export default function MyPage() {
                   setPasswordSuccess(null);
                 }
               }}
-              className="grid gap-3 max-w-md"
+              className="grid max-w-md gap-3"
             >
               {/* 현재 비밀번호 입력 */}
               <input
                 type="password"
                 placeholder="현재 비밀번호"
-                className="border rounded-md px-4 py-2"
+                className="rounded-md border px-4 py-2"
                 required
                 value={currentPassword} // state와 연결
                 onChange={(e) => {
@@ -446,7 +458,7 @@ export default function MyPage() {
               <input
                 type="password"
                 placeholder="새 비밀번호"
-                className="border rounded-md px-4 py-2"
+                className="rounded-md border px-4 py-2"
                 required
                 value={newPassword} // state와 연결
                 onChange={(e) => {
@@ -461,7 +473,7 @@ export default function MyPage() {
               <input
                 type="password"
                 placeholder="새 비밀번호 확인"
-                className="border rounded-md px-4 py-2"
+                className="rounded-md border px-4 py-2"
                 required
                 value={newPasswordConfirm} // state와 연결
                 onChange={(e) => {
@@ -473,12 +485,12 @@ export default function MyPage() {
               />
 
               {/* 비밀번호 검증 메시지 영역 */}
-              {passwordError && <p className="text-sm text-red-500 mt-1">{passwordError}</p>}
+              {passwordError && <p className="mt-1 text-sm text-red-500">{passwordError}</p>}
               {!passwordError && passwordSuccess && (
-                <p className="text-sm text-green-600 mt-1">{passwordSuccess}</p>
+                <p className="mt-1 text-sm text-green-600">{passwordSuccess}</p>
               )}
 
-              <button className="mt-2 bg-[var(--color-jd-violet)] hover:bg-[var(--color-jd-violet-hover)] text-white rounded-md px-5 py-2">
+              <button className="mt-2 rounded-md bg-[var(--color-jd-violet)] px-5 py-2 text-white hover:bg-[var(--color-jd-violet-hover)]">
                 비밀번호 변경 저장
               </button>
             </form>

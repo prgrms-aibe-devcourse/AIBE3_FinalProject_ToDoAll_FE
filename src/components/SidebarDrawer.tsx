@@ -1,15 +1,52 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import ConfirmLogoutModal from '../features/user/components/ConfirmLogoutModal.tsx';
+import { getMe } from '../features/user/api/user.api.ts';
+import { logout } from '../features/auth/api/auth.api.ts';
 
 type Props = {
   open: boolean;
   onClose: () => void;
 };
 
+type DrawerUser = {
+  nickname: string;
+  email: string;
+  profileUrl: string | null;
+};
+
 export default function SidebarDrawer({ open, onClose }: Props) {
   const navigate = useNavigate();
   const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const [user, setUser] = useState<DrawerUser | null>(null);
+
+  useEffect(() => {
+    // 드로어가 열려 있을 때만 불러와도 되고, 한 번만 불러와도 됨
+    getMe()
+      .then((data) => {
+        const userData = data as {
+          nickname?: string | null;
+          email?: string | null;
+          profileUrl?: string | null;
+        };
+
+        setUser({
+          nickname: userData.nickname ?? '',
+          email: userData.email ?? '',
+          profileUrl: userData.profileUrl ?? null,
+        });
+      })
+      .catch((err) => {
+        console.error('SidebarDrawer getMe 실패:', err);
+        // 실패해도 UI는 기본 아바타 + 빈 텍스트로 표시
+        setUser({
+          nickname: '',
+          email: '',
+          profileUrl: null,
+        });
+      });
+  }, []);
 
   return (
     <>
@@ -125,8 +162,10 @@ export default function SidebarDrawer({ open, onClose }: Props) {
                 className="h-9 w-9 rounded-full object-cover"
               />
               <div className="leading-tight">
-                <div className="text-sm font-semibold">nickname</div>
-                <div className="text-[11px] text-gray-500">abcd@d.d.kr</div>
+                <div className="text-sm font-semibold">{user?.nickname || '마이페이지'}</div>
+                <div className="text-[11px] text-gray-500">
+                  {user?.email || '프로필을 확인해 보세요'}
+                </div>
               </div>
             </div>
 
@@ -159,10 +198,21 @@ export default function SidebarDrawer({ open, onClose }: Props) {
       <ConfirmLogoutModal
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
-        onConfirm={() => {
+        onConfirm={async () => {
           setConfirmOpen(false);
-          // TODO: 실제 로그아웃 로직(토큰 삭제 등)
-          navigate('/login');
+          try {
+            // 실제 로그아웃 API + sessionStorage 토큰 삭제
+            await logout();
+          } catch (error) {
+            console.error('로그아웃 API 호출 실패:', error);
+          } finally {
+            // 재인증 시간 등 추가 상태도 정리
+            localStorage.removeItem('reauthAt');
+
+            // 드로어 닫고 로그인 페이지로 이동
+            onClose();
+            navigate('/login', { replace: true });
+          }
         }}
       />
     </>
