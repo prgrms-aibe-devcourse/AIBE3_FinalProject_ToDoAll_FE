@@ -1,4 +1,4 @@
-import { request, unwrap } from '@lib/utils/base.ts';
+import { request, unwrap } from '../../../lib/utils/base';
 
 // 타입 정의
 export interface LoginRequest {
@@ -21,7 +21,7 @@ export async function login(dto: LoginRequest): Promise<LoginResponse> {
   const { accessToken, refreshToken } = unwrap<LoginResponse>(raw) ?? {};
 
   if (accessToken) {
-    sessionStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('accessToken', accessToken);
   }
 
   if (refreshToken) {
@@ -32,12 +32,27 @@ export async function login(dto: LoginRequest): Promise<LoginResponse> {
 
 //  로그아웃 API
 export async function logout() {
+  // 1. 저장해둔 refreshToken 꺼내기
+  const refreshToken =
+    sessionStorage.getItem('refreshToken') || localStorage.getItem('refreshToken');
+
+  // 2. 아예 없으면 백엔드에 굳이 안 보내고
+  //    클라이언트 쪽 상태만 정리하고 끝내도 됨
+  if (!refreshToken) {
+    sessionStorage.removeItem('accessToken');
+    sessionStorage.removeItem('refreshToken');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    return;
+  }
   await request<void>('/v1/auth/logout', {
     method: 'POST',
-    body: JSON.stringify({}), // 바디가 필요 없더라도 빈 객체를 보내주던 기존 동작 유지
+    body: JSON.stringify({ refreshToken }),
   });
   sessionStorage.removeItem('accessToken');
   sessionStorage.removeItem('refreshToken');
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
 }
 
 // 로그인 전 비번 찾기

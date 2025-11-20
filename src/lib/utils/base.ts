@@ -1,34 +1,38 @@
 /* global RequestInit, HeadersInit */
-
+// 백엔드 기본 주소
 export const BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 
 export async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  // 1) 로그인할 때 localStorage 에 저장해둔 accessToken 꺼냄
+  const accessToken = localStorage.getItem('accessToken');
+
+  // 2) /v1/users/me
   const url = path.startsWith('http') ? path : `${BASE_URL}${path}`;
 
-  const defaultHeaders: HeadersInit = {
-    'Content-Type': 'application/json',
-  };
-
+  // 3) 기본 헤더 + 토큰
   const headers: HeadersInit = {
-    ...defaultHeaders,
-    ...(options.headers ?? {}),
+    'Content-Type': 'application/json',
+    ...(options.headers || {}),
+    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
   };
 
-  const response = await fetch(url, {
+  // 4) fetch 호출
+  const res = await fetch(url, {
     ...options,
     headers,
     credentials: 'include',
   });
 
+  // 5) 응답 파싱
   let body: unknown;
   try {
-    body = await response.json();
+    body = await res.json();
   } catch {
     body = null;
   }
 
-  if (!response.ok) {
-    const message = (body as any)?.message ?? `요청 실패 (status=${response.status})`;
+  if (!res.ok) {
+    const message = (body as any)?.message ?? `요청 실패 (status=${res.status})`;
     throw new Error(message);
   }
 
@@ -36,8 +40,5 @@ export async function request<T>(path: string, options: RequestInit = {}): Promi
 }
 
 export function unwrap<T>(raw: any): T {
-  if (raw && typeof raw === 'object' && 'data' in raw) {
-    return raw.data as T;
-  }
-  return raw as T;
+  return raw?.data ?? raw;
 }

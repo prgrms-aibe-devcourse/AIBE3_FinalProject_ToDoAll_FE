@@ -1,4 +1,4 @@
-import { request } from '@lib/utils/base.ts';
+import { request } from '../../../lib/utils/base';
 
 // 내 정보 수정 API
 export async function updateMe(payload: {
