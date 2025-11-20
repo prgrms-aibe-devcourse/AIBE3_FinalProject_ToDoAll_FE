@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getMe, updateMe, changePassword } from '../api/user.api.ts';
+import ReqBadge from '@features/auth/components/ReqBadge.tsx';
+import { buildPasswordChecks } from '@features/auth/utils/passwordChecks.ts';
 
 type Focus = 'profile' | 'password' | undefined;
 
@@ -37,7 +39,7 @@ export default function MyPage() {
 
   const [form, setForm] = useState(user);
 
-  // 마운트 시 내 정보 실제 조회 → 화면/폼에 반영
+  // 1) 내 정보 조회
   useEffect(() => {
     getMe()
       .then((data) => {
@@ -71,22 +73,33 @@ export default function MyPage() {
       })
       .catch((err) => {
         console.log('getMe 응답:', err);
-        alert('내 정보 조회에 실패했습니다.');
+        alert('내 정보 조회에 실패했습니다. 다시 로그인 후 시도해주세요.');
       });
   }, [navigate]);
+
+  // 2) 최근 재인증 여부
 
   const [recentlyReauthed, setRecentlyReauthed] = useState(false); //TTL을 상태로 보유 → UI가 자동 갱신됨
   useEffect(() => {
     const checkReauth = () => {
-      const at = Number(localStorage.getItem('reauthAt') || 0); //현재 저장된 재인증 시각 읽기
-      setRecentlyReauthed(Date.now() - at < 5 * 60 * 1000); //5분 이내면 true
+      const raw = localStorage.getItem('reauthAt') || '0';
+      const at = Number(raw);
+      const flag = Date.now() - at < 5 * 60 * 1000; //5분 이내면 true
+
+      console.log('최근 재인증 체크:', { raw, at, recentlyReauthed: flag });
+
+      setRecentlyReauthed(flag);
     };
 
-    checkReauth(); //마운트 즉시 1회 평가 → 초기 표시 정확
+    checkReauth(); //마운트 즉시 1회 평가
     const interval = setInterval(checkReauth, 60 * 1000); //  1분 주기로
+
     const onStorage = (e: StorageEvent) => {
       // 다른 탭에서 reauthAt 갱신 시 동기화
       if (e.key === 'reauthAt') checkReauth();
+
+      console.log('reauthAt 변경 감지:', e.newValue);
+      checkReauth();
     };
     window.addEventListener('storage', onStorage); // storage 이벤트 등록
 
@@ -107,7 +120,14 @@ export default function MyPage() {
 
   //  공통 업데이트 도우미(안전하게 키 제한)
   type FormKeys = 'name' | 'nickname' | 'phone' | 'position' | 'birthDate' | 'gender';
-  const updateForm = (name: FormKeys, value: string) => setForm((f) => ({ ...f, [name]: value }));
+
+  const updateForm = (name: FormKeys, value: string) => {
+    setForm((f) => {
+      const next = { ...f, [name]: value };
+      console.log('폼 변경:', { field: name, value, next });
+      return next;
+    });
+  };
 
   // input 전용
   const onInputChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -122,13 +142,22 @@ export default function MyPage() {
   };
 
   const onCancel = () => {
+    console.log('수정 취소', user);
     setForm(user);
     setEditing(false);
   };
 
-  //  API 연동: 내 정보 저장
+  // 내 정보 저장
   const onSave = async () => {
     try {
+      console.log('[MyPage] 저장 요청 payload:', {
+        name: form.name,
+        nickname: form.nickname,
+        phoneNumber: form.phone,
+        position: form.position,
+        birthDate: form.birthDate,
+        gender: form.gender || undefined,
+      });
       await updateMe({
         name: form.name,
         nickname: form.nickname,
@@ -140,8 +169,9 @@ export default function MyPage() {
       setUser(form);
       setEditing(false);
       alert('저장되었습니다.');
-    } catch {
-      alert('저장에 실패했습니다.');
+    } catch (e) {
+      console.error('updateMe 실패:', e);
+      alert('저장 중 문제가 발생했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -154,6 +184,18 @@ export default function MyPage() {
   const [passwordError, setPasswordError] = useState<string | null>(null); // 비밀번호 관련 에러 메시지
   const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null); // 비밀번호 관련 성공/안내 메시지
 
+  // 비밀번호 강도/조건 체크용 개인정보 후보
+  const piiSources: string[] = [
+    user.name,
+    user.email,
+    user.nickname,
+    user.phone,
+    user.company,
+  ].filter(Boolean);
+
+  // 새 비밀번호에 대한 조건 체크
+  const checks = buildPasswordChecks(newPassword, piiSources);
+
   // 비밀번호 입력 검증 함수
   const validatePasswords = (cur: string, next: string, nextConfirm: string) => {
     // 먼저 메시지 초기화
@@ -161,9 +203,7 @@ export default function MyPage() {
     setPasswordSuccess(null);
 
     // 새 비밀번호/확인 비밀번호 둘 중 하나라도 비어 있으면 아직 판단하지 않음
-    if (!next || !nextConfirm) {
-      return; // 아무 메시지도 띄우지 않음
-    }
+    if (!next || !nextConfirm) return;
 
     // 새 비밀번호와 확인 비밀번호가 다를 때
     if (next !== nextConfirm) {
@@ -395,14 +435,21 @@ export default function MyPage() {
               onSubmit={async (e) => {
                 e.preventDefault(); // 기본 submit 동작 막기
 
-                // 제출 시 최종 검증: 새 비밀번호 일치 여부
+                // 1) 새 비밀번호 / 확인 비밀번호 일치 여부
                 if (newPassword !== newPasswordConfirm) {
                   setPasswordError('새 비밀번호와 확인 비밀번호가 일치하지 않습니다.');
                   setPasswordSuccess(null);
                   return;
                 }
 
-                // 제출 시 최종 검증: 현재 비밀번호와 새 비밀번호 동일 여부
+                // 2) 비밀번호 규칙(영문/숫자/길이/PII) 체크
+                if (!checks.english || !checks.digit || !checks.length || !checks.notContainsPII) {
+                  setPasswordError('비밀번호 조건을 모두 충족해야 합니다.');
+                  setPasswordSuccess(null);
+                  return;
+                }
+
+                // 3) 현재 비밀번호와 다른지
                 if (currentPassword && currentPassword === newPassword) {
                   setPasswordError(
                     '현재 비밀번호와 새 비밀번호가 같습니다. 다른 비밀번호를 입력해주세요.'
@@ -440,6 +487,7 @@ export default function MyPage() {
               className="grid max-w-md gap-3"
             >
               {/* 현재 비밀번호 입력 */}
+
               <input
                 type="password"
                 placeholder="현재 비밀번호"
@@ -455,19 +503,28 @@ export default function MyPage() {
               />
 
               {/* 새 비밀번호 입력 */}
-              <input
-                type="password"
-                placeholder="새 비밀번호"
-                className="rounded-md border px-4 py-2"
-                required
-                value={newPassword} // state와 연결
-                onChange={(e) => {
-                  const value = e.target.value; // 입력값
-                  setNewPassword(value); // 상태 업데이트
-                  // 새 비밀번호 검증 재실행
-                  validatePasswords(currentPassword, value, newPasswordConfirm);
-                }}
-              />
+              <div className="flex flex-col gap-2">
+                <input
+                  type="password"
+                  placeholder="새 비밀번호"
+                  className="rounded-md border px-4 py-2"
+                  required
+                  value={newPassword} // state와 연결
+                  onChange={(e) => {
+                    const value = e.target.value; // 입력값
+                    setNewPassword(value); // 상태 업데이트
+                    // 새 비밀번호 검증 재실행
+                    validatePasswords(currentPassword, value, newPasswordConfirm);
+                  }}
+                />
+                {/* 비밀번호 조건 뱃지 영역 */}
+                <div className="mt-1 flex flex-wrap gap-2">
+                  <ReqBadge ok={checks.english} label="영문자" />
+                  <ReqBadge ok={checks.digit} label="숫자" />
+                  <ReqBadge ok={checks.length} label="8자 이상" />
+                  <ReqBadge ok={checks.notContainsPII} label="개인정보 미포함" />
+                </div>
+              </div>
 
               {/* 새 비밀번호 확인 입력 */}
               <input
