@@ -18,7 +18,21 @@ export async function login(dto: LoginRequest): Promise<LoginResponse> {
     body: JSON.stringify(dto),
   });
 
-  const { accessToken, refreshToken } = unwrap<LoginResponse>(raw) ?? {};
+  // 1) 공통 응답에서 data 꺼내기 (또는 raw 자체)
+  const result = unwrap<LoginResponse>(raw);
+
+  // 2) 기본적인 타입/필수값 검증
+  if (
+    !result || // null / undefined
+    typeof result !== 'object' ||
+    typeof result.accessToken !== 'string' ||
+    !result.accessToken.trim()
+  ) {
+    console.error('로그인 응답 포맷이 올바르지 않습니다:', raw);
+    throw new Error('로그인 응답에 accessToken이 없습니다.');
+  }
+
+  const { accessToken, refreshToken } = result;
 
   if (accessToken) {
     localStorage.setItem('accessToken', accessToken);
@@ -32,11 +46,11 @@ export async function login(dto: LoginRequest): Promise<LoginResponse> {
 
 //  로그아웃 API
 export async function logout() {
-  // 1. 저장해둔 refreshToken 꺼내기
+  // 1) 저장해둔 refreshToken 꺼내기
   const refreshToken =
     sessionStorage.getItem('refreshToken') || localStorage.getItem('refreshToken');
 
-  // 2. 아예 없으면 백엔드에 굳이 안 보내고
+  // 2) 아예 없으면 백엔드에 굳이 안 보내고
   //    클라이언트 쪽 상태만 정리하고 끝내도 됨
   if (!refreshToken) {
     sessionStorage.removeItem('accessToken');
