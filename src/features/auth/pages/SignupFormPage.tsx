@@ -1,18 +1,21 @@
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import AuthShell from '../components/AuthShell';
 import PrivacyModal from '../components/PrivacyModal';
 import ReqBadge from '../components/ReqBadge';
 import { buildPasswordChecks } from '../utils/passwordChecks';
+import { signup } from '../api/auth.api.ts';
 
 export default function SignupFormPage() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
-  // 개발용: 토큰 없으면 자동으로 'dev-token' 사용
-  const token = searchParams.get('token') || 'dev-token';
+  // URL에서 email + token 둘 다 읽기
+  const token = searchParams.get('token'); // URL에서 토큰만 읽음
+  const emailFromUrl = searchParams.get('email') ?? ''; // 인증된 회사 이메일
 
-  const [companyEmail, setCompanyEmail] = useState('');
+  const [companyEmail, setCompanyEmail] = useState(emailFromUrl);
   const [loading, setLoading] = useState(true);
 
   // 필수 입력값 상태들 — 컴포넌트 "안"에서 선언
@@ -20,7 +23,7 @@ export default function SignupFormPage() {
   const [companyName, setCompanyName] = useState('');
   const [position, setPosition] = useState('');
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [nickname, setNickname] = useState(''); // [추가]
+  const [nickname, setNickname] = useState('');
 
   // 비밀번호 입력 상태
 
@@ -59,6 +62,7 @@ export default function SignupFormPage() {
   const [didSubmit, setDidSubmit] = useState(false);
   const [consentChecked, setConsentChecked] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [submitting, setSubmitting] = useState(false); // 중복 제출 막는 스위치
 
   //최종 유효성에 동의 포함
   const isFormValid = Boolean(
@@ -80,15 +84,22 @@ export default function SignupFormPage() {
   };
 
   useEffect(() => {
-    // 개발 중엔 서버 요청 대신 임시 이메일 세팅
-    const fakeEmail = 'developer@jobda.com';
-    setCompanyEmail(fakeEmail);
+    //  1) 토큰 없으면 폼 진입 금지
+    if (!token || !emailFromUrl) {
+      alert('유효하지 않은 회원가입 링크입니다. 다시 이메일 인증을 진행해주세요.');
+      navigate('/signup/email', { replace: true });
+      return;
+    }
+    // URL에서 받은 이메일을 그대로 고정
+    setCompanyEmail(emailFromUrl);
     setLoading(false);
-  }, [token]);
+  }, [token, emailFromUrl, navigate]);
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setDidSubmit(true);
+
+    if (submitting) return;
 
     // 텍스트 필수값 에러 수집
     const newErrors: { [key: string]: string } = {};
@@ -103,18 +114,32 @@ export default function SignupFormPage() {
     }
 
     //  최종 안전장치: 폼이 유효하지 않으면 전송 금지
-    if (!isFormValid) return;
+    if (!isFormValid || !token) return;
 
     setErrors({});
-    // TODO: 회원가입 요청 (token과 함께 전송)
-    console.log('회원가입 제출:', {
-      companyEmail,
-      companyName,
-      name,
-      nickname,
-      position,
-      passwordLen: password.length,
-    });
+    setSubmitting(true); // 전송 시작
+
+    try {
+      await signup({
+        token,
+        email: companyEmail,
+        name,
+        nickname,
+        position,
+        companyName,
+        password,
+      });
+
+      alert('가입이 완료되었습니다. 로그인 해주세요.');
+      navigate('/login', { replace: true });
+    } catch (e: any) {
+      //  서버에서 실패(중복 이메일, 만료 토큰 등) 시 사용자에게 안내
+      const msg =
+        e?.response?.data?.message ?? '회원가입에 실패했습니다. 잠시 후 다시 시도해주세요.';
+      alert(msg);
+    } finally {
+      setSubmitting(false); // 전송 끝
+    }
   };
 
   if (loading) {
@@ -144,8 +169,8 @@ export default function SignupFormPage() {
               >
                 <path
                   d="M4 22h16v-2h-1V4a1 1 0 0 0-1-1h-4V2h-4v1H6a1 1 0 0 0-1
-                1v16H4v2zm3-2V5h10v15H7zM9 7h2v2H9V7zm0 4h2v2H9v-2zm0 4h2v2H9v-2zm4-8h2v2h-2V7zm0
-                4h2v2h-2v-2zm0 4h2v2h-2v-2z"
+              1v16H4v2zm3-2V5h10v15H7zM9 7h2v2H9V7zm0 4h2v2H9v-2zm0 4h2v2H9v-2zm4-8h2v2h-2V7zm0
+              4h2v2h-2v-2zm0 4h2v2h-2v-2z"
                 />
               </svg>
             </div>
@@ -322,7 +347,7 @@ export default function SignupFormPage() {
               >
                 <path
                   d="M18 8h-1V6a5 5 0 0 0-10 0v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2
-                2 0 0 0-2-2Zm-6 9a2 2 0 1 1 0-4 2 2 0 0 1 0 4Zm3.1-9H8.9V6a3.1 3.1 0 1 1 6.2 0v2Z"
+              2 0 0 0-2-2Zm-6 9a2 2 0 1 1 0-4 2 2 0 0 1 0 4Zm3.1-9H8.9V6a3.1 3.1 0 1 1 6.2 0v2Z"
                 />
               </svg>
             </div>
@@ -363,7 +388,7 @@ export default function SignupFormPage() {
               >
                 <path
                   d="M18 8h-1V6a5 5 0 0 0-10 0v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2
-                2 0 0 0-2-2Zm-6 9a2 2 0 1 1 0-4 2 2 0 0 1 0 4Zm3.1-9H8.9V6a3.1 3.1 0 1 1 6.2 0v2Z"
+              2 0 0 0-2-2Zm-6 9a2 2 0 1 1 0-4 2 2 0 0 1 0 4Zm3.1-9H8.9V6a3.1 3.1 0 1 1 6.2 0v2Z"
                 />
               </svg>
             </div>
@@ -432,8 +457,8 @@ export default function SignupFormPage() {
         <div className="flex justify-end">
           <button
             type="submit"
-            disabled={!isFormValid}
-            aria-disabled={!isFormValid}
+            disabled={!isFormValid || submitting}
+            aria-disabled={!isFormValid || submitting}
             className={`inline-flex h-12 w-40 items-center justify-center !rounded-[15px] [background-image:none] font-extrabold tracking-tight !text-white !opacity-100 transition will-change-transform outline-none select-none ${
               isFormValid
                 ? '!bg-[#752F6D] shadow-[0_4px_12px_rgba(117,47,109,.25)] ' +

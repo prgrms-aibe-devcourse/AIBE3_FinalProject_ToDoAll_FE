@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { getMe, updateMe, changePassword } from '../api/user.api.ts';
+import ReqBadge from '@features/auth/components/ReqBadge.tsx';
+import { buildPasswordChecks } from '@features/auth/utils/passwordChecks.ts';
 
 type Focus = 'profile' | 'password' | undefined;
 
@@ -9,34 +12,94 @@ export default function MyPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  // 목업 데이터
-  const [user, setUser] = useState({
-    name: '김민수',
-    email: 'abck@gmail.com',
-    phone: '010-1111-2222',
-    company: '잡다 컴퍼니',
-    position: '매니저',
-    profile: 'https://i.imgur.com/8Km9tLL.png',
-    birthDate: '',
-    gender: '' as Gender,
-  });
-
   // 편집 토글 & 폼 데이터
   const [editing, setEditing] = useState(false);
+  const [user, setUser] = useState({
+    name: '',
+    email: '',
+    nickname: '',
+    phone: '',
+    company: '',
+    position: '',
+    birthDate: '',
+    gender: '' as Gender,
+    profile: '/default-profile.png',
+  });
+  type MeResponse = {
+    name?: string | null;
+    email?: string | null;
+    nickname?: string | null;
+    phoneNumber?: string | null;
+    companyName?: string | null;
+    position?: string | null;
+    birthDate?: string | null;
+    gender?: 'MALE' | 'FEMALE' | 'OTHER' | null;
+    profileUrl?: string | null;
+  };
+
   const [form, setForm] = useState(user);
+
+  // 1) 내 정보 조회
+  useEffect(() => {
+    getMe()
+      .then((data) => {
+        console.log('getMe 응답:', data);
+        const me = data as MeResponse;
+        setUser((prev) => ({
+          ...prev,
+          name: me.name ?? prev.name,
+          email: me.email ?? prev.email,
+          nickname: me.nickname ?? prev.nickname,
+          phone: me.phoneNumber ?? prev.phone,
+          company: me.companyName ?? prev.company,
+          position: me.position ?? prev.position,
+          birthDate: me.birthDate ?? prev.birthDate,
+          gender: (me.gender ?? prev.gender) as Gender,
+          profile: me.profileUrl || prev.profile,
+        }));
+        // 폼에도 동일값 반영
+        setForm((f) => ({
+          ...f,
+          name: me.name ?? f.name,
+          email: me.email ?? f.email,
+          nickname: me.nickname ?? f.nickname,
+          phone: me.phoneNumber ?? f.phone,
+          company: me.companyName ?? f.company,
+          position: me.position ?? f.position,
+          birthDate: me.birthDate ?? f.birthDate,
+          gender: (me.gender ?? f.gender) as Gender,
+          profile: me.profileUrl || f.profile,
+        }));
+      })
+      .catch((err) => {
+        console.log('getMe 응답:', err);
+        alert('내 정보 조회에 실패했습니다. 다시 로그인 후 시도해주세요.');
+      });
+  }, [navigate]);
+
+  // 2) 최근 재인증 여부
 
   const [recentlyReauthed, setRecentlyReauthed] = useState(false); //TTL을 상태로 보유 → UI가 자동 갱신됨
   useEffect(() => {
     const checkReauth = () => {
-      const at = Number(localStorage.getItem('reauthAt') || 0); //현재 저장된 재인증 시각 읽기
-      setRecentlyReauthed(Date.now() - at < 5 * 60 * 1000); //5분 이내면 true
+      const raw = localStorage.getItem('reauthAt') || '0';
+      const at = Number(raw);
+      const flag = Date.now() - at < 5 * 60 * 1000; //5분 이내면 true
+
+      console.log('최근 재인증 체크:', { raw, at, recentlyReauthed: flag });
+
+      setRecentlyReauthed(flag);
     };
 
-    checkReauth(); //마운트 즉시 1회 평가 → 초기 표시 정확
+    checkReauth(); //마운트 즉시 1회 평가
     const interval = setInterval(checkReauth, 60 * 1000); //  1분 주기로
+
     const onStorage = (e: StorageEvent) => {
       // 다른 탭에서 reauthAt 갱신 시 동기화
       if (e.key === 'reauthAt') checkReauth();
+
+      console.log('reauthAt 변경 감지:', e.newValue);
+      checkReauth();
     };
     window.addEventListener('storage', onStorage); // storage 이벤트 등록
 
@@ -56,8 +119,15 @@ export default function MyPage() {
   // 타입 분리된 onChange 핸들러
 
   //  공통 업데이트 도우미(안전하게 키 제한)
-  type FormKeys = 'name' | 'phone' | 'position' | 'birthDate' | 'gender';
-  const updateForm = (name: FormKeys, value: string) => setForm((f) => ({ ...f, [name]: value }));
+  type FormKeys = 'name' | 'nickname' | 'phone' | 'position' | 'birthDate' | 'gender';
+
+  const updateForm = (name: FormKeys, value: string) => {
+    setForm((f) => {
+      const next = { ...f, [name]: value };
+      console.log('폼 변경:', { field: name, value, next });
+      return next;
+    });
+  };
 
   // input 전용
   const onInputChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -72,14 +142,83 @@ export default function MyPage() {
   };
 
   const onCancel = () => {
+    console.log('수정 취소', user);
     setForm(user);
     setEditing(false);
   };
 
-  const onSave = () => {
-    // TODO: 실제 API 연동 시 검증/요청
-    setUser(form);
-    setEditing(false);
+  // 내 정보 저장
+  const onSave = async () => {
+    try {
+      console.log('[MyPage] 저장 요청 payload:', {
+        name: form.name,
+        nickname: form.nickname,
+        phoneNumber: form.phone,
+        position: form.position,
+        birthDate: form.birthDate,
+        gender: form.gender || undefined,
+      });
+      await updateMe({
+        name: form.name,
+        nickname: form.nickname,
+        phoneNumber: form.phone,
+        position: form.position,
+        birthDate: form.birthDate,
+        gender: form.gender || undefined,
+      });
+      setUser(form);
+      setEditing(false);
+      alert('저장되었습니다.');
+    } catch (e) {
+      console.error('updateMe 실패:', e);
+      alert('저장 중 문제가 발생했습니다. 다시 시도해주세요.');
+    }
+  };
+
+  // 비밀번호 변경 관련 상태 & 로직
+
+  const [currentPassword, setCurrentPassword] = useState(''); // 현재 비밀번호 입력값
+  const [newPassword, setNewPassword] = useState(''); // 새 비밀번호 입력값
+  const [newPasswordConfirm, setNewPasswordConfirm] = useState(''); // 새 비밀번호 확인 입력값
+
+  const [passwordError, setPasswordError] = useState<string | null>(null); // 비밀번호 관련 에러 메시지
+  const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null); // 비밀번호 관련 성공/안내 메시지
+
+  // 비밀번호 강도/조건 체크용 개인정보 후보
+  const piiSources: string[] = [
+    user.name,
+    user.email,
+    user.nickname,
+    user.phone,
+    user.company,
+  ].filter(Boolean);
+
+  // 새 비밀번호에 대한 조건 체크
+  const checks = buildPasswordChecks(newPassword, piiSources);
+
+  // 비밀번호 입력 검증 함수
+  const validatePasswords = (cur: string, next: string, nextConfirm: string) => {
+    // 먼저 메시지 초기화
+    setPasswordError(null);
+    setPasswordSuccess(null);
+
+    // 새 비밀번호/확인 비밀번호 둘 중 하나라도 비어 있으면 아직 판단하지 않음
+    if (!next || !nextConfirm) return;
+
+    // 새 비밀번호와 확인 비밀번호가 다를 때
+    if (next !== nextConfirm) {
+      setPasswordError('새 비밀번호와 확인 비밀번호가 일치하지 않습니다.');
+      return;
+    }
+
+    // 새 비밀번호가 현재 비밀번호와 같을 때
+    if (cur && cur === next) {
+      setPasswordError('현재 비밀번호와 새 비밀번호가 같습니다. 다른 비밀번호를 입력해주세요.');
+      return;
+    }
+
+    // 위 조건을 다 통과하면 사용 가능한 비밀번호로 판단
+    setPasswordSuccess('사용 가능한 비밀번호입니다.');
   };
 
   return (
@@ -126,7 +265,6 @@ export default function MyPage() {
               <label className="self-center font-semibold text-[var(--color-jd-gray-dark)]">
                 이메일
               </label>
-              {/* 이메일도 항상 읽기 전용 */}
               <div className="self-center font-semibold">{user.email}</div>
 
               <label className="self-center font-semibold text-[var(--color-jd-gray-dark)]">
@@ -141,6 +279,22 @@ export default function MyPage() {
                 />
               ) : (
                 <div className="self-center font-semibold">{user.name}</div>
+              )}
+
+              <label className="self-center font-semibold text-[var(--color-jd-gray-dark)]">
+                닉네임
+              </label>
+              {editing ? (
+                <input
+                  name="nickname"
+                  value={form.nickname}
+                  onChange={onInputChange}
+                  className="rounded-md border px-3 py-2"
+                  type="nickname"
+                  placeholder="예: 잡다닉"
+                />
+              ) : (
+                <div className="self-center font-bold">{user.nickname}</div>
               )}
 
               <label className="self-center font-semibold text-[var(--color-jd-gray-dark)]">
@@ -278,30 +432,121 @@ export default function MyPage() {
               </div>
             )}
             <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                alert('비밀번호 변경 완료 (mock)');
+              onSubmit={async (e) => {
+                e.preventDefault(); // 기본 submit 동작 막기
+
+                // 1) 새 비밀번호 / 확인 비밀번호 일치 여부
+                if (newPassword !== newPasswordConfirm) {
+                  setPasswordError('새 비밀번호와 확인 비밀번호가 일치하지 않습니다.');
+                  setPasswordSuccess(null);
+                  return;
+                }
+
+                // 2) 비밀번호 규칙(영문/숫자/길이/PII) 체크
+                if (!checks.english || !checks.digit || !checks.length || !checks.notContainsPII) {
+                  setPasswordError('비밀번호 조건을 모두 충족해야 합니다.');
+                  setPasswordSuccess(null);
+                  return;
+                }
+
+                // 3) 현재 비밀번호와 다른지
+                if (currentPassword && currentPassword === newPassword) {
+                  setPasswordError(
+                    '현재 비밀번호와 새 비밀번호가 같습니다. 다른 비밀번호를 입력해주세요.'
+                  );
+                  setPasswordSuccess(null);
+                  return;
+                }
+
+                try {
+                  // 실제 비밀번호 변경 API 호출
+                  await changePassword(currentPassword, newPassword);
+
+                  // 재인증 시간 기록
+                  localStorage.setItem('reauthAt', String(Date.now()));
+
+                  alert('비밀번호가 변경되었습니다.'); // 성공 알림
+
+                  // 입력값 및 메시지 초기화
+                  setCurrentPassword('');
+                  setNewPassword('');
+                  setNewPasswordConfirm('');
+                  setPasswordError(null);
+                  setPasswordSuccess(null);
+
+                  // 비밀번호 변경 섹션 자동으로 닫기
+                  setExpandPassword(false);
+                } catch (err) {
+                  console.log('비밀번호 변경 에러:', err); // 콘솔 로그
+                  setPasswordError(
+                    '비밀번호 변경에 실패했습니다. 현재 비밀번호를 다시 확인해주세요.'
+                  );
+                  setPasswordSuccess(null);
+                }
               }}
               className="grid max-w-md gap-3"
             >
+              {/* 현재 비밀번호 입력 */}
+
               <input
                 type="password"
                 placeholder="현재 비밀번호"
                 className="rounded-md border px-4 py-2"
                 required
+                value={currentPassword} // state와 연결
+                onChange={(e) => {
+                  const value = e.target.value; // 입력값
+                  setCurrentPassword(value); // 상태 업데이트
+                  // 새 비밀번호 검증 재실행
+                  validatePasswords(value, newPassword, newPasswordConfirm);
+                }}
               />
-              <input
-                type="password"
-                placeholder="새 비밀번호"
-                className="rounded-md border px-4 py-2"
-                required
-              />
+
+              {/* 새 비밀번호 입력 */}
+              <div className="flex flex-col gap-2">
+                <input
+                  type="password"
+                  placeholder="새 비밀번호"
+                  className="rounded-md border px-4 py-2"
+                  required
+                  value={newPassword} // state와 연결
+                  onChange={(e) => {
+                    const value = e.target.value; // 입력값
+                    setNewPassword(value); // 상태 업데이트
+                    // 새 비밀번호 검증 재실행
+                    validatePasswords(currentPassword, value, newPasswordConfirm);
+                  }}
+                />
+                {/* 비밀번호 조건 뱃지 영역 */}
+                <div className="mt-1 flex flex-wrap gap-2">
+                  <ReqBadge ok={checks.english} label="영문자" />
+                  <ReqBadge ok={checks.digit} label="숫자" />
+                  <ReqBadge ok={checks.length} label="8자 이상" />
+                  <ReqBadge ok={checks.notContainsPII} label="개인정보 미포함" />
+                </div>
+              </div>
+
+              {/* 새 비밀번호 확인 입력 */}
               <input
                 type="password"
                 placeholder="새 비밀번호 확인"
                 className="rounded-md border px-4 py-2"
                 required
+                value={newPasswordConfirm} // state와 연결
+                onChange={(e) => {
+                  const value = e.target.value; // 입력값
+                  setNewPasswordConfirm(value); // 상태 업데이트
+                  // 새 비밀번호 검증 재실행
+                  validatePasswords(currentPassword, newPassword, value);
+                }}
               />
+
+              {/* 비밀번호 검증 메시지 영역 */}
+              {passwordError && <p className="mt-1 text-sm text-red-500">{passwordError}</p>}
+              {!passwordError && passwordSuccess && (
+                <p className="mt-1 text-sm text-green-600">{passwordSuccess}</p>
+              )}
+
               <button className="mt-2 rounded-md bg-[var(--color-jd-violet)] px-5 py-2 text-white hover:bg-[var(--color-jd-violet-hover)]">
                 비밀번호 변경 저장
               </button>

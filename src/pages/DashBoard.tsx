@@ -15,27 +15,27 @@ type NumByProgressStatus = {
 
 // TODO : 리렌더링 최적화 (요청 별 컴포넌트 분리)
 export default function DashBoard() {
-  const { resData: summaryActive } = useFetch<number>('api/v1/dashboard/summary/active');
-  const { resData: summaryApplicant } = useFetch<number>('api/v1/dashboard/summary/applicant');
-  const { resData: summaryInterview } = useFetch<number>('api/v1/dashboard/summary/interview');
-  const { resData: summaryHired } = useFetch<number>('api/v1/dashboard/summary/hired');
+  const { resData: summaryActive } = useFetch<number>('/api/v1/dashboard/summary/active');
+  const { resData: summaryApplicant } = useFetch<number>('/api/v1/dashboard/summary/applicant');
+  const { resData: summaryInterview } = useFetch<number>('/api/v1/dashboard/summary/interview');
+  const { resData: summaryHired } = useFetch<number>('//v1/dashboard/summary/hired');
 
   const { resData: jobResults } = useFetch<NumberSlotsCardProps[]>(
-    'api/v1/dashboard/detail/job-result'
+    '/api/v1/dashboard/detail/job-result'
   );
   const { resData: upcomingInterviews } = useFetch<DataInfoCardProps[]>(
-    'api/v1/dashboard/detail/upcoming-interview'
+    '/api/v1/dashboard/detail/upcoming-interview'
   );
 
   const { resData: jobStatus } = useFetch<NumByProgressStatus>(
-    'api/v1/dashboard/detail/job-status'
+    '/api/v1/dashboard/detail/job-status'
   );
   const { resData: interviewStatus } = useFetch<NumByProgressStatus>(
-    'api/v1/dashboard/detail/interview-status'
+    '/api/v1/dashboard/detail/interview-status'
   );
 
   const { resData: weeklyCalendar } = useFetch<WeeklyCalendarType>(
-    'api/v1/dashboard/week-calendar'
+    '/api/v1/dashboard/week-calendar'
   );
 
   //TODO : 로딩 프로그레스나 스켈레톤 처리

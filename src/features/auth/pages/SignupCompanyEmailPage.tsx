@@ -1,6 +1,7 @@
 import type React from 'react';
 import { useState } from 'react';
 import AuthShell from '../components/AuthShell';
+import { sendCompanyVerifyLink } from '../api/auth.api.ts';
 
 const PERSONAL_DOMAINS = new Set([
   'gmail.com',
@@ -16,22 +17,54 @@ const PERSONAL_DOMAINS = new Set([
 export default function SignupCompanyEmailPage() {
   const [email, setEmail] = useState('');
   const [invalid, setInvalid] = useState(false);
+  const [loading, setLoading] = useState(false); // 전송 중 중복 클릭 방지
+  const [sent, setSent] = useState(false); // 전송 완료 안내 표시
+  const [error, setError] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.trim();
     setEmail(value);
+    setError('');
+    setSent(false);
 
     const at = value.lastIndexOf('@');
     const domain = at >= 0 ? value.slice(at + 1).toLowerCase() : '';
     // 비어있거나 개인용 도메인이면 경고
     setInvalid(Boolean(domain) && PERSONAL_DOMAINS.has(domain));
   };
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (invalid || !email) return; // 회사 이메일 아닐 때 전송 막기
-    // TODO: 이메일 인증 로직
-    // 서버에서도 반드시 2차 검증(화이트리스트/블랙리스트) 수행할 것
-    console.log('회사 이메일 인증 요청:', email);
+    if (invalid || !email || loading) return; // 회사메일 아닐 때/중복 클릭 방지
+    try {
+      setLoading(true); // 버튼 잠금
+      await sendCompanyVerifyLink(email); // 서버에 “인증 링크 보내기” 요청
+      setSent(true); // 안내 메시지 노출
+      alert('회사 이메일로 인증 링크를 보냈습니다. 메일함을 확인해 주세요.');
+    } catch (err: any) {
+      // ← catch 뒤에 (err: any) 추가
+      console.error('이메일 발송 실패:', err);
+
+      const status = err?.response?.status;
+      const backendMessage = err?.response?.data?.message;
+
+      let errorMessage = '';
+
+      if (status === 400) {
+        errorMessage = backendMessage || '이메일 형식이 올바르지 않습니다.';
+      } else if (status === 409 || backendMessage?.includes('이미')) {
+        errorMessage = '이미 인증된 이메일입니다. 로그인하시거나 다른 이메일을 사용해주세요.';
+      } else if (status === 429) {
+        errorMessage = '잠시 후 다시 시도해주세요. (5분 이내 재발송 제한)';
+      } else if (status === 500) {
+        errorMessage = '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+      } else {
+        errorMessage = backendMessage || '이메일 전송에 실패했습니다. 다시 시도해주세요.';
+      }
+
+      setError(errorMessage); // alert 대신 setError 사용
+    } finally {
+      setLoading(false); // 버튼 잠금 해제
+    }
   };
 
   return (
@@ -76,18 +109,60 @@ export default function SignupCompanyEmailPage() {
               </span>
             </div>
           )}
+
+          {/* 에러 메시지 */}
+          {error && (
+            <div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3">
+              <svg
+                className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <p className="text-sm leading-relaxed text-red-800">{error}</p>
+            </div>
+          )}
+
+          {/* 성공 메시지 */}
+          {sent && !invalid && !error && (
+            <div className="flex items-start gap-2 rounded-lg border border-green-200 bg-green-50 p-3">
+              <svg
+                className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <div>
+                <p className="text-sm font-medium text-green-800">인증 이메일이 발송되었습니다!</p>
+                <p className="mt-1 text-xs text-green-700">
+                  <strong>{email}</strong>로 발송된 이메일을 확인하고 인증 버튼을 눌러주세요.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {sent && !invalid && (
+            <p className="text-sm text-[#413F3F]">{email} 주소로 인증 메일을 보냈습니다.</p>
+          )}
         </div>
 
         <button
           type="submit"
-          disabled={!email || invalid}
-          className="h-12 w-full !rounded-[15px] !text-white font-extrabold !bg-[#752F6D] [background-image:none]
-          !opacity-100 shadow-[0_4px_12px_rgba(117,47,109,.25)] hover:brightness-[1.05] active:brightness-95 transition
-          ${!email || invalid ? 'bg-[#752F6D]/60 cursor-not-allowed' : 'bg-[#752F6D] hover:brightness-[1.05] active:brightness-95'}`}
-          style={{ height: 44 }"
+          disabled={!email || invalid || loading}
+          className="${!email || invalid || loading ? 'bg-[#752F6D]/60 cursor-not-allowed' : 'bg-[#752F6D] active:brightness-95'}`} h-12 w-full !rounded-[15px] !bg-[#752F6D] [background-image:none] font-extrabold !text-white !opacity-100 shadow-[0_4px_12px_rgba(117,47,109,.25)] transition hover:brightness-[1.05] active:brightness-95"
           style={{ height: 44 }}
         >
-          이메일 인증
+          {loading ? '전송 중...' : '이메일 인증'}
         </button>
       </form>
     </AuthShell>

@@ -1,4 +1,6 @@
 // src/components/ConfirmLogoutModal.tsx
+import { logout } from '../../auth/api/auth.api.ts';
+
 type Props = {
   open: boolean;
   onConfirm: () => void;
@@ -24,7 +26,13 @@ export default function ConfirmLogoutModal({ open, onConfirm, onClose }: Props) 
             취소
           </button>
           <button
-            onClick={onConfirm}
+            onClick={async () => {
+              try {
+                await logout(); // 서버 세션 종료 및 refreshToken 쿠키 제거
+              } finally {
+                onConfirm(); // 부모 컴포넌트로 알림 (ex: 화면 전환, 모달 닫기)
+              }
+            }}
             className="rounded-md bg-[var(--color-jd-scarlet)] px-4 py-2 text-white"
           >
             로그아웃

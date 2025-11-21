@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import AuthShell from '../components/AuthShell';
 import ReqBadge from '../components/ReqBadge';
 import { buildPasswordChecks } from '../utils/passwordChecks';
+import { resetPasswordByToken } from '../api/auth.api.ts';
 
 export default function ResetPasswordPage() {
   const [searchParams] = useSearchParams();
@@ -49,20 +50,13 @@ export default function ResetPasswordPage() {
     setSubmitting(true);
     setServerError(null);
     try {
-      const res = await fetch('/api/auth/password/reset', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, newPassword: password }),
-        credentials: 'include',
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error((data && (data as any).message) || '서버 오류가 발생했습니다.');
-      }
+      await resetPasswordByToken(token, password);
+
       setSuccess(true);
       setTimeout(() => navigate('/login'), 1800);
     } catch (err: any) {
-      setServerError(err?.message || '비밀번호 재설정에 실패했습니다.');
+      const msg = err?.response?.data?.message || err?.message || '비밀번호 재설정에 실패했습니다.';
+      setServerError(msg);
     } finally {
       setSubmitting(false);
     }

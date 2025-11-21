@@ -1,9 +1,19 @@
 import type { FormEvent } from 'react';
-import AuthShell from '../components/AuthShell';
+
+import { requestResetEmail } from '../api/auth.api.ts';
+import AuthShell from '../components/AuthShell.tsx';
 
 export default function ResetPasswordEmailPage() {
-  const onSubmit = (e: FormEvent) => {
+  const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    const form = new FormData(e.target as HTMLFormElement);
+    const email = String(form.get('email') || '');
+    try {
+      await requestResetEmail(email); // 서버에 메일 발송 요청
+      alert('이메일을 확인해 주세요.');
+    } catch {
+      alert('이메일 전송에 실패했습니다.');
+    }
   };
 
   return (
@@ -29,6 +39,8 @@ export default function ResetPasswordEmailPage() {
 
             <input
               placeholder="name@jobda.com"
+              type="email"
+              name="email"
               className="border-jd-gray-light bg-jd-white placeholder:text-jd-gray-dark/70 focus:border-jd-gray-light h-12 w-full rounded-full border pr-5 pl-12 text-[#413F3F] shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)] outline-none focus:ring-0"
               style={{ borderRadius: 15, paddingLeft: '3rem' }}
             />
