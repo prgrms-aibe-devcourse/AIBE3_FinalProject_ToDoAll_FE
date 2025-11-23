@@ -6,6 +6,8 @@ on:
 
 env:
   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
 jobs:
@@ -126,14 +128,14 @@ jobs:
         run: |
           echo "OPENAI_API_KEY=$OPENAI_API_KEY" > .env
 
-      - name: Vercel pull
+      - name: Vercel pull (prod)
         run: npx vercel pull --yes --environment=production --token=$VERCEL_TOKEN
 
-      - name: Clean old Vercel output
-        run: rm -rf .vercel/output
+      - name: Clean old output
+        run: rm -rf .vercel/output || true
 
-      - name: Vercel build
+      - name: Vercel build (prod)
         run: npx vercel build --prod --token=$VERCEL_TOKEN
 
-      - name: Deploy to Vercel
+      - name: Deploy to Vercel (prod)
         run: npx vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
