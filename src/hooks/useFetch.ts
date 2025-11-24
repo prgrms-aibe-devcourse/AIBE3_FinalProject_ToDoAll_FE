@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
+let baseUrl = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 
-const baseUrl = import.meta.env.VITE_API_BASE_URL;
+if (baseUrl.endsWith('/api')) {
+  baseUrl = baseUrl.slice(0, -4); // '/api' 길이 = 4
+}
+
+console.log('ENV CHECK:', import.meta.env);
 
 interface CommonResponse<T> {
   errorCode?: number;
@@ -21,16 +26,21 @@ export default function useFetch<T>(
   useEffect(() => {
     controller.current = new AbortController();
     const signal = controller.current.signal;
-    fetch(baseUrl + url, {
+    // URL 앞쪽 / 을 제거 → 중복 /api 방지
+    const cleanUrl = url.replace(/^\/+/, '');
+
+    // baseUrl + cleanUrl 합치기
+    const finalUrl = `${baseUrl}/${cleanUrl}`;
+    console.log('FETCH URL:', finalUrl);
+    fetch(finalUrl, {
       signal,
       method,
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ~`,
         ...headers,
       },
-      body: JSON.stringify(body),
+      body: body ? JSON.stringify(body) : undefined,
     })
       .then((res) => {
         if (!res.ok) throw new Error(res.status + ' : ' + '네트워크 응답이 OK가 아님');
