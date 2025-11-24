@@ -3,17 +3,13 @@
 export const BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 
 export async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
-  // 1) 로그인할 때 localStorage 에 저장해둔 accessToken 꺼냄
-  const accessToken = localStorage.getItem('accessToken');
-
-  // 2) /v1/users/me
+  // 경로 설정
   const url = path.startsWith('http') ? path : `${BASE_URL}${path}`;
 
   // 3) 기본 헤더 + 토큰
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
     ...(options.headers || {}),
-    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
   };
 
   // 4) fetch 호출
