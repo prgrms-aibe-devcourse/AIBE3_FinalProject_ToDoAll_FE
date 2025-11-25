@@ -113,7 +113,7 @@ jobs:
       - name: Vercel deploy (preview)
         id: vercel-deploy
         run: |
-          PREVIEW_URL=$(npx vercel deploy --prebuilt --token=$VERCEL_TOKEN --yes | tail -n 1)
+          PREVIEW_URL=$(npx vercel deploy --prebuilt --token=$VERCEL_TOKEN --yes | tail -n 1) || exit 1
           echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
           
       - name: Comment preview URL on PR
