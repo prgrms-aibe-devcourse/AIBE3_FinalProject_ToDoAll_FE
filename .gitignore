@@ -16,7 +16,9 @@ dist-ssr
 
 # Environment files
 .env
+.env.*
 .env.*.local
+.vercel
 
 # Vite cache
 .vite
@@ -48,7 +50,3 @@ ehthumbs.db
 
 # Husky
 .husky/_/
-
-# .env
-.env
-.env.*

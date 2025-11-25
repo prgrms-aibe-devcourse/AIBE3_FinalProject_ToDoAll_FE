@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "prepare": "husky install",
-    "act": "act pull_request -j build",
+    "act": "act pull_request --secret-file .env.local -j Vercel-Preview",
     "test": "echo \"No tests yet\""
   },
   "dependencies": {
