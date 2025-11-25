@@ -90,9 +90,31 @@ export default function SignupFormPage() {
       navigate('/signup/email', { replace: true });
       return;
     }
-    // URL에서 받은 이메일을 그대로 고정
-    setCompanyEmail(emailFromUrl);
-    setLoading(false);
+    // 2) 이메일 인증 완료 API 자동 호출
+    const completeEmailVerification = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:8080/api/v1/auth/email-verifications/complete?token=${token}`
+        );
+
+        if (!response.ok) {
+          throw new Error('이메일 인증 완료 실패');
+        }
+
+        const data = await response.json();
+        console.log('이메일 인증 완료:', data);
+
+        // URL에서 받은 이메일을 그대로 고정
+        setCompanyEmail(emailFromUrl);
+        setLoading(false);
+      } catch (error) {
+        console.error('이메일 인증 완료 실패:', error);
+        alert('이메일 인증에 실패했습니다. 다시 시도해주세요.');
+        navigate('/signup/email', { replace: true });
+      }
+    };
+
+    completeEmailVerification();
   }, [token, emailFromUrl, navigate]);
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -134,6 +156,7 @@ export default function SignupFormPage() {
       navigate('/login', { replace: true });
     } catch (e: any) {
       //  서버에서 실패(중복 이메일, 만료 토큰 등) 시 사용자에게 안내
+      console.error('회원가입 실패:', e);
       const msg =
         e?.response?.data?.message ?? '회원가입에 실패했습니다. 잠시 후 다시 시도해주세요.';
       alert(msg);
