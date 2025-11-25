@@ -94,9 +94,8 @@ export default function SignupFormPage() {
     const completeEmailVerification = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8080/api/v1/auth/email-verifications/complete?token=${token}`
+          `${import.meta.env.VITE_API_URL}/v1/auth/email-verifications/complete?token=${token}`
         );
-
         if (!response.ok) {
           throw new Error('이메일 인증 완료 실패');
         }
