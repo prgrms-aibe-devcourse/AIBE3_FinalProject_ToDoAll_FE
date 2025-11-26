@@ -28,45 +28,20 @@ export async function login(dto: LoginRequest): Promise<LoginResponse> {
     typeof result.accessToken !== 'string' ||
     !result.accessToken.trim()
   ) {
-    console.error('로그인 응답 포맷이 올바르지 않습니다:', raw);
-    throw new Error('로그인 응답에 accessToken이 없습니다.');
+    console.error('서버에서 로그인 토큰이 전달되지 않았습니다:', raw);
+    throw new Error('로그인에 실패했습니다. 다시 시도해주세요.');
   }
 
-  const { accessToken, refreshToken } = result;
+  console.log('로그인 성공:', result);
 
-  if (accessToken) {
-    localStorage.setItem('accessToken', accessToken);
-  }
-
-  if (refreshToken) {
-    sessionStorage.setItem('refreshToken', refreshToken);
-  }
-  return { accessToken, refreshToken };
+  return result;
 }
 
 //  로그아웃 API
 export async function logout() {
-  // 1) 저장해둔 refreshToken 꺼내기
-  const refreshToken =
-    sessionStorage.getItem('refreshToken') || localStorage.getItem('refreshToken');
-
-  // 2) 아예 없으면 백엔드에 굳이 안 보내고
-  //    클라이언트 쪽 상태만 정리하고 끝내도 됨
-  if (!refreshToken) {
-    sessionStorage.removeItem('accessToken');
-    sessionStorage.removeItem('refreshToken');
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    return;
-  }
   await request<void>('/v1/auth/logout', {
     method: 'POST',
-    body: JSON.stringify({ refreshToken }),
   });
-  sessionStorage.removeItem('accessToken');
-  sessionStorage.removeItem('refreshToken');
-  localStorage.removeItem('accessToken');
-  localStorage.removeItem('refreshToken');
 }
 
 // 로그인 전 비번 찾기
