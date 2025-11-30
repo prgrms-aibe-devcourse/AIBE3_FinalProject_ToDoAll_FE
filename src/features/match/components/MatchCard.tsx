@@ -51,19 +51,31 @@ export default function MatchCard({ resume, matchRate = 50, onView }: Props) {
               </div>
             </div>
 
-            <div className="mb-3 flex flex-wrap gap-2">
-              {resume.skills.map((skill) => (
-                <span
-                  key={skill.name}
-                  className="rounded-full border border-[#837C7C] bg-white px-2 py-1 text-xs text-[#837C7C]"
-                >
-                  {skill.name}
-                </span>
-              ))}
+            <div className="mb-3">
+              <div className="text-m mb-1 font-medium text-[#413F3F]">보유 스킬</div>
+              <div className="flex flex-wrap gap-2">
+                {resume.skills.map((skill) => (
+                  <span
+                    key={skill.name}
+                    className="rounded-full border border-[#837C7C] bg-white px-2 py-1 text-xs text-[#837C7C]"
+                  >
+                    {skill.name}
+                  </span>
+                ))}
+              </div>
             </div>
 
+            {resume.summary && (
+              <div className="mt-4">
+                <div className="text-m mb-1 font-medium text-[#413F3F]">지원자 이력서 요약</div>
+                <p className="text-sm leading-relaxed whitespace-pre-line text-[#837C7C]">
+                  {resume.summary}
+                </p>
+              </div>
+            )}
+
             {resume.career && resume.career.length > 0 && (
-              <ul className="mb-4 list-inside list-disc text-sm text-[#837C7C]">
+              <ul className="mt-4 list-inside list-disc text-sm text-[#837C7C]">
                 {resume.career.map((c, idx) => (
                   <li key={idx}>
                     {c.company} / {c.position} / {c.department}
