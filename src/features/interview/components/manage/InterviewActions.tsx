@@ -29,7 +29,7 @@ export default function InterviewActions({
     });
   };
 
-  const handleCreateQuestionSet = () => {
+  const handleUpdateQuestionSet = () => {
     navigate('/interview/question-create', {
       state: { name, avatar, interviewId },
     });
@@ -43,7 +43,12 @@ export default function InterviewActions({
 
   const actionButtons: Partial<Record<InterviewStatus, React.ReactNode[]>> = {
     WAITING: [
-      <InterviewButton key="question" label="질문 세트 생성" onClick={handleCreateQuestionSet} />,
+      <InterviewButton
+        key="question"
+        label="질문 세트 보기"
+        variant="question"
+        onClick={handleUpdateQuestionSet}
+      />,
       <InterviewButton key="resume" label="이력서 열람" />,
     ],
     DONE: [
