@@ -7,3 +7,13 @@ export interface MatchListResponseDto {
   missingSkills: string[];
   resumeSummary: string | null;
 }
+
+export interface ResumeRecommendation {
+  resumeId: number;
+  resumeName: string;
+  matchScore: number;
+  status?: string;
+  skillMatchRate?: string;
+  missingSkills?: string[];
+  resumeSummary?: string | null;
+}

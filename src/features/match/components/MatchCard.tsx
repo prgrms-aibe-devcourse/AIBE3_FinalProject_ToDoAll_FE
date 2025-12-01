@@ -1,13 +1,13 @@
-import type { ResumeData } from '../../resumes/types/resumes.types';
 import emptyHeartImg from '../../../assets/Favorite-2.png';
 import fullHeartImg from '../../../assets/Heart.png';
 import { useState } from 'react';
+import type { MatchCardData } from '../types/matchCardData.types';
 
 type Props = {
-  resume: ResumeData;
-  matchRate?: number;
-  onView?: () => void;
-  onInvite?: () => void;
+  resume: MatchCardData;
+  matchRate: number;
+  onView: () => void;
+  onInvite: () => void;
 };
 
 export default function MatchCard({ resume, matchRate = 50, onView }: Props) {
