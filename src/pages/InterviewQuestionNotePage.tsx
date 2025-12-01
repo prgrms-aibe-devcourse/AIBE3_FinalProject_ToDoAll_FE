@@ -13,8 +13,8 @@ type UserProfile = {
   interests: string[];
 };
 
+// 실제에선 API 호출로 대체될 mock
 const mockFetchUserProfile = async (): Promise<UserProfile> => {
-  // 실제로는 API 호출 예정
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({
@@ -29,7 +29,6 @@ const mockFetchUserProfile = async (): Promise<UserProfile> => {
 };
 
 const mockFetchQuestions = async (): Promise<InterviewQuestionAiDto[]> => {
-  // 실제로는 API 호출 예정
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve([
@@ -61,7 +60,6 @@ const InterviewQuestionNotePage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // 질문/유저 정보 동시 로드 (실제 구현 시 Promise.all로 API 호출 예정)
     const load = async () => {
       try {
         const [userRes, questionRes] = await Promise.all([
@@ -71,7 +69,6 @@ const InterviewQuestionNotePage: React.FC = () => {
         setUser(userRes);
         setQuestions(questionRes);
       } catch (e) {
-        // 실패 시 질문 없음 상태 그대로 두고 로딩만 종료
         console.error(e);
       } finally {
         setIsLoading(false);
@@ -90,23 +87,49 @@ const InterviewQuestionNotePage: React.FC = () => {
       );
     }
 
+    // 타입별 그룹핑
+    const grouped: Record<string, InterviewQuestionAiDto[]> = questions.reduce(
+      (acc, q) => {
+        if (!acc[q.questionType]) acc[q.questionType] = [];
+        acc[q.questionType].push(q);
+        return acc;
+      },
+      {} as Record<string, InterviewQuestionAiDto[]>
+    );
+
+    const typeOrder = ['TECH', 'CORE', 'BEHAVIOR', 'OPERATIONS'];
+    const typeLabel: Record<string, string> = {
+      TECH: '기술 역량 질문 (TECH)',
+      CORE: '공통/핵심 역량 질문 (CORE)',
+      BEHAVIOR: '태도/경험 질문 (BEHAVIOR)',
+      OPERATIONS: '운영·품질 관련 질문 (OPERATIONS)',
+    };
+
+    const sortedTypes = Object.keys(grouped).sort((a, b) => {
+      const ia = typeOrder.indexOf(a);
+      const ib = typeOrder.indexOf(b);
+      const sa = ia === -1 ? 99 : ia;
+      const sb = ib === -1 ? 99 : ib;
+      return sa - sb;
+    });
+
     return (
-      <div className="flex flex-col gap-4">
-        {questions.map((q, index) => (
-          <div
-            key={`${q.questionType}-${index}`}
-            className="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5"
-          >
-            <span className="mt-1 h-2 w-2 rounded-full bg-purple-400" />
-            <div className="flex-1">
-              <div className="mb-1 flex items-center gap-2">
-                <span className="inline-flex items-center rounded-full bg-purple-100 px-2 py-0.5 text-[11px] font-semibold text-purple-700">
-                  {q.questionType}
-                </span>
-              </div>
-              <p className="text-sm leading-relaxed text-slate-800">{q.content}</p>
+      <div className="flex flex-col gap-6">
+        {sortedTypes.map((type) => (
+          <section key={type} className="flex flex-col gap-3">
+            <h2 className="text-sm font-semibold text-slate-900">{typeLabel[type] ?? type}</h2>
+            <div className="flex flex-col gap-2.5">
+              {grouped[type].map((q, index) => (
+                <div
+                  key={`${type}-${index}`}
+                  className="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5"
+                >
+                  <span className="mt-1 h-2 w-2 rounded-full bg-purple-400" />
+                  <p className="flex-1 text-sm leading-relaxed text-slate-800">{q.content}</p>
+                </div>
+              ))}
             </div>
-          </div>
+          </section>
         ))}
       </div>
     );
