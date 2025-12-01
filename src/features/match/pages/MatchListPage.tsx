@@ -1,62 +1,59 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import MatchFilterSection from '../components/MatchFilterSection';
 import MatchCard from '../components/MatchCard';
-import { mockResumes } from '../data/mockResumes';
-import type { ResumeData } from '../../resumes/types/resumes.types';
 import NoSearchResult from '../components/NoSearchResult';
+import { fetchRecommendedResumes } from '../api/recommendation.api';
+import { mapRecommendationToResumeData } from '../utils/mapRecommendation';
+import type { ResumeData } from '../../resumes/types/resumes.types';
 
 export default function MatchListPage() {
-  const [keyword, setKeyword] = useState('');
-  const [sortBy, setSortBy] = useState<'latest' | 'oldest' | 'name'>('latest');
-  const [tab, setTab] = useState<'all' | 'recommended'>('all');
+  const [resumes, setResumes] = useState<
+    (ResumeData & { summary?: string; matchScore?: number })[]
+  >([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredResumes = useMemo(() => {
-    let result = [...mockResumes];
+  const JD_ID = 2001;
 
-    if (tab === 'recommended') {
-      result = result.filter((r) => r.skills.some((s) => s.name === 'React')); // 예시: React 스킬 있는 사람 추천
-    }
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      try {
+        const recommendations = await fetchRecommendedResumes(JD_ID);
+        const mapped = recommendations.map(mapRecommendationToResumeData);
+        setResumes(mapped);
+      } catch (e) {
+        console.error(e);
+        setError('추천 이력서를 불러오지 못했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    if (keyword) {
-      result = result.filter(
-        (r) =>
-          r.name.toLowerCase().includes(keyword.toLowerCase()) ||
-          r.skills.some((s) => s.name.toLowerCase().includes(keyword.toLowerCase()))
-      );
-    }
-
-    result.sort((a, b) => {
-      if (sortBy === 'latest')
-        return new Date(b.applyDate).getTime() - new Date(a.applyDate).getTime();
-      if (sortBy === 'oldest')
-        return new Date(a.applyDate).getTime() - new Date(b.applyDate).getTime();
-      if (sortBy === 'name') return a.name.localeCompare(b.name);
-      return 0;
-    });
-
-    return result;
-  }, [keyword, sortBy, tab]);
+    load();
+  }, [JD_ID]);
 
   return (
     <div className="min-h-screen bg-[#FAF8F8] p-6">
-      <h1 className="mb-6 text-2xl font-semibold text-[#413F3F]">지원자 조회</h1>
+      <h1 className="mb-6 text-2xl font-semibold text-[#413F3F]">추천된 지원자</h1>
 
-      <MatchFilterSection onSearch={setKeyword} onSortChange={setSortBy} onTabChange={setTab} />
+      <MatchFilterSection onSearch={() => {}} onSortChange={() => {}} onTabChange={() => {}} />
 
       <div className="mt-6 flex flex-col gap-4">
-        {filteredResumes.length > 0 ? (
-          filteredResumes.map((resume: ResumeData) => (
+        {loading && <p className="text-center">불러오는 중...</p>}
+        {error && <p className="text-center text-red-500">{error}</p>}
+        {!loading && !error && resumes.length === 0 && <NoSearchResult />}
+        {!loading &&
+          !error &&
+          resumes.map((resume) => (
             <MatchCard
               key={resume.id}
               resume={resume}
-              matchRate={Math.floor(Math.random() * 50) + 50} // 매칭률 예시
+              matchRate={resume.matchScore ?? 0}
               onView={() => console.log('보기 클릭', resume.name)}
               onInvite={() => console.log('면접 초대 클릭', resume.name)}
             />
-          ))
-        ) : (
-          <NoSearchResult />
-        )}
+          ))}
       </div>
     </div>
   );
