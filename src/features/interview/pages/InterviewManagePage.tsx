@@ -1,13 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import InterviewCard from '../components/manage/InterviewCard';
 import InterviewFilterTabs from '../components/manage/InterviewFilterTabs';
 import InterviewSortDropdown from '../components/manage/InterviewSortDropdown';
 import type { TabStatus, InterviewStatus } from '../types/interviewer';
 import { tabToInterviewStatus } from '../types/interviewer';
 
+interface InterviewSummaryResponse {
+  interviewId: number;
+  jdId: number;
+  jdTitle: string;
+  candidateName: string;
+  status: InterviewStatus;
+  scheduledAt: string;
+  createdAt: string;
+}
+
+interface InterviewListResponse {
+  data: InterviewSummaryResponse[];
+  nextCursor: number | null;
+  hasNext: boolean;
+}
+
 interface InterviewCardData {
-  id: number; // 인터뷰 고유 ID
-  jd_id: number; // 해당 인터뷰가 속한 공고(Job Description)의 ID
+  id: number;
+  jd_id: number;
   name: string;
   position: string;
   date: string;
@@ -18,88 +34,82 @@ interface InterviewCardData {
 }
 
 export default function InterviewManagePage() {
-  const [activeTab, setActiveTab] = useState<TabStatus>('전체');
+  const [activeTab, setActiveTab] = useState<TabStatus>('ALL');
   const [selectedJD, setSelectedJD] = useState<number | null>(null);
+  const [cursor, setCursor] = useState<number | null>(null);
+  const [interviews, setInterviews] = useState<InterviewCardData[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // 예시 공고 리스트
-  const jobPosts = [
-    { id: 1, title: '시니어 프론트엔드 개발자' },
-    { id: 2, title: '백엔드 개발자 (Spring)' },
-  ];
+  const fetchInterviews = async () => {
+    setLoading(true);
 
-  // 예시 인터뷰 데이터
-  const interviews: InterviewCardData[] = [
-    {
-      id: 1,
-      jd_id: 1,
-      name: '김철수',
-      position: '시니어 프론트엔드 개발자 구합니다',
-      date: '2025-12-01',
-      time: '12:00',
-      interviewers: '홍길동, 홍길순',
-      status: '진행중',
-      avatar: 'https://cdn.pixabay.com/photo/2025/10/02/06/28/mood-9867715_1280.jpg',
-    },
-    {
-      id: 2,
-      jd_id: 1,
-      name: '이영희',
-      position: '시니어 프론트엔드 개발자 구합니다',
-      date: '2025-12-02',
-      time: '15:00',
-      interviewers: '홍길동, 홍길순',
-      status: '합격',
-      avatar: 'https://cdn.pixabay.com/photo/2025/10/02/06/28/mood-9867715_1280.jpg',
-    },
-    {
-      id: 3,
-      jd_id: 2,
-      name: '박민수',
-      position: '백엔드 개발자 (Spring)',
-      date: '2025-12-05',
-      time: '14:00',
-      interviewers: '홍길동, 김영희',
-      status: '예정',
-      avatar: 'https://cdn.pixabay.com/photo/2025/10/02/06/28/mood-9867715_1280.jpg',
-    },
-    {
-      id: 4,
-      jd_id: 2,
-      name: '정현우',
-      position: '백엔드 개발자 (Spring)',
-      date: '2025-12-06',
-      time: '10:00',
-      interviewers: '홍길동, 이지현',
-      status: '미정',
-      avatar: 'https://cdn.pixabay.com/photo/2025/10/02/06/28/mood-9867715_1280.jpg',
-    },
-  ];
+    try {
+      const statusParam = activeTab === 'ALL' ? 'ALL' : tabToInterviewStatus[activeTab][0];
 
-  // 탭 + 공고 기준 필터링
-  const filtered = interviews.filter((i) => {
-    const matchTab = activeTab === '전체' || tabToInterviewStatus[activeTab].includes(i.status);
-    const matchJD = selectedJD ? i.jd_id === selectedJD : true;
-    return matchTab && matchJD;
-  });
+      const params = new URLSearchParams({
+        status: statusParam,
+        limit: '6',
+        sort: 'createdAt,desc',
+      });
+
+      if (selectedJD) params.append('jdId', selectedJD.toString());
+      if (cursor) params.append('cursor', cursor.toString());
+
+      const query = `http://localhost:8080/api/v1/interviews?${params.toString()}`;
+      console.log('%cFETCH URL:', 'color: #0af', query);
+
+      const res = await fetch(query);
+      if (!res.ok) throw new Error('인터뷰 조회 실패');
+
+      const json = await res.json();
+      const list: InterviewListResponse = json.data;
+
+      const mapped = list.data.map((i) => ({
+        id: i.interviewId,
+        jd_id: i.jdId,
+        name: i.candidateName,
+        position: i.jdTitle,
+        date: i.scheduledAt.split('T')[0],
+        time: i.scheduledAt.split('T')[1].slice(0, 5),
+        interviewers: '면접관 정보 필요',
+        status: i.status,
+        avatar: '/default-avatar.png',
+      }));
+
+      setInterviews(mapped);
+      setCursor(list.nextCursor ?? null);
+    } catch (err) {
+      console.error(' 인터뷰 불러오기 오류:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchInterviews();
+  }, [activeTab, selectedJD]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center text-gray-500">
+        불러오는 중...
+      </div>
+    );
+  }
 
   return (
     <div className="bg-jd-white min-h-screen px-12 py-8">
-      {/* 상단 영역 */}
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-semibold">면접 관리</h1>
-        <InterviewSortDropdown jobPosts={jobPosts} onSelect={setSelectedJD} />
+        <InterviewSortDropdown jobPosts={[]} onSelect={setSelectedJD} />
       </div>
 
-      {/* 필터 탭 */}
       <InterviewFilterTabs activeTab={activeTab} onChange={setActiveTab} />
 
-      {/* 카드 리스트 */}
       <div className="mt-6 grid grid-cols-3 gap-8">
-        {filtered.map((item) => (
-          <InterviewCard key={item.id} {...item} />
-        ))}
-
-        {filtered.length === 0 && (
+        {interviews.length > 0 ? (
+          interviews.map((item) => <InterviewCard key={item.id} {...item} />)
+        ) : (
           <div className="col-span-3 py-16 text-center text-gray-500">
             해당 조건에 맞는 면접이 없습니다.
           </div>
