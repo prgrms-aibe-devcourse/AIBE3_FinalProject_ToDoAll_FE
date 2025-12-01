@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import InterviewCard from '../components/manage/InterviewCard';
 import InterviewFilterTabs from '../components/manage/InterviewFilterTabs';
 import InterviewSortDropdown from '../components/manage/InterviewSortDropdown';
 import type { TabStatus, InterviewStatus } from '../types/interviewer';
 import { tabToInterviewStatus } from '../types/interviewer';
+import useFetch from '@/hooks/useFetch';
 
 interface InterviewSummaryResponse {
   interviewId: number;
@@ -36,60 +37,37 @@ interface InterviewCardData {
 export default function InterviewManagePage() {
   const [activeTab, setActiveTab] = useState<TabStatus>('ALL');
   const [selectedJD, setSelectedJD] = useState<number | null>(null);
-  const [cursor, setCursor] = useState<number | null>(null);
-  const [interviews, setInterviews] = useState<InterviewCardData[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [cursor] = useState<number | null>(null);
 
-  const fetchInterviews = async () => {
-    setLoading(true);
+  const statusParam = activeTab === 'ALL' ? 'ALL' : tabToInterviewStatus[activeTab][0];
 
-    try {
-      const statusParam = activeTab === 'ALL' ? 'ALL' : tabToInterviewStatus[activeTab][0];
+  const params = new URLSearchParams({
+    status: statusParam,
+    limit: '6',
+    sort: 'createdAt,desc',
+  });
 
-      const params = new URLSearchParams({
-        status: statusParam,
-        limit: '6',
-        sort: 'createdAt,desc',
-      });
+  if (selectedJD) params.append('jdId', selectedJD.toString());
+  if (cursor) params.append('cursor', cursor.toString());
 
-      if (selectedJD) params.append('jdId', selectedJD.toString());
-      if (cursor) params.append('cursor', cursor.toString());
+  const query = `/api/v1/interviews?${params.toString()}`;
 
-      const query = `http://localhost:8080/api/v1/interviews?${params.toString()}`;
-      console.log('%cFETCH URL:', 'color: #0af', query);
+  const { resData } = useFetch<InterviewListResponse>(query);
 
-      const res = await fetch(query);
-      if (!res.ok) throw new Error('인터뷰 조회 실패');
+  const interviews: InterviewCardData[] =
+    resData?.data?.map((i) => ({
+      id: i.interviewId,
+      jd_id: i.jdId,
+      name: i.candidateName,
+      position: i.jdTitle,
+      date: i.scheduledAt.split('T')[0],
+      time: i.scheduledAt.split('T')[1].slice(0, 5),
+      interviewers: '면접관 정보 필요',
+      status: i.status,
+      avatar: '/default-avatar.png',
+    })) ?? [];
 
-      const json = await res.json();
-      const list: InterviewListResponse = json.data;
-
-      const mapped = list.data.map((i) => ({
-        id: i.interviewId,
-        jd_id: i.jdId,
-        name: i.candidateName,
-        position: i.jdTitle,
-        date: i.scheduledAt.split('T')[0],
-        time: i.scheduledAt.split('T')[1].slice(0, 5),
-        interviewers: '면접관 정보 필요',
-        status: i.status,
-        avatar: '/default-avatar.png',
-      }));
-
-      setInterviews(mapped);
-      setCursor(list.nextCursor ?? null);
-    } catch (err) {
-      console.error(' 인터뷰 불러오기 오류:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchInterviews();
-  }, [activeTab, selectedJD]);
-
-  if (loading) {
+  if (!resData) {
     return (
       <div className="flex min-h-screen items-center justify-center text-gray-500">
         불러오는 중...
