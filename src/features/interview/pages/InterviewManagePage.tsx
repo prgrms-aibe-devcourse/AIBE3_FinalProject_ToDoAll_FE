@@ -10,6 +10,7 @@ interface InterviewSummaryResponse {
   interviewId: number;
   jdId: number;
   jdTitle: string;
+  resumeId: number;
   candidateName: string;
   status: InterviewStatus;
   scheduledAt: string;
@@ -30,6 +31,7 @@ interface InterviewCardData {
   interviewers: string;
   status: InterviewStatus;
   avatar: string;
+  resumeId: number;
 }
 
 export default function InterviewManagePage() {
@@ -65,6 +67,7 @@ export default function InterviewManagePage() {
       interviewers: '면접관 정보 필요',
       status: i.status,
       avatar: '/default-avatar.png',
+      resumeId: i.resumeId,
     })) ?? [];
 
   const handleNext = () => {

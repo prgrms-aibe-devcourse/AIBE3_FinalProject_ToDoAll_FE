@@ -9,6 +9,7 @@ interface InterviewActionsProps {
   name?: string;
   avatar?: string;
   interviewId?: number;
+  resumeId?: number;
 }
 
 export default function InterviewActions({
@@ -16,6 +17,7 @@ export default function InterviewActions({
   name,
   avatar,
   interviewId,
+  resumeId,
 }: InterviewActionsProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
@@ -41,6 +43,11 @@ export default function InterviewActions({
     });
   };
 
+  const handleOpenResume = () => {
+    if (!resumeId) return;
+    navigate(`/resumes/${resumeId}`);
+  };
+
   const actionButtons: Partial<Record<InterviewStatus, React.ReactNode[]>> = {
     WAITING: [
       <InterviewButton
@@ -49,7 +56,7 @@ export default function InterviewActions({
         variant="question"
         onClick={handleUpdateQuestionSet}
       />,
-      <InterviewButton key="resume" label="이력서 열람" />,
+      <InterviewButton key="resume" label="이력서 열람" onClick={handleOpenResume} />,
     ],
     DONE: [
       <InterviewButton key="note" label="면접 노트" onClick={handleOpenInterviewNote} />,
