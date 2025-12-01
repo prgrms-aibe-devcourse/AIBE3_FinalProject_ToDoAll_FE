@@ -1,18 +1,33 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { getMe, updateMe, changePassword } from '../api/user.api.ts';
+import { getMe, updateMe, changePassword, uploadProfileImage } from '../api/user.api.ts';
 import ReqBadge from '@features/auth/components/ReqBadge.tsx';
 import { buildPasswordChecks } from '@features/auth/utils/passwordChecks.ts';
+import { API_ORIGIN } from '@lib/utils/base.ts';
 
 type Focus = 'profile' | 'password' | undefined;
 
 type Gender = '' | 'MALE' | 'FEMALE' | 'OTHER';
 
+type MeResponse = {
+  name?: string | null;
+  email?: string | null;
+  nickname?: string | null;
+  phoneNumber?: string | null;
+  companyName?: string | null;
+  position?: string | null;
+  birthDate?: string | null;
+  gender?: 'MALE' | 'FEMALE' | 'OTHER' | null;
+  profileUrl?: string | null;
+};
+
 export default function MyPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  // 편집 토글 & 폼 데이터
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // 1) 편집 토글 & 유저 상태
   const [editing, setEditing] = useState(false);
   const [user, setUser] = useState({
     name: '',
@@ -23,23 +38,20 @@ export default function MyPage() {
     position: '',
     birthDate: '',
     gender: '' as Gender,
-    profile: '/default-profile.png',
+    profileUrl: '/images/default-profile.jpg',
   });
-  type MeResponse = {
-    name?: string | null;
-    email?: string | null;
-    nickname?: string | null;
-    phoneNumber?: string | null;
-    companyName?: string | null;
-    position?: string | null;
-    birthDate?: string | null;
-    gender?: 'MALE' | 'FEMALE' | 'OTHER' | null;
-    profileUrl?: string | null;
-  };
 
   const [form, setForm] = useState(user);
 
-  // 1) 내 정보 조회
+  const resolvedProfileUrl =
+    user.profileUrl &&
+    (user.profileUrl.startsWith('http://') ||
+      user.profileUrl.startsWith('https://') ||
+      user.profileUrl.startsWith('data:'))
+      ? user.profileUrl
+      : `${API_ORIGIN}${user.profileUrl || '/images/default-profile.jpg'}`;
+
+  // 2) 내 정보 조회
   useEffect(() => {
     getMe()
       .then((data) => {
@@ -55,7 +67,7 @@ export default function MyPage() {
           position: me.position ?? prev.position,
           birthDate: me.birthDate ?? prev.birthDate,
           gender: (me.gender ?? prev.gender) as Gender,
-          profile: me.profileUrl || prev.profile,
+          profileUrl: me.profileUrl ?? prev.profileUrl,
         }));
         // 폼에도 동일값 반영
         setForm((f) => ({
@@ -68,7 +80,7 @@ export default function MyPage() {
           position: me.position ?? f.position,
           birthDate: me.birthDate ?? f.birthDate,
           gender: (me.gender ?? f.gender) as Gender,
-          profile: me.profileUrl || f.profile,
+          profileUrl: me.profileUrl || f.profileUrl,
         }));
       })
       .catch((err) => {
@@ -77,9 +89,10 @@ export default function MyPage() {
       });
   }, [navigate]);
 
-  // 2) 최근 재인증 여부
+  // 3) 최근 재인증 여부
 
-  const [recentlyReauthed, setRecentlyReauthed] = useState(false); //TTL을 상태로 보유 → UI가 자동 갱신됨
+  const [recentlyReauthed, setRecentlyReauthed] = useState(false);
+
   useEffect(() => {
     const checkReauth = () => {
       const raw = localStorage.getItem('reauthAt') || '0';
@@ -109,16 +122,14 @@ export default function MyPage() {
     };
   }, []);
 
-  // 의도에 따라 비밀번호 섹션 자동 오픈
+  // 4) 의도에 따라 비밀번호 섹션 자동 오픈
   const [expandPassword, setExpandPassword] = useState(false);
   useEffect(() => {
     const focusParam = searchParams.get('focus') as Focus | null; //URL 쿼리에서 focus 읽기
     if (focusParam === 'password') setExpandPassword(true); //  ?focus=password면 비번 섹션 자동 오픈
   }, [searchParams]); //URL 쿼리가 바뀌면 다시 평가
 
-  // 타입 분리된 onChange 핸들러
-
-  //  공통 업데이트 도우미(안전하게 키 제한)
+  // 5) 폼 변경 핸들러
   type FormKeys = 'name' | 'nickname' | 'phone' | 'position' | 'birthDate' | 'gender';
 
   const updateForm = (name: FormKeys, value: string) => {
@@ -147,7 +158,7 @@ export default function MyPage() {
     setEditing(false);
   };
 
-  // 내 정보 저장
+  // 6) 내 정보 저장
   const onSave = async () => {
     try {
       console.log('[MyPage] 저장 요청 payload:', {
@@ -175,7 +186,7 @@ export default function MyPage() {
     }
   };
 
-  // 비밀번호 변경 관련 상태 & 로직
+  // 7) 비밀번호 변경 관련 상태 & 로직
 
   const [currentPassword, setCurrentPassword] = useState(''); // 현재 비밀번호 입력값
   const [newPassword, setNewPassword] = useState(''); // 새 비밀번호 입력값
@@ -221,6 +232,49 @@ export default function MyPage() {
     setPasswordSuccess('사용 가능한 비밀번호입니다.');
   };
 
+  //  프로필 이미지 변경 관련 로직
+  const [uploading, setUploading] = useState(false);
+
+  const onClickChangePhoto = () => {
+    fileInputRef.current?.click();
+  };
+
+  const onChangeProfileFile: React.ChangeEventHandler<HTMLInputElement> = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const MAX_SIZE = 5 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      alert('이미지 용량이 너무 큽니다. 5MB 이하 파일만 업로드할 수 있어요.');
+      e.target.value = '';
+      return;
+    }
+
+    try {
+      setUploading(true);
+      const updated = (await uploadProfileImage(file)) as MeResponse;
+
+      // 응답에서 profileUrl만 업데이트
+      setUser((prev) => ({
+        ...prev,
+        profileUrl: updated.profileUrl ?? prev.profileUrl,
+      }));
+      setForm((f) => ({
+        ...f,
+        profileUrl: updated.profileUrl ?? f.profileUrl,
+      }));
+
+      alert('프로필 이미지가 변경되었습니다.');
+    } catch (err) {
+      console.error('프로필 이미지 업로드 실패:', err);
+      alert('프로필 이미지 변경에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setUploading(false);
+      // 같은 파일 다시 선택해도 change 이벤트 뜨도록 초기화
+      e.target.value = '';
+    }
+  };
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-start bg-[var(--color-jd-white)] px-6 py-10 font-[var(--default-font-family)] sm:px-6 sm:py-12 md:px-8">
       <div className="mt-10 mb-6 w-full max-w-[860px]">
@@ -247,15 +301,28 @@ export default function MyPage() {
           {/* 프로필 */}
           <div className="w-full self-center sm:w-40 sm:self-start">
             <div className="mx-auto mb-3 h-28 w-28 overflow-hidden rounded-full bg-[var(--color-jd-gray-light)] sm:mx-0 sm:h-40 sm:w-40">
-              <img src={user.profile} alt="profile" className="h-full w-full object-cover" />
+              <img src={resolvedProfileUrl} alt="profile" className="h-full w-full object-cover" />
             </div>
-            <button className="mt-4 w-full rounded-md bg-[var(--color-jd-gray-light)] py-2 text-sm">
-              사진 변경
+            {/* 숨겨진 파일 업로더 */}
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              className="hidden"
+              onChange={onChangeProfileFile}
+            />
+
+            <button
+              type="button"
+              onClick={onClickChangePhoto}
+              disabled={uploading}
+              className="mt-4 w-full rounded-md bg-[var(--color-jd-gray-light)] py-2 text-sm disabled:opacity-60"
+            >
+              {uploading ? '업로드 중...' : '사진 변경'}
             </button>
           </div>
 
-          {/* 정보 폼/뷰 */}
-          {/* ===== 기본 정보 섹션 ===== */}
+          {/* 기본 정보 섹션 */}
           <div className="flex-1">
             <h3 className="mb-4 border-b border-black/10 pb-2 text-sm font-semibold text-[var(--color-jd-gray-dark)]">
               기본 정보
@@ -359,7 +426,7 @@ export default function MyPage() {
               )}
             </div>
 
-            {/* ===== 조직 정보 섹션 ===== */}
+            {/*  조직 정보 섹션 */}
             <h3 className="mt-8 mb-4 border-b border-black/10 pb-2 text-sm font-semibold text-[var(--color-jd-gray-dark)]">
               조직 정보
             </h3>
