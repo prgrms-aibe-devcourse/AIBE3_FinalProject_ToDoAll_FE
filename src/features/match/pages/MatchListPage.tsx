@@ -1,13 +1,17 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import MatchFilterSection from '../components/MatchFilterSection';
 import MatchCard from '../components/MatchCard';
 import NoSearchResult from '../components/NoSearchResult';
 
-import { fetchAllMatchedResumes } from '../api/matchApi';
+import { fetchAllMatchedResumes, confirmMatch } from '../api/matchApi';
+
 import { mapMatchDtoToCardData } from '../utils/mapMatchDtoToCardData';
 import { mapRecommendationToCardData } from '../utils/mapRecommendationToResumeData';
-import type { MatchCardData } from '../types/matchCardData.types';
 import { fetchRecommendedResumes } from '../api/recommendation.api';
+
+import type { MatchCardData } from '../types/matchCardData.types';
 
 export default function MatchListPage() {
   const [resumes, setResumes] = useState<MatchCardData[]>([]);
@@ -20,6 +24,7 @@ export default function MatchListPage() {
   const [totalPages, setTotalPages] = useState(1);
 
   const JD_ID = 2001;
+  const navigate = useNavigate();
 
   useEffect(() => {
     const load = async () => {
@@ -44,6 +49,19 @@ export default function MatchListPage() {
 
     load();
   }, [tab, limit, page]);
+
+  const handleInvite = async (resumeId: number) => {
+    try {
+      await confirmMatch(JD_ID, resumeId);
+      console.log('매칭 확정 성공');
+    } catch (error) {
+      console.error('매칭 확정 실패:', error);
+      alert('이미 매칭된 지원자이거나 오류가 발생했습니다.');
+      return;
+    }
+
+    navigate('/interview/create');
+  };
 
   return (
     <div className="min-h-screen bg-[#FAF8F8] p-6">
@@ -73,7 +91,7 @@ export default function MatchListPage() {
               resume={resume}
               matchRate={resume.matchScore ?? 0}
               onView={() => console.log('보기 클릭', resume.name)}
-              onInvite={() => console.log('면접 초대 클릭', resume.name)}
+              onInvite={() => handleInvite(resume.resumeId)}
             />
           ))}
       </div>
