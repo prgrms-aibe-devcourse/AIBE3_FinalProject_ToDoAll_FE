@@ -1,6 +1,6 @@
 on:
   push:
-    branches: [develop]
+    branches: [main, develop]
   pull_request:
     branches: [develop]
 
@@ -132,7 +132,7 @@ jobs:
             });
 
   Vercel-Deploy :
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     needs: Test-And-Build
     steps:
