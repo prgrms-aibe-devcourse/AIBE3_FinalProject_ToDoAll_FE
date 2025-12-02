@@ -13,7 +13,7 @@ type UserProfile = {
   interests: string[];
 };
 
-// 실제에선 API 호출로 대체될 mock
+// 실제 API 대신 사용하는 더미 fetch 함수들
 const mockFetchUserProfile = async (): Promise<UserProfile> => {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -46,8 +46,8 @@ const mockFetchQuestions = async (): Promise<InterviewQuestionAiDto[]> => {
           content: '협업 과정에서 발생한 갈등을 해결했던 경험이 있다면 말씀해 주세요.',
         },
         {
-          questionType: 'OPERATIONS',
-          content: '프론트엔드 성능을 측정하거나 모니터링할 때 주로 사용하는 지표와 도구가 있나요?',
+          questionType: 'BEHAVIOR',
+          content: '본인이 가장 크게 성장을 느꼈던 경험과 그 계기를 말씀해 주세요.',
         },
       ]);
     }, 800);
@@ -57,7 +57,9 @@ const mockFetchQuestions = async (): Promise<InterviewQuestionAiDto[]> => {
 const InterviewQuestionNotePage: React.FC = () => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [questions, setQuestions] = useState<InterviewQuestionAiDto[] | null>(null);
+  const [originalQuestions, setOriginalQuestions] = useState<InterviewQuestionAiDto[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -77,6 +79,44 @@ const InterviewQuestionNotePage: React.FC = () => {
     load();
   }, []);
 
+  const handleEnterEditMode = () => {
+    if (!questions) return;
+    setOriginalQuestions(questions);
+    setIsEditMode(true);
+  };
+
+  const handleCancelEdit = () => {
+    if (originalQuestions) {
+      setQuestions(originalQuestions);
+    }
+    setIsEditMode(false);
+    setOriginalQuestions(null);
+  };
+
+  const handleSaveEdit = () => {
+    // TODO: 추후 여기서 API 호출로 서버에 저장
+    setIsEditMode(false);
+    setOriginalQuestions(null);
+  };
+
+  const handleContentChange = (index: number, value: string) => {
+    setQuestions((prev) => {
+      if (!prev) return prev;
+      const copy = [...prev];
+      copy[index] = { ...copy[index], content: value };
+      return copy;
+    });
+  };
+
+  const handleTypeChange = (index: number, value: string) => {
+    setQuestions((prev) => {
+      if (!prev) return prev;
+      const copy = [...prev];
+      copy[index] = { ...copy[index], questionType: value };
+      return copy;
+    });
+  };
+
   const renderQuestions = () => {
     if (isLoading || !questions || questions.length === 0) {
       return (
@@ -87,22 +127,26 @@ const InterviewQuestionNotePage: React.FC = () => {
       );
     }
 
-    // 타입별 그룹핑
-    const grouped: Record<string, InterviewQuestionAiDto[]> = questions.reduce(
-      (acc, q) => {
+    // index 포함해서 타입별 그룹핑
+    const questionsWithIndex = questions.map((q, idx) => ({
+      ...q,
+      index: idx,
+    }));
+
+    const grouped = questionsWithIndex.reduce(
+      (acc: Record<string, { questionType: string; content: string; index: number }[]>, q) => {
         if (!acc[q.questionType]) acc[q.questionType] = [];
         acc[q.questionType].push(q);
         return acc;
       },
-      {} as Record<string, InterviewQuestionAiDto[]>
+      {}
     );
 
-    const typeOrder = ['TECH', 'CORE', 'BEHAVIOR', 'OPERATIONS'];
+    const typeOrder = ['TECH', 'CORE', 'BEHAVIOR'];
     const typeLabel: Record<string, string> = {
       TECH: '기술 역량 질문 (TECH)',
       CORE: '공통/핵심 역량 질문 (CORE)',
       BEHAVIOR: '태도/경험 질문 (BEHAVIOR)',
-      OPERATIONS: '운영·품질 관련 질문 (OPERATIONS)',
     };
 
     const sortedTypes = Object.keys(grouped).sort((a, b) => {
@@ -113,19 +157,49 @@ const InterviewQuestionNotePage: React.FC = () => {
       return sa - sb;
     });
 
+    const typeOptions = ['TECH', 'CORE', 'BEHAVIOR'];
+
     return (
       <div className="flex flex-col gap-6">
         {sortedTypes.map((type) => (
           <section key={type} className="flex flex-col gap-3">
             <h2 className="text-sm font-semibold text-slate-900">{typeLabel[type] ?? type}</h2>
             <div className="flex flex-col gap-2.5">
-              {grouped[type].map((q, index) => (
+              {grouped[type].map((q) => (
                 <div
-                  key={`${type}-${index}`}
-                  className="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5"
+                  key={`${type}-${q.index}`}
+                  className="flex flex-col gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5"
                 >
-                  <span className="mt-1 h-2 w-2 rounded-full bg-purple-400" />
-                  <p className="flex-1 text-sm leading-relaxed text-slate-800">{q.content}</p>
+                  {isEditMode ? (
+                    <div className="flex items-center gap-2">
+                      <label className="text-[11px] text-slate-500">타입</label>
+                      <select
+                        className="h-7 rounded-md border border-slate-300 bg-white px-2 text-[11px]"
+                        value={q.questionType}
+                        onChange={(e) => handleTypeChange(q.index, e.target.value)}
+                      >
+                        {typeOptions.map((opt) => (
+                          <option key={opt} value={opt}>
+                            {opt}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  ) : (
+                    <span className="inline-flex items-center self-start rounded-full bg-purple-100 px-2 py-0.5 text-[11px] font-semibold text-purple-700">
+                      {q.questionType}
+                    </span>
+                  )}
+
+                  {isEditMode ? (
+                    <textarea
+                      className="min-h-[60px] w-full rounded-md border border-slate-300 bg-white px-2 py-1 text-sm text-slate-800 outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-300"
+                      value={q.content}
+                      onChange={(e) => handleContentChange(q.index, e.target.value)}
+                    />
+                  ) : (
+                    <p className="text-sm leading-relaxed text-slate-800">{q.content}</p>
+                  )}
                 </div>
               ))}
             </div>
@@ -136,8 +210,8 @@ const InterviewQuestionNotePage: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-100">
-      <main className="flex flex-1 gap-5 px-5 py-4">
+    <div className="flex min-h-screen items-start justify-center bg-slate-100 px-5 py-6">
+      <main className="flex w-full max-w-6xl gap-5">
         {/* 왼쪽 프로필 */}
         <aside className="w-72 flex-shrink-0">
           <div className="flex flex-col gap-4 rounded-2xl bg-white p-5 shadow-md">
@@ -172,20 +246,40 @@ const InterviewQuestionNotePage: React.FC = () => {
           </div>
         </aside>
 
-        {/* 오른쪽 질문 영역 */}
+        {/* 오른쪽 질문 패널 */}
         <section className="flex flex-1">
           <div className="flex flex-1 flex-col rounded-2xl bg-white px-6 py-5 shadow-md">
             <div className="mb-4 flex items-center justify-between">
               <h1 className="text-base font-semibold text-slate-900">질문 목록</h1>
+
+              {/* 보기 / 수정 모드 토글 및 저장/취소 */}
+              {isEditMode ? (
+                <div className="flex items-center gap-2">
+                  <button
+                    className="inline-flex items-center rounded-full bg-slate-200 px-4 py-1.5 text-xs font-semibold text-slate-800 hover:bg-slate-300"
+                    onClick={handleCancelEdit}
+                  >
+                    취소
+                  </button>
+                  <button
+                    className="inline-flex items-center rounded-full bg-purple-700 px-4 py-1.5 text-xs font-semibold text-white hover:bg-purple-800"
+                    onClick={handleSaveEdit}
+                  >
+                    저장
+                  </button>
+                </div>
+              ) : (
+                <button
+                  className="inline-flex items-center rounded-full bg-purple-700 px-5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-purple-800 disabled:opacity-50"
+                  disabled={isLoading || !questions || questions.length === 0}
+                  onClick={handleEnterEditMode}
+                >
+                  질문 수정
+                </button>
+              )}
             </div>
 
             <div className="flex-1 overflow-y-auto">{renderQuestions()}</div>
-
-            <div className="mt-4 flex justify-end">
-              <button className="inline-flex items-center rounded-full bg-purple-700 px-5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-purple-800">
-                질문 수정
-              </button>
-            </div>
           </div>
         </section>
       </main>
