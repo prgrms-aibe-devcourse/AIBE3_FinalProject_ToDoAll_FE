@@ -51,7 +51,6 @@ const InterviewQuestionNotePage: React.FC = () => {
 
   const apiBaseUrl = import.meta.env.VITE_API_URL || '';
 
-  // ====== GET: 질문 조회 ======
   const fetchQuestions = async () => {
     if (!interviewId) {
       setLoadError('면접 ID가 없습니다.');
@@ -98,10 +97,8 @@ const InterviewQuestionNotePage: React.FC = () => {
 
   useEffect(() => {
     fetchQuestions();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [interviewId]);
 
-  // ====== PUT: 질문 수정/저장 ======
   const saveQuestions = async () => {
     if (!interviewId || !questions) return;
 
@@ -109,7 +106,6 @@ const InterviewQuestionNotePage: React.FC = () => {
     setSaveError(null);
 
     try {
-      // 백엔드 InterviewQuestionUpdateRequestDto 구조에 맞게 수정
       const updatePayload = {
         questions: questions.map((q) => ({
           questionId: q.id,
@@ -138,7 +134,6 @@ const InterviewQuestionNotePage: React.FC = () => {
     } catch (err) {
       console.error(err);
       setSaveError('질문을 저장하는 중 오류가 발생했습니다.');
-      // 롤백
       if (originalQuestions) {
         setQuestions(originalQuestions);
       }
@@ -148,9 +143,7 @@ const InterviewQuestionNotePage: React.FC = () => {
     }
   };
 
-  // 보기 ↔ 수정 토글 + 저장 트리거
   const handleToggleEdit = () => {
-    // 보기 → 수정
     if (!isEditing) {
       if (questions) {
         setOriginalQuestions(questions);
@@ -160,7 +153,6 @@ const InterviewQuestionNotePage: React.FC = () => {
       return;
     }
 
-    // 수정 → 보기 (저장 시도)
     if (!questions) {
       setIsEditing(false);
       return;
@@ -306,7 +298,6 @@ const InterviewQuestionNotePage: React.FC = () => {
       <h1 className="text-jd-black mb-6 text-2xl font-bold">질문 노트</h1>
 
       <div className="flex gap-8">
-        {/* 왼쪽 프로필 */}
         <div className="w-1/4">
           <ProfileCard
             profileData={initialProfileData}
@@ -315,7 +306,6 @@ const InterviewQuestionNotePage: React.FC = () => {
           />
         </div>
 
-        {/* 오른쪽 질문 영역 */}
         <div className="w-3/4">
           <div className="rounded-2xl border border-gray-200 bg-white p-8 text-sm leading-relaxed shadow-md">
             <div className="mb-4 flex items-center justify-between">
@@ -332,7 +322,6 @@ const InterviewQuestionNotePage: React.FC = () => {
             {renderQuestions()}
           </div>
 
-          {/* 보기/수정 토글 + 저장 트리거 */}
           <EditButton isEditing={isEditing} onToggle={handleToggleEdit} />
         </div>
       </div>
