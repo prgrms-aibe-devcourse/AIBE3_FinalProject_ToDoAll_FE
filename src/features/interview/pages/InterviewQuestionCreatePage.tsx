@@ -7,7 +7,7 @@ import EditButton from '../components/question-create/EditButton';
 import type { ApiResponse } from '@/features/jd/services/jobApi';
 
 type InterviewQuestionResponseDto = {
-  id: number;
+  questionId: number;
   questionType: string;
   content: string;
 };
@@ -81,7 +81,7 @@ const InterviewQuestionNotePage: React.FC = () => {
 
       const mapped: InterviewQuestionAiDto[] =
         body.data?.map((q) => ({
-          id: q.id,
+          id: q.questionId,
           questionType: q.questionType,
           content: q.content,
         })) ?? [];
@@ -112,7 +112,7 @@ const InterviewQuestionNotePage: React.FC = () => {
       // 백엔드 InterviewQuestionUpdateRequestDto 구조에 맞게 수정
       const updatePayload = {
         questions: questions.map((q) => ({
-          id: q.id,
+          questionId: q.id,
           questionType: q.questionType,
           content: q.content,
         })),
@@ -132,13 +132,6 @@ const InterviewQuestionNotePage: React.FC = () => {
         console.error('PUT error:', res.status, text);
         throw new Error(`HTTP ${res.status}`);
       }
-
-      // 성공 응답: ApiResponse<string> 정도일 것으로 가정
-      const body: ApiResponse<string> = await res.json();
-      console.log('update success:', body);
-
-      // 서버 기준으로 다시 싱크 맞추고 싶으면 재조회
-      await fetchQuestions();
 
       setOriginalQuestions(null);
       setIsEditing(false);
