@@ -13,7 +13,7 @@ type InterviewQuestionResponseDto = {
 };
 
 type InterviewQuestionAiDto = {
-  id: number;
+  id: number | null;
   questionType: string;
   content: string;
 };
@@ -107,11 +107,13 @@ const InterviewQuestionNotePage: React.FC = () => {
 
     try {
       const updatePayload = {
-        questions: questions.map((q) => ({
-          questionId: q.id,
-          questionType: q.questionType,
-          content: q.content,
-        })),
+        questions: questions
+          .filter((q) => q.content.trim().length > 0)
+          .map((q) => ({
+            questionId: q.id,
+            questionType: q.questionType,
+            content: q.content,
+          })),
       };
 
       const res = await fetch(`${apiBaseUrl}/api/v1/interviews/${interviewId}/questions`, {
@@ -134,6 +136,7 @@ const InterviewQuestionNotePage: React.FC = () => {
     } catch (err) {
       console.error(err);
       setSaveError('질문을 저장하는 중 오류가 발생했습니다.');
+
       if (originalQuestions) {
         setQuestions(originalQuestions);
       }
@@ -179,6 +182,20 @@ const InterviewQuestionNotePage: React.FC = () => {
     });
   };
 
+  const handleAddQuestion = (questionType: 'TECH' | 'CORE' | 'BEHAVIOR') => {
+    setQuestions((prev) => {
+      if (!prev) return prev;
+      return [
+        ...prev,
+        {
+          id: null,
+          questionType,
+          content: '',
+        },
+      ];
+    });
+  };
+
   const renderQuestions = () => {
     if (isLoading) {
       return (
@@ -217,7 +234,10 @@ const InterviewQuestionNotePage: React.FC = () => {
 
     const grouped = questionsWithIndex.reduce(
       (
-        acc: Record<string, { id: number; questionType: string; content: string; index: number }[]>,
+        acc: Record<
+          string,
+          { id: number | null; questionType: string; content: string; index: number }[]
+        >,
         q
       ) => {
         if (!acc[q.questionType]) acc[q.questionType] = [];
@@ -233,7 +253,7 @@ const InterviewQuestionNotePage: React.FC = () => {
       CORE: '공통/핵심 역량 질문 (CORE)',
       BEHAVIOR: '태도/경험 질문 (BEHAVIOR)',
     };
-    const typeOptions = ['TECH', 'CORE', 'BEHAVIOR'];
+    const typeOptions: ('TECH' | 'CORE' | 'BEHAVIOR')[] = ['TECH', 'CORE', 'BEHAVIOR'];
 
     const sortedTypes = Object.keys(grouped).sort((a, b) => {
       const ia = typeOrder.indexOf(a);
@@ -247,11 +267,24 @@ const InterviewQuestionNotePage: React.FC = () => {
       <div className="flex flex-col gap-6">
         {sortedTypes.map((type) => (
           <section key={type} className="flex flex-col gap-3">
-            <h2 className="text-sm font-semibold text-slate-900">{typeLabel[type] ?? type}</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-slate-900">{typeLabel[type] ?? type}</h2>
+
+              {isEditing && (
+                <button
+                  type="button"
+                  onClick={() => handleAddQuestion(type as 'TECH' | 'CORE' | 'BEHAVIOR')}
+                  className="rounded-full border border-purple-200 px-3 py-1 text-[11px] font-semibold text-purple-700 hover:bg-purple-50"
+                >
+                  + {typeLabel[type] ? typeLabel[type].split(' ')[0] : type} 질문 추가
+                </button>
+              )}
+            </div>
+
             <div className="flex flex-col gap-2.5">
               {grouped[type].map((q) => (
                 <div
-                  key={q.id}
+                  key={q.id ?? `new-${type}-${q.index}`}
                   className="flex flex-col gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5"
                 >
                   {isEditing ? (
