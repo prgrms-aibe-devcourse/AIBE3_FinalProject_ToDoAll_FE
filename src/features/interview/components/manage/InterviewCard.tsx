@@ -12,6 +12,7 @@ export interface InterviewCardProps {
   interviewers: string;
   status: InterviewStatus;
   avatar: string;
+  resumeId: number;
 }
 
 export default function InterviewCard({
@@ -23,6 +24,7 @@ export default function InterviewCard({
   interviewers,
   status,
   avatar,
+  resumeId,
 }: InterviewCardProps) {
   return (
     <div
@@ -38,7 +40,13 @@ export default function InterviewCard({
       <InterviewInfoSection date={date} time={time} interviewers={interviewers} />
 
       {/* 버튼 영역 */}
-      <InterviewActions status={status} name={name} avatar={avatar} interviewId={id} />
+      <InterviewActions
+        status={status}
+        name={name}
+        avatar={avatar}
+        interviewId={id}
+        resumeId={resumeId}
+      />
     </div>
   );
 }

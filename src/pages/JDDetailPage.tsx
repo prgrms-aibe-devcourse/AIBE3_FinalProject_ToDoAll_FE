@@ -3,6 +3,7 @@ import JobDetailView from '../features/jd/components/detail/JobDetailView';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { fetchJobDetail } from '../features/jd/services/jobApi';
+import { Link } from 'react-router-dom';
 
 export default function JDDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -19,6 +20,12 @@ export default function JDDetailPage() {
         <h1 className="text-lg font-semibold">공고 관리</h1>
       </div>
       <JobDetailView job={data} onEdit={() => navigate(`/jobs/${id}/update`)} />
+      <Link
+        to={`/jobs/${id}/matches`}
+        className="rounded bg-[#752F6D] px-4 py-2 text-white transition hover:bg-[#9A3F90]"
+      >
+        지원자 관리
+      </Link>
     </main>
   );
 }

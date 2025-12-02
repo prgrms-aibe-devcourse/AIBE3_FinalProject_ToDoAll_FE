@@ -1,21 +1,20 @@
-import type { ResumeData } from '../../resumes/types/resumes.types';
 import emptyHeartImg from '../../../assets/Favorite-2.png';
 import fullHeartImg from '../../../assets/Heart.png';
 import { useState } from 'react';
+import type { MatchCardData } from '../types/matchCardData.types';
 
 type Props = {
-  resume: ResumeData;
-  matchRate?: number;
-  onView?: () => void;
-  onInvite?: () => void;
+  resume: MatchCardData;
+  matchRate: number;
+  onView: () => void;
+  onInvite: () => void;
 };
 
-export default function MatchCard({ resume, matchRate = 50, onView }: Props) {
+export default function MatchCard({ resume, matchRate = 50, onView, onInvite }: Props) {
   const [checked, setChecked] = useState(false);
 
-  const handleClick = () => {
+  const handleBookmark = () => {
     setChecked(!checked);
-    onView?.();
   };
 
   return (
@@ -51,19 +50,17 @@ export default function MatchCard({ resume, matchRate = 50, onView }: Props) {
               </div>
             </div>
 
-            <div className="mb-3 flex flex-wrap gap-2">
-              {resume.skills.map((skill) => (
-                <span
-                  key={skill.name}
-                  className="rounded-full border border-[#837C7C] bg-white px-2 py-1 text-xs text-[#837C7C]"
-                >
-                  {skill.name}
-                </span>
-              ))}
-            </div>
+            {resume.summary && (
+              <div className="mt-4">
+                <div className="text-m mb-1 font-medium text-[#413F3F]">지원자 이력서 요약</div>
+                <p className="text-sm leading-relaxed whitespace-pre-line text-[#837C7C]">
+                  {resume.summary}
+                </p>
+              </div>
+            )}
 
             {resume.career && resume.career.length > 0 && (
-              <ul className="mb-4 list-inside list-disc text-sm text-[#837C7C]">
+              <ul className="mt-4 list-inside list-disc text-sm text-[#837C7C]">
                 {resume.career.map((c, idx) => (
                   <li key={idx}>
                     {c.company} / {c.position} / {c.department}
@@ -76,21 +73,21 @@ export default function MatchCard({ resume, matchRate = 50, onView }: Props) {
       </div>
 
       <div className="absolute top-6 right-6 flex flex-col items-end gap-2">
-        <button onClick={handleClick} className="rounded-full transition">
+        <button onClick={handleBookmark} className="rounded-full transition">
           <img src={checked ? fullHeartImg : emptyHeartImg} alt="heart" className="h-5 w-5" />
         </button>
       </div>
 
       <div className="absolute right-6 bottom-6 flex gap-2">
         <button
-          onClick={handleClick}
+          onClick={onView}
           className="rounded-full bg-[#752F6D] px-4 py-2 font-medium text-[#FAF8F8] transition hover:bg-[#9A3F90]"
         >
           보류
         </button>
         <button
-          onClick={handleClick}
-          className="rounded-full bg-[#752F6D] px-4 py-2 font-medium text-[#FAF8F8] transition hover:bg-[#9A3F90]"
+          onClick={onInvite}
+          className="rounded-full bg-[#DE4F36] px-4 py-2 font-medium text-white transition hover:bg-[#b73d2b]"
         >
           면접 초대
         </button>

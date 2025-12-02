@@ -60,3 +60,34 @@ export async function uploadProfileImage(file: File): Promise<unknown> {
   // CommonResponse 래핑을 고려해서 data 우선 반환
   return body?.data ?? body;
 }
+
+// 채팅 내역 조회 API
+// GET /api/v1/interviews/{interviewId}/chat
+// Response: { errorCode: 0, message: "string", data: [{ id, senderId, sender, content, createdAt }] }
+export interface ChatMessage {
+  id: number;
+  senderId: number;
+  sender: string;
+  content: string;
+  createdAt: string;
+}
+
+export async function getChatHistory(interviewId: number): Promise<ChatMessage[]> {
+  const res = await request<{ errorCode: number; message: string; data: ChatMessage[] }>(
+    `/api/v1/interviews/${interviewId}/chat`,
+    {
+      method: 'GET',
+    }
+  );
+
+  return res?.data ?? [];
+}
+
+// 면접 메모 조회 API
+export async function getInterviewMemos(interviewId: number): Promise<any[]> {
+  const res = await request<any>(`/api/v1/interviews/${interviewId}/memos`, {
+    method: 'GET',
+  });
+
+  return res?.data ?? res;
+}

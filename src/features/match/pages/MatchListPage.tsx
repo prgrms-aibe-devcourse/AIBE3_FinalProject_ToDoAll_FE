@@ -1,63 +1,117 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+
 import MatchFilterSection from '../components/MatchFilterSection';
 import MatchCard from '../components/MatchCard';
-import { mockResumes } from '../data/mockResumes';
-import type { ResumeData } from '../../resumes/types/resumes.types';
 import NoSearchResult from '../components/NoSearchResult';
 
+import { fetchAllMatchedResumes, confirmMatch } from '../api/matchApi';
+import { fetchRecommendedResumes } from '../api/recommendation.api';
+
+import { mapMatchDtoToCardData } from '../utils/mapMatchDtoToCardData';
+import { mapRecommendationToCardData } from '../utils/mapRecommendationToResumeData';
+
+import type { MatchCardData } from '../types/matchCardData.types';
+
 export default function MatchListPage() {
-  const [keyword, setKeyword] = useState('');
-  const [sortBy, setSortBy] = useState<'latest' | 'oldest' | 'name'>('latest');
-  const [tab, setTab] = useState<'all' | 'recommended'>('all');
+  const { id } = useParams<{ id: string }>();
+  const JD_ID = Number(id);
+  const navigate = useNavigate();
 
-  const filteredResumes = useMemo(() => {
-    let result = [...mockResumes];
+  const [resumes, setResumes] = useState<MatchCardData[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-    if (tab === 'recommended') {
-      result = result.filter((r) => r.skills.some((s) => s.name === 'React')); // 예시: React 스킬 있는 사람 추천
+  const [tab, setTab] = useState<'recommended' | 'all'>('recommended');
+  const [limit, setLimit] = useState(10);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+
+  useEffect(() => {
+    if (!JD_ID) return;
+    const load = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        if (tab === 'recommended') {
+          const recs = await fetchRecommendedResumes(JD_ID, limit);
+          setResumes(recs.map(mapRecommendationToCardData));
+        } else {
+          const all = await fetchAllMatchedResumes(JD_ID, page, limit);
+          setResumes(all.content.map(mapMatchDtoToCardData));
+          setTotalPages(all.totalPages);
+        }
+      } catch (_e) {
+        console.error(_e);
+        setError('지원자 목록을 불러오지 못했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    load();
+  }, [JD_ID, tab, limit, page]);
+
+  const handleInvite = async (resumeId: number) => {
+    try {
+      await confirmMatch(JD_ID, resumeId);
+      console.log('매칭 확정 성공');
+      navigate(`/interview/create?resumeId=${resumeId}&jdId=${JD_ID}`);
+    } catch (error) {
+      console.error('매칭 확정 실패:', error);
+      alert('이미 매칭된 지원자이거나 오류가 발생했습니다.');
     }
-
-    if (keyword) {
-      result = result.filter(
-        (r) =>
-          r.name.toLowerCase().includes(keyword.toLowerCase()) ||
-          r.skills.some((s) => s.name.toLowerCase().includes(keyword.toLowerCase()))
-      );
-    }
-
-    result.sort((a, b) => {
-      if (sortBy === 'latest')
-        return new Date(b.applyDate).getTime() - new Date(a.applyDate).getTime();
-      if (sortBy === 'oldest')
-        return new Date(a.applyDate).getTime() - new Date(b.applyDate).getTime();
-      if (sortBy === 'name') return a.name.localeCompare(b.name);
-      return 0;
-    });
-
-    return result;
-  }, [keyword, sortBy, tab]);
+  };
 
   return (
     <div className="min-h-screen bg-[#FAF8F8] p-6">
-      <h1 className="mb-6 text-2xl font-semibold text-[#413F3F]">지원자 조회</h1>
+      <h1 className="mb-6 text-2xl font-semibold text-[#413F3F]">
+        {tab === 'recommended' ? '추천된 지원자' : '전체 지원자'}
+      </h1>
 
-      <MatchFilterSection onSearch={setKeyword} onSortChange={setSortBy} onTabChange={setTab} />
+      <MatchFilterSection
+        onSearch={() => {}}
+        onTabChange={(t) => {
+          setTab(t);
+          setPage(0);
+        }}
+        onLimitChange={setLimit}
+      />
 
       <div className="mt-6 flex flex-col gap-4">
-        {filteredResumes.length > 0 ? (
-          filteredResumes.map((resume: ResumeData) => (
+        {loading && <p className="text-center">불러오는 중...</p>}
+        {error && <p className="text-center text-red-500">{error}</p>}
+        {!loading && !error && resumes.length === 0 && <NoSearchResult />}
+
+        {!loading &&
+          !error &&
+          resumes.map((resume) => (
             <MatchCard
-              key={resume.id}
+              key={resume.resumeId}
               resume={resume}
-              matchRate={Math.floor(Math.random() * 50) + 50} // 매칭률 예시
+              matchRate={resume.matchScore ?? 0}
               onView={() => console.log('보기 클릭', resume.name)}
-              onInvite={() => console.log('면접 초대 클릭', resume.name)}
+              onInvite={() => handleInvite(resume.resumeId)}
             />
-          ))
-        ) : (
-          <NoSearchResult />
-        )}
+          ))}
       </div>
+
+      {tab === 'all' && totalPages > 1 && (
+        <div className="mt-6 flex justify-center gap-4">
+          <button disabled={page === 0} onClick={() => setPage((p) => Math.max(p - 1, 0))}>
+            이전
+          </button>
+          <span>
+            {page + 1} / {totalPages}
+          </span>
+          <button
+            disabled={page >= totalPages - 1}
+            onClick={() => setPage((p) => Math.min(p + 1, totalPages - 1))}
+          >
+            다음
+          </button>
+        </div>
+      )}
     </div>
   );
 }
