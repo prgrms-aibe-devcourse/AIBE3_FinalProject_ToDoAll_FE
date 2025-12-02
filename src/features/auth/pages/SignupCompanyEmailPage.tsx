@@ -150,10 +150,6 @@ export default function SignupCompanyEmailPage() {
               </div>
             </div>
           )}
-
-          {sent && !invalid && (
-            <p className="text-sm text-[#413F3F]">{email} 주소로 인증 메일을 보냈습니다.</p>
-          )}
         </div>
 
         <button

@@ -41,7 +41,7 @@ export default function AlertModal({
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center">
       {/* 배경 오버레이 */}
-      <div className="absolute inset-0 bg-black/20" onClick={onClose} />
+      <div className="absolute inset-0 bg-transparent" onClick={onClose} />
 
       {/* 모달 카드 */}
       <div className="relative z-[71] w-[360px] rounded-2xl bg-white p-6 shadow-[0_12px_30px_rgba(0,0,0,.25)]">
