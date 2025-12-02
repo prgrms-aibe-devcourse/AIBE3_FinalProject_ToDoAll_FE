@@ -5,16 +5,16 @@ import InterviewSummarySection from '../components/chat/InterviewSummarySection'
 
 import { useEffect, useState } from 'react';
 
+import { getMe, getChatHistory, type ChatMessage } from '@/features/user/api/user.api';
+
 import {
-  getMe,
-  getChatHistory,
-  getInterviewMemos,
-  type ChatMessage,
-} from '@/features/user/api/user.api';
+  getInterviewQuestions,
+  toggleQuestionCheck,
+  type InterviewQuestion,
+} from '@/features/interview/api/question.api';
 
 import useInterviewSocket from '@/hooks/useInterviewSocket';
 
-// ⭐ 반드시 import 해야 함
 import { MessageType, type OutgoingChatMessage, type QuestionSection } from '../types/chatroom';
 
 export default function InterviewChatRoomPage() {
@@ -88,30 +88,35 @@ export default function InterviewChatRoomPage() {
     );
   }, [me]);
 
-  // 4) 메모 로드
+  // 4) 질문 로드
   useEffect(() => {
     if (!numericInterviewId) return;
 
     (async () => {
       try {
-        const memos = await getInterviewMemos(numericInterviewId);
+        const questions = await getInterviewQuestions(numericInterviewId);
 
-        const map = new Map<string, string[]>();
+        // topic별로 그룹화 (questionType이 topic 역할)
+        const map = new Map<string, InterviewQuestion[]>();
 
-        memos.forEach((memo: any) => {
-          const author = memo.author?.name ?? '익명';
-          if (!map.has(author)) map.set(author, []);
-          map.get(author)!.push(memo.content);
+        questions.forEach((q: InterviewQuestion) => {
+          const topic = q.questionType ?? '기타';
+          if (!map.has(topic)) map.set(topic, []);
+          map.get(topic)!.push(q);
         });
 
         setQuestionNotes(
-          Array.from(map.entries()).map(([topic, questions]) => ({
+          Array.from(map.entries()).map(([topic, questionList]) => ({
             topic,
-            questions,
+            questions: questionList.map((q) => ({
+              id: q.questionId, // 서버 필드
+              content: q.content,
+              checked: q.checked ?? false, // 서버에서 없음 → 기본 false
+            })),
           }))
         );
       } catch (e) {
-        console.error('메모 불러오기 실패:', e);
+        console.error('질문 불러오기 실패:', e);
       }
     })();
   }, [numericInterviewId]);
@@ -121,7 +126,6 @@ export default function InterviewChatRoomPage() {
     interviewId: numericInterviewId,
     onChatMessage: (msg: OutgoingChatMessage) => {
       setMessages((prev) => {
-        // 중복 메시지 체크 (같은 내용과 senderId를 가진 메시지가 이미 있으면 추가하지 않음)
         const isDuplicate = prev.some(
           (m) =>
             m.text === msg.content &&
@@ -145,7 +149,27 @@ export default function InterviewChatRoomPage() {
     },
   });
 
-  // 6) 메시지 전송 (낙관적 업데이트)
+  // 6) 질문 체크 토글 핸들러 ★ 수정한 부분
+  const handleToggleQuestionCheck = async (questionId: number) => {
+    try {
+      await toggleQuestionCheck(numericInterviewId, questionId);
+
+      // 서버는 checked 상태를 안 줌 → 프론트에서 바로 토글 처리
+      setQuestionNotes((prev) =>
+        prev.map((section) => ({
+          ...section,
+          questions: section.questions.map((q) =>
+            q.id === questionId ? { ...q, checked: !q.checked } : q
+          ),
+        }))
+      );
+    } catch (error) {
+      console.error('질문 체크 토글 실패:', error);
+      throw error;
+    }
+  };
+
+  // 7) 메시지 전송
   const handleSend = (content: string) => {
     if (!me) {
       console.warn('⚠️ 사용자 정보가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.');
@@ -160,7 +184,6 @@ export default function InterviewChatRoomPage() {
       isMine: true,
     };
 
-    // 즉시 화면에 추가 (낙관적 업데이트)
     setMessages((prev) => [...prev, newMessage]);
 
     const payload: OutgoingChatMessage = {
@@ -179,9 +202,6 @@ export default function InterviewChatRoomPage() {
     navigate('/interview/manage');
   };
 
-  // ==========================
-  // 7) UI 렌더링
-  // ==========================
   return (
     <div className="bg-jd-white text-jd-black flex h-screen flex-col overflow-hidden">
       <header className="flex h-20 shrink-0 items-center justify-between px-10 py-6">
@@ -197,7 +217,10 @@ export default function InterviewChatRoomPage() {
       <div className="flex flex-1 gap-6 overflow-hidden px-8 pb-8">
         <div className="flex h-full flex-1 gap-6 overflow-hidden">
           <ChatSection initialMessages={messages} onSend={handleSend} />
-          <QuestionNoteSection questionNotes={questionNotes} />
+          <QuestionNoteSection
+            questionNotes={questionNotes}
+            onToggleCheck={handleToggleQuestionCheck}
+          />
           <InterviewSummarySection summaries={[]} currentUserId={me?.id} />
         </div>
       </div>

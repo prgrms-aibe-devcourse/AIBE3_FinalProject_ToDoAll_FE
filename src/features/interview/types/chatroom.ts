@@ -14,9 +14,15 @@ export interface OutgoingChatMessage {
   content: string;
 }
 
+export interface QuestionItem {
+  id: number;
+  content: string;
+  checked: boolean;
+}
+
 export interface QuestionSection {
   topic: string;
-  questions: string[];
+  questions: QuestionItem[];
 }
 
 export interface InterviewSummary {

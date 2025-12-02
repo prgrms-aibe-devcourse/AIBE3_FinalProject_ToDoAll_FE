@@ -29,17 +29,41 @@ export default function InterviewNotePage() {
     {
       topic: '기술 및 아키텍처',
       questions: [
-        'React에서 렌더링 최적화를 위해 주로 어떤 방법들을 사용해 보셨나요?',
-        '대규모 전역상태 관리를 개선 시, 어떤 결과물로 이어졌나요?',
-        'Next.js의 dynamic routing과 static routing의 이해도는?',
-        'React 18 이후 도입된 concurrent rendering에 대한 이해도는?',
+        {
+          id: 1,
+          content: 'React에서 렌더링 최적화를 위해 주로 어떤 방법들을 사용해 보셨나요?',
+          checked: false,
+        },
+        {
+          id: 2,
+          content: '대규모 전역상태 관리를 개선 시, 어떤 결과물로 이어졌나요?',
+          checked: false,
+        },
+        {
+          id: 3,
+          content: 'Next.js의 dynamic routing과 static routing의 이해도는?',
+          checked: false,
+        },
+        {
+          id: 4,
+          content: 'React 18 이후 도입된 concurrent rendering에 대한 이해도는?',
+          checked: false,
+        },
       ],
     },
     {
       topic: '성능 및 품질 관리',
       questions: [
-        '성능 모니터링을 위해 어떤 도구를 사용하셨나요?',
-        'CI/CD 환경에서 품질 보장을 위한 전략은 무엇인가요?',
+        {
+          id: 5,
+          content: '성능 모니터링을 위해 어떤 도구를 사용하셨나요?',
+          checked: false,
+        },
+        {
+          id: 6,
+          content: 'CI/CD 환경에서 품질 보장을 위한 전략은 무엇인가요?',
+          checked: false,
+        },
       ],
     },
   ];
