@@ -4,6 +4,9 @@ import { fileURLToPath } from 'node:url';
 
 // https://vite.dev/config/
 export default defineConfig({
+  define: {
+    global: 'window',
+  },
   plugins: [react()],
   resolve: {
     alias: {
