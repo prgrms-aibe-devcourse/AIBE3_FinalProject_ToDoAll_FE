@@ -13,7 +13,7 @@ export interface LoginResponse {
 
 //  로그인 API
 export async function login(dto: LoginRequest): Promise<LoginResponse> {
-  const raw = await request<any>('/v1/auth/token', {
+  const raw = await request<any>('/api/v1/auth/token', {
     method: 'POST',
     body: JSON.stringify(dto),
   });
@@ -39,21 +39,21 @@ export async function login(dto: LoginRequest): Promise<LoginResponse> {
 
 //  로그아웃 API
 export async function logout() {
-  await request<void>('/v1/auth/logout', {
+  await request<void>('/api/v1/auth/logout', {
     method: 'POST',
   });
 }
 
 // 로그인 전 비번 찾기
 export async function requestResetEmail(email: string) {
-  await request<void>('/v1/auth/password/reset-requests', {
+  await request<void>('/api/v1/auth/password/reset-requests', {
     method: 'POST',
     body: JSON.stringify({ email }),
   });
 }
 // 토큰으로 비번 찾기
 export async function resetPasswordByToken(token: string, newPassword: string) {
-  await request<void>('/v1/auth/password/reset', {
+  await request<void>('/api/v1/auth/password/reset', {
     method: 'POST',
     body: JSON.stringify({ token, newPassword }),
   });
@@ -63,7 +63,7 @@ export async function resetPasswordByToken(token: string, newPassword: string) {
 
 // 이메일 인증 링크 요청
 export async function sendCompanyVerifyLink(email: string) {
-  await request<void>('/v1/auth/email-verifications', {
+  await request<void>('/api/v1/auth/email-verifications', {
     method: 'POST',
     body: JSON.stringify({ email }),
   });
@@ -71,18 +71,20 @@ export async function sendCompanyVerifyLink(email: string) {
 
 // 이메일 토큰 검증
 export async function verifyCompanyEmailToken(token: string) {
-  const path = `/v1/auth/email-verifications/complete?token=${encodeURIComponent(token)}`;
+  const path = `/api/v1/auth/email-verifications/complete?token=${encodeURIComponent(token)}`;
   // GET 요청 보내기
   const raw = await request<any>(path, {
     method: 'GET',
   });
+  // CommonResponse 래핑해제 → data 꺼내기
+  const data = unwrap<{ email: string; verifiedAt: string | null }>(raw);
 
   // 응답에서 verified + email을 보고, 인증된 이메일 저장
-  if (raw?.verified && raw.email) {
+  if (data?.email) {
     // 이메일 인증이 완료된 회사 이메일을 세션 스토리지에 저장
-    sessionStorage.setItem('verifiedCompanyEmail', raw.email);
+    sessionStorage.setItem('verifiedCompanyEmail', data.email);
   }
-  return raw;
+  return data;
 }
 
 // 회원가입 요청
@@ -95,7 +97,7 @@ export async function signup(payload: {
   companyName: string;
   password: string;
 }) {
-  const raw = await request<any>('/v1/users', {
+  const raw = await request<any>('/api/v1/users', {
     method: 'POST',
     body: JSON.stringify(payload),
   });
