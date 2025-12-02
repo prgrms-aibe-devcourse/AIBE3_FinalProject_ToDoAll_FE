@@ -42,7 +42,7 @@ export const mainRoutes = [
   { path: '/interview/create', element: <InterviewCreatePage /> },
   { path: '/mypage', element: <MyPage /> },
   { path: '/interview/manage', element: <InterviewManagePage /> },
-  { path: '/interview/question-create', element: <InterviewQuestionCreatePage /> },
+  { path: '/interview/:interviewId/question-create', element: <InterviewQuestionCreatePage /> },
   { path: '/interview/chat-room', element: <InterviewChatRoomPage /> },
   { path: '/interview/note', element: <InterviewNotePage /> },
   { path: '/resumes/:resumeId', element: <ResumeDetail /> },
