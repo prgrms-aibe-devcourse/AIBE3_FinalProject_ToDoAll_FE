@@ -31,6 +31,7 @@ export async function login(dto: LoginRequest): Promise<LoginResponse> {
     console.error('서버에서 로그인 토큰이 전달되지 않았습니다:', raw);
     throw new Error('로그인에 실패했습니다. 다시 시도해주세요.');
   }
+  localStorage.setItem('accessToken', result.accessToken);
 
   console.log('로그인 성공:', result);
 

@@ -1,8 +1,17 @@
-export interface Message {
-  id: number;
-  text: string;
+export const MessageType = {
+  CHAT: 'CHAT',
+  NOTE: 'NOTE',
+  SYSTEM: 'SYSTEM',
+} as const;
+
+export type MessageTypeValue = (typeof MessageType)[keyof typeof MessageType];
+
+export interface OutgoingChatMessage {
+  type: typeof MessageType.CHAT;
+  interviewId: number;
   senderId: number;
-  isMine: boolean;
+  sender: string;
+  content: string;
 }
 
 export interface QuestionSection {

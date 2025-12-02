@@ -1,14 +1,12 @@
-// src/hooks/useInterviewSocket.ts
-
 import { useEffect, useRef } from 'react';
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
 import type { IMessage } from '@stomp/stompjs';
+import type { OutgoingChatMessage } from '@/features/interview/types/chatroom';
 
 interface UseInterviewSocketProps {
   interviewId: number;
-  token: string;
-  onChatMessage?: (_msg: any) => void;
+  onChatMessage?: (_msg: OutgoingChatMessage) => void;
   onNoteMessage?: (_msg: any) => void;
   onSystemMessage?: (_msg: any) => void;
 }
@@ -34,7 +32,8 @@ export default function useInterviewSocket({
   useEffect(() => {
     if (!interviewId) return;
 
-    const wsUrl = import.meta.env.VITE_WS_URL || `${window.location.origin}/ws/interview`;
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+    const wsUrl = `${apiUrl.replace(/\/$/, '')}/ws/interview`;
 
     const socket = new SockJS(wsUrl);
 
@@ -42,9 +41,9 @@ export default function useInterviewSocket({
       webSocketFactory: () => socket as any,
       reconnectDelay: 3000,
 
-      // 🔥 Authorization 제거! 쿠키 기반 인증만 사용
       connectHeaders: {
         interviewId: `${interviewId}`,
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
       },
 
       debug: () => {},
@@ -53,23 +52,24 @@ export default function useInterviewSocket({
         console.log('%c[WS CONNECTED]', 'color: green');
 
         client.subscribe(`/topic/interview/${interviewId}/chat`, (msg: IMessage) => {
-          const body = JSON.parse(msg.body);
-          chatRef.current?.(body);
+          chatRef.current?.(JSON.parse(msg.body));
         });
 
         client.subscribe(`/topic/interview/${interviewId}/note`, (msg: IMessage) => {
-          const body = JSON.parse(msg.body);
-          noteRef.current?.(body);
+          noteRef.current?.(JSON.parse(msg.body));
         });
 
         client.subscribe(`/topic/interview/${interviewId}/system`, (msg: IMessage) => {
-          const body = JSON.parse(msg.body);
-          systemRef.current?.(body);
+          systemRef.current?.(JSON.parse(msg.body));
         });
       },
 
       onStompError: (frame) => {
-        console.error('[STOMP ERROR]', frame.headers['message']);
+        console.error('[STOMP ERROR]', {
+          message: frame.headers['message'],
+          headers: frame.headers,
+          body: frame.body,
+        });
       },
 
       onWebSocketError: (err) => {
@@ -81,22 +81,16 @@ export default function useInterviewSocket({
     clientRef.current = client;
 
     return () => {
-      console.log('%c[WS DISCONNECT]', 'color: orange');
       clientRef.current?.deactivate();
     };
   }, [interviewId]);
 
-  const sendChat = (content: string, senderId: number, sender: string) => {
+  const sendChat = (message: OutgoingChatMessage) => {
     if (!clientRef.current?.connected) return;
 
     clientRef.current.publish({
       destination: `/app/interview/${interviewId}/chat`,
-      body: JSON.stringify({
-        interviewId,
-        senderId,
-        sender,
-        content,
-      }),
+      body: JSON.stringify(message),
     });
   };
 

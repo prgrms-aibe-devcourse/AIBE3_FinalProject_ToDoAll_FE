@@ -2,42 +2,48 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import ChatSection from '../components/chat/ChatSection';
 import QuestionNoteSection from '../components/chat/QuestionNoteSection';
 import InterviewSummarySection from '../components/chat/InterviewSummarySection';
-import type { Message, QuestionSection } from '../types/chatroom';
+
 import { useEffect, useState } from 'react';
+
 import {
   getMe,
   getChatHistory,
   getInterviewMemos,
   type ChatMessage,
 } from '@/features/user/api/user.api';
+
 import useInterviewSocket from '@/hooks/useInterviewSocket';
+
+// ⭐ 반드시 import 해야 함
+import { MessageType, type OutgoingChatMessage, type QuestionSection } from '../types/chatroom';
 
 export default function InterviewChatRoomPage() {
   const location = useLocation();
   const { interviewId: interviewIdParam } = useParams();
-  const navigate = useNavigate();
 
+  const navigate = useNavigate();
   const numericInterviewId = Number(interviewIdParam);
 
   const [me, setMe] = useState<any>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<
+    { id: number; text: string; senderId: number; isMine: boolean }[]
+  >([]);
   const [questionNotes, setQuestionNotes] = useState<QuestionSection[]>([]);
 
-  // 초기 상태 로그
+  // 초기 로그
   useEffect(() => {
     console.log('🔍 InterviewChatRoomPage 초기화:', {
       interviewIdParam,
       numericInterviewId,
-      locationState: location.state,
+      state: location.state,
     });
   }, [interviewIdParam, numericInterviewId, location.state]);
 
-  // 1) 내 정보 불러오기
+  // 1) 사용자 정보 로드
   useEffect(() => {
     (async () => {
       try {
         const user = await getMe();
-        console.log('🔥 Loaded me:', user);
         setMe(user);
       } catch (error) {
         console.error('사용자 정보 가져오기 실패:', error);
@@ -45,23 +51,22 @@ export default function InterviewChatRoomPage() {
     })();
   }, []);
 
-  // 2) 채팅 내역 불러오기
+  // 2) 채팅 내역 로드 (me 없이도 즉시 로드)
   useEffect(() => {
     if (!numericInterviewId) {
-      console.error('❌ 유효하지 않은 interviewId:', interviewIdParam);
+      console.error('❌ 잘못된 interviewId:', interviewIdParam);
       return;
     }
 
     (async () => {
       try {
-        console.log('📥 채팅 내역 불러오기 시작:', numericInterviewId);
         const history = await getChatHistory(numericInterviewId);
 
         const mapped = history.map((m: ChatMessage) => ({
           id: m.id,
           text: m.content,
           senderId: m.senderId,
-          isMine: me ? m.senderId === me.id : false,
+          isMine: false, // me가 로드되면 나중에 업데이트됨
         }));
 
         setMessages(mapped);
@@ -69,9 +74,9 @@ export default function InterviewChatRoomPage() {
         console.error('채팅 내역 불러오기 실패:', e);
       }
     })();
-  }, [numericInterviewId, interviewIdParam, me]);
+  }, [numericInterviewId, interviewIdParam]);
 
-  // 3) me 로딩 후 메시지 소유자 판별 업데이트
+  // 3) me가 로드된 후 isMine 업데이트
   useEffect(() => {
     if (!me) return;
 
@@ -83,7 +88,7 @@ export default function InterviewChatRoomPage() {
     );
   }, [me]);
 
-  // 4) 메모 불러오기
+  // 4) 메모 로드
   useEffect(() => {
     if (!numericInterviewId) return;
 
@@ -92,7 +97,8 @@ export default function InterviewChatRoomPage() {
         const memos = await getInterviewMemos(numericInterviewId);
 
         const map = new Map<string, string[]>();
-        (memos || []).forEach((memo: any) => {
+
+        memos.forEach((memo: any) => {
           const author = memo.author?.name ?? '익명';
           if (!map.has(author)) map.set(author, []);
           map.get(author)!.push(memo.content);
@@ -104,38 +110,75 @@ export default function InterviewChatRoomPage() {
             questions,
           }))
         );
-      } catch (error) {
-        console.error('메모 불러오기 실패:', error);
+      } catch (e) {
+        console.error('메모 불러오기 실패:', e);
       }
     })();
   }, [numericInterviewId]);
 
-  // 5) WebSocket 연결
+  // 5) WebSocket 연결 (쿠키 기반 인증)
   const { sendChat } = useInterviewSocket({
     interviewId: numericInterviewId,
-    token: localStorage.getItem('accessToken') || '',
-    onChatMessage: (msg: any) => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: Date.now(),
-          text: msg.content,
-          senderId: msg.senderId,
-          isMine: msg.senderId === me?.id,
-        },
-      ]);
+    onChatMessage: (msg: OutgoingChatMessage) => {
+      setMessages((prev) => {
+        // 중복 메시지 체크 (같은 내용과 senderId를 가진 메시지가 이미 있으면 추가하지 않음)
+        const isDuplicate = prev.some(
+          (m) =>
+            m.text === msg.content &&
+            m.senderId === msg.senderId &&
+            Math.abs(m.id - Date.now()) < 5000
+        );
+        if (isDuplicate) {
+          return prev;
+        }
+
+        return [
+          ...prev,
+          {
+            id: Date.now(),
+            text: msg.content,
+            senderId: msg.senderId,
+            isMine: msg.senderId === me?.id,
+          },
+        ];
+      });
     },
   });
 
-  // 6) 메시지 전송
+  // 6) 메시지 전송 (낙관적 업데이트)
   const handleSend = (content: string) => {
-    if (!me) return;
-    sendChat(content, me.id, me.name);
+    if (!me) {
+      console.warn('⚠️ 사용자 정보가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+
+    const tempId = Date.now();
+    const newMessage = {
+      id: tempId,
+      text: content,
+      senderId: me.id,
+      isMine: true,
+    };
+
+    // 즉시 화면에 추가 (낙관적 업데이트)
+    setMessages((prev) => [...prev, newMessage]);
+
+    const payload: OutgoingChatMessage = {
+      type: MessageType.CHAT,
+      interviewId: numericInterviewId,
+      senderId: me.id,
+      sender: me.name ?? me.nickname ?? '사용자',
+      content,
+    };
+
+    console.log('📤 WebSocket 전송:', payload);
+    sendChat(payload);
   };
 
   const handleEndInterview = () => {
     navigate('/interview/manage');
   };
+
   // ==========================
   // 7) UI 렌더링
   // ==========================
