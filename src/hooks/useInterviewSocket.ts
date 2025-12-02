@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
-import type { IMessage } from '@stomp/stompjs';
+import type { IMessage, IFrame } from '@stomp/stompjs';
 import type { OutgoingChatMessage } from '@/features/interview/types/chatroom';
 
 interface UseInterviewSocketProps {
@@ -64,7 +64,7 @@ export default function useInterviewSocket({
         });
       },
 
-      onStompError: (frame) => {
+      onStompError: (frame: IFrame) => {
         console.error('[STOMP ERROR]', {
           message: frame.headers['message'],
           headers: frame.headers,
@@ -72,7 +72,7 @@ export default function useInterviewSocket({
         });
       },
 
-      onWebSocketError: (err) => {
+      onWebSocketError: (err: Event) => {
         console.error('[WS ERROR]', err);
       },
     });
