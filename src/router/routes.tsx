@@ -43,7 +43,7 @@ export const mainRoutes = [
   { path: '/interview/create', element: <InterviewCreatePage /> },
   { path: '/mypage', element: <MyPage /> },
   { path: '/interview/manage', element: <InterviewManagePage /> },
-  { path: '/interview/question-create', element: <InterviewQuestionCreatePage /> },
+  { path: '/interview/:interviewId/question-create', element: <InterviewQuestionCreatePage /> },
   { path: '/interview/:interviewId/chat-room', element: <InterviewChatRoomPage /> },
   { path: '/interview/note', element: <InterviewNotePage /> },
   { path: '/resumes/:resumeId', element: <ResumeDetail /> },
@@ -53,5 +53,5 @@ export const mainRoutes = [
   { path: '/jobs/:id', element: <JDDetailPage /> },
   { path: '/jobs/:id/update', element: <JDEditPage /> },
   { path: '/interview/manage/question-create', element: <InterviewQuestionCreatePage /> },
-  { path: '/matches', element: <MatchList /> },
+  { path: '/jobs/:id/matches', element: <MatchList /> },
 ];
