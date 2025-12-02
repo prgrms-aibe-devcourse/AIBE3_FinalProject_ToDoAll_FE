@@ -13,7 +13,7 @@ interface InterviewSortDropdownProps {
 
 export default function InterviewSortDropdown({ jobPosts, onSelect }: InterviewSortDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [selected, setSelected] = useState<string>('공고별 보기 ▾');
+  const [selected, setSelected] = useState<string>('전체 보기 ▾');
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // 외부 클릭 시 닫기
@@ -29,10 +29,10 @@ export default function InterviewSortDropdown({ jobPosts, onSelect }: InterviewS
 
   const handleSelect = (post: JobPost | null) => {
     if (post) {
-      setSelected(post.title);
+      setSelected(post.title + ' ▾');
       onSelect(post.id);
     } else {
-      setSelected('공고별 보기 ▾');
+      setSelected('전체 보기 ▾');
       onSelect(null);
     }
     setIsOpen(false);

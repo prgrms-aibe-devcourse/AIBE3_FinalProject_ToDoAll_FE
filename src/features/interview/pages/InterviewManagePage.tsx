@@ -23,7 +23,7 @@ interface InterviewListResponse {
 }
 interface InterviewCardData {
   id: number;
-  jd_id: number;
+  jdId: number;
   name: string;
   position: string;
   date: string;
@@ -32,6 +32,11 @@ interface InterviewCardData {
   status: InterviewStatus;
   avatar: string;
   resumeId: number;
+}
+
+interface JobDescriptionInterviewOptionDto {
+  jdId: number;
+  title: string;
 }
 
 export default function InterviewManagePage() {
@@ -54,12 +59,21 @@ export default function InterviewManagePage() {
   if (cursor) params.append('cursor', cursor.toString());
 
   const query = `/api/v1/interviews?${params.toString()}`;
-  const { resData } = useFetch<InterviewListResponse>(query);
+  const { resData: interviewList } = useFetch<InterviewListResponse>(query);
+  const { resData: jdList } = useFetch<JobDescriptionInterviewOptionDto[]>(
+    '/api/v1/jd/interview/options'
+  );
+
+  const jobPosts =
+    jdList?.map((jd) => ({
+      id: jd.jdId,
+      title: jd.title,
+    })) ?? [];
 
   const interviews: InterviewCardData[] =
-    resData?.data?.map((i) => ({
+    interviewList?.data?.map((i) => ({
       id: i.interviewId,
-      jd_id: i.jdId,
+      jdId: i.jdId,
       name: i.candidateName,
       position: i.jdTitle,
       date: i.scheduledAt.split('T')[0],
@@ -71,9 +85,9 @@ export default function InterviewManagePage() {
     })) ?? [];
 
   const handleNext = () => {
-    if (resData?.nextCursor) {
-      setCursorHistory((prev) => [...prev, resData.nextCursor]);
-      setCursor(resData.nextCursor);
+    if (interviewList?.nextCursor) {
+      setCursorHistory((prev) => [...prev, interviewList.nextCursor]);
+      setCursor(interviewList.nextCursor);
     }
   };
 
@@ -101,7 +115,7 @@ export default function InterviewManagePage() {
     resetPage();
   };
 
-  if (!resData) {
+  if (!interviewList) {
     return (
       <div className="flex min-h-screen items-center justify-center text-gray-500">
         불러오는 중...
@@ -113,7 +127,7 @@ export default function InterviewManagePage() {
     <div className="bg-jd-white min-h-screen px-12 py-8">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-semibold">면접 관리</h1>
-        <InterviewSortDropdown jobPosts={[]} onSelect={handleJDChange} />
+        <InterviewSortDropdown jobPosts={jobPosts} onSelect={handleJDChange} />
       </div>
 
       <InterviewFilterTabs activeTab={activeTab} onChange={handleTabChange} />
@@ -137,7 +151,7 @@ export default function InterviewManagePage() {
         )}
 
         {/* 다음 페이지 */}
-        {resData.hasNext && (
+        {interviewList.hasNext && (
           <button
             onClick={handleNext}
             className="rounded bg-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-300"
