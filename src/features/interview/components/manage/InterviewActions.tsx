@@ -32,7 +32,7 @@ export default function InterviewActions({
   };
 
   const handleUpdateQuestionSet = () => {
-    navigate('/interview/question-create', {
+    navigate(`/interview/${interviewId}/question-create`, {
       state: { name, avatar, interviewId },
     });
   };
