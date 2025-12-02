@@ -40,12 +40,18 @@ const InterviewQuestionNotePage: React.FC = () => {
   const { name, avatar } = (location.state as { name?: string; avatar?: string }) || {};
 
   const [questions, setQuestions] = useState<InterviewQuestionAiDto[] | null>(null);
+  const [originalQuestions, setOriginalQuestions] = useState<InterviewQuestionAiDto[] | null>(null);
+
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+
   const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const apiBaseUrl = import.meta.env.VITE_API_URL || '';
 
+  // ====== GET: 질문 조회 ======
   const fetchQuestions = async () => {
     if (!interviewId) {
       setLoadError('면접 ID가 없습니다.');
@@ -62,11 +68,10 @@ const InterviewQuestionNotePage: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include', // 필요 없으면 제거
+        credentials: 'include',
       });
 
       if (!res.ok) {
-        // 에러 응답이 JSON이 아닐 수도 있으니 방어적으로 처리
         const text = await res.text();
         console.error('Fetch error:', res.status, text);
         throw new Error(`HTTP ${res.status}`);
@@ -96,7 +101,80 @@ const InterviewQuestionNotePage: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [interviewId]);
 
-  const handleToggleEdit = () => setIsEditing((prev) => !prev);
+  // ====== PUT: 질문 수정/저장 ======
+  const saveQuestions = async () => {
+    if (!interviewId || !questions) return;
+
+    setIsSaving(true);
+    setSaveError(null);
+
+    try {
+      // 백엔드 InterviewQuestionUpdateRequestDto 구조에 맞게 수정
+      const updatePayload = {
+        questions: questions.map((q) => ({
+          id: q.id,
+          questionType: q.questionType,
+          content: q.content,
+        })),
+      };
+
+      const res = await fetch(`${apiBaseUrl}/api/v1/interviews/${interviewId}/questions`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(updatePayload),
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        console.error('PUT error:', res.status, text);
+        throw new Error(`HTTP ${res.status}`);
+      }
+
+      // 성공 응답: ApiResponse<string> 정도일 것으로 가정
+      const body: ApiResponse<string> = await res.json();
+      console.log('update success:', body);
+
+      // 서버 기준으로 다시 싱크 맞추고 싶으면 재조회
+      await fetchQuestions();
+
+      setOriginalQuestions(null);
+      setIsEditing(false);
+    } catch (err) {
+      console.error(err);
+      setSaveError('질문을 저장하는 중 오류가 발생했습니다.');
+      // 롤백
+      if (originalQuestions) {
+        setQuestions(originalQuestions);
+      }
+      setIsEditing(false);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // 보기 ↔ 수정 토글 + 저장 트리거
+  const handleToggleEdit = () => {
+    // 보기 → 수정
+    if (!isEditing) {
+      if (questions) {
+        setOriginalQuestions(questions);
+      }
+      setSaveError(null);
+      setIsEditing(true);
+      return;
+    }
+
+    // 수정 → 보기 (저장 시도)
+    if (!questions) {
+      setIsEditing(false);
+      return;
+    }
+
+    void saveQuestions();
+  };
 
   const handleContentChange = (index: number, value: string) => {
     setQuestions((prev) => {
@@ -142,7 +220,6 @@ const InterviewQuestionNotePage: React.FC = () => {
     }
 
     if (!questions || questions.length === 0) {
-      // 인터뷰는 존재하지만 아직 질문이 생성되지 않은 상태
       return (
         <div className="flex flex-1 flex-col items-center justify-center gap-3 py-12">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-purple-200 border-t-transparent" />
@@ -250,12 +327,19 @@ const InterviewQuestionNotePage: React.FC = () => {
           <div className="rounded-2xl border border-gray-200 bg-white p-8 text-sm leading-relaxed shadow-md">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-base font-semibold text-slate-900">질문 목록</h2>
+              {isSaving && <span className="text-xs text-slate-500">저장 중...</span>}
             </div>
+
+            {saveError && (
+              <div className="mb-3 rounded-md bg-red-50 px-3 py-2 text-xs text-red-600">
+                {saveError}
+              </div>
+            )}
 
             {renderQuestions()}
           </div>
 
-          {/* 보기/수정 토글 (지금은 UI만, PUT은 다음 단계에서) */}
+          {/* 보기/수정 토글 + 저장 트리거 */}
           <EditButton isEditing={isEditing} onToggle={handleToggleEdit} />
         </div>
       </div>
