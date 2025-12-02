@@ -1,14 +1,23 @@
+// src/pages/InterviewQuestionNotePage.tsx
+
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import ProfileCard from '../components/question-create/ProfileCard';
 import EditButton from '../components/question-create/EditButton';
+import type { ApiResponse } from '@/features/jd/services/jobApi';
 
-type InterviewQuestionAiDto = {
+type InterviewQuestionResponseDto = {
+  id: number;
   questionType: string;
   content: string;
 };
 
-// 예전 페이지에서 쓰던 프로필 더미 데이터
+type InterviewQuestionAiDto = {
+  id: number;
+  questionType: string;
+  content: string;
+};
+
 const initialProfileData = {
   name: '김철수',
   title: '프론트엔드 개발자',
@@ -25,54 +34,67 @@ const initialProfileData = {
   image: 'https://cdn.pixabay.com/photo/2025/10/02/06/28/mood-9867715_1280.jpg',
 };
 
-// 실제 API 대신 사용하는 더미 fetch
-const mockFetchQuestions = async (): Promise<InterviewQuestionAiDto[]> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([
-        {
-          questionType: 'TECH',
-          content: 'React에서 렌더링 최적화를 위해 사용했던 방법들을 설명해 주세요.',
-        },
-        {
-          questionType: 'TECH',
-          content:
-            'Next.js에서 SSR/ISR을 적용해 본 경험이 있다면, 어떤 기준으로 선택했는지 알려 주세요.',
-        },
-        {
-          questionType: 'CORE',
-          content: '협업 과정에서 발생한 갈등을 해결했던 경험이 있다면 말씀해 주세요.',
-        },
-        {
-          questionType: 'BEHAVIOR',
-          content: '본인이 가장 크게 성장을 느꼈던 경험과 그 계기를 말씀해 주세요.',
-        },
-      ]);
-    }, 800);
-  });
-};
-
 const InterviewQuestionNotePage: React.FC = () => {
+  const { interviewId } = useParams<{ interviewId: string }>();
   const location = useLocation();
-  const { name, avatar } = location.state || {};
+  const { name, avatar } = (location.state as { name?: string; avatar?: string }) || {};
 
   const [questions, setQuestions] = useState<InterviewQuestionAiDto[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const questionRes = await mockFetchQuestions();
-        setQuestions(questionRes);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setIsLoading(false);
+  const apiBaseUrl = import.meta.env.VITE_API_URL || '';
+
+  const fetchQuestions = async () => {
+    if (!interviewId) {
+      setLoadError('면접 ID가 없습니다.');
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    setLoadError(null);
+
+    try {
+      const res = await fetch(`${apiBaseUrl}/api/v1/interviews/${interviewId}/questions`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // 필요 없으면 제거
+      });
+
+      if (!res.ok) {
+        // 에러 응답이 JSON이 아닐 수도 있으니 방어적으로 처리
+        const text = await res.text();
+        console.error('Fetch error:', res.status, text);
+        throw new Error(`HTTP ${res.status}`);
       }
-    };
-    load();
-  }, []);
+
+      const body: ApiResponse<InterviewQuestionResponseDto[]> = await res.json();
+
+      const mapped: InterviewQuestionAiDto[] =
+        body.data?.map((q) => ({
+          id: q.id,
+          questionType: q.questionType,
+          content: q.content,
+        })) ?? [];
+
+      setQuestions(mapped);
+    } catch (err) {
+      console.error(err);
+      setLoadError('질문을 불러오는 중 오류가 발생했습니다.');
+      setQuestions(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchQuestions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [interviewId]);
 
   const handleToggleEdit = () => setIsEditing((prev) => !prev);
 
@@ -95,7 +117,32 @@ const InterviewQuestionNotePage: React.FC = () => {
   };
 
   const renderQuestions = () => {
-    if (isLoading || !questions || questions.length === 0) {
+    if (isLoading) {
+      return (
+        <div className="flex flex-1 flex-col items-center justify-center gap-3 py-12">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-purple-200 border-t-transparent" />
+          <p className="text-sm text-slate-500">질문이 생성중입니다.</p>
+        </div>
+      );
+    }
+
+    if (loadError) {
+      return (
+        <div className="flex flex-1 flex-col items-center justify-center gap-3 py-12">
+          <p className="text-sm text-red-500">{loadError}</p>
+          <button
+            type="button"
+            onClick={fetchQuestions}
+            className="rounded-full bg-slate-200 px-4 py-1.5 text-xs font-semibold text-slate-800 hover:bg-slate-300"
+          >
+            다시 불러오기
+          </button>
+        </div>
+      );
+    }
+
+    if (!questions || questions.length === 0) {
+      // 인터뷰는 존재하지만 아직 질문이 생성되지 않은 상태
       return (
         <div className="flex flex-1 flex-col items-center justify-center gap-3 py-12">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-purple-200 border-t-transparent" />
@@ -107,7 +154,10 @@ const InterviewQuestionNotePage: React.FC = () => {
     const questionsWithIndex = questions.map((q, idx) => ({ ...q, index: idx }));
 
     const grouped = questionsWithIndex.reduce(
-      (acc: Record<string, { questionType: string; content: string; index: number }[]>, q) => {
+      (
+        acc: Record<string, { id: number; questionType: string; content: string; index: number }[]>,
+        q
+      ) => {
         if (!acc[q.questionType]) acc[q.questionType] = [];
         acc[q.questionType].push(q);
         return acc;
@@ -139,7 +189,7 @@ const InterviewQuestionNotePage: React.FC = () => {
             <div className="flex flex-col gap-2.5">
               {grouped[type].map((q) => (
                 <div
-                  key={`${type}-${q.index}`}
+                  key={q.id}
                   className="flex flex-col gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5"
                 >
                   {isEditing ? (
@@ -186,7 +236,7 @@ const InterviewQuestionNotePage: React.FC = () => {
       <h1 className="text-jd-black mb-6 text-2xl font-bold">질문 노트</h1>
 
       <div className="flex gap-8">
-        {/* 왼쪽 프로필 카드 (기존 UI) */}
+        {/* 왼쪽 프로필 */}
         <div className="w-1/4">
           <ProfileCard
             profileData={initialProfileData}
@@ -195,7 +245,7 @@ const InterviewQuestionNotePage: React.FC = () => {
           />
         </div>
 
-        {/* 오른쪽 질문 영역 (새 UI + 타입별 그룹) */}
+        {/* 오른쪽 질문 영역 */}
         <div className="w-3/4">
           <div className="rounded-2xl border border-gray-200 bg-white p-8 text-sm leading-relaxed shadow-md">
             <div className="mb-4 flex items-center justify-between">
@@ -205,7 +255,7 @@ const InterviewQuestionNotePage: React.FC = () => {
             {renderQuestions()}
           </div>
 
-          {/* 기존 EditButton 컴포넌트로 보기/수정 토글 */}
+          {/* 보기/수정 토글 (지금은 UI만, PUT은 다음 단계에서) */}
           <EditButton isEditing={isEditing} onToggle={handleToggleEdit} />
         </div>
       </div>
