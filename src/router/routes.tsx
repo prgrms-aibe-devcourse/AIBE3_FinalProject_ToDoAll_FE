@@ -23,7 +23,7 @@ import JDEditPage from '@pages/JDEditPage.tsx';
 import ResumePreviewPage from '@features/resumes/pages/ResumePreviewPage';
 import ResumeSubmitSuccessPage from '@features/resumes/pages/ResumeSubmitSuccessPage';
 import MyPage from '@features/user/pages/MyPage.tsx';
-
+import InterviewCHatRoomGuestPage from '@features/interview/pages/InterviewChatRoomGuest';
 // 레이아웃 없는 페이지 (로그인/회원가입 관련)
 export const noLayoutRoutes = [
   { path: '/login', element: <LoginPage /> },
@@ -35,6 +35,7 @@ export const noLayoutRoutes = [
   { path: '/resume/create/:id', element: <ResumeCreatePage /> },
   { path: '/resume/preview', element: <ResumePreviewPage /> },
   { path: '/resume/submit-success', element: <ResumeSubmitSuccessPage /> },
+  { path: '/interview/:interviewId/chat-room/guest', element: <InterviewCHatRoomGuestPage /> },
 ];
 
 // 메인 레이아웃 적용되는 페이지
