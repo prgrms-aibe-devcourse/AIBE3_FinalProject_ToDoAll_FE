@@ -3,28 +3,26 @@ import InterviewCard from '../components/manage/InterviewCard';
 import InterviewFilterTabs from '../components/manage/InterviewFilterTabs';
 import InterviewSortDropdown from '../components/manage/InterviewSortDropdown';
 import type { TabStatus, InterviewStatus } from '../types/interviewer';
-import { tabToInterviewStatus } from '../types/interviewer';
 import useFetch from '@/hooks/useFetch';
 
 interface InterviewSummaryResponse {
   interviewId: number;
   jdId: number;
   jdTitle: string;
+  resumeId: number;
   candidateName: string;
   status: InterviewStatus;
   scheduledAt: string;
   createdAt: string;
 }
-
 interface InterviewListResponse {
   data: InterviewSummaryResponse[];
   nextCursor: number | null;
   hasNext: boolean;
 }
-
 interface InterviewCardData {
   id: number;
-  jd_id: number;
+  jdId: number;
   name: string;
   position: string;
   date: string;
@@ -32,14 +30,24 @@ interface InterviewCardData {
   interviewers: string;
   status: InterviewStatus;
   avatar: string;
+  resumeId: number;
+}
+
+interface JobDescriptionInterviewOptionDto {
+  jdId: number;
+  title: string;
 }
 
 export default function InterviewManagePage() {
   const [activeTab, setActiveTab] = useState<TabStatus>('ALL');
   const [selectedJD, setSelectedJD] = useState<number | null>(null);
-  const [cursor] = useState<number | null>(null);
+  const [cursor, setCursor] = useState<number | null>(null);
 
-  const statusParam = activeTab === 'ALL' ? 'ALL' : tabToInterviewStatus[activeTab][0];
+  // 뒤로가기 위한 cursor 스택
+  const [cursorHistory, setCursorHistory] = useState<(number | null)[]>([null]);
+
+  //const statusParam = activeTab === 'ALL' ? 'ALL' : tabToInterviewStatus[activeTab][0];
+  const statusParam = activeTab;
 
   const params = new URLSearchParams({
     status: statusParam,
@@ -51,13 +59,21 @@ export default function InterviewManagePage() {
   if (cursor) params.append('cursor', cursor.toString());
 
   const query = `/api/v1/interviews?${params.toString()}`;
+  const { resData: interviewList } = useFetch<InterviewListResponse>(query);
+  const { resData: jdList } = useFetch<JobDescriptionInterviewOptionDto[]>(
+    '/api/v1/jd/interview/options'
+  );
 
-  const { resData } = useFetch<InterviewListResponse>(query);
+  const jobPosts =
+    jdList?.map((jd) => ({
+      id: jd.jdId,
+      title: jd.title,
+    })) ?? [];
 
   const interviews: InterviewCardData[] =
-    resData?.data?.map((i) => ({
+    interviewList?.data?.map((i) => ({
       id: i.interviewId,
-      jd_id: i.jdId,
+      jdId: i.jdId,
       name: i.candidateName,
       position: i.jdTitle,
       date: i.scheduledAt.split('T')[0],
@@ -65,9 +81,41 @@ export default function InterviewManagePage() {
       interviewers: '면접관 정보 필요',
       status: i.status,
       avatar: '/default-avatar.png',
+      resumeId: i.resumeId,
     })) ?? [];
 
-  if (!resData) {
+  const handleNext = () => {
+    if (interviewList?.nextCursor) {
+      setCursorHistory((prev) => [...prev, interviewList.nextCursor]);
+      setCursor(interviewList.nextCursor);
+    }
+  };
+
+  const handlePrev = () => {
+    if (cursorHistory.length > 1) {
+      const newHistory = [...cursorHistory];
+      newHistory.pop(); // 현재 커서 제거
+      const prevCursor = newHistory[newHistory.length - 1];
+      setCursorHistory(newHistory);
+      setCursor(prevCursor);
+    }
+  };
+
+  // 탭/공고 바뀌면 초기화
+  const resetPage = () => {
+    setCursor(null);
+    setCursorHistory([null]);
+  };
+  const handleTabChange = (tab: TabStatus) => {
+    setActiveTab(tab);
+    resetPage();
+  };
+  const handleJDChange = (id: number | null) => {
+    setSelectedJD(id);
+    resetPage();
+  };
+
+  if (!interviewList) {
     return (
       <div className="flex min-h-screen items-center justify-center text-gray-500">
         불러오는 중...
@@ -79,18 +127,37 @@ export default function InterviewManagePage() {
     <div className="bg-jd-white min-h-screen px-12 py-8">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-semibold">면접 관리</h1>
-        <InterviewSortDropdown jobPosts={[]} onSelect={setSelectedJD} />
+        <InterviewSortDropdown jobPosts={jobPosts} onSelect={handleJDChange} />
       </div>
 
-      <InterviewFilterTabs activeTab={activeTab} onChange={setActiveTab} />
+      <InterviewFilterTabs activeTab={activeTab} onChange={handleTabChange} />
 
       <div className="mt-6 grid grid-cols-3 gap-8">
-        {interviews.length > 0 ? (
-          interviews.map((item) => <InterviewCard key={item.id} {...item} />)
-        ) : (
-          <div className="col-span-3 py-16 text-center text-gray-500">
-            해당 조건에 맞는 면접이 없습니다.
-          </div>
+        {interviews.map((item) => (
+          <InterviewCard key={item.id} {...item} />
+        ))}
+      </div>
+
+      {/* 페이지 이동 버튼 */}
+      <div className="mt-10 flex justify-center gap-6">
+        {/* 이전 페이지 */}
+        {cursorHistory.length > 1 && (
+          <button
+            onClick={handlePrev}
+            className="rounded bg-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-300"
+          >
+            ◀ 이전
+          </button>
+        )}
+
+        {/* 다음 페이지 */}
+        {interviewList.hasNext && (
+          <button
+            onClick={handleNext}
+            className="rounded bg-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-300"
+          >
+            다음 ▶
+          </button>
         )}
       </div>
     </div>
