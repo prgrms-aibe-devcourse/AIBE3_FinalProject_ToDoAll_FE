@@ -4,6 +4,7 @@ import { getMe, updateMe, changePassword, uploadProfileImage } from '../api/user
 import ReqBadge from '@features/auth/components/ReqBadge.tsx';
 import { buildPasswordChecks } from '@features/auth/utils/passwordChecks.ts';
 import { API_ORIGIN } from '@lib/utils/base.ts';
+import AlertModal from '@components/Alertmodal.tsx';
 
 type Focus = 'profile' | 'password' | undefined;
 
@@ -26,6 +27,27 @@ export default function MyPage() {
   const [searchParams] = useSearchParams();
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const [alertModal, setAlertModal] = useState({
+    open: false,
+    type: 'info' as 'success' | 'error' | 'info' | 'warning',
+    title: '',
+    message: '',
+  });
+
+  // 모달 열기 헬퍼 함수
+  const showAlert = (
+    message: string,
+    type: 'success' | 'error' | 'info' | 'warning' = 'info',
+    title?: string
+  ) => {
+    setAlertModal({ open: true, type, title: title || '', message });
+  };
+
+  // 모달 닫기
+  const closeAlert = () => {
+    setAlertModal((prev) => ({ ...prev, open: false }));
+  };
 
   // 1) 편집 토글 & 유저 상태
   const [editing, setEditing] = useState(false);
@@ -85,7 +107,7 @@ export default function MyPage() {
       })
       .catch((err) => {
         console.log('getMe 응답:', err);
-        alert('내 정보 조회에 실패했습니다. 다시 로그인 후 시도해주세요.');
+        showAlert('내 정보 조회에 실패했습니다. 다시 로그인 후 시도해주세요.', 'error');
       });
   }, [navigate]);
 
@@ -179,10 +201,10 @@ export default function MyPage() {
       });
       setUser(form);
       setEditing(false);
-      alert('저장되었습니다.');
+      showAlert('저장되었습니다.', 'success', '저장 완료');
     } catch (e) {
       console.error('updateMe 실패:', e);
-      alert('저장 중 문제가 발생했습니다. 다시 시도해주세요.');
+      showAlert('저장 중 문제가 발생했습니다. 다시 시도해주세요.', 'error', '저장 실패');
     }
   };
 
@@ -245,7 +267,11 @@ export default function MyPage() {
 
     const MAX_SIZE = 5 * 1024 * 1024;
     if (file.size > MAX_SIZE) {
-      alert('이미지 용량이 너무 큽니다. 5MB 이하 파일만 업로드할 수 있어요.');
+      showAlert(
+        '이미지 용량이 너무 큽니다. \n 최대 5MB 파일만 업로드할 수 있어요.',
+        'error',
+        '업로드 실패'
+      );
       e.target.value = '';
       return;
     }
@@ -264,10 +290,10 @@ export default function MyPage() {
         profileUrl: updated.profileUrl ?? f.profileUrl,
       }));
 
-      alert('프로필 이미지가 변경되었습니다.');
+      showAlert('프로필 이미지가 변경되었습니다.', 'success', '변경 완료');
     } catch (err) {
       console.error('프로필 이미지 업로드 실패:', err);
-      alert('프로필 이미지 변경에 실패했습니다. 다시 시도해주세요.');
+      showAlert('프로필 이미지 변경에 실패했습니다. 다시 시도해주세요.', 'success', '변경 완료');
     } finally {
       setUploading(false);
       // 같은 파일 다시 선택해도 change 이벤트 뜨도록 초기화
@@ -532,7 +558,7 @@ export default function MyPage() {
                   // 재인증 시간 기록
                   localStorage.setItem('reauthAt', String(Date.now()));
 
-                  alert('비밀번호가 변경되었습니다.'); // 성공 알림
+                  showAlert('비밀번호가 성공적으로 변경되었습니다.', 'success', '변경 완료');
 
                   // 입력값 및 메시지 초기화
                   setCurrentPassword('');
@@ -621,6 +647,14 @@ export default function MyPage() {
           </div>
         )}
       </div>
+      {/* 범용 알림 모달 */}
+      <AlertModal
+        open={alertModal.open}
+        type={alertModal.type}
+        title={alertModal.title}
+        message={alertModal.message}
+        onClose={closeAlert}
+      />
     </div>
   );
 }
