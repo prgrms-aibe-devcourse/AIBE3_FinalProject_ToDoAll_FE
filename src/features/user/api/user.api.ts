@@ -57,8 +57,34 @@ export async function uploadProfileImage(file: File): Promise<unknown> {
     throw new Error(message);
   }
 
-  // CommonResponse 래핑을 고려해서 data 우선 반환
-  return body?.data ?? body;
+  const profileUrl =
+    body?.data?.profileUrl && body.data.profileUrl.trim() !== ''
+      ? body.data.profileUrl
+      : '/images/default-profile.jpg';
+
+  return {
+    ...body.data,
+    profileUrl,
+  };
+}
+
+// 프로필 이미지 삭제 API (기본 이미지로 되돌리기)
+export async function removeProfileImage(): Promise<unknown> {
+  const res = await request<any>('/api/v1/users/me/profile-image', {
+    method: 'DELETE',
+  });
+
+  const data = res?.data ?? res;
+
+  const profileUrl =
+    data?.profileUrl && data.profileUrl.trim() !== ''
+      ? data.profileUrl
+      : '/images/default-profile.jpg';
+
+  return {
+    ...data,
+    profileUrl,
+  };
 }
 
 // 채팅 내역 조회 API

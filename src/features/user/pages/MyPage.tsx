@@ -1,6 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { getMe, updateMe, changePassword, uploadProfileImage } from '../api/user.api.ts';
+import {
+  getMe,
+  updateMe,
+  changePassword,
+  uploadProfileImage,
+  removeProfileImage,
+} from '../api/user.api.ts';
 import ReqBadge from '@features/auth/components/ReqBadge.tsx';
 import { buildPasswordChecks } from '@features/auth/utils/passwordChecks.ts';
 import { API_ORIGIN } from '@lib/utils/base.ts';
@@ -64,6 +70,8 @@ export default function MyPage() {
   });
 
   const [form, setForm] = useState(user);
+
+  const isDefaultProfile = !user.profileUrl || user.profileUrl.includes('default-profile');
 
   const resolvedProfileUrl =
     user.profileUrl &&
@@ -256,6 +264,7 @@ export default function MyPage() {
 
   //  프로필 이미지 변경 관련 로직
   const [uploading, setUploading] = useState(false);
+  const [removing, setRemoving] = useState(false);
 
   const onClickChangePhoto = () => {
     fileInputRef.current?.click();
@@ -289,15 +298,38 @@ export default function MyPage() {
         ...f,
         profileUrl: updated.profileUrl ?? f.profileUrl,
       }));
-
-      showAlert('프로필 이미지가 변경되었습니다.', 'success', '변경 완료');
     } catch (err) {
       console.error('프로필 이미지 업로드 실패:', err);
-      showAlert('프로필 이미지 변경에 실패했습니다. 다시 시도해주세요.', 'success', '변경 완료');
+      showAlert('프로필 이미지 변경에 실패했습니다. 다시 시도해주세요.', 'success', '변경 실패');
     } finally {
       setUploading(false);
       // 같은 파일 다시 선택해도 change 이벤트 뜨도록 초기화
       e.target.value = '';
+    }
+  };
+
+  const onClickRemovePhoto = async () => {
+    if (!window.confirm('현재 프로필 사진을 삭제하고 기본 이미지로 되돌릴까요?')) return;
+
+    try {
+      setRemoving(true);
+
+      const updated = (await removeProfileImage()) as MeResponse;
+
+      setUser((prev) => ({
+        ...prev,
+        profileUrl: updated.profileUrl ?? prev.profileUrl,
+      }));
+
+      setForm((f) => ({
+        ...f,
+        profileUrl: updated.profileUrl ?? f.profileUrl,
+      }));
+    } catch (err) {
+      console.error('프로필 이미지 삭제 실패:', err);
+      showAlert('프로필 이미지를 삭제하지 못했습니다. 다시 시도해주세요.', 'error');
+    } finally {
+      setRemoving(false);
     }
   };
 
@@ -326,8 +358,28 @@ export default function MyPage() {
         <div className="mb-8 flex flex-col gap-8 sm:flex-row sm:gap-12">
           {/* 프로필 */}
           <div className="w-full self-center sm:w-40 sm:self-start">
-            <div className="mx-auto mb-3 h-28 w-28 overflow-hidden rounded-full bg-[var(--color-jd-gray-light)] sm:mx-0 sm:h-40 sm:w-40">
-              <img src={resolvedProfileUrl} alt="profile" className="h-full w-full object-cover" />
+            <div className="relative mx-auto mb-3 h-28 w-28 sm:mx-0 sm:h-40 sm:w-40">
+              {/* 동그란 이미지 박스 */}
+              <div className="h-full w-full overflow-hidden rounded-full bg-[var(--color-jd-gray-light)]">
+                <img
+                  src={resolvedProfileUrl}
+                  alt="profile"
+                  className="h-full w-full object-cover"
+                />
+              </div>
+
+              {/* 기본 이미지가 아닐 때만 X 버튼 */}
+              {!isDefaultProfile && (
+                <button
+                  type="button"
+                  onClick={onClickRemovePhoto}
+                  disabled={removing || uploading}
+                  aria-label="프로필 이미지 삭제"
+                  className="absolute top-5 right-6 flex h-6 w-6 translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[rgba(130,110,180,0.65)] text-xs font-bold text-white shadow-md backdrop-blur-sm transition hover:bg-[rgba(130,110,180,0.85)] disabled:opacity-50"
+                >
+                  x
+                </button>
+              )}
             </div>
             {/* 숨겨진 파일 업로더 */}
             <input
