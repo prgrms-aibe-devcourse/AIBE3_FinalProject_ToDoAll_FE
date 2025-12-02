@@ -1,4 +1,4 @@
-import { request } from '../../../lib/utils/base';
+import { BASE_URL, request } from '../../../lib/utils/base';
 
 // 내 정보 수정 API
 export async function updateMe(payload: {
@@ -31,6 +31,60 @@ export async function changePassword(currentPassword: string, newPassword: strin
     method: 'PATCH',
     body: JSON.stringify({ currentPassword, newPassword }),
   });
+}
+
+// 프로필 이미지 변경 API (S3 업로드)
+
+export async function uploadProfileImage(file: File): Promise<unknown> {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const res = await fetch(`${BASE_URL}/api/v1/users/me/profile-image`, {
+    method: 'PATCH',
+    body: formData,
+    credentials: 'include', // 쿠키(JWT) 포함
+  });
+
+  let body: any = null;
+  try {
+    body = await res.json();
+  } catch {
+    body = null;
+  }
+
+  if (!res.ok) {
+    const message = body?.message ?? `프로필 이미지 변경 실패 (status=${res.status})`;
+    throw new Error(message);
+  }
+
+  const profileUrl =
+    body?.data?.profileUrl && body.data.profileUrl.trim() !== ''
+      ? body.data.profileUrl
+      : '/images/default-profile.jpg';
+
+  return {
+    ...body.data,
+    profileUrl,
+  };
+}
+
+// 프로필 이미지 삭제 API (기본 이미지로 되돌리기)
+export async function removeProfileImage(): Promise<unknown> {
+  const res = await request<any>('/api/v1/users/me/profile-image', {
+    method: 'DELETE',
+  });
+
+  const data = res?.data ?? res;
+
+  const profileUrl =
+    data?.profileUrl && data.profileUrl.trim() !== ''
+      ? data.profileUrl
+      : '/images/default-profile.jpg';
+
+  return {
+    ...data,
+    profileUrl,
+  };
 }
 
 // 채팅 내역 조회 API

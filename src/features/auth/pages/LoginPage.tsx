@@ -1,11 +1,26 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../api/auth.api.ts';
+import AlertModal from '@components/Alertmodal.tsx';
 
 export default function LoginPage() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
+
+  const [alertModal, setAlertModal] = useState({
+    open: false,
+    type: 'error' as 'success' | 'error' | 'info' | 'warning',
+    message: '',
+  });
+
+  const showAlert = (message: string, type: 'success' | 'error' | 'info' | 'warning' = 'error') => {
+    setAlertModal({ open: true, type, message });
+  };
+
+  const closeAlert = () => {
+    setAlertModal((prev) => ({ ...prev, open: false }));
+  };
 
   useEffect(() => {
     const onVisibility = () => {
@@ -29,7 +44,7 @@ export default function LoginPage() {
       await login({ email, password }); // 서버에서 accessToken을 받기
       window.location.href = '/dashboard'; // 다음 단계(E2E 스모크)를 바로 확인
     } catch {
-      alert('이메일 또는 비밀번호를 확인해 주세요.');
+      showAlert('이메일 또는 비밀번호를 확인해 주세요.', 'error');
     } finally {
       setSubmitting(false); // 버튼 비활성화를 해제
     }
@@ -188,6 +203,13 @@ export default function LoginPage() {
           </div>
         </section>
       </main>
+
+      <AlertModal
+        open={alertModal.open}
+        type={alertModal.type}
+        message={alertModal.message}
+        onClose={closeAlert}
+      />
     </div>
   );
 }
