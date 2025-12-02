@@ -3,7 +3,6 @@ import InterviewCard from '../components/manage/InterviewCard';
 import InterviewFilterTabs from '../components/manage/InterviewFilterTabs';
 import InterviewSortDropdown from '../components/manage/InterviewSortDropdown';
 import type { TabStatus, InterviewStatus } from '../types/interviewer';
-import { tabToInterviewStatus } from '../types/interviewer';
 import useFetch from '@/hooks/useFetch';
 
 interface InterviewSummaryResponse {
@@ -47,7 +46,8 @@ export default function InterviewManagePage() {
   // 뒤로가기 위한 cursor 스택
   const [cursorHistory, setCursorHistory] = useState<(number | null)[]>([null]);
 
-  const statusParam = activeTab === 'ALL' ? 'ALL' : tabToInterviewStatus[activeTab][0];
+  //const statusParam = activeTab === 'ALL' ? 'ALL' : tabToInterviewStatus[activeTab][0];
+  const statusParam = activeTab;
 
   const params = new URLSearchParams({
     status: statusParam,
