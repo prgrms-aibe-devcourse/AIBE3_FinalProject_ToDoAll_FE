@@ -7,6 +7,7 @@ type Props = {
   message: string;
   onClose: () => void;
   confirmText?: string;
+  onConfirm?: () => void;
 };
 
 export default function AlertModal({
@@ -16,15 +17,16 @@ export default function AlertModal({
   message,
   onClose,
   confirmText = '확인',
+  onConfirm,
 }: Props) {
   if (!open) return null;
 
   // 타입별 색상 매핑
   const colors = {
-    success: 'bg-[var(--color-jd-violet)]',
-    error: 'bg-[var(--color-jd-scarlet)]',
-    info: 'bg-[var(--color-jd-violet)]',
-    warning: 'bg-[var(--color-jd-yellow)]',
+    success: 'bg-[var(--color-jd-yellow)]',
+    error: 'bg-[var(--color-jd-yellow)]',
+    info: 'bg-[var(--color-jd-yellow)]',
+    warning: 'bg-[var(--color-jd-scarlet)]',
   };
 
   // 타입별 기본 제목
@@ -55,9 +57,32 @@ export default function AlertModal({
 
         {/* 버튼 */}
         <div className="flex justify-end gap-2">
-          <button onClick={onClose} className={`rounded-md px-4 py-2 text-white ${buttonColor}`}>
-            {confirmText}
-          </button>
+          {onConfirm ? (
+            <>
+              {/* 취소 버튼 */}
+              <button
+                onClick={onClose}
+                className="rounded-md bg-[var(--color-jd-gray-light)] px-4 py-2 text-sm text-[var(--color-jd-black)]"
+              >
+                취소
+              </button>
+              {/* 확인 버튼 */}
+              <button
+                onClick={onConfirm}
+                className={`rounded-md px-4 py-2 text-sm text-white ${buttonColor}`}
+              >
+                {confirmText}
+              </button>
+            </>
+          ) : (
+            // 기존 단일 버튼 모드
+            <button
+              onClick={onClose}
+              className={`rounded-md px-4 py-2 text-sm text-white ${buttonColor}`}
+            >
+              {confirmText}
+            </button>
+          )}
         </div>
       </div>
     </div>

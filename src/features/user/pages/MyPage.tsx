@@ -307,32 +307,35 @@ export default function MyPage() {
       e.target.value = '';
     }
   };
+  const [confirmRemoveOpen, setConfirmRemoveOpen] = useState(false);
 
-  const onClickRemovePhoto = async () => {
-    if (!window.confirm('현재 프로필 사진을 삭제하고 기본 이미지로 되돌릴까요?')) return;
+  const onClickRemovePhoto = () => {
+    setConfirmRemoveOpen(true);
+  };
 
+  const handleConfirmRemovePhoto = async () => {
     try {
       setRemoving(true);
-
       const updated = (await removeProfileImage()) as MeResponse;
 
       setUser((prev) => ({
         ...prev,
         profileUrl: updated.profileUrl ?? prev.profileUrl,
       }));
-
       setForm((f) => ({
         ...f,
         profileUrl: updated.profileUrl ?? f.profileUrl,
       }));
+
+      showAlert('프로필 이미지가 기본 이미지로 변경되었습니다.', 'success', '삭제 완료');
     } catch (err) {
       console.error('프로필 이미지 삭제 실패:', err);
-      showAlert('프로필 이미지를 삭제하지 못했습니다. 다시 시도해주세요.', 'error');
+      showAlert('프로필 이미지를 삭제하지 못했습니다. 다시 시도해주세요.', 'error', '삭제 실패');
     } finally {
       setRemoving(false);
+      setConfirmRemoveOpen(false);
     }
   };
-
   return (
     <div className="flex min-h-screen flex-col items-center justify-start bg-[var(--color-jd-white)] px-6 py-10 font-[var(--default-font-family)] sm:px-6 sm:py-12 md:px-8">
       <div className="mt-10 mb-6 w-full max-w-[860px]">
@@ -375,7 +378,7 @@ export default function MyPage() {
                   onClick={onClickRemovePhoto}
                   disabled={removing || uploading}
                   aria-label="프로필 이미지 삭제"
-                  className="absolute top-5 right-6 flex h-6 w-6 translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[rgba(130,110,180,0.65)] text-xs font-bold text-white shadow-md backdrop-blur-sm transition hover:bg-[rgba(130,110,180,0.85)] disabled:opacity-50"
+                  className="absolute top-4 right-6 flex h-6 w-6 translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[rgba(130,110,180,0.65)] text-xs font-bold text-white shadow-md backdrop-blur-sm transition hover:bg-[rgba(130,110,180,0.85)] disabled:opacity-50"
                 >
                   x
                 </button>
@@ -706,6 +709,15 @@ export default function MyPage() {
         title={alertModal.title}
         message={alertModal.message}
         onClose={closeAlert}
+      />
+      <AlertModal
+        open={confirmRemoveOpen}
+        type="warning"
+        title="프로필 이미지 삭제"
+        message="현재 프로필 사진을 삭제하고 기본 이미지로 되돌릴까요?"
+        onClose={() => setConfirmRemoveOpen(false)}
+        onConfirm={handleConfirmRemovePhoto}
+        confirmText="삭제"
       />
     </div>
   );
