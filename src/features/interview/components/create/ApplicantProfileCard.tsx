@@ -1,4 +1,4 @@
-interface ApplicantProfileCardProps {
+interface ApplicantProfile {
   applicant: {
     name: string;
     email: string;
@@ -9,7 +9,7 @@ interface ApplicantProfileCardProps {
   };
 }
 
-export default function ApplicantProfileCard({ applicant }: ApplicantProfileCardProps) {
+export default function ApplicantProfileCard({ applicant }: ApplicantProfile) {
   const { name, email, phoneNumber, birthDate, avatar, jdTitle } = applicant;
 
   return (

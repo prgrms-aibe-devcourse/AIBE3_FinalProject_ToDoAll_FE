@@ -74,7 +74,6 @@ export default function InterviewCreatePage() {
     setInvited(invited.filter((i) => i.id !== id));
   };
 
-  // 면접 생성
   // 인터뷰 생성
   const handleSubmit = () => {
     if (!resumeId || !jdId) {
@@ -115,6 +114,24 @@ export default function InterviewCreatePage() {
     );
   }
 
+  interface ApplicantProfile {
+    name: string;
+    email: string;
+    phoneNumber?: string;
+    birthDate?: string;
+    avatar?: string;
+    jdTitle?: string;
+  }
+
+  const profile: ApplicantProfile = {
+    name: applicant.name,
+    email: applicant.email,
+    phoneNumber: applicant.phone,
+    birthDate: applicant.birthDate,
+    avatar: '/default-avatar.png',
+    jdTitle: applicant.jobTitle,
+  };
+
   return (
     <div className="flex min-h-screen bg-[#fbf9f9] px-12 py-8">
       <h1 className="mt-4 w-40 text-xl font-semibold">면접 생성</h1>
@@ -123,7 +140,7 @@ export default function InterviewCreatePage() {
         <div className="flex w-full max-w-5xl gap-12">
           {/* 지원자 카드 */}
           <div className="flex-1">
-            <ApplicantProfileCard applicant={applicant} />
+            <ApplicantProfileCard applicant={profile} />
           </div>
 
           {/* 면접관 초대 */}
