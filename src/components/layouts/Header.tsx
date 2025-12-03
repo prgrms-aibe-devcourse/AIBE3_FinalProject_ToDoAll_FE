@@ -1,28 +1,33 @@
 import { useState, useRef, useEffect } from 'react';
 import SidebarDrawer from '../../components/SidebarDrawer';
+import useFetch from '@/hooks/useFetch';
 
 type Notice = {
-  id: string;
-  avatarUrl?: string;
+  id: number;
   text: string;
+  avatarUrl?: string;
 };
 
 const Header = () => {
   const [leftOpen, setLeftOpen] = useState(false); // 왼쪽 드로어 열림/닫힘
   const [notiOpen, setNotiOpen] = useState(false); // 알림 드롭다운 열림/닫힘
 
-  const [notices, setNotices] = useState<Notice[]>([
+  const { resData: notifications } = useFetch<
     {
-      id: 'n1',
-      avatarUrl: 'https://i.pravatar.cc/32?img=5',
-      text: '김말수 님의 면접(2025-02-12)이 하루 남았습니다.',
-    },
-    {
-      id: 'n2',
-      avatarUrl: 'https://i.pravatar.cc/32?img=7',
-      text: '김영희 님의 면접(2025-02-12)이 하루 남았습니다.',
-    },
-  ]);
+      notificationId: number;
+      title: string;
+      message: string;
+      type: string;
+      createdAt: string;
+    }[]
+  >('/api/v1/notifications');
+
+  const notices: Notice[] =
+    notifications?.map((n) => ({
+      id: n.notificationId,
+      text: `${n.title} - ${n.message}`,
+      avatarUrl: '/default-avatar.png', // TODO: 백에서 주면 변경
+    })) ?? [];
 
   const notiBtnRef = useRef<HTMLButtonElement | null>(null); // 알림 버튼 참조
   const notiMenuRef = useRef<HTMLDivElement | null>(null); // 알림 메뉴 박스 참조
@@ -41,13 +46,12 @@ const Header = () => {
   }, [notiOpen]);
 
   // 개별 알림 지우기
-  const removeNotice = (id: string) => {
-    setNotices((list) => list.filter((n) => n.id !== id));
+  const removeNotice = (id: number) => {
+    console.log('TODO: 삭제 API 연동 필요 → id:', id);
   };
 
-  // 모두 지우기
   const clearAll = () => {
-    setNotices([]);
+    console.log('TODO: 전체 삭제 API 연동 필요');
   };
 
   return (
