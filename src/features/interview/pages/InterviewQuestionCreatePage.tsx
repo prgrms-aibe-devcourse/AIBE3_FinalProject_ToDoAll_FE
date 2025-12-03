@@ -18,7 +18,19 @@ type InterviewQuestionAiDto = {
   content: string;
 };
 
-const initialProfileData = {
+type ProfileData = {
+  name: string;
+  title: string;
+  date: string;
+  time: string;
+  interviewers: string[];
+  skills: string[];
+  missingSkills: string[];
+  experiences: string[];
+  image: string;
+};
+
+const initialProfileData: ProfileData = {
   name: '김철수',
   title: '프론트엔드 개발자',
   date: '2025-12-01',
@@ -37,7 +49,24 @@ const initialProfileData = {
 const InterviewQuestionNotePage: React.FC = () => {
   const { interviewId } = useParams<{ interviewId: string }>();
   const location = useLocation();
-  const { name, avatar } = (location.state as { name?: string; avatar?: string }) || {};
+  const {
+    name: name,
+    avatar,
+    date,
+    time,
+    interviewers,
+    position,
+    resumeId,
+  } = (location.state ?? {}) as {
+    name?: string;
+    avatar?: string;
+    interviewId?: number;
+    date?: string;
+    time?: string;
+    interviewers?: string;
+    position?: string;
+    resumeId?: number;
+  };
 
   const [questions, setQuestions] = useState<InterviewQuestionAiDto[] | null>(null);
   const [originalQuestions, setOriginalQuestions] = useState<InterviewQuestionAiDto[] | null>(null);
@@ -48,6 +77,8 @@ const InterviewQuestionNotePage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+
+  const [profileData, setProfileData] = useState<ProfileData>(initialProfileData);
 
   const apiBaseUrl = import.meta.env.VITE_API_URL || '';
 
@@ -98,6 +129,66 @@ const InterviewQuestionNotePage: React.FC = () => {
   useEffect(() => {
     fetchQuestions();
   }, [interviewId]);
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      // 1) 우선 라우터 state 기반으로 기본 값 구성
+      const baseProfile: ProfileData = {
+        ...initialProfileData,
+        name: name ?? initialProfileData.name,
+        title: position ?? initialProfileData.title,
+        date: date ?? initialProfileData.date,
+        time: time ?? initialProfileData.time,
+        interviewers: interviewers
+          ? interviewers.split(',').map((s) => s.trim())
+          : initialProfileData.interviewers,
+      };
+
+      // 2) resumeId 가 있으면 → API 로 스킬/경험 보강 (엔드포인트는 예시)
+      try {
+        if (resumeId) {
+          const res = await fetch(
+            `${apiBaseUrl}/api/v1/interviews/${interviewId}/interview-profile`,
+            {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              credentials: 'include',
+            }
+          );
+
+          if (res.ok) {
+            // 예시: 백엔드 응답 형태
+            // { data: { skills: string[], missingSkills: string[], experiences: string[] } }
+            type ProfileApiDto = {
+              skills: string[];
+              missingSkills: string[];
+              experiences: string[];
+            };
+
+            const body: ApiResponse<ProfileApiDto> = await res.json();
+
+            setProfileData({
+              ...baseProfile,
+              skills: body.data?.skills ?? baseProfile.skills,
+              missingSkills: body.data?.missingSkills ?? baseProfile.missingSkills,
+              experiences: body.data?.experiences ?? baseProfile.experiences,
+            });
+            return;
+          }
+        }
+
+        // 3) resumeId 없거나 API 실패 → state 기반 기본 값만 사용
+        setProfileData(baseProfile);
+      } catch (e) {
+        console.error('프로필 로딩 실패:', e);
+        setProfileData(baseProfile);
+      }
+    };
+
+    loadProfile();
+  }, [name, position, date, time, interviewers, resumeId, apiBaseUrl]);
 
   const saveQuestions = async () => {
     if (!interviewId || !questions) return;
@@ -332,11 +423,7 @@ const InterviewQuestionNotePage: React.FC = () => {
 
       <div className="flex gap-8">
         <div className="w-1/4">
-          <ProfileCard
-            profileData={initialProfileData}
-            name={name ?? initialProfileData.name}
-            avatar={avatar}
-          />
+          <ProfileCard profileData={profileData} name={name} avatar={avatar} />
         </div>
 
         <div className="w-3/4">

@@ -10,6 +10,10 @@ interface InterviewActionsProps {
   avatar?: string;
   interviewId?: number;
   resumeId?: number;
+  date?: string;
+  time?: string;
+  interviewers?: string;
+  position?: string;
 }
 
 export default function InterviewActions({
@@ -18,6 +22,10 @@ export default function InterviewActions({
   avatar,
   interviewId,
   resumeId,
+  date,
+  time,
+  interviewers,
+  position,
 }: InterviewActionsProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
@@ -33,7 +41,7 @@ export default function InterviewActions({
 
   const handleUpdateQuestionSet = () => {
     navigate(`/interview/${interviewId}/question-create`, {
-      state: { name, avatar, interviewId },
+      state: { name, avatar, interviewId, date, time, interviewers, position, resumeId },
     });
   };
 

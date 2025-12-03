@@ -137,7 +137,7 @@ export default function ResetPasswordPage() {
         </button>
 
         <div className="mt-4 text-center text-xs text-[#837C7C]">
-          비밀번호 재설정 링크는 보안을 위해 발송 후 12시간 동안만 유효합니다.
+          비밀번호 재설정 링크는 보안을 위해 발송 후 30분 동안만 유효합니다.
         </div>
       </form>
     </AuthShell>

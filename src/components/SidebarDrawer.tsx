@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import ConfirmLogoutModal from '../features/user/components/ConfirmLogoutModal.tsx';
 import { getMe } from '../features/user/api/user.api.ts';
 import { logout } from '../features/auth/api/auth.api.ts';
+import { API_ORIGIN } from '@lib/utils/base.ts';
 
 type Props = {
   open: boolean;
@@ -20,6 +21,7 @@ export default function SidebarDrawer({ open, onClose }: Props) {
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const [user, setUser] = useState<DrawerUser | null>(null);
+  const avatarUrl = user?.profileUrl || `${API_ORIGIN}/images/default-profile.jpg`;
 
   useEffect(() => {
     // 드로어가 열려 있을 때만 불러와도 되고, 한 번만 불러와도 됨
@@ -155,31 +157,32 @@ export default function SidebarDrawer({ open, onClose }: Props) {
             }}
             className="flex cursor-pointer items-center justify-between rounded-xl bg-[var(--color-jd-white)] px-3 py-2 ring-1 ring-black/5"
           >
-            <div className="flex items-center gap-3">
+            <div className="flex min-w-0 flex-1 items-center gap-3">
               <img
-                src="https://i.imgur.com/8Km9tLL.png"
+                src={avatarUrl}
                 alt="avatar"
-                className="h-9 w-9 rounded-full object-cover"
+                className="aspect-square h-9 w-9 shrink-0 rounded-full object-cover"
               />
-              <div className="leading-tight">
-                <div className="text-sm font-semibold">{user?.nickname || '마이페이지'}</div>
-                <div className="text-[11px] text-gray-500">
+
+              <div className="min-w-0 flex-1 leading-tight">
+                <div className="truncate text-sm font-semibold">
+                  {user?.nickname || '마이페이지'}
+                </div>
+
+                <div className="truncate text-[11px] text-gray-500">
                   {user?.email || '프로필을 확인해 보세요'}
                 </div>
               </div>
             </div>
-
-            {/* 로그아웃 버튼 (아이콘) */}
             <button
               type="button"
               aria-label="로그아웃"
               onClick={(e) => {
-                e.stopPropagation(); // 카드 클릭으로 마이페이지 가는 것 방지
+                e.stopPropagation();
                 setConfirmOpen(true);
               }}
-              className="rounded-md p-2 hover:bg-[var(--color-jd-gray-light)]"
+              className="shrink-0 rounded-md p-2 hover:bg-[var(--color-jd-gray-light)]"
             >
-              {/* exit 아이콘 */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="18"
