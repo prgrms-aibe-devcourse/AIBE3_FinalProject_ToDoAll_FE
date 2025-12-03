@@ -9,8 +9,10 @@ type Notice = {
 };
 
 const Header = () => {
-  const [leftOpen, setLeftOpen] = useState(false); // 왼쪽 드로어 열림/닫힘
-  const [notiOpen, setNotiOpen] = useState(false); // 알림 드롭다운 열림/닫힘
+  const [leftOpen, setLeftOpen] = useState(false);
+  const [notiOpen, setNotiOpen] = useState(false);
+
+  const [notices, setNotices] = useState<Notice[]>([]);
 
   const { resData: notifications } = useFetch<
     {
@@ -22,32 +24,54 @@ const Header = () => {
     }[]
   >('/api/v1/notifications');
 
-  const notices: Notice[] =
-    notifications?.map((n) => ({
-      id: n.notificationId,
-      text: `${n.title} - ${n.message}`,
-      avatarUrl: '/default-avatar.png', // TODO: 백에서 주면 변경
-    })) ?? [];
+  useEffect(() => {
+    if (notifications) {
+      setNotices(
+        notifications.map((n) => ({
+          id: n.notificationId,
+          text: `${n.title} - ${n.message}`,
+          avatarUrl: '/default-avatar.png',
+        }))
+      );
+    }
+  }, [notifications]);
 
-  const notiBtnRef = useRef<HTMLButtonElement | null>(null); // 알림 버튼 참조
-  const notiMenuRef = useRef<HTMLDivElement | null>(null); // 알림 메뉴 박스 참조
+  const notiBtnRef = useRef<HTMLButtonElement | null>(null);
+  const notiMenuRef = useRef<HTMLDivElement | null>(null);
 
-  // 바깥 클릭 시 드롭다운 닫기
   useEffect(() => {
     if (!notiOpen) return;
     const onDocClick = (e: MouseEvent) => {
       const t = e.target as Node;
-      if (notiMenuRef.current?.contains(t)) return; // 메뉴 안쪽 클릭이면 유지
-      if (notiBtnRef.current?.contains(t)) return; // 버튼 클릭이면 유지
-      setNotiOpen(false); // 그 외는 닫기
+      if (notiMenuRef.current?.contains(t)) return;
+      if (notiBtnRef.current?.contains(t)) return;
+      setNotiOpen(false);
     };
     document.addEventListener('mousedown', onDocClick);
-    return () => document.removeEventListener('mousedown', onDocClick); // 언마운트/닫힐 때 정리
+    return () => document.removeEventListener('mousedown', onDocClick);
   }, [notiOpen]);
 
-  // 개별 알림 지우기
+  /** -------------------- DELETE 요청 useFetch 적용 -------------------- **/
+  const [deleteReq, setDeleteReq] = useState<{ url: string; method: string } | null>(null);
+  const { resData: deleteResult } = useFetch<any>(
+    deleteReq?.url ?? '',
+    null,
+    deleteReq?.method ?? undefined
+  );
+
+  useEffect(() => {
+    if (deleteResult) {
+      console.log('알림 삭제 성공', deleteResult);
+    }
+  }, [deleteResult]);
+
   const removeNotice = (id: number) => {
-    console.log('TODO: 삭제 API 연동 필요 → id:', id);
+    setDeleteReq({
+      url: `/api/v1/notifications/${id}`,
+      method: 'DELETE',
+    });
+
+    setNotices((list) => list.filter((n) => n.id !== id));
   };
 
   const clearAll = () => {
