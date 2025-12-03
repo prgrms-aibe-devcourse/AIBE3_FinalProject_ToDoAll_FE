@@ -45,7 +45,7 @@ export const mainRoutes = [
   { path: '/interview/manage', element: <InterviewManagePage /> },
   { path: '/interview/:interviewId/question-create', element: <InterviewQuestionCreatePage /> },
   { path: '/interview/:interviewId/chat-room', element: <InterviewChatRoomPage /> },
-  { path: '/interview/note', element: <InterviewNotePage /> },
+  { path: '/interview/:interviewId/note', element: <InterviewNotePage /> },
   { path: '/resumes/:resumeId', element: <ResumeDetail /> },
   { path: '/dashboard', element: <DashBoard /> },
   { path: '/jobs/new', element: <JDCreatePage /> },
