@@ -5,17 +5,27 @@ import InterviewSummarySection from '../components/chat/InterviewSummarySection'
 
 import { useEffect, useState } from 'react';
 
-import { getMe, getChatHistory, type ChatMessage } from '@/features/user/api/user.api';
+import { getMe } from '@/features/user/api/user.api';
 
 import {
   getInterviewQuestions,
   toggleQuestionCheck,
+  getChatHistory,
+  getInterviewMemos,
   type InterviewQuestion,
+  type ChatMessage,
+  type InterviewMemo,
 } from '@/features/interview/api/question.api';
 
 import useInterviewSocket from '@/hooks/useInterviewSocket';
 
-import { MessageType, type OutgoingChatMessage, type QuestionSection } from '../types/chatroom';
+import {
+  MessageType,
+  type OutgoingChatMessage,
+  type QuestionSection,
+  type InterviewSummary,
+  type IncomingNoteMessage,
+} from '../types/chatroom';
 
 export default function InterviewChatRoomPage() {
   const location = useLocation();
@@ -29,6 +39,7 @@ export default function InterviewChatRoomPage() {
     { id: number; text: string; senderId: number; isMine: boolean }[]
   >([]);
   const [questionNotes, setQuestionNotes] = useState<QuestionSection[]>([]);
+  const [summaries, setSummaries] = useState<InterviewSummary[]>([]);
 
   // 초기 로그
   useEffect(() => {
@@ -121,8 +132,68 @@ export default function InterviewChatRoomPage() {
     })();
   }, [numericInterviewId]);
 
-  // 5) WebSocket 연결 (쿠키 기반 인증)
-  const { sendChat } = useInterviewSocket({
+  // 5) 메모 로드 (같은 userId의 최신 메모만)
+  useEffect(() => {
+    if (!numericInterviewId) return;
+
+    (async () => {
+      try {
+        const memos = await getInterviewMemos(numericInterviewId);
+
+        // userId별로 그룹화하고 각 그룹에서 가장 최근 메모만 선택
+        const memoMap = new Map<number, InterviewMemo>();
+        memos.forEach((memo: InterviewMemo) => {
+          const userId = memo.author.userId;
+          const existing = memoMap.get(userId);
+          if (!existing || new Date(memo.updatedAt) > new Date(existing.updatedAt)) {
+            memoMap.set(userId, memo);
+          }
+        });
+
+        // InterviewSummary 형태로 변환
+        const summaryList: InterviewSummary[] = Array.from(memoMap.values()).map((memo) => {
+          // content가 JSON 문자열인 경우 파싱 시도
+          let content = memo.content;
+          try {
+            const parsed = JSON.parse(memo.content);
+            if (typeof parsed === 'object' && parsed.content) {
+              // 중첩된 JSON인 경우 최종 content 추출
+              let finalContent = parsed.content;
+              while (typeof finalContent === 'string' && finalContent.startsWith('{')) {
+                try {
+                  const nested = JSON.parse(finalContent);
+                  if (nested.content) {
+                    finalContent = nested.content;
+                  } else {
+                    break;
+                  }
+                } catch {
+                  break;
+                }
+              }
+              content = typeof finalContent === 'string' ? finalContent : memo.content;
+            }
+          } catch {
+            // JSON 파싱 실패 시 원본 content 사용
+          }
+
+          return {
+            id: memo.memoId,
+            authorId: memo.author.userId,
+            title: memo.author.name,
+            content,
+          };
+        });
+
+        setSummaries(summaryList);
+      } catch (e) {
+        console.error('메모 불러오기 실패:', e);
+      }
+    })();
+  }, [numericInterviewId]);
+
+  // 6) WebSocket 연결 (쿠키 기반 인증)
+  const { sendChat, sendNote } = useInterviewSocket({
     interviewId: numericInterviewId,
     onChatMessage: (msg: OutgoingChatMessage) => {
       setMessages((prev) => {
@@ -147,9 +218,25 @@ export default function InterviewChatRoomPage() {
         ];
       });
     },
+    onNoteMessage: (msg: IncomingNoteMessage) => {
+      // 웹소켓 노트 메시지 수신 시 메모 목록 업데이트
+      setSummaries((prev) => {
+        // 같은 userId의 기존 메모 제거하고 새 메모 추가
+        const filtered = prev.filter((s) => s.authorId !== msg.senderId);
+        return [
+          ...filtered,
+          {
+            id: msg.noteId ?? Date.now(),
+            authorId: msg.senderId,
+            title: msg.sender,
+            content: msg.content,
+          },
+        ];
+      });
+    },
   });
 
-  // 6) 질문 체크 토글 핸들러 ★ 수정한 부분
+  // 7) 질문 체크 토글 핸들러
   const handleToggleQuestionCheck = async (questionId: number) => {
     try {
       await toggleQuestionCheck(numericInterviewId, questionId);
@@ -169,7 +256,7 @@ export default function InterviewChatRoomPage() {
     }
   };
 
-  // 7) 메시지 전송
+  // 8) 메시지 전송
   const handleSend = (content: string) => {
     if (!me) {
       console.warn('⚠️ 사용자 정보가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.');
@@ -198,6 +285,17 @@ export default function InterviewChatRoomPage() {
     sendChat(payload);
   };
 
+  // 9) 노트 전송 핸들러
+  const handleSendNote = (content: string) => {
+    if (!me) {
+      console.warn('⚠️ 사용자 정보가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+
+    console.log('📝 노트 전송:', content);
+    sendNote(content);
+  };
+
   const handleEndInterview = () => {
     navigate('/interview/manage');
   };
@@ -221,7 +319,11 @@ export default function InterviewChatRoomPage() {
             questionNotes={questionNotes}
             onToggleCheck={handleToggleQuestionCheck}
           />
-          <InterviewSummarySection summaries={[]} currentUserId={me?.id} />
+          <InterviewSummarySection
+            summaries={summaries}
+            currentUserId={me?.id}
+            onSendNote={handleSendNote}
+          />
         </div>
       </div>
     </div>
