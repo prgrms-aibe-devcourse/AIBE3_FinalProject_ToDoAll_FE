@@ -14,7 +14,9 @@ export default function InterviewCreatePage() {
   const jdId = searchParams.get('jdId');
 
   // 지원자 조회
-  const { resData: applicant } = useFetch<any>(resumeId ? `/api/v1/resumes/${resumeId}` : '');
+  const { resData: applicant } = useFetch<any>(
+    resumeId ? `/api/v1/resumes/${resumeId}/interview-info` : ''
+  );
 
   // POST 요청에만 쓰는 상태
   const [createReq, setCreateReq] = useState<{
@@ -126,10 +128,10 @@ export default function InterviewCreatePage() {
   const profile: ApplicantProfile = {
     name: applicant.name,
     email: applicant.email,
-    phoneNumber: applicant.phone,
+    phoneNumber: applicant.phoneNumber,
     birthDate: applicant.birthDate,
-    avatar: '/default-avatar.png',
-    jdTitle: applicant.jobTitle,
+    avatar: applicant.avatar,
+    jdTitle: applicant.jdTitle,
   };
 
   return (
