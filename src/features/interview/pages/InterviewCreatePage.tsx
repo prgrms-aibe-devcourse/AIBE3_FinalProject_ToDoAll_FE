@@ -42,11 +42,7 @@ export default function InterviewCreatePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 임시 면접관 리스트
-  const [interviewers] = useState<Interviewer[]>([
-    { id: 1, name: '박철수', email: 'abcd@gmail.com', avatar: '/avatar.png' },
-    { id: 2, name: '이영희', email: 'lee@gmail.com', avatar: '/avatar.png' },
-    { id: 3, name: '김민수', email: 'kim@gmail.com', avatar: '/avatar.png' },
-  ]);
+  const { resData: interviewers } = useFetch<Interviewer[]>(`/api/v1/users/domain`);
 
   const [invited, setInvited] = useState<Interviewer[]>([]);
   const [search, setSearch] = useState('');
@@ -55,7 +51,7 @@ export default function InterviewCreatePage() {
   const invitedIds = invited.map((i) => i.id);
   const filtered = useMemo(
     () =>
-      search.trim().length > 0
+      search.trim().length > 0 && interviewers
         ? interviewers.filter(
             (i) =>
               !invitedIds.includes(i.id) &&
