@@ -4,6 +4,7 @@ import type { Interviewer } from '../types/interviewer';
 import ApplicantProfileCard from '../components/create/ApplicantProfileCard';
 import InterviewerSearchBox from '../components/create/InterviewerSearchBox';
 import InvitedList from '../components/create/InvitedList';
+import SchedulePicker from '../components/create/SchedulePicker';
 import useFetch from '@/hooks/useFetch';
 
 export default function InterviewCreatePage() {
@@ -12,6 +13,9 @@ export default function InterviewCreatePage() {
 
   const resumeId = searchParams.get('resumeId');
   const jdId = searchParams.get('jdId');
+
+  const [date, setDate] = useState('');
+  const [time, setTime] = useState('');
 
   // 지원자 조회
   const { resData: applicant } = useFetch<any>(
@@ -78,14 +82,21 @@ export default function InterviewCreatePage() {
       alert('지원서와 공고 정보가 필요합니다.');
       return;
     }
+    if (!date || !time) {
+      alert('면접 일자를 선택하세요.');
+      return;
+    }
 
     setIsSubmitting(true);
+
+    // 선택된 날짜 + 시간 하나의 ISO로 병합
+    const scheduledAt = new Date(`${date}T${time}:00`).toISOString();
 
     const body = {
       jdId: Number(jdId),
       resumeId: Number(resumeId),
       participantIds: invited.map((i) => i.id),
-      scheduledAt: new Date().toISOString(), // TODO: 날짜 입력 UI 붙일 예정
+      scheduledAt,
     };
 
     setCreateReq({
@@ -139,6 +150,9 @@ export default function InterviewCreatePage() {
           {/* 지원자 카드 */}
           <div className="flex-1">
             <ApplicantProfileCard applicant={profile} />
+
+            {/* 날짜/시간 설정 이동 */}
+            <SchedulePicker date={date} time={time} setDate={setDate} setTime={setTime} />
           </div>
 
           {/* 면접관 초대 */}
