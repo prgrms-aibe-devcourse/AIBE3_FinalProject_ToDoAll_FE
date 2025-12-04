@@ -27,7 +27,6 @@ import InterviewCHatRoomGuestPage from '@features/interview/pages/InterviewChatR
 // 레이아웃 없는 페이지 (로그인/회원가입 관련)
 export const noLayoutRoutes = [
   { path: '/login', element: <LoginPage /> },
-  { path: '/interview/create/test', element: <InterviewCreatePage /> },
   { path: '/signup/email', element: <SignupCompanyEmailPage /> },
   { path: '/signup/form', element: <SignupFormPage /> },
   { path: '/forgot', element: <ResetPasswordEmailPage /> },
