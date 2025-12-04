@@ -1,7 +1,7 @@
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
-import InterviewSummarySection from '../components/chat/InterviewSummarySection';
+import InterviewNoteSummarySection from '../components/note/InterviewNoteSummarySection';
 import type { QuestionSection, InterviewSummary } from '../types/chatroom';
 import ProfileCard from '../components/question-create/ProfileCard';
 import QuestionNoteSection from '../components/note/QuestionNoteSection';
@@ -15,9 +15,10 @@ import {
   type InterviewQuestion,
 } from '@features/interview/api/question.api.ts';
 
-// =====================
+// 내 정보 조회용
+import { getMe } from '@/features/user/api/user.api';
+
 // 타입 & 초기 프로필
-// =====================
 
 type ProfileData = {
   name: string;
@@ -61,6 +62,9 @@ export default function InterviewNotePage() {
 
   const numericInterviewId = Number(interviewIdParam);
 
+  // 내 정보 상태
+  const [me, setMe] = useState<any>(null);
+
   // 라우터 state에서 면접자 기본 정보 가져오기
   const { name, avatar, date, time, interviewers, position, resumeId } = (location.state ?? {}) as {
     name?: string;
@@ -75,14 +79,26 @@ export default function InterviewNotePage() {
 
   // 상태
   const [profileData, setProfileData] = useState<ProfileData>(initialProfileData);
-  const [profileError, setProfileError] = useState<string | null>(null);
+  const [, setProfileError] = useState<string | null>(null);
 
   const [questionNotes, setQuestionNotes] = useState<QuestionSection[]>([]);
-  const [questionError, setQuestionError] = useState<string | null>(null);
+  const [, setQuestionError] = useState<string | null>(null);
 
   const [summaries, setSummaries] = useState<InterviewSummary[]>([]);
   const [summaryError, setSummaryError] = useState<string | null>(null);
   const [aiSummary, setAiSummary] = useState<string>('');
+  // 내 정보 불러오기
+  useEffect(() => {
+    (async () => {
+      try {
+        const user = await getMe();
+        setMe(user);
+      } catch (e) {
+        console.error('내 정보 조회 실패:', e);
+      }
+    })();
+  }, []);
+
   // 0) 인터뷰 ID 없으면 뒤로
   useEffect(() => {
     if (!numericInterviewId) {
@@ -139,10 +155,7 @@ export default function InterviewNotePage() {
 
     loadProfile();
   }, [name, position, date, time, interviewers, resumeId, interviewIdParam]);
-
-  // =====================
   // 2) 질문 로딩 (체크 상태 포함)
-  // =====================
   useEffect(() => {
     if (!numericInterviewId) return;
 
@@ -174,12 +187,7 @@ export default function InterviewNotePage() {
       }
     })();
   }, [numericInterviewId]);
-
-  // =====================
   // 3) 메모 + AI 요약 로딩
-  //    - summaries: 면접관 메모들 (오른쪽)
-  //    - aiSummary: 중앙 질문 목록 아래에 한 덩어리로 표시
-  // =====================
   useEffect(() => {
     if (!numericInterviewId) return;
 
@@ -277,12 +285,36 @@ export default function InterviewNotePage() {
     })();
   }, [numericInterviewId]);
 
-  // @ts-ignore
+  // 메모 수정 핸들러 (노트 페이지 전용)
+  const handleUpdateMemo = async (memoId: number, content: string) => {
+    try {
+      const res = await fetch(
+        `${apiBaseUrl}/api/v1/interviews/${numericInterviewId}/memos/${memoId}`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ content }),
+        }
+      );
+
+      if (!res.ok) {
+        console.error('메모 수정 실패:', res.status);
+        return;
+      }
+
+      // 성공 시 프론트 상태도 같이 업데이트
+      setSummaries((prev) => prev.map((s) => (s.id === memoId ? { ...s, content } : s)));
+    } catch (e) {
+      console.error('메모 수정 중 오류:', e);
+    }
+  };
+
   return (
     <div className="bg-jd-white text-jd-black flex h-screen flex-col overflow-hidden">
-      {/* 헤더 */}
       <header className="flex shrink-0 items-center justify-between px-10 pt-6">
         <h1 className="text-jd-black text-2xl font-bold">면접 노트</h1>
+
         <button
           onClick={() => navigate('/interview/manage')}
           className="text-jd-gray-dark hover:text-jd-black text-sm transition"
@@ -291,47 +323,35 @@ export default function InterviewNotePage() {
         </button>
       </header>
 
-      {/* 본문 */}
       <div className="flex flex-1 gap-6 overflow-hidden p-6">
-        {/* 왼쪽: 지원자 정보 + 점수 */}
-        <div className="flex w-1/4 flex-col gap-4">
-          {profileError && <p className="text-xs text-red-500">{profileError}</p>}
+        {/* 왼쪽 20% → 기존 25%보다 좁게 */}
+        <div className="flex w-[20%] min-w-[260px] flex-col gap-4">
           <ProfileCard profileData={profileData} name={name} avatar={avatar} />
-          <ScoreInputCard />
+          <ScoreInputCard interviewId={numericInterviewId} />
         </div>
 
-        {/* 가운데: 질문 목록 + AI 요약 */}
-        <div className="flex flex-1 flex-col gap-4 overflow-auto">
-          {questionError && <p className="mb-2 text-xs text-red-500">{questionError}</p>}
-
+        {/* 가운데 60% → 질문 + AI 요약 */}
+        <div className="flex w-[60%] min-w-[600px] flex-col gap-4 overflow-auto">
           <QuestionNoteSection questionNotes={questionNotes} />
 
-          {/* AI 요약 박스 */}
-          <div className="mt-4 flex min-h-[180px] flex-col rounded-2xl border border-gray-200 bg-white p-6 shadow-md">
-            <h2 className="mb-3 text-base font-semibold text-slate-900">면접 요약</h2>
-
-            {aiSummary ? (
-              <p className="flex-1 text-sm leading-relaxed whitespace-pre-line text-slate-800">
-                {aiSummary}
-              </p>
-            ) : (
-              <div className="flex-1 text-sm leading-relaxed text-slate-400">
-                <p>아직 생성된 면접 요약이 없습니다.</p>
-                <p className="mt-1">면접 채팅 기록을 기반으로 AI가 자동으로 요약을 생성합니다.</p>
-              </div>
-            )}
+          <div className="mt-4 min-h-[200px] rounded-2xl border border-gray-200 bg-white p-6 shadow-md">
+            <h2 className="mb-3 text-base font-semibold text-slate-900">AI 면접 요약</h2>
+            <p className="text-sm leading-relaxed whitespace-pre-line text-slate-800">
+              {aiSummary || '아직 생성된 면접 요약이 없습니다.'}
+            </p>
           </div>
         </div>
-        {/* ✅ 여기서 "가운데" div 닫힘 */}
 
-        {/* 오른쪽: 면접관 메모 - "가운데"와 같은 레벨! */}
-        <div className="flex w-1/4 flex-col overflow-auto">
+        {/* 오른쪽: 면접관 메모만 */}
+        <div className="flex w-[26%] min-w-[300px] flex-col overflow-hidden">
           {summaryError && <p className="mb-1 text-xs text-red-500">{summaryError}</p>}
-          <InterviewSummarySection summaries={summaries} currentUserId={0} />
+          <InterviewNoteSummarySection
+            summaries={summaries}
+            currentUserId={me?.id ?? 0}
+            onUpdateMemo={handleUpdateMemo}
+          />
         </div>
       </div>
-      {/* ✅ 여기서 "본문" div 닫힘 */}
     </div>
-    // ✅ 여기서 최상위 컨테이너 닫힘
   );
 }
