@@ -10,6 +10,7 @@ export default function ChatSection({ initialMessages, avatar, onSend }: ChatSec
   const [messages, setMessages] =
     useState<{ id: number; text: string; senderId: number; isMine: boolean }[]>(initialMessages);
   const [newMessage, setNewMessage] = useState('');
+  const [isComposing, setIsComposing] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -26,12 +27,10 @@ export default function ChatSection({ initialMessages, avatar, onSend }: ChatSec
     const trimmed = newMessage.trim();
     if (!trimmed) return;
 
-    if (onSend) {
-      onSend(trimmed);
-    }
-
+    onSend?.(trimmed);
     setNewMessage('');
   };
+
   return (
     <div className="border-jd-gray-light flex max-h-full flex-1 flex-col overflow-hidden rounded-2xl border bg-white p-6 shadow-md">
       {/* 채팅 리스트 */}
@@ -76,7 +75,11 @@ export default function ChatSection({ initialMessages, avatar, onSend }: ChatSec
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="메시지를 입력하세요..."
             className="text-jd-black placeholder-jd-gray-black flex-1 bg-transparent text-sm focus:outline-none"
+            onCompositionStart={() => setIsComposing(true)}
+            onCompositionEnd={() => setIsComposing(false)}
             onKeyDown={(e) => {
+              if (isComposing) return;
+
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 handleSend();
