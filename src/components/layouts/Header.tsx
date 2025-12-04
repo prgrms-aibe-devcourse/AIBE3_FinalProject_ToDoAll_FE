@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import SidebarDrawer from '../../components/SidebarDrawer';
 import useFetch from '@/hooks/useFetch';
 
+let baseUrl = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+
 type Notice = {
   id: number;
   text: string;
@@ -14,7 +16,7 @@ const Header = () => {
 
   const [notices, setNotices] = useState<Notice[]>([]);
 
-  /** 📌 GET 알림 목록 */
+  /** GET 알림 목록 */
   const { resData: notifications } = useFetch<
     {
       notificationId: number;
@@ -36,7 +38,49 @@ const Header = () => {
     );
   }, [notifications]);
 
-  /** 📌 DELETE 요청 설정 */
+  function parseJwt(token: string) {
+    const base64Payload = token.split('.')[1];
+    const payload = decodeURIComponent(
+      atob(base64Payload)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(payload);
+  }
+
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return;
+
+    const decoded = parseJwt(token);
+    const userId = decoded?.sub;
+    if (!userId) return;
+
+    const es = new EventSource(`${baseUrl}/api/v1/notifications/subscribe?userId=${userId}`);
+
+    es.addEventListener('notification', (event) => {
+      try {
+        const data = JSON.parse(event.data);
+
+        setNotices((prev) => [
+          {
+            id: data.notificationId,
+            text: `${data.title} - ${data.message}`,
+            avatarUrl: '/default-avatar.png',
+          },
+          ...prev,
+        ]);
+      } catch (e) {
+        console.log('JSON 파싱 오류', e);
+      }
+    });
+
+    es.onerror = () => es.close();
+    return () => es.close();
+  }, []);
+
+  /** DELETE 요청 설정 */
   const [deleteReq, setDeleteReq] = useState<{ url: string; method: string } | null>(null);
 
   const { resData: deleteResult } = useFetch<any>(
@@ -62,7 +106,7 @@ const Header = () => {
     setNotices((list) => list.filter((n) => n.id !== id));
   };
 
-  /** 🔥 전체 삭제 관련 Hook */
+  /** 전체 삭제 관련 Hook */
   const [delAllReq, setDelAllReq] = useState<{ url: string; method: string } | null>(null);
   const { resData: delAllResult } = useFetch<any>(
     delAllReq?.url || '',
