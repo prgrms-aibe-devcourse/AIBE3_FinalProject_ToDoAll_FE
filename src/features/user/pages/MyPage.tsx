@@ -1,18 +1,61 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { getMe, updateMe, changePassword } from '../api/user.api.ts';
+import {
+  getMe,
+  updateMe,
+  changePassword,
+  uploadProfileImage,
+  removeProfileImage,
+} from '../api/user.api.ts';
 import ReqBadge from '@features/auth/components/ReqBadge.tsx';
 import { buildPasswordChecks } from '@features/auth/utils/passwordChecks.ts';
+import { API_ORIGIN } from '@lib/utils/base.ts';
+import AlertModal from '@components/Alertmodal.tsx';
 
 type Focus = 'profile' | 'password' | undefined;
 
 type Gender = '' | 'MALE' | 'FEMALE' | 'OTHER';
 
+type MeResponse = {
+  name?: string | null;
+  email?: string | null;
+  nickname?: string | null;
+  phoneNumber?: string | null;
+  companyName?: string | null;
+  position?: string | null;
+  birthDate?: string | null;
+  gender?: 'MALE' | 'FEMALE' | 'OTHER' | null;
+  profileUrl?: string | null;
+};
+
 export default function MyPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  // 편집 토글 & 폼 데이터
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const [alertModal, setAlertModal] = useState({
+    open: false,
+    type: 'info' as 'success' | 'error' | 'info' | 'warning',
+    title: '',
+    message: '',
+  });
+
+  // 모달 열기 헬퍼 함수
+  const showAlert = (
+    message: string,
+    type: 'success' | 'error' | 'info' | 'warning' = 'info',
+    title?: string
+  ) => {
+    setAlertModal({ open: true, type, title: title || '', message });
+  };
+
+  // 모달 닫기
+  const closeAlert = () => {
+    setAlertModal((prev) => ({ ...prev, open: false }));
+  };
+
+  // 1) 편집 토글 & 유저 상태
   const [editing, setEditing] = useState(false);
   const [user, setUser] = useState({
     name: '',
@@ -23,23 +66,22 @@ export default function MyPage() {
     position: '',
     birthDate: '',
     gender: '' as Gender,
-    profile: '/default-profile.png',
+    profileUrl: '/images/default-profile.jpg',
   });
-  type MeResponse = {
-    name?: string | null;
-    email?: string | null;
-    nickname?: string | null;
-    phoneNumber?: string | null;
-    companyName?: string | null;
-    position?: string | null;
-    birthDate?: string | null;
-    gender?: 'MALE' | 'FEMALE' | 'OTHER' | null;
-    profileUrl?: string | null;
-  };
 
   const [form, setForm] = useState(user);
 
-  // 1) 내 정보 조회
+  const isDefaultProfile = !user.profileUrl || user.profileUrl.includes('default-profile');
+
+  const resolvedProfileUrl =
+    user.profileUrl &&
+    (user.profileUrl.startsWith('http://') ||
+      user.profileUrl.startsWith('https://') ||
+      user.profileUrl.startsWith('data:'))
+      ? user.profileUrl
+      : `${API_ORIGIN}${user.profileUrl || '/images/default-profile.jpg'}`;
+
+  // 2) 내 정보 조회
   useEffect(() => {
     getMe()
       .then((data) => {
@@ -55,7 +97,7 @@ export default function MyPage() {
           position: me.position ?? prev.position,
           birthDate: me.birthDate ?? prev.birthDate,
           gender: (me.gender ?? prev.gender) as Gender,
-          profile: me.profileUrl || prev.profile,
+          profileUrl: me.profileUrl ?? prev.profileUrl,
         }));
         // 폼에도 동일값 반영
         setForm((f) => ({
@@ -68,18 +110,19 @@ export default function MyPage() {
           position: me.position ?? f.position,
           birthDate: me.birthDate ?? f.birthDate,
           gender: (me.gender ?? f.gender) as Gender,
-          profile: me.profileUrl || f.profile,
+          profileUrl: me.profileUrl || f.profileUrl,
         }));
       })
       .catch((err) => {
         console.log('getMe 응답:', err);
-        alert('내 정보 조회에 실패했습니다. 다시 로그인 후 시도해주세요.');
+        showAlert('내 정보 조회에 실패했습니다. 다시 로그인 후 시도해주세요.', 'error');
       });
   }, [navigate]);
 
-  // 2) 최근 재인증 여부
+  // 3) 최근 재인증 여부
 
-  const [recentlyReauthed, setRecentlyReauthed] = useState(false); //TTL을 상태로 보유 → UI가 자동 갱신됨
+  const [recentlyReauthed, setRecentlyReauthed] = useState(false);
+
   useEffect(() => {
     const checkReauth = () => {
       const raw = localStorage.getItem('reauthAt') || '0';
@@ -109,16 +152,14 @@ export default function MyPage() {
     };
   }, []);
 
-  // 의도에 따라 비밀번호 섹션 자동 오픈
+  // 4) 의도에 따라 비밀번호 섹션 자동 오픈
   const [expandPassword, setExpandPassword] = useState(false);
   useEffect(() => {
     const focusParam = searchParams.get('focus') as Focus | null; //URL 쿼리에서 focus 읽기
     if (focusParam === 'password') setExpandPassword(true); //  ?focus=password면 비번 섹션 자동 오픈
   }, [searchParams]); //URL 쿼리가 바뀌면 다시 평가
 
-  // 타입 분리된 onChange 핸들러
-
-  //  공통 업데이트 도우미(안전하게 키 제한)
+  // 5) 폼 변경 핸들러
   type FormKeys = 'name' | 'nickname' | 'phone' | 'position' | 'birthDate' | 'gender';
 
   const updateForm = (name: FormKeys, value: string) => {
@@ -147,7 +188,7 @@ export default function MyPage() {
     setEditing(false);
   };
 
-  // 내 정보 저장
+  // 6) 내 정보 저장
   const onSave = async () => {
     try {
       console.log('[MyPage] 저장 요청 payload:', {
@@ -168,14 +209,14 @@ export default function MyPage() {
       });
       setUser(form);
       setEditing(false);
-      alert('저장되었습니다.');
+      showAlert('저장되었습니다.', 'success', '저장 완료');
     } catch (e) {
       console.error('updateMe 실패:', e);
-      alert('저장 중 문제가 발생했습니다. 다시 시도해주세요.');
+      showAlert('저장 중 문제가 발생했습니다. 다시 시도해주세요.', 'error', '저장 실패');
     }
   };
 
-  // 비밀번호 변경 관련 상태 & 로직
+  // 7) 비밀번호 변경 관련 상태 & 로직
 
   const [currentPassword, setCurrentPassword] = useState(''); // 현재 비밀번호 입력값
   const [newPassword, setNewPassword] = useState(''); // 새 비밀번호 입력값
@@ -221,6 +262,80 @@ export default function MyPage() {
     setPasswordSuccess('사용 가능한 비밀번호입니다.');
   };
 
+  //  프로필 이미지 변경 관련 로직
+  const [uploading, setUploading] = useState(false);
+  const [removing, setRemoving] = useState(false);
+
+  const onClickChangePhoto = () => {
+    fileInputRef.current?.click();
+  };
+
+  const onChangeProfileFile: React.ChangeEventHandler<HTMLInputElement> = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const MAX_SIZE = 5 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      showAlert(
+        '이미지 용량이 너무 큽니다. \n 최대 5MB 파일만 업로드할 수 있어요.',
+        'error',
+        '업로드 실패'
+      );
+      e.target.value = '';
+      return;
+    }
+
+    try {
+      setUploading(true);
+      const updated = (await uploadProfileImage(file)) as MeResponse;
+
+      // 응답에서 profileUrl만 업데이트
+      setUser((prev) => ({
+        ...prev,
+        profileUrl: updated.profileUrl ?? prev.profileUrl,
+      }));
+      setForm((f) => ({
+        ...f,
+        profileUrl: updated.profileUrl ?? f.profileUrl,
+      }));
+    } catch (err) {
+      console.error('프로필 이미지 업로드 실패:', err);
+      showAlert('프로필 이미지 변경에 실패했습니다. 다시 시도해주세요.', 'success', '변경 실패');
+    } finally {
+      setUploading(false);
+      // 같은 파일 다시 선택해도 change 이벤트 뜨도록 초기화
+      e.target.value = '';
+    }
+  };
+  const [confirmRemoveOpen, setConfirmRemoveOpen] = useState(false);
+
+  const onClickRemovePhoto = () => {
+    setConfirmRemoveOpen(true);
+  };
+
+  const handleConfirmRemovePhoto = async () => {
+    try {
+      setRemoving(true);
+      const updated = (await removeProfileImage()) as MeResponse;
+
+      setUser((prev) => ({
+        ...prev,
+        profileUrl: updated.profileUrl ?? prev.profileUrl,
+      }));
+      setForm((f) => ({
+        ...f,
+        profileUrl: updated.profileUrl ?? f.profileUrl,
+      }));
+
+      showAlert('프로필 이미지가 기본 이미지로 변경되었습니다.', 'success', '삭제 완료');
+    } catch (err) {
+      console.error('프로필 이미지 삭제 실패:', err);
+      showAlert('프로필 이미지를 삭제하지 못했습니다. 다시 시도해주세요.', 'error', '삭제 실패');
+    } finally {
+      setRemoving(false);
+      setConfirmRemoveOpen(false);
+    }
+  };
   return (
     <div className="flex min-h-screen flex-col items-center justify-start bg-[var(--color-jd-white)] px-6 py-10 font-[var(--default-font-family)] sm:px-6 sm:py-12 md:px-8">
       <div className="mt-10 mb-6 w-full max-w-[860px]">
@@ -246,16 +361,49 @@ export default function MyPage() {
         <div className="mb-8 flex flex-col gap-8 sm:flex-row sm:gap-12">
           {/* 프로필 */}
           <div className="w-full self-center sm:w-40 sm:self-start">
-            <div className="mx-auto mb-3 h-28 w-28 overflow-hidden rounded-full bg-[var(--color-jd-gray-light)] sm:mx-0 sm:h-40 sm:w-40">
-              <img src={user.profile} alt="profile" className="h-full w-full object-cover" />
+            <div className="relative mx-auto mb-3 h-28 w-28 sm:mx-0 sm:h-40 sm:w-40">
+              {/* 동그란 이미지 박스 */}
+              <div className="h-full w-full overflow-hidden rounded-full bg-[var(--color-jd-gray-light)]">
+                <img
+                  src={resolvedProfileUrl}
+                  alt="profile"
+                  className="h-full w-full object-cover"
+                />
+              </div>
+
+              {/* 기본 이미지가 아닐 때만 X 버튼 */}
+              {!isDefaultProfile && (
+                <button
+                  type="button"
+                  onClick={onClickRemovePhoto}
+                  disabled={removing || uploading}
+                  aria-label="프로필 이미지 삭제"
+                  className="absolute top-4 right-6 flex h-6 w-6 translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[rgba(130,110,180,0.65)] text-xs font-bold text-white shadow-md backdrop-blur-sm transition hover:bg-[rgba(130,110,180,0.85)] disabled:opacity-50"
+                >
+                  x
+                </button>
+              )}
             </div>
-            <button className="mt-4 w-full rounded-md bg-[var(--color-jd-gray-light)] py-2 text-sm">
-              사진 변경
+            {/* 숨겨진 파일 업로더 */}
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              className="hidden"
+              onChange={onChangeProfileFile}
+            />
+
+            <button
+              type="button"
+              onClick={onClickChangePhoto}
+              disabled={uploading}
+              className="mt-4 w-full rounded-md bg-[var(--color-jd-gray-light)] py-2 text-sm disabled:opacity-60"
+            >
+              {uploading ? '업로드 중...' : '사진 변경'}
             </button>
           </div>
 
-          {/* 정보 폼/뷰 */}
-          {/* ===== 기본 정보 섹션 ===== */}
+          {/* 기본 정보 섹션 */}
           <div className="flex-1">
             <h3 className="mb-4 border-b border-black/10 pb-2 text-sm font-semibold text-[var(--color-jd-gray-dark)]">
               기본 정보
@@ -359,7 +507,7 @@ export default function MyPage() {
               )}
             </div>
 
-            {/* ===== 조직 정보 섹션 ===== */}
+            {/*  조직 정보 섹션 */}
             <h3 className="mt-8 mb-4 border-b border-black/10 pb-2 text-sm font-semibold text-[var(--color-jd-gray-dark)]">
               조직 정보
             </h3>
@@ -465,7 +613,7 @@ export default function MyPage() {
                   // 재인증 시간 기록
                   localStorage.setItem('reauthAt', String(Date.now()));
 
-                  alert('비밀번호가 변경되었습니다.'); // 성공 알림
+                  showAlert('비밀번호가 성공적으로 변경되었습니다.', 'success', '변경 완료');
 
                   // 입력값 및 메시지 초기화
                   setCurrentPassword('');
@@ -554,6 +702,23 @@ export default function MyPage() {
           </div>
         )}
       </div>
+      {/* 범용 알림 모달 */}
+      <AlertModal
+        open={alertModal.open}
+        type={alertModal.type}
+        title={alertModal.title}
+        message={alertModal.message}
+        onClose={closeAlert}
+      />
+      <AlertModal
+        open={confirmRemoveOpen}
+        type="warning"
+        title="프로필 이미지 삭제"
+        message="현재 프로필 사진을 삭제하고 기본 이미지로 되돌릴까요?"
+        onClose={() => setConfirmRemoveOpen(false)}
+        onConfirm={handleConfirmRemovePhoto}
+        confirmText="삭제"
+      />
     </div>
   );
 }

@@ -46,6 +46,10 @@ export default function InterviewCard({
         avatar={avatar}
         interviewId={id}
         resumeId={resumeId}
+        date={date}
+        time={time}
+        interviewers={interviewers}
+        position={position}
       />
     </div>
   );

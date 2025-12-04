@@ -1,59 +1,154 @@
 import { useState, useRef, useEffect } from 'react';
 import SidebarDrawer from '../../components/SidebarDrawer';
+import useFetch from '@/hooks/useFetch';
+
+let baseUrl = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 
 type Notice = {
-  id: string;
-  avatarUrl?: string;
+  id: number;
   text: string;
+  avatarUrl?: string;
 };
 
 const Header = () => {
-  const [leftOpen, setLeftOpen] = useState(false); // 왼쪽 드로어 열림/닫힘
-  const [notiOpen, setNotiOpen] = useState(false); // 알림 드롭다운 열림/닫힘
+  const [leftOpen, setLeftOpen] = useState(false);
+  const [notiOpen, setNotiOpen] = useState(false);
 
-  const [notices, setNotices] = useState<Notice[]>([
+  const [notices, setNotices] = useState<Notice[]>([]);
+
+  /** GET 알림 목록 */
+  const { resData: notifications } = useFetch<
     {
-      id: 'n1',
-      avatarUrl: 'https://i.pravatar.cc/32?img=5',
-      text: '김말수 님의 면접(2025-02-12)이 하루 남았습니다.',
-    },
-    {
-      id: 'n2',
-      avatarUrl: 'https://i.pravatar.cc/32?img=7',
-      text: '김영희 님의 면접(2025-02-12)이 하루 남았습니다.',
-    },
-  ]);
+      notificationId: number;
+      title: string;
+      message: string;
+      type: string;
+      createdAt: string;
+    }[]
+  >('/api/v1/notifications');
 
-  const notiBtnRef = useRef<HTMLButtonElement | null>(null); // 알림 버튼 참조
-  const notiMenuRef = useRef<HTMLDivElement | null>(null); // 알림 메뉴 박스 참조
+  useEffect(() => {
+    if (!notifications) return;
+    setNotices(
+      notifications.map((n) => ({
+        id: n.notificationId,
+        text: `${n.title} - ${n.message}`,
+        avatarUrl: '/default-avatar.png',
+      }))
+    );
+  }, [notifications]);
 
-  // 바깥 클릭 시 드롭다운 닫기
+  function parseJwt(token: string) {
+    const base64Payload = token.split('.')[1];
+    const payload = decodeURIComponent(
+      atob(base64Payload)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(payload);
+  }
+
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return;
+
+    const decoded = parseJwt(token);
+    const userId = decoded?.sub;
+    if (!userId) return;
+
+    const es = new EventSource(`${baseUrl}/api/v1/notifications/subscribe?userId=${userId}`);
+
+    es.addEventListener('notification', (event) => {
+      try {
+        const data = JSON.parse(event.data);
+
+        setNotices((prev) => [
+          {
+            id: data.notificationId,
+            text: `${data.title} - ${data.message}`,
+            avatarUrl: '/default-avatar.png',
+          },
+          ...prev,
+        ]);
+      } catch (e) {
+        console.log('JSON 파싱 오류', e);
+      }
+    });
+
+    es.onerror = () => es.close();
+    return () => es.close();
+  }, []);
+
+  /** DELETE 요청 설정 */
+  const [deleteReq, setDeleteReq] = useState<{ url: string; method: string } | null>(null);
+
+  const { resData: deleteResult } = useFetch<any>(
+    deleteReq?.url || '',
+    null,
+    deleteReq?.method,
+    undefined
+  );
+
+  useEffect(() => {
+    if (deleteResult) {
+      console.log('✔ 개별 알림 삭제 성공', deleteResult);
+    }
+  }, [deleteResult]);
+
+  const removeNotice = (id: number) => {
+    setDeleteReq({
+      url: `/api/v1/notifications/${id}`,
+      method: 'DELETE',
+    });
+
+    // 화면 즉시 반영
+    setNotices((list) => list.filter((n) => n.id !== id));
+  };
+
+  /** 전체 삭제 관련 Hook */
+  const [delAllReq, setDelAllReq] = useState<{ url: string; method: string } | null>(null);
+  const { resData: delAllResult } = useFetch<any>(
+    delAllReq?.url || '',
+    null,
+    delAllReq?.method,
+    undefined
+  );
+
+  useEffect(() => {
+    if (delAllResult) {
+      console.log('✔ 전체 알림 삭제 성공', delAllResult);
+      setNotices([]);
+    }
+  }, [delAllResult]);
+
+  const clearAll = () => {
+    if (notices.length === 0) return;
+    setDelAllReq({
+      url: '/api/v1/notifications',
+      method: 'DELETE',
+    });
+  };
+
+  /** 드롭다운 외부 클릭 */
+  const notiBtnRef = useRef<HTMLButtonElement | null>(null);
+  const notiMenuRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
     if (!notiOpen) return;
     const onDocClick = (e: MouseEvent) => {
       const t = e.target as Node;
-      if (notiMenuRef.current?.contains(t)) return; // 메뉴 안쪽 클릭이면 유지
-      if (notiBtnRef.current?.contains(t)) return; // 버튼 클릭이면 유지
-      setNotiOpen(false); // 그 외는 닫기
+      if (notiMenuRef.current?.contains(t)) return;
+      if (notiBtnRef.current?.contains(t)) return;
+      setNotiOpen(false);
     };
     document.addEventListener('mousedown', onDocClick);
-    return () => document.removeEventListener('mousedown', onDocClick); // 언마운트/닫힐 때 정리
+    return () => document.removeEventListener('mousedown', onDocClick);
   }, [notiOpen]);
-
-  // 개별 알림 지우기
-  const removeNotice = (id: string) => {
-    setNotices((list) => list.filter((n) => n.id !== id));
-  };
-
-  // 모두 지우기
-  const clearAll = () => {
-    setNotices([]);
-  };
 
   return (
     <>
       <header className="fixed top-0 right-0 left-0 z-50 flex h-12 w-full items-center justify-between bg-[var(--color-jd-violet)] px-4 text-white shadow-[0_6px_22px_rgba(0,0,0,.15)]">
-        {/* ☰ 햄버거 */}
         <div className="flex items-center gap-3">
           <button type="button" aria-label="메뉴 열기" onClick={() => setLeftOpen((prev) => !prev)}>
             <svg width="20" height="18" viewBox="0 0 24 24" fill="none" className="text-white">
@@ -62,15 +157,15 @@ const Header = () => {
           </button>
         </div>
 
-        {/* 🔔 알림 버튼 */}
         <div className="relative">
           <button
             type="button"
             aria-label="알림"
             aria-haspopup="menu"
             aria-expanded={notiOpen}
+            ref={notiBtnRef}
             onClick={() => setNotiOpen((v) => !v)}
-            className="relative inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/10 transition hover:bg-white/15 focus:ring-2 focus:ring-white/30 focus:outline-none"
+            className="relative inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/10 transition hover:bg-white/15"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-white">
               <path
@@ -83,19 +178,16 @@ const Header = () => {
             )}
           </button>
 
-          {/* 알림 드롭다운 */}
           {notiOpen && (
             <div
               ref={notiMenuRef}
-              role="menu"
-              aria-label="알림 목록"
-              className="absolute right-0 z-[60] mt-2 w-[320px] overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_10px_30px_rgba(0,0,0,.15)]"
+              className="absolute right-0 z-[60] mt-2 w-[320px] rounded-2xl border bg-white shadow-lg"
             >
               <div className="flex items-center justify-between px-4 py-2">
-                <p className="text-sm font-semibold text-[var(--color-jd-black)]">알림</p>
+                <p className="text-sm font-semibold text-black">알림</p>
                 <button
                   onClick={clearAll}
-                  className="rounded-md px-2 py-1 text-xs text-black/60 hover:bg-black/5"
+                  className="rounded-md px-2 py-1 text-xs text-black/60 hover:bg-black/10"
                 >
                   모두 지우기
                 </button>
@@ -106,51 +198,28 @@ const Header = () => {
                   <p className="px-4 py-8 text-center text-sm text-black/50">알림이 없습니다.</p>
                 ) : (
                   notices.map((n) => (
-                    <div
-                      key={n.id}
-                      className="flex items-start gap-3 border-t border-black/5 px-4 py-3 first:border-t-0"
-                    >
-                      <img
-                        src={n.avatarUrl}
-                        alt=""
-                        className="mt-0.5 h-8 w-8 rounded-full object-cover"
-                      />
-                      <p className="flex-1 text-sm leading-5 text-black/80">{n.text}</p>
+                    <div key={n.id} className="flex items-start gap-3 border-t px-4 py-3">
+                      <img src={n.avatarUrl} className="h-8 w-8 rounded-full object-cover" />
+                      <p className="flex-1 text-sm text-black">{n.text}</p>
                       <button
-                        title="이 알림 지우기"
                         onClick={(e) => {
-                          e.stopPropagation(); // 드문 케이스에서 부모 클릭 전파 방지
+                          e.stopPropagation();
                           removeNotice(n.id);
                         }}
-                        className="mt-0.5 ml-1 inline-flex h-6 w-6 items-center justify-center rounded-full text-black/40 hover:bg-black/5"
-                        aria-label="알림 삭제"
+                        className="flex h-6 w-6 items-center justify-center rounded-full text-black/40 hover:bg-black/10"
                       >
-                        <svg
-                          viewBox="0 0 24 24"
-                          className="h-4 w-4"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                        >
-                          <path d="M18 6 6 18M6 6l12 12" />
-                        </svg>
+                        ✕
                       </button>
                     </div>
                   ))
                 )}
               </div>
-
-              {/* 말풍선 꼬리 */}
-              <div className="pointer-events-none absolute -top-2 right-6 h-4 w-4 rotate-45 rounded-sm bg-white shadow-[-2px_-2px_2px_rgba(0,0,0,.04)]" />
             </div>
           )}
         </div>
       </header>
 
-      {/* 컨텐츠가 헤더 밑에서 시작되도록 스페이서 */}
       <div className="h-12" />
-
-      {/*  왼쪽 사이드 컨트롤러 패널 */}
       <SidebarDrawer open={leftOpen} onClose={() => setLeftOpen(false)} />
     </>
   );
