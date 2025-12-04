@@ -331,10 +331,12 @@ export default function InterviewNotePage() {
         </div>
 
         {/* 가운데 60% → 질문 + AI 요약 */}
-        <div className="flex w-[60%] min-w-[600px] flex-col gap-4 overflow-auto">
+        <div className="mb-3 flex w-[60%] min-w-[600px] flex-col gap-4 overflow-auto">
+          {/* ❌ wrapper 카드 제거하고, 그냥 섹션만 */}
           <QuestionNoteSection questionNotes={questionNotes} />
 
-          <div className="mt-4 min-h-[200px] rounded-2xl border border-gray-200 bg-white p-6 shadow-md">
+          {/* AI 요약 카드만 단일 카드로 유지 */}
+          <div className="mt-4 mb-3 min-h-[200px] w-full rounded-2xl border border-gray-200 bg-white p-6 shadow-md">
             <h2 className="mb-3 text-base font-semibold text-slate-900">AI 면접 요약</h2>
             <p className="text-sm leading-relaxed whitespace-pre-line text-slate-800">
               {aiSummary || '아직 생성된 면접 요약이 없습니다.'}

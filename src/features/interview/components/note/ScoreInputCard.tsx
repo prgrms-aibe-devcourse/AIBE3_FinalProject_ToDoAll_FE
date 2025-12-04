@@ -1,4 +1,9 @@
 import { useState, useEffect } from 'react';
+import {
+  createInterviewEvaluation,
+  getInterviewEvaluation,
+  updateInterviewEvaluation,
+} from '@features/interview/api/evaluation.api.ts';
 
 interface Scores {
   tech: string;
@@ -8,20 +13,46 @@ interface Scores {
 }
 
 interface ScoreInputCardProps {
-  initialScores?: Scores;
+  interviewId: number;
 }
 
-export default function ScoreInputCard({ initialScores }: ScoreInputCardProps) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [scores, setScores] = useState<Scores>(
-    initialScores || { tech: '', comm: '', total: '', comment: '' }
-  );
-
+export default function ScoreInputCard({ interviewId }: ScoreInputCardProps) {
+  const [isEditing, setIsEditing] = useState(true);
+  const [evaluationId, setEvaluationId] = useState<number | null>(null);
+  const [scores, setScores] = useState<Scores>({
+    tech: '',
+    comm: '',
+    total: '',
+    comment: '',
+  });
   useEffect(() => {
-    if (initialScores) {
-      setScores(initialScores);
-    }
-  }, [initialScores]);
+    if (!interviewId) return;
+
+    (async () => {
+      try {
+        const data = await getInterviewEvaluation(interviewId);
+        if (!data) {
+          // 아직 평가 없음 → 입력 모드
+          setIsEditing(true);
+          setEvaluationId(null);
+          setScores({ tech: '', comm: '', total: '', comment: '' });
+          return;
+        }
+
+        // 서버에서 가져온 값으로 채우기
+        setEvaluationId(data.evaluationId);
+        setScores({
+          tech: data.scoreTech?.toString() ?? '',
+          comm: data.scoreComm?.toString() ?? '',
+          total: data.scoreOverall?.toString() ?? '',
+          comment: data.comment ?? '',
+        });
+        setIsEditing(false);
+      } catch (e) {
+        console.error('⚠️ 점수 조회 실패:', e);
+      }
+    })();
+  }, [interviewId]);
 
   // 0~100 범위 제한
   const handleChange = (key: 'tech' | 'comm', value: string) => {
@@ -35,7 +66,12 @@ export default function ScoreInputCard({ initialScores }: ScoreInputCardProps) {
   useEffect(() => {
     const techNum = Number(scores.tech);
     const commNum = Number(scores.comm);
-    if (!isNaN(techNum) && !isNaN(commNum) && scores.tech !== '' && scores.comm !== '') {
+    if (
+      scores.tech !== '' &&
+      scores.comm !== '' &&
+      !Number.isNaN(techNum) &&
+      !Number.isNaN(commNum)
+    ) {
       const avg = ((techNum + commNum) / 2).toFixed(1);
       setScores((prev) => ({ ...prev, total: avg }));
     } else {
@@ -43,9 +79,35 @@ export default function ScoreInputCard({ initialScores }: ScoreInputCardProps) {
     }
   }, [scores.tech, scores.comm]);
 
-  const handleSave = () => {
-    if (scores.tech !== '' && scores.comm !== '' && scores.total !== '') {
+  // 2) 저장 버튼
+  const handleSave = async () => {
+    if (scores.tech === '' || scores.comm === '' || scores.total === '') {
+      alert('기술 / 커뮤니케이션 / 종합 점수를 모두 입력해 주세요.');
+      return;
+    }
+
+    const payload = {
+      scoreTech: Number(scores.tech),
+      scoreComm: Number(scores.comm),
+      scoreOverall: Number(scores.total),
+      comment: scores.comment,
+    };
+
+    try {
+      if (evaluationId == null) {
+        // 처음 저장 (POST)
+        const created = await createInterviewEvaluation(interviewId, payload);
+        setEvaluationId(created.evaluationId);
+      } else {
+        // 이미 있으면 수정 (PATCH)
+        await updateInterviewEvaluation(interviewId, evaluationId, payload);
+      }
+
+      alert('면접 점수가 저장되었습니다.');
       setIsEditing(false);
+    } catch (e) {
+      console.error(e);
+      alert('면접 점수 저장 실패!');
     }
   };
 
@@ -65,6 +127,7 @@ export default function ScoreInputCard({ initialScores }: ScoreInputCardProps) {
                 value={scores.tech}
                 onChange={(e) => handleChange('tech', e.target.value)}
                 className="border-jd-gray-light w-1/3 appearance-none rounded border px-3 py-1 text-right [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                placeholder="0"
               />
               <span className="text-jd-gray-dark text-sm">점</span>
             </div>
@@ -81,6 +144,7 @@ export default function ScoreInputCard({ initialScores }: ScoreInputCardProps) {
                 value={scores.comm}
                 onChange={(e) => handleChange('comm', e.target.value)}
                 className="border-jd-gray-light w-1/3 appearance-none rounded border px-3 py-1 text-right [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                placeholder="0"
               />
               <span className="text-jd-gray-dark text-sm">점</span>
             </div>
@@ -94,6 +158,7 @@ export default function ScoreInputCard({ initialScores }: ScoreInputCardProps) {
                 type="text"
                 value={scores.total}
                 readOnly
+                placeholder="자동 계산"
                 className="border-jd-gray-light text-jd-scarlet w-1/3 rounded border bg-gray-50 px-3 py-1 text-right font-semibold"
               />
               <span className="text-jd-gray-dark text-sm">점</span>
@@ -122,9 +187,9 @@ export default function ScoreInputCard({ initialScores }: ScoreInputCardProps) {
             </button>
           </div>
         </div>
-      ) : scores.tech && scores.comm && scores.total ? (
-        // 표시 모드
-        <div className="border-jd-gray-light flex w-full flex-col items-start rounded-2xl border bg-white p-2 text-left shadow-sm">
+      ) : (
+        // 표시 모드 (저장된 점수가 있을 때만)
+        <div className="border-jd-gray-light flex w-full flex-col items-start rounded-2xl border bg-white p-5 text-left shadow-sm">
           <div className="text-jd-gray-dark mb-2 flex w-full justify-between text-sm font-medium">
             <div className="flex flex-1 flex-col items-center">
               <span>기술 점수</span>
@@ -158,14 +223,6 @@ export default function ScoreInputCard({ initialScores }: ScoreInputCardProps) {
             </button>
           </div>
         </div>
-      ) : (
-        // + 버튼
-        <button
-          onClick={() => setIsEditing(true)}
-          className="border-jd-gray-light flex h-10 w-10 items-center justify-center self-center rounded-full border transition hover:bg-gray-50"
-        >
-          <span className="text-jd-gray-dark text-2xl leading-none">＋</span>
-        </button>
       )}
     </div>
   );
