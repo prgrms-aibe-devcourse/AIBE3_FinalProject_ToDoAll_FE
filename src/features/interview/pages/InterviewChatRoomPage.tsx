@@ -3,6 +3,8 @@ import ChatSection from '../components/chat/ChatSection';
 import QuestionNoteSection from '../components/chat/QuestionNoteSection';
 import InterviewSummarySection from '../components/chat/InterviewSummarySection';
 
+import { endInterview } from '@/features/interview/api/interview.api';
+
 import { useEffect, useState } from 'react';
 
 import { getMeAuthed } from '@/features/interview/api/me.authed.api';
@@ -12,7 +14,7 @@ import {
   toggleQuestionCheck,
   getChatHistory,
   getInterviewMemos,
-  updateInterviewMemo, // ✅ 추가
+  updateInterviewMemo,
   type InterviewQuestion,
   type ChatMessage,
   type InterviewMemo,
@@ -42,16 +44,14 @@ export default function InterviewChatRoomPage() {
   const [questionNotes, setQuestionNotes] = useState<QuestionSection[]>([]);
   const [summaries, setSummaries] = useState<InterviewSummary[]>([]);
 
-  // 초기 로그
   useEffect(() => {
-    console.log('🔍 InterviewChatRoomPage 초기화:', {
+    console.log('InterviewChatRoomPage 초기화:', {
       interviewIdParam,
       numericInterviewId,
       state: location.state,
     });
   }, [interviewIdParam, numericInterviewId, location.state]);
 
-  // 1) 사용자 정보 로드
   useEffect(() => {
     (async () => {
       try {
@@ -63,10 +63,9 @@ export default function InterviewChatRoomPage() {
     })();
   }, []);
 
-  // 2) 채팅 내역 로드 (me 없이도 즉시 로드)
   useEffect(() => {
     if (!numericInterviewId) {
-      console.error('❌ 잘못된 interviewId:', interviewIdParam);
+      console.error('잘못된 interviewId:', interviewIdParam);
       return;
     }
 
@@ -88,7 +87,6 @@ export default function InterviewChatRoomPage() {
     })();
   }, [numericInterviewId, interviewIdParam]);
 
-  // 3) me가 로드된 후 isMine 업데이트
   useEffect(() => {
     if (!me) return;
 
@@ -100,7 +98,6 @@ export default function InterviewChatRoomPage() {
     );
   }, [me]);
 
-  // 4) 질문 로드
   useEffect(() => {
     if (!numericInterviewId) return;
 
@@ -132,7 +129,6 @@ export default function InterviewChatRoomPage() {
     })();
   }, [numericInterviewId]);
 
-  // 5) 메모 로드 (같은 userId의 최신 메모만)
   useEffect(() => {
     if (!numericInterviewId) return;
 
@@ -185,7 +181,6 @@ export default function InterviewChatRoomPage() {
     })();
   }, [numericInterviewId]);
 
-  // 6) WebSocket 연결
   const { sendChat, sendNote } = useInterviewSocket({
     interviewId: numericInterviewId,
     onChatMessage: (msg: OutgoingChatMessage) => {
@@ -210,7 +205,6 @@ export default function InterviewChatRoomPage() {
       });
     },
     onNoteMessage: (msg: IncomingNoteMessage) => {
-      // NOTE 생성/수신은 실시간으로 요약 갱신
       setSummaries((prev) => {
         const filtered = prev.filter((s) => s.authorId !== msg.senderId);
         return [
@@ -226,7 +220,6 @@ export default function InterviewChatRoomPage() {
     },
   });
 
-  // 7) 질문 체크 토글 핸들러
   const handleToggleQuestionCheck = async (questionId: number) => {
     try {
       await toggleQuestionCheck(numericInterviewId, questionId);
@@ -245,10 +238,9 @@ export default function InterviewChatRoomPage() {
     }
   };
 
-  // 8) 메시지 전송
   const handleSend = (content: string) => {
     if (!me) {
-      console.warn('⚠️ 사용자 정보가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.');
+      console.warn('사용자 정보가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.');
       return;
     }
 
@@ -264,33 +256,34 @@ export default function InterviewChatRoomPage() {
       content,
     };
 
-    console.log('📤 WebSocket 전송:', payload);
+    console.log('WebSocket 전송:', payload);
     sendChat(payload);
   };
 
-  // 9) 노트 전송 핸들러 (생성: WS)
   const handleSendNote = (content: string) => {
     if (!me) {
-      console.warn('⚠️ 사용자 정보가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.');
+      console.warn('사용자 정보가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.');
       return;
     }
-    console.log('📝 노트 전송:', content);
+    console.log('노트 전송:', content);
     sendNote(content);
   };
 
-  // ✅ 10) 메모 수정 저장(HTTP PATCH)
   const handleUpdateMemo = async (memoId: number, content: string) => {
-    // content를 그대로 서버에 보냄. (서버가 title/content 분리를 원하면 여기서 JSON으로 감싸도 됨)
     const data = await updateInterviewMemo(numericInterviewId, memoId, content);
-    // data: { memoId, content, updatedAt }
 
     setSummaries((prev) =>
       prev.map((s) => (s.id === data.memoId ? { ...s, content: data.content } : s))
     );
   };
 
-  const handleEndInterview = () => {
-    navigate('/interview/manage');
+  const handleEndInterview = async () => {
+    try {
+      await endInterview(numericInterviewId);
+      navigate('/interview/manage');
+    } catch (e) {
+      console.error('면접 종료 실패:', e);
+    }
   };
 
   return (
@@ -316,7 +309,7 @@ export default function InterviewChatRoomPage() {
             summaries={summaries}
             currentUserId={me?.id}
             onSendNote={handleSendNote}
-            onUpdateMemo={handleUpdateMemo} // ✅ 연결
+            onUpdateMemo={handleUpdateMemo}
           />
         </div>
       </div>

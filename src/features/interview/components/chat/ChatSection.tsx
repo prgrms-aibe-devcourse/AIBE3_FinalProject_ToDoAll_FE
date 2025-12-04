@@ -14,11 +14,10 @@ export default function ChatSection({ initialMessages, avatar, onSend }: ChatSec
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    console.log('💬 ChatSection initialMessages 업데이트:', initialMessages);
+    console.log(' ChatSection initialMessages 업데이트:', initialMessages);
     setMessages(initialMessages);
   }, [initialMessages]);
 
-  // 메시지가 업데이트될 때마다 스크롤을 맨 아래로 이동
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);

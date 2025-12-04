@@ -10,7 +10,6 @@ export type Me = {
   id: number;
   name?: string;
   nickname?: string;
-  // 필요한 필드 있으면 추가
 };
 
 export async function getMeAuthed(): Promise<Me> {

@@ -6,7 +6,6 @@ interface InterviewSummarySectionProps {
   currentUserId: number;
   onSendNote?: (_content: string) => void;
 
-  // ✅ 추가: memoId + content로 서버 저장
   onUpdateMemo?: (_memoId: number, _content: string) => Promise<void> | void;
 }
 
@@ -21,7 +20,6 @@ export default function InterviewSummarySection({
   const [newNoteContent, setNewNoteContent] = useState('');
   const [isWriting, setIsWriting] = useState(false);
 
-  // ✅ 저장 UX 상태
   const [savingIdx, setSavingIdx] = useState<number | null>(null);
   const [savedIdx, setSavedIdx] = useState<number | null>(null);
 
@@ -29,19 +27,16 @@ export default function InterviewSummarySection({
     setSummaryList(summaries);
   }, [summaries]);
 
-  // 수정 핸들러(로컬 반영)
   const handleEdit = (idx: number, key: keyof InterviewSummary, value: string) => {
     setSummaryList((prev) => prev.map((item, i) => (i === idx ? { ...item, [key]: value } : item)));
   };
 
-  // ✅ 수정 종료(blur) 시 DB 저장
   const handleBlur = async (idx: number) => {
     setEditingIdx(null);
 
     const item = summaryList[idx];
     if (!item) return;
 
-    // 원하면: 내 메모만 수정 저장 (다른 사람 메모는 편집 버튼도 없어서 사실상 필요 없긴 함)
     if (item.authorId !== currentUserId) return;
 
     if (!onUpdateMemo) return;
@@ -54,12 +49,11 @@ export default function InterviewSummarySection({
       window.setTimeout(() => setSavedIdx(null), 1200);
     } catch (e) {
       setSavingIdx(null);
-      // 실패 UX는 최소로 콘솔만(원하면 토스트 가능)
+
       console.error('메모 저장 실패:', e);
     }
   };
 
-  // 새 메모 작성 핸들러(WS 전송)
   const handleSendNote = () => {
     const trimmed = newNoteContent.trim();
     if (!trimmed || !onSendNote) return;
@@ -69,7 +63,6 @@ export default function InterviewSummarySection({
     setIsWriting(false);
   };
 
-  // 내 메모 찾기
   const mySummary = summaryList.find((s) => s.authorId === currentUserId);
 
   return (
@@ -126,7 +119,7 @@ export default function InterviewSummarySection({
 
           return (
             <div key={item.id} className="bg-jd-gray-light relative rounded-xl p-4 shadow-sm">
-              {/* ✅ 저장 UX */}
+              {/* 저장 UX */}
               {savingIdx === idx && (
                 <span className="text-jd-gray-dark absolute top-3 right-3 rounded-full bg-white/70 px-2 py-0.5 text-[11px]">
                   저장 중...
@@ -134,7 +127,7 @@ export default function InterviewSummarySection({
               )}
               {savedIdx === idx && (
                 <span className="text-jd-gray-dark absolute top-3 right-3 rounded-full bg-white/70 px-2 py-0.5 text-[11px]">
-                  저장됨 ✅
+                  저장됨
                 </span>
               )}
 

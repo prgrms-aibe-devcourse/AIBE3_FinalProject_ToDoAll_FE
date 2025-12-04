@@ -16,7 +16,7 @@ export default function InterviewChatRoomGuest() {
 
   const cleanupPending = () => {
     const now = Date.now();
-    pendingRef.current = pendingRef.current.filter((p) => now - p.at < 7000); // 7초 유지
+    pendingRef.current = pendingRef.current.filter((p) => now - p.at < 7000);
   };
 
   const { sendChat } = useInterviewSocket({

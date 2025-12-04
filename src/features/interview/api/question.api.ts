@@ -1,4 +1,3 @@
-// src/features/interview/api/question.api.ts
 import { authedRequest } from '@/lib/utils/authedRequest';
 
 export interface InterviewQuestion {
