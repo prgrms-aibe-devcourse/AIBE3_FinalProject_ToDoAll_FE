@@ -5,31 +5,55 @@ interface InterviewSummarySectionProps {
   summaries: InterviewSummary[];
   currentUserId: number;
   onSendNote?: (_content: string) => void;
+
+  onUpdateMemo?: (_memoId: number, _content: string) => Promise<void> | void;
 }
 
 export default function InterviewSummarySection({
   summaries,
   currentUserId,
   onSendNote,
+  onUpdateMemo,
 }: InterviewSummarySectionProps) {
   const [summaryList, setSummaryList] = useState<InterviewSummary[]>(summaries);
   const [editingIdx, setEditingIdx] = useState<number | null>(null);
   const [newNoteContent, setNewNoteContent] = useState('');
   const [isWriting, setIsWriting] = useState(false);
 
+  const [savingIdx, setSavingIdx] = useState<number | null>(null);
+  const [savedIdx, setSavedIdx] = useState<number | null>(null);
+
   useEffect(() => {
     setSummaryList(summaries);
   }, [summaries]);
 
-  // 수정 핸들러
   const handleEdit = (idx: number, key: keyof InterviewSummary, value: string) => {
     setSummaryList((prev) => prev.map((item, i) => (i === idx ? { ...item, [key]: value } : item)));
   };
 
-  // 수정 종료
-  const handleBlur = () => setEditingIdx(null);
+  const handleBlur = async (idx: number) => {
+    setEditingIdx(null);
 
-  // 새 메모 작성 핸들러
+    const item = summaryList[idx];
+    if (!item) return;
+
+    if (item.authorId !== currentUserId) return;
+
+    if (!onUpdateMemo) return;
+
+    try {
+      setSavingIdx(idx);
+      await onUpdateMemo(item.id, item.content);
+      setSavingIdx(null);
+      setSavedIdx(idx);
+      window.setTimeout(() => setSavedIdx(null), 1200);
+    } catch (e) {
+      setSavingIdx(null);
+
+      console.error('메모 저장 실패:', e);
+    }
+  };
+
   const handleSendNote = () => {
     const trimmed = newNoteContent.trim();
     if (!trimmed || !onSendNote) return;
@@ -39,7 +63,6 @@ export default function InterviewSummarySection({
     setIsWriting(false);
   };
 
-  // 내 메모 찾기
   const mySummary = summaryList.find((s) => s.authorId === currentUserId);
 
   return (
@@ -96,19 +119,31 @@ export default function InterviewSummarySection({
 
           return (
             <div key={item.id} className="bg-jd-gray-light relative rounded-xl p-4 shadow-sm">
+              {/* 저장 UX */}
+              {savingIdx === idx && (
+                <span className="text-jd-gray-dark absolute top-3 right-3 rounded-full bg-white/70 px-2 py-0.5 text-[11px]">
+                  저장 중...
+                </span>
+              )}
+              {savedIdx === idx && (
+                <span className="text-jd-gray-dark absolute top-3 right-3 rounded-full bg-white/70 px-2 py-0.5 text-[11px]">
+                  저장됨
+                </span>
+              )}
+
               {isEditing ? (
                 <>
                   <input
                     type="text"
                     value={item.title}
                     onChange={(e) => handleEdit(idx, 'title', e.target.value)}
-                    onBlur={handleBlur}
+                    onBlur={() => void handleBlur(idx)}
                     className="border-jd-gray-light focus:outline-jd-violet mb-2 w-full border-b bg-transparent text-sm font-semibold"
                   />
                   <textarea
                     value={item.content}
                     onChange={(e) => handleEdit(idx, 'content', e.target.value)}
-                    onBlur={handleBlur}
+                    onBlur={() => void handleBlur(idx)}
                     rows={3}
                     className="text-jd-black border-jd-gray-light focus:outline-jd-violet w-full resize-none rounded-md border bg-white p-2 text-sm"
                   />
