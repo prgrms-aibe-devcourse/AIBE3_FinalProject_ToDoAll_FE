@@ -12,14 +12,18 @@ interface InterviewSummaryResponse {
   resumeId: number;
   candidateName: string;
   status: InterviewStatus;
+  candidateAvatar: string;
+  interviewers: string[];
   scheduledAt: string;
   createdAt: string;
 }
+
 interface InterviewListResponse {
   data: InterviewSummaryResponse[];
   nextCursor: number | null;
   hasNext: boolean;
 }
+
 interface InterviewCardData {
   id: number;
   jdId: number;
@@ -78,9 +82,9 @@ export default function InterviewManagePage() {
       position: i.jdTitle,
       date: i.scheduledAt.split('T')[0],
       time: i.scheduledAt.split('T')[1].slice(0, 5),
-      interviewers: '면접관 정보 필요',
+      interviewers: i.interviewers?.join(', ') || '면접관 없음',
       status: i.status,
-      avatar: '/default-avatar.png',
+      avatar: i.candidateAvatar || '/default-avatar.png',
       resumeId: i.resumeId,
     })) ?? [];
 

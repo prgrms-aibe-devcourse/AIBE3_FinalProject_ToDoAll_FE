@@ -1,26 +1,47 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import ChatSection from '../components/chat/ChatSection';
 import useInterviewSocket from '@/hooks/useInterviewSocket';
 import { MessageType, type OutgoingChatMessage } from '@/features/interview/types/chatroom';
 
+type UiMsg = { id: number; text: string; senderId: number; isMine: boolean };
+
 export default function InterviewChatRoomGuest() {
   const { interviewId: interviewIdParam } = useParams();
   const interviewId = Number(interviewIdParam);
 
-  const [messages, setMessages] = useState<
-    { id: number; text: string; senderId: number; isMine: boolean }[]
-  >([]);
+  const [messages, setMessages] = useState<UiMsg[]>([]);
+
+  const pendingRef = useRef<{ content: string; at: number }[]>([]);
+
+  const cleanupPending = () => {
+    const now = Date.now();
+    pendingRef.current = pendingRef.current.filter((p) => now - p.at < 7000);
+  };
 
   const { sendChat } = useInterviewSocket({
     interviewId,
     onChatMessage: (msg) => {
+      const incoming = (msg.content ?? '').trim();
+      if (!incoming) return;
+
+      const now = Date.now();
+      cleanupPending();
+
+      const dupIdx = pendingRef.current.findIndex((p) => p.content === incoming);
+      const isMyEcho = dupIdx !== -1;
+
+      if (isMyEcho) {
+        pendingRef.current.splice(dupIdx, 1);
+        return;
+      }
+
       setMessages((prev) => [
         ...prev,
         {
-          id: Date.now(),
-          text: msg.content,
-          senderId: msg.senderId ?? 0,
+          id: now,
+          text: incoming,
+          senderId: msg.senderId ?? -999,
           isMine: false,
         },
       ]);
@@ -28,25 +49,30 @@ export default function InterviewChatRoomGuest() {
   });
 
   const handleSend = (content: string) => {
-    const payload: OutgoingChatMessage = {
-      type: MessageType.CHAT,
-      interviewId,
-      senderId: 0,
-      sender: 'Guest',
-      content,
-    };
+    const trimmed = content.trim();
+    if (!trimmed) return;
 
-    sendChat(payload);
+    pendingRef.current.push({ content: trimmed, at: Date.now() });
 
     setMessages((prev) => [
       ...prev,
       {
         id: Date.now(),
-        text: content,
+        text: trimmed,
         senderId: 0,
         isMine: true,
       },
     ]);
+
+    const payload: OutgoingChatMessage = {
+      type: MessageType.CHAT,
+      interviewId,
+      senderId: 0,
+      sender: 'Guest',
+      content: trimmed,
+    };
+
+    sendChat(payload);
   };
 
   return (

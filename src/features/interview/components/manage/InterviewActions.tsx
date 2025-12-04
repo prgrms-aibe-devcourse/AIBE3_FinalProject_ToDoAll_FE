@@ -46,7 +46,7 @@ export default function InterviewActions({
   };
 
   const handleStartInterview = () => {
-    navigate('/interview/chat-room', {
+    navigate(`/interview/${interviewId}/chat-room`, {
       state: { avatar, interviewId },
     });
   };

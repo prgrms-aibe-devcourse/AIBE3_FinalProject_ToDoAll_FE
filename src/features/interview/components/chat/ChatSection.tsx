@@ -10,14 +10,14 @@ export default function ChatSection({ initialMessages, avatar, onSend }: ChatSec
   const [messages, setMessages] =
     useState<{ id: number; text: string; senderId: number; isMine: boolean }[]>(initialMessages);
   const [newMessage, setNewMessage] = useState('');
+  const [isComposing, setIsComposing] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    console.log('💬 ChatSection initialMessages 업데이트:', initialMessages);
+    console.log(' ChatSection initialMessages 업데이트:', initialMessages);
     setMessages(initialMessages);
   }, [initialMessages]);
 
-  // 메시지가 업데이트될 때마다 스크롤을 맨 아래로 이동
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -26,12 +26,10 @@ export default function ChatSection({ initialMessages, avatar, onSend }: ChatSec
     const trimmed = newMessage.trim();
     if (!trimmed) return;
 
-    if (onSend) {
-      onSend(trimmed);
-    }
-
+    onSend?.(trimmed);
     setNewMessage('');
   };
+
   return (
     <div className="border-jd-gray-light flex max-h-full flex-1 flex-col overflow-hidden rounded-2xl border bg-white p-6 shadow-md">
       {/* 채팅 리스트 */}
@@ -76,7 +74,11 @@ export default function ChatSection({ initialMessages, avatar, onSend }: ChatSec
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="메시지를 입력하세요..."
             className="text-jd-black placeholder-jd-gray-black flex-1 bg-transparent text-sm focus:outline-none"
+            onCompositionStart={() => setIsComposing(true)}
+            onCompositionEnd={() => setIsComposing(false)}
             onKeyDown={(e) => {
+              if (isComposing) return;
+
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 handleSend();
