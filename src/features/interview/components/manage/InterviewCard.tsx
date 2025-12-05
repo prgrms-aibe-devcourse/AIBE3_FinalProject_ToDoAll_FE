@@ -1,7 +1,8 @@
 import InterviewHeader from './InterviewHeader';
 import InterviewInfoSection from './InterviewInfoSection';
 import InterviewActions from './InterviewActions';
-import { type InterviewStatus } from '../../types/interviewer';
+import { type InterviewStatus, type ResultStatus } from '../../types/interviewer';
+import { useState } from 'react';
 
 export interface InterviewCardProps {
   id: number;
@@ -11,6 +12,7 @@ export interface InterviewCardProps {
   time: string;
   interviewers: string;
   status: InterviewStatus;
+  result: ResultStatus;
   avatar: string;
   resumeId: number;
 }
@@ -23,18 +25,27 @@ export default function InterviewCard({
   time,
   interviewers,
   status,
+  result,
   avatar,
   resumeId,
 }: InterviewCardProps) {
+  const [currResult, setResult] = useState<ResultStatus>(result);
+
   return (
     <div
       key={id}
       className="relative rounded-2xl bg-white p-6 shadow-md transition hover:shadow-lg"
     >
-      <button className="absolute top-3 right-3 text-gray-400 hover:text-gray-600">×</button>
+      {/* <button className="absolute top-3 right-3 text-gray-400 hover:text-gray-600">×</button> */}
 
       {/* 헤더 영역 */}
-      <InterviewHeader avatar={avatar} name={name} position={position} status={status} />
+      <InterviewHeader
+        avatar={avatar}
+        name={name}
+        position={position}
+        status={status}
+        result={currResult}
+      />
 
       {/* 인터뷰 정보 */}
       <InterviewInfoSection date={date} time={time} interviewers={interviewers} />
@@ -42,6 +53,7 @@ export default function InterviewCard({
       {/* 버튼 영역 */}
       <InterviewActions
         status={status}
+        result={currResult}
         name={name}
         avatar={avatar}
         interviewId={id}
@@ -50,6 +62,7 @@ export default function InterviewCard({
         time={time}
         interviewers={interviewers}
         position={position}
+        onResultChange={setResult}
       />
     </div>
   );

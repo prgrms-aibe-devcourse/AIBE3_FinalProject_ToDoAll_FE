@@ -2,7 +2,7 @@ import { useState } from 'react';
 import InterviewCard from '../components/manage/InterviewCard';
 import InterviewFilterTabs from '../components/manage/InterviewFilterTabs';
 import InterviewSortDropdown from '../components/manage/InterviewSortDropdown';
-import type { TabStatus, InterviewStatus } from '../types/interviewer';
+import type { TabStatus, InterviewStatus, ResultStatus } from '../types/interviewer';
 import useFetch from '@/hooks/useFetch';
 
 interface InterviewSummaryResponse {
@@ -12,6 +12,7 @@ interface InterviewSummaryResponse {
   resumeId: number;
   candidateName: string;
   status: InterviewStatus;
+  resultStatus: ResultStatus;
   candidateAvatar: string;
   interviewers: string[];
   scheduledAt: string;
@@ -33,6 +34,7 @@ interface InterviewCardData {
   time: string;
   interviewers: string;
   status: InterviewStatus;
+  result: ResultStatus;
   avatar: string;
   resumeId: number;
 }
@@ -84,6 +86,7 @@ export default function InterviewManagePage() {
       time: i.scheduledAt.split('T')[1].slice(0, 5),
       interviewers: i.interviewers?.join(', ') || '면접관 없음',
       status: i.status,
+      result: i.resultStatus,
       avatar: i.candidateAvatar || '/default-avatar.png',
       resumeId: i.resumeId,
     })) ?? [];
