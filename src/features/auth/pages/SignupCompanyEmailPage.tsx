@@ -50,9 +50,9 @@ export default function SignupCompanyEmailPage() {
       const backendMessage = data?.message || err?.message;
       const errorCode: number | undefined = data?.errorCode;
 
-      let errorMessage = '';
+      let errorMessage: string;
 
-      // ✅ 1) 이미 가입된 이메일 (백엔드 USER_ALREADY_EXISTS = 1001, HTTP 409)
+      // 1) 이미 가입된 이메일 (백엔드 USER_ALREADY_EXISTS = 1001, HTTP 409)
       if (
         errorCode === ERROR_CODES.USER_ALREADY_EXISTS ||
         status === 409 ||
@@ -180,7 +180,11 @@ export default function SignupCompanyEmailPage() {
         <button
           type="submit"
           disabled={!email || invalid || loading}
-          className="${!email || invalid || loading ? 'bg-[#752F6D]/60 cursor-not-allowed' : 'bg-[#752F6D] active:brightness-95'}`} h-12 w-full !rounded-[15px] !bg-[#752F6D] [background-image:none] font-extrabold !text-white !opacity-100 shadow-[0_4px_12px_rgba(117,47,109,.25)] transition hover:brightness-[1.05] active:brightness-95"
+          className={`${
+            !email || invalid || loading
+              ? 'cursor-not-allowed bg-[#752F6D]/60'
+              : 'bg-[#752F6D] active:brightness-95'
+          } h-12 w-full !rounded-[15px] !bg-[#752F6D] [background-image:none] font-extrabold !text-white !opacity-100 shadow-[0_4px_12px_rgba(117,47,109,.25)] transition hover:brightness-[1.05] active:brightness-95`}
           style={{ height: 44 }}
         >
           {loading ? '전송 중...' : '이메일 인증'}

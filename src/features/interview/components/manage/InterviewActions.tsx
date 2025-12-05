@@ -34,6 +34,7 @@ export default function InterviewActions({
   const handleCloseModal = () => setIsModalOpen(false);
 
   const handleOpenInterviewNote = () => {
+    if (!interviewId) return;
     navigate(`/interview/${interviewId}/note`, {
       state: { name, avatar, interviewId },
     });
