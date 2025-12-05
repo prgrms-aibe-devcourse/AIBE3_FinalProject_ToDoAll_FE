@@ -92,7 +92,7 @@ const Header = () => {
 
   useEffect(() => {
     if (deleteResult) {
-      console.log('✔ 개별 알림 삭제 성공', deleteResult);
+      console.log(' 개별 알림 삭제 성공', deleteResult);
     }
   }, [deleteResult]);
 
@@ -117,7 +117,7 @@ const Header = () => {
 
   useEffect(() => {
     if (delAllResult) {
-      console.log('✔ 전체 알림 삭제 성공', delAllResult);
+      console.log(' 전체 알림 삭제 성공', delAllResult);
       setNotices([]);
     }
   }, [delAllResult]);

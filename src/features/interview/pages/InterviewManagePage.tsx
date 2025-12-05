@@ -76,20 +76,36 @@ export default function InterviewManagePage() {
       title: jd.title,
     })) ?? [];
 
+  const toKST = (dateStr: string) => {
+    const date = new Date(dateStr);
+    date.setHours(date.getHours() + 9);
+    return date;
+  };
+
   const interviews: InterviewCardData[] =
-    interviewList?.data?.map((i) => ({
-      id: i.interviewId,
-      jdId: i.jdId,
-      name: i.candidateName,
-      position: i.jdTitle,
-      date: i.scheduledAt.split('T')[0],
-      time: i.scheduledAt.split('T')[1].slice(0, 5),
-      interviewers: i.interviewers?.join(', ') || '면접관 없음',
-      status: i.status,
-      result: i.resultStatus,
-      avatar: i.candidateAvatar || '/default-avatar.png',
-      resumeId: i.resumeId,
-    })) ?? [];
+    interviewList?.data?.map((i) => {
+      const kstDate = toKST(i.scheduledAt);
+      const pad = (n: number) => n.toString().padStart(2, '0');
+
+      const year = kstDate.getFullYear();
+      const month = pad(kstDate.getMonth() + 1);
+      const day = pad(kstDate.getDate());
+      const hours = pad(kstDate.getHours());
+      const minutes = pad(kstDate.getMinutes());
+      return {
+        id: i.interviewId,
+        jdId: i.jdId,
+        name: i.candidateName,
+        position: i.jdTitle,
+        date: `${year}-${month}-${day}`,
+        time: `${hours}:${minutes}`,
+        interviewers: i.interviewers?.join(', ') || '면접관 없음',
+        status: i.status,
+        result: i.resultStatus,
+        avatar: i.candidateAvatar || '/default-avatar.png',
+        resumeId: i.resumeId,
+      };
+    }) ?? [];
 
   const handleNext = () => {
     if (interviewList?.nextCursor) {
