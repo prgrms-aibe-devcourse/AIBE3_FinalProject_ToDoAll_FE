@@ -1,7 +1,7 @@
 import InterviewHeader from './InterviewHeader';
 import InterviewInfoSection from './InterviewInfoSection';
 import InterviewActions from './InterviewActions';
-import { type InterviewStatus } from '../../types/interviewer';
+import { type InterviewStatus, type ResultStatus } from '../../types/interviewer';
 
 export interface InterviewCardProps {
   id: number;
@@ -11,6 +11,7 @@ export interface InterviewCardProps {
   time: string;
   interviewers: string;
   status: InterviewStatus;
+  result: ResultStatus;
   avatar: string;
   resumeId: number;
 }
@@ -23,6 +24,7 @@ export default function InterviewCard({
   time,
   interviewers,
   status,
+  result,
   avatar,
   resumeId,
 }: InterviewCardProps) {
@@ -34,7 +36,13 @@ export default function InterviewCard({
       <button className="absolute top-3 right-3 text-gray-400 hover:text-gray-600">×</button>
 
       {/* 헤더 영역 */}
-      <InterviewHeader avatar={avatar} name={name} position={position} status={status} />
+      <InterviewHeader
+        avatar={avatar}
+        name={name}
+        position={position}
+        status={status}
+        result={result}
+      />
 
       {/* 인터뷰 정보 */}
       <InterviewInfoSection date={date} time={time} interviewers={interviewers} />
@@ -42,6 +50,7 @@ export default function InterviewCard({
       {/* 버튼 영역 */}
       <InterviewActions
         status={status}
+        result={result}
         name={name}
         avatar={avatar}
         interviewId={id}

@@ -7,26 +7,26 @@ export interface Interviewer {
 
 export type TabStatus = 'ALL' | 'WAITING' | 'DONE' | 'IN_PROGRESS';
 
-export type InterviewStatus =
-  | 'WAITING'
-  | 'IN_PROGRESS'
-  | 'ACCEPTED'
-  | 'ON_HOLD'
-  | 'REJECTED'
-  | 'DONE';
+export type InterviewStatus = 'WAITING' | 'IN_PROGRESS' | 'DONE';
+
+export type ResultStatus = 'PASS' | 'HOLD' | 'FAIL' | 'PENDING';
 
 export const statusLabelMap: Record<InterviewStatus, string> = {
   WAITING: '예정',
   IN_PROGRESS: '진행중',
-  ACCEPTED: '합격',
-  ON_HOLD: '보류',
-  REJECTED: '불합격',
   DONE: '완료',
 };
 
+export const resultStatusLabelMap: Record<ResultStatus, string> = {
+  PASS: '합격',
+  HOLD: '보류',
+  FAIL: '불합격',
+  PENDING: '미정',
+};
+
 export const tabToInterviewStatus: Record<TabStatus, InterviewStatus[]> = {
-  ALL: ['WAITING', 'IN_PROGRESS', 'ACCEPTED', 'ON_HOLD', 'REJECTED', 'DONE'],
+  ALL: ['WAITING', 'IN_PROGRESS', 'DONE'],
   WAITING: ['WAITING'],
   IN_PROGRESS: ['IN_PROGRESS'],
-  DONE: ['ACCEPTED', 'ON_HOLD', 'REJECTED', 'DONE'],
+  DONE: ['DONE'],
 };
