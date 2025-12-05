@@ -52,7 +52,7 @@ export default function InterviewSortDropdown({ jobPosts, onSelect }: InterviewS
           {/* 전체 보기 */}
           <button
             onClick={() => handleSelect(null)}
-            className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+            className="text-jd-black block w-full px-4 py-2 text-left text-sm hover:bg-gray-100"
           >
             전체 보기
           </button>
