@@ -31,7 +31,11 @@ type JobPostListItemResponse = {
 };
 
 export async function fetchJobPosts(page = 0, size = 10): Promise<JobPost[]> {
-  const res = await fetch(`http://localhost:8080/api/v1/jd?page=${page}&size=${size}`);
+  const res = await fetch(`http://localhost:8080/api/v1/jd?page=${page}&size=${size}`, {
+    method: 'GET',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+  });
   const body = (await res.json()) as ApiResponse<SpringPage<JobPostListItemResponse>>;
   if (!body.data) throw new Error(body.message ?? 'Empty response');
   return body.data.content.map((it) => ({
