@@ -23,13 +23,19 @@
   --color-jd-white: #faf8f8;
   --color-jd-black: #413f3f;
   --color-jd-gray-light: #e3dbdb;
+  --color-jd-gray-light-hover: #d5cbcb;
   --color-jd-gray-dark: #837c7c;
   --color-jd-green: #5cc46f;
+  --color-jd-blue: #4a90e2;
 }
 
 @layer components {
-  .jd-LongViewSection-RWD { @apply max-w-sm md:max-w-[584px] }
-  .jd-LongViewSection-RWD-full { @apply max-w-sm md:max-w-[584px] xl:max-w-full }
+  .jd-LongViewSection-RWD {
+    @apply max-w-sm md:max-w-[584px];
+  }
+  .jd-LongViewSection-RWD-full {
+    @apply max-w-sm md:max-w-[584px] xl:max-w-full;
+  }
 }
 
 @layer utilities {

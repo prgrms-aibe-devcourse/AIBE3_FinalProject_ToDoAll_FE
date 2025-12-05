@@ -1,6 +1,6 @@
 interface InterviewButtonProps {
   label: string;
-  variant?: 'default' | 'primary' | 'success' | 'danger' | 'question';
+  variant?: 'default' | 'primary' | 'success' | 'question';
   onClick?: () => void;
 }
 
@@ -12,11 +12,10 @@ export default function InterviewButton({
   const baseStyle = 'font-semibold px-5 py-2 rounded-lg transition-colors';
 
   const variants = {
-    default: 'bg-gray-100 text-gray-700 hover:bg-gray-200',
-    primary: 'bg-jd-violet text-white hover:bg-jd-violet-hover',
-    success: 'bg-jd-green text-gray-100 hover:bg-green-500',
-    question: 'bg-jd-yellow text-black hover:bg-yellow-500',
-    danger: 'bg-jd-scarlet text-white hover:bg-red-300',
+    default: 'bg-jd-gray-light text-jd-black hover:bg-jd-gray-light-hover',
+    primary: 'bg-jd-violet text-jd-white hover:bg-jd-violet-hover',
+    success: 'bg-jd-green text-jd-white hover:bg-green-500',
+    question: 'bg-jd-yellow text-jd-black hover:bg-yellow-500',
   };
 
   return (
