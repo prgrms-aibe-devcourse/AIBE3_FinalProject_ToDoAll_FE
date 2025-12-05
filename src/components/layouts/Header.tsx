@@ -11,6 +11,7 @@ type Notice = {
   message: string;
   createdAt: string;
   interviewId?: number;
+  readFlag?: boolean;
 };
 
 const Header = () => {
@@ -29,6 +30,7 @@ const Header = () => {
       type: string;
       createdAt: string;
       payload?: string;
+      readFlag: boolean;
     }[]
   >('/api/v1/notifications');
 
@@ -50,6 +52,7 @@ const Header = () => {
           message: n.message,
           createdAt: n.createdAt,
           interviewId: payload.interviewId,
+          readFlag: n.readFlag,
         };
       })
     );
@@ -93,6 +96,7 @@ const Header = () => {
             message: data.message,
             createdAt: data.createdAt,
             interviewId: payload.interviewId,
+            readFlag: false,
           },
           ...prev,
         ]);
@@ -104,6 +108,35 @@ const Header = () => {
     es.onerror = () => es.close();
     return () => es.close();
   }, []);
+
+  // 알림 읽음 처리 함수
+  const markAllAsRead = () => {
+    if (notices.length === 0) return;
+
+    setNotices((prev) => prev.map((n) => ({ ...n, readFlag: true })));
+
+    const token = localStorage.getItem('accessToken');
+    if (!token) return; // 애초에 요청 안 날리는게 나음
+
+    fetch(`${baseUrl}/api/v1/notifications/read`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    }).catch((err) => {
+      console.error('markAllAsRead error', err);
+    });
+  };
+
+  // 알림창 열릴 때 읽음 처리
+  const toggleNotiOpen = () => {
+    setNotiOpen((open) => {
+      const newOpen = !open;
+      if (newOpen) markAllAsRead();
+      return newOpen;
+    });
+  };
 
   /** DELETE 요청 설정 */
   const [deleteReq, setDeleteReq] = useState<{ url: string; method: string } | null>(null);
@@ -197,13 +230,13 @@ const Header = () => {
         <div className="relative">
           <button
             ref={notiBtnRef}
-            onClick={() => setNotiOpen((v) => !v)}
+            onClick={toggleNotiOpen}
             className="relative flex h-9 w-9 items-center justify-center rounded-full bg-white/10 hover:bg-white/15"
           >
             <svg width="18" height="18" fill="currentColor">
               <path d="M12 22a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2Zm6-6V11a6 6 0 1 0-12 0v5l-2 2v1h16v-1l-2-2Z" />
             </svg>
-            {notices.length > 0 && (
+            {notices.some((n) => !n.readFlag) && (
               <span className="absolute top-[2px] right-[2px] h-2.5 w-2.5 rounded-full bg-[var(--color-jd-scarlet)]"></span>
             )}
           </button>
