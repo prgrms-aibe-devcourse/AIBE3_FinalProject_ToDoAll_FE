@@ -153,7 +153,7 @@ export default function InterviewManagePage() {
             onClick={handlePrev}
             className="rounded bg-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-300"
           >
-            ◀ 이전
+            ◀ 이전 페이지
           </button>
         )}
 
@@ -163,7 +163,7 @@ export default function InterviewManagePage() {
             onClick={handleNext}
             className="rounded bg-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-300"
           >
-            다음 ▶
+            다음 페이지 ▶
           </button>
         )}
       </div>

@@ -14,8 +14,8 @@ export default function InterviewButton({
   const variants = {
     default: 'bg-jd-gray-light text-jd-black hover:bg-jd-gray-light-hover',
     primary: 'bg-jd-violet text-jd-white hover:bg-jd-violet-hover',
-    success: 'bg-jd-green text-jd-white hover:bg-green-500',
-    question: 'bg-jd-yellow text-jd-black hover:bg-yellow-500',
+    success: 'bg-jd-green text-jd-white hover:bg-jd-green-hover',
+    question: 'bg-jd-yellow text-jd-black hover:bg-jd-yellow-hover',
   };
 
   return (
