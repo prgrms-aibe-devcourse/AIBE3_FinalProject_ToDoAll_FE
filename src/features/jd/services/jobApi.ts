@@ -120,7 +120,6 @@ export type JobCreateRequest = {
   benefits?: string | null;
   location?: string | null;
   thumbnailUrl?: string | null;
-  authorId: number;
   requiredSkills?: string[];
   preferredSkills?: string[];
 };
@@ -128,6 +127,7 @@ export type JobCreateRequest = {
 export async function createJobPost(request: JobCreateRequest): Promise<string> {
   const res = await fetch(`http://localhost:8080/api/v1/jd`, {
     method: 'POST',
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
     },
@@ -145,7 +145,11 @@ export type Skill = {
 };
 
 export async function fetchSkills(): Promise<Skill[]> {
-  const res = await fetch('http://localhost:8080/api/v1/jd/skills');
+  const res = await fetch('http://localhost:8080/api/v1/jd/skills', {
+    method: 'GET',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+  });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
   const body = (await res.json()) as ApiResponse<Skill[]>;

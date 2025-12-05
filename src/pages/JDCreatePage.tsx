@@ -23,8 +23,6 @@ const JDCreatePage: React.FC = () => {
     loadSkills();
   }, []);
 
-  // TODO: 나중에 로그인 붙으면 실제 로그인 유저의 ID로 교체
-  const authorId = 1;
   const mapToJobCreateRequest = (values: JobPostFormValues): JobCreateRequest => {
     const emptyToNull = (v?: string): string | null => (v && v.trim().length > 0 ? v : null);
 
@@ -40,7 +38,6 @@ const JDCreatePage: React.FC = () => {
       benefits: emptyToNull(values.benefits),
       location: emptyToNull(values.location),
       thumbnailUrl: null,
-      authorId,
       requiredSkills: values.requiredSkills ?? [],
       preferredSkills: values.preferredSkills ?? [],
     };
