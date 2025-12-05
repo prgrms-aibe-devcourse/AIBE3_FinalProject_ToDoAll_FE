@@ -27,8 +27,8 @@ export default function InterviewHeader({
   };
 
   const resultStyle: Record<ResultStatus, { bg: string; text: string }> = {
-    PASS: { bg: 'bg-green-600', text: 'text-white' },
-    HOLD: { bg: 'bg-blue-600', text: 'text-jd-white' },
+    PASS: { bg: 'bg-jd-green', text: 'text-white' },
+    HOLD: { bg: 'bg-jd-blue', text: 'text-jd-white' },
     FAIL: { bg: 'bg-jd-scarlet', text: 'text-jd-white' },
     PENDING: { bg: 'bg-jd-gray-dark', text: 'text-jd-white' },
   };
