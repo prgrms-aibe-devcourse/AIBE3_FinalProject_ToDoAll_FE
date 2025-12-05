@@ -1,70 +1,71 @@
-export type Address = {
-  country: string;
-  city: string;
-  detail: string;
-};
+// src/features/resumes/types/resumes.types.ts
 
 export type Skill = {
   name: string;
   level: '초급' | '중급' | '고급';
 };
 
-export type EducationItem =
-  | {
-      type: '초등학교' | '중학교' | '고등학교';
-      name: string;
-      graduated: boolean;
-      startDate: string;
-      endDate: string;
-    }
-  | {
-      type: '대학' | '대학원';
-      universityType: string;
-      name: string;
-      transferred: boolean;
-      major: string;
-      graduated: boolean;
-      startDate: string;
-      endDate: string;
-      dayTime: 'DAY' | 'NIGHT';
-      gpa?: number;
-      maxGpa?: number;
-    };
+export type EducationItem = {
+  type: string;
+  universityType?: string;
+  name: string;
+  transferred?: boolean;
+  major?: string;
+  graduated?: boolean;
+  startDate?: string;
+  endDate?: string;
+  dayTime?: 'DAY' | 'NIGHT';
+  gpa?: string | number;
+  maxGpa?: string | number;
+};
 
 export type CareerItem = {
   company: string;
+  department: string;
+  position: string;
   startDate: string;
   endDate: string;
-  position: string;
-  department: string;
   job: string;
+};
+
+export type ResumeFiles = {
+  // ✅ 업로드용
+  resume: File | null;
+  portfolio: File | null;
+  etc: File[];
+
+  // ✅ 조회용(fileKey)
+  resumeKey: string;
+  portfolioKey: string;
+
+  // ✅ 화면 표시용
+  resumeName: string;
+  portfolioName: string;
+  etcNames: string[];
 };
 
 export type ResumeData = {
   id: string;
   jdId: number;
   name: string;
-  gender: '남' | '여';
+  gender: '남' | '여' | string;
   birth: string;
   profileImage: string;
   email: string;
   phone: string;
   applyDate: string;
-  address: Address;
-  files: {
-    resume: string;
-    portfolio: string;
-    etc?: string[];
-  };
+  address: { country: string; city: string; detail: string };
+
+  files: ResumeFiles;
+
   education: EducationItem[];
-  career?: CareerItem[];
+  career: CareerItem[];
   skills: Skill[];
+
   experience: string;
   activities: string;
   certifications: string;
   memo: string;
-  summary?: string; // 이력서 요약
-  matchScore?: number; // 기술 매칭률
 };
 
 export type OnResumeChange = <K extends keyof ResumeData>(_field: K, _value: ResumeData[K]) => void;

@@ -1,6 +1,6 @@
 import type { ResumeData } from '../types/resumes.types';
-
 import CustomSelect from './CustomSelect';
+
 type Props = {
   formData: ResumeData;
   onChange: (_field: keyof ResumeData, _value: ResumeData[keyof ResumeData]) => void;
@@ -97,19 +97,32 @@ export default function BasicInfoForm({ formData, onChange }: Props) {
                 <span>이미지 추가</span>
               </div>
             )}
+
             <input
               type="file"
               accept="image/*"
               className="hidden"
               onChange={(e) => {
-                if (e.target.files && e.target.files[0]) {
-                  const file = e.target.files[0];
-                  const reader = new FileReader();
-                  reader.onload = () => {
-                    onChange('profileImage', reader.result as string);
-                  };
-                  reader.readAsDataURL(file);
-                }
+                const file = e.target.files?.[0];
+                if (!file) return;
+
+                // 1) 미리보기용 dataURL 저장 (기존 그대로)
+                const reader = new FileReader();
+                reader.onload = () => {
+                  onChange('profileImage', reader.result as string);
+                };
+                reader.readAsDataURL(file);
+
+                // 2) ✅ 업로드용: resume 파일로 저장 (핵심)
+                onChange('files', {
+                  ...formData.files,
+                  resume: file,
+                  resumeName: file.name,
+                  resumeKey: '',
+                });
+
+                // 같은 파일 다시 선택 가능하게 초기화(선택사항)
+                e.currentTarget.value = '';
               }}
             />
           </label>

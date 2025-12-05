@@ -7,6 +7,8 @@ import ResumeForm from '../components/ResumeForm';
 import { createResume } from '../data/resumes.api';
 import { getJobDescription } from '../data/jd.api';
 
+const DRAFT_KEY = (jdId: number) => `resumeDraft:${jdId}`;
+
 export default function ResumeCreatePage() {
   const { id } = useParams();
   const jdId = Number(id);
@@ -15,7 +17,7 @@ export default function ResumeCreatePage() {
   const [jobTitle, setJobTitle] = useState('');
   const [formData, setFormData] = useState<ResumeData>({
     id: '',
-    jdId: jdId,
+    jdId,
     name: '',
     gender: '남',
     birth: '',
@@ -24,7 +26,18 @@ export default function ResumeCreatePage() {
     phone: '',
     applyDate: '',
     address: { country: '대한민국', city: '', detail: '' },
-    files: { resume: '', portfolio: '', etc: [] },
+
+    files: {
+      resume: null, // (다른 곳에서 연결)
+      portfolio: null, // FileUploadForm에서 연결
+      etc: [],
+      resumeKey: '',
+      portfolioKey: '',
+      resumeName: '',
+      portfolioName: '',
+      etcNames: [],
+    },
+
     education: [],
     career: [],
     skills: [],
@@ -34,12 +47,10 @@ export default function ResumeCreatePage() {
     memo: '',
   });
 
+  // ✅ 공고명 불러오기
   useEffect(() => {
     async function fetchJD() {
-      if (!jdId || isNaN(jdId)) {
-        console.error('유효하지 않은 공고 ID입니다.');
-        return;
-      }
+      if (!jdId || isNaN(jdId)) return;
       try {
         const jd = await getJobDescription(jdId);
         setJobTitle(jd.title);
@@ -50,18 +61,74 @@ export default function ResumeCreatePage() {
     fetchJD();
   }, [jdId]);
 
+  // ✅ 페이지 진입 시 draft 복원
+  useEffect(() => {
+    if (!jdId || isNaN(jdId)) return;
+
+    const raw = localStorage.getItem(DRAFT_KEY(jdId));
+    if (!raw) return;
+
+    try {
+      const saved = JSON.parse(raw) as ResumeData;
+
+      // File은 직렬화 불가 -> null로 복원 (텍스트/리스트만 복원)
+      setFormData((prev) => ({
+        ...prev,
+        ...saved,
+        jdId,
+        files: {
+          ...prev.files,
+          ...saved.files,
+          resume: null,
+          portfolio: null,
+          etc: [],
+        },
+      }));
+    } catch {
+      localStorage.removeItem(DRAFT_KEY(jdId));
+    }
+  }, [jdId]);
+
+  const saveDraft = (next: ResumeData) => {
+    if (!jdId || isNaN(jdId)) return;
+
+    const toSave: ResumeData = {
+      ...next,
+      jdId,
+      files: {
+        ...next.files,
+        // File 객체는 저장 불가라 null 처리
+        resume: null,
+        portfolio: null,
+        etc: [],
+      },
+    };
+
+    localStorage.setItem(DRAFT_KEY(jdId), JSON.stringify(toSave));
+  };
+
+  // ✅ 입력 변경 시: state 업데이트 + 즉시 draft 저장
   const handleChange = (field: keyof ResumeData, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    setFormData((prev) => {
+      const next = { ...prev, [field]: value };
+      saveDraft(next);
+      return next;
+    });
   };
 
   const handleSubmit = async () => {
     try {
       const result = await createResume(formData);
 
+      // ✅ 제출 성공하면 draft 삭제
+      if (jdId && !isNaN(jdId)) {
+        localStorage.removeItem(DRAFT_KEY(jdId));
+      }
+
       navigate('/resume/submit-success', {
         state: {
           resumeId: result.id,
-          formData: formData,
+          formData,
         },
       });
     } catch (e: any) {
@@ -70,6 +137,8 @@ export default function ResumeCreatePage() {
   };
 
   const handlePreview = () => {
+    // (선택) 디버그
+    // console.log('[Create] before preview draft=', localStorage.getItem(DRAFT_KEY(jdId)));
     navigate('/resume/preview', { state: { formData } });
   };
 
