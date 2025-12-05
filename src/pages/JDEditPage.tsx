@@ -64,7 +64,6 @@ const JDEditPage: React.FC = () => {
       benefits: emptyToNull(values.benefits),
       location: emptyToNull(values.location),
       thumbnailUrl: null, // 아직 업로드 안 붙였으면 그대로
-      authorId: 1, // TODO: 로그인 붙으면 교체
       requiredSkills: values.requiredSkills ?? [],
       preferredSkills: values.preferredSkills ?? [],
     };
