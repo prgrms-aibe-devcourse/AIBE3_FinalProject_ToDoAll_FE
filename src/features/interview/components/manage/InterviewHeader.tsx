@@ -1,24 +1,45 @@
-import { type InterviewStatus, statusLabelMap } from '../../types/interviewer';
+import {
+  type InterviewStatus,
+  type ResultStatus,
+  statusLabelMap,
+  resultStatusLabelMap,
+} from '../../types/interviewer';
 
 interface InterviewHeaderProps {
   avatar: string;
   name: string;
   position: string;
   status: InterviewStatus;
+  result: ResultStatus;
 }
 
-export default function InterviewHeader({ avatar, name, position, status }: InterviewHeaderProps) {
-  // 상태별 스타일
+export default function InterviewHeader({
+  avatar,
+  name,
+  position,
+  status,
+  result,
+}: InterviewHeaderProps) {
   const statusStyle: Record<InterviewStatus, { bg: string; text: string }> = {
     WAITING: { bg: 'bg-jd-violet', text: 'text-jd-white' },
     IN_PROGRESS: { bg: 'bg-jd-yellow', text: 'text-jd-black' },
-    ACCEPTED: { bg: 'bg-green-600', text: 'text-white' },
-    ON_HOLD: { bg: 'bg-orange-500', text: 'text-white' },
-    REJECTED: { bg: 'bg-jd-scarlet', text: 'text-jd-white' },
     DONE: { bg: 'bg-jd-gray-dark', text: 'text-jd-white' },
   };
 
-  const { bg, text } = statusStyle[status];
+  const resultStyle: Record<ResultStatus, { bg: string; text: string }> = {
+    PASS: { bg: 'bg-green-600', text: 'text-white' },
+    HOLD: { bg: 'bg-blue-600', text: 'text-jd-white' },
+    FAIL: { bg: 'bg-jd-scarlet', text: 'text-jd-white' },
+    PENDING: { bg: 'bg-jd-gray-dark', text: 'text-jd-white' },
+  };
+
+  const isDone = status === 'DONE';
+
+  const { bg, text } = isDone
+    ? resultStyle[result] // DONE → 결과 스타일
+    : statusStyle[status]; // 나머지 → 진행 상태 스타일
+
+  const label = isDone ? resultStatusLabelMap[result] : statusLabelMap[status];
 
   return (
     <div className="mb-3 flex items-center gap-3">
@@ -28,7 +49,7 @@ export default function InterviewHeader({ avatar, name, position, status }: Inte
         <p className="text-jd-gray-dark text-sm">{position}</p>
       </div>
       <span className={`ml-auto rounded-full px-3 py-1 text-xs font-medium ${bg} ${text}`}>
-        {statusLabelMap[status]}
+        {label}
       </span>
     </div>
   );
