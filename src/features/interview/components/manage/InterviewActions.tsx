@@ -15,6 +15,7 @@ interface InterviewActionsProps {
   time?: string;
   interviewers?: string;
   position?: string;
+  onResultChange?: (_r: ResultStatus) => void;
 }
 
 export default function InterviewActions({
@@ -28,8 +29,11 @@ export default function InterviewActions({
   time,
   interviewers,
   position,
+  onResultChange,
 }: InterviewActionsProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentResult, setCurrentResult] = useState(result); //추가!
+
   const navigate = useNavigate();
 
   const handleOpenModal = () => setIsModalOpen(true);
@@ -87,14 +91,12 @@ export default function InterviewActions({
 
   /** status === DONE → result에 따라 분기 */
   if (status === 'DONE') {
-    if (result === 'PENDING' || result === 'HOLD') {
-      // 아직 결과 미등록
+    if (currentResult === 'PENDING' || currentResult === 'HOLD') {
       buttons = [
         <InterviewButton key="note" label="면접 노트" onClick={handleOpenInterviewNote} />,
         <InterviewButton key="result" label="결과 등록" onClick={handleOpenModal} />,
       ];
     } else {
-      // 결과 등록 완료
       buttons = [
         <InterviewButton key="note" label="면접 노트" onClick={handleOpenInterviewNote} />,
         <InterviewButton key="done" label="등록 완료" variant="success" />,
@@ -106,10 +108,21 @@ export default function InterviewActions({
     <>
       <div className="flex justify-center gap-4">{buttons}</div>
 
-      {/* 결과 모달: PENDING → 등록 버튼 클릭 시 */}
-      {status === 'DONE' && (result === 'PENDING' || result === 'HOLD') && isModalOpen && (
-        <InterviewResultModal name={name} avatar={avatar} onClose={handleCloseModal} />
-      )}
+      {status === 'DONE' &&
+        (currentResult === 'PENDING' || currentResult === 'HOLD') &&
+        isModalOpen && (
+          <InterviewResultModal
+            name={name}
+            avatar={avatar}
+            interviewId={interviewId}
+            onClose={handleCloseModal}
+            onSuccess={(newResult) => {
+              onResultChange?.(newResult); // UI 즉시 반영
+              setCurrentResult(newResult); // 내부 상태도 업데이트
+              setIsModalOpen(false);
+            }}
+          />
+        )}
     </>
   );
 }
