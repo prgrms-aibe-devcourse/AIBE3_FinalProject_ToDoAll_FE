@@ -36,7 +36,7 @@ export default function InterviewCard({
       key={id}
       className="relative rounded-2xl bg-white p-6 shadow-md transition hover:shadow-lg"
     >
-      <button className="absolute top-3 right-3 text-gray-400 hover:text-gray-600">×</button>
+      {/* <button className="absolute top-3 right-3 text-gray-400 hover:text-gray-600">×</button> */}
 
       {/* 헤더 영역 */}
       <InterviewHeader
