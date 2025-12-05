@@ -241,7 +241,7 @@ const Header = () => {
 
                       <div className="flex-1">
                         <p className="text-sm font-medium text-black">{n.title}</p>
-                        <p className="text-xs text-black/60">{n.message}</p>
+                        <p className="text-xs whitespace-pre-line text-black/60">{n.message}</p>
                         <p className="mt-1 text-[10px] text-gray-400">{formatTime(n.createdAt)}</p>
                       </div>
 
