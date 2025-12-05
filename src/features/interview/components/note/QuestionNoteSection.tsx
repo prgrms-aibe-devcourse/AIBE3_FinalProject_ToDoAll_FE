@@ -18,7 +18,7 @@ export default function QuestionNoteSection({ questionNotes }: QuestionNoteSecti
   };
 
   return (
-    <div className="border-jd-gray-light flex w-[35%] flex-col overflow-hidden rounded-2xl border bg-white p-6 shadow-md">
+    <div className="border-jd-gray-light flex flex-col overflow-hidden rounded-2xl border bg-white p-6 shadow-md">
       <div className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent flex-1 overflow-y-auto pr-2">
         {questionNotes.map((section, idx) => (
           <div key={idx} className="mb-8">
