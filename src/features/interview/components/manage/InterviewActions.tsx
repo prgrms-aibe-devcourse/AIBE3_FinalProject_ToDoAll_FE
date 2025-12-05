@@ -11,6 +11,10 @@ interface InterviewActionsProps {
   avatar?: string;
   interviewId?: number;
   resumeId?: number;
+  date?: string;
+  time?: string;
+  interviewers?: string;
+  position?: string;
   onResultChange?: (_r: ResultStatus) => void;
 }
 
@@ -21,6 +25,10 @@ export default function InterviewActions({
   avatar,
   interviewId,
   resumeId,
+  date,
+  time,
+  interviewers,
+  position,
   onResultChange,
 }: InterviewActionsProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -32,14 +40,15 @@ export default function InterviewActions({
   const handleCloseModal = () => setIsModalOpen(false);
 
   const handleOpenInterviewNote = () => {
-    navigate('/interview/note', {
+    if (!interviewId) return;
+    navigate(`/interview/${interviewId}/note`, {
       state: { name, avatar, interviewId },
     });
   };
 
   const handleUpdateQuestionSet = () => {
     navigate(`/interview/${interviewId}/question-create`, {
-      state: { name, avatar, interviewId },
+      state: { name, avatar, interviewId, date, time, interviewers, position, resumeId },
     });
   };
 

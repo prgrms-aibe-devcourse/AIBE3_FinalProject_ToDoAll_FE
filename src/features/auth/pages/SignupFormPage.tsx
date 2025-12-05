@@ -6,6 +6,7 @@ import PrivacyModal from '../components/PrivacyModal';
 import ReqBadge from '../components/ReqBadge';
 import { buildPasswordChecks } from '../utils/passwordChecks';
 import { signup } from '../api/auth.api.ts';
+import AlertModal from '@components/Alertmodal.tsx';
 
 export default function SignupFormPage() {
   const [searchParams] = useSearchParams();
@@ -32,6 +33,20 @@ export default function SignupFormPage() {
 
   // 모달 트리거 버튼 ref
   const openPrivacyBtnRef = useRef<HTMLButtonElement | null>(null);
+
+  const [alertModal, setAlertModal] = useState({
+    open: false,
+    type: 'error' as 'success' | 'error' | 'info' | 'warning',
+    message: '',
+  });
+
+  const showAlert = (message: string, type: 'success' | 'error' | 'info' | 'warning' = 'error') => {
+    setAlertModal({ open: true, type, message });
+  };
+
+  const closeAlert = () => {
+    setAlertModal((prev) => ({ ...prev, open: false }));
+  };
 
   //  “개인정보 미포함” 판단에 사용할 PII 소스 구성 (이메일 local-part + 이름)
   const piiSources = [
@@ -86,7 +101,7 @@ export default function SignupFormPage() {
   useEffect(() => {
     //  1) 토큰 없으면 폼 진입 금지
     if (!token || !emailFromUrl) {
-      alert('유효하지 않은 회원가입 링크입니다. 다시 이메일 인증을 진행해주세요.');
+      showAlert('유효하지 않은 회원가입 링크입니다.\n다시 이메일 인증을 진행해주세요.', 'error');
       navigate('/signup/email', { replace: true });
       return;
     }
@@ -108,7 +123,7 @@ export default function SignupFormPage() {
         setLoading(false);
       } catch (error) {
         console.error('이메일 인증 완료 실패:', error);
-        alert('이메일 인증에 실패했습니다. 다시 시도해주세요.');
+        showAlert('이메일 인증에 실패했습니다.\n다시 시도해주세요.', 'error');
         navigate('/signup/email', { replace: true });
       }
     };
@@ -151,14 +166,14 @@ export default function SignupFormPage() {
         password,
       });
 
-      alert('가입이 완료되었습니다. 로그인 해주세요.');
+      showAlert('가입이 완료되었습니다.\n로그인 해주세요.', 'success');
       navigate('/login', { replace: true });
     } catch (e: any) {
       //  서버에서 실패(중복 이메일, 만료 토큰 등) 시 사용자에게 안내
       console.error('회원가입 실패:', e);
       const msg =
         e?.response?.data?.message ?? '회원가입에 실패했습니다. 잠시 후 다시 시도해주세요.';
-      alert(msg);
+      showAlert(msg, 'error');
     } finally {
       setSubmitting(false); // 전송 끝
     }
@@ -245,7 +260,7 @@ export default function SignupFormPage() {
               <input
                 value={name}
                 onChange={(e) => {
-                  setName(e.target.value); // ← 상태 실제 사용
+                  setName(e.target.value);
                   if (errors.name) {
                     setErrors((prev) => ({ ...prev, name: '' }));
                     setFieldError('name', name);
@@ -494,6 +509,13 @@ export default function SignupFormPage() {
           </button>
         </div>
       </form>
+
+      <AlertModal
+        open={alertModal.open}
+        type={alertModal.type}
+        message={alertModal.message}
+        onClose={closeAlert}
+      />
     </AuthShell>
   );
 }

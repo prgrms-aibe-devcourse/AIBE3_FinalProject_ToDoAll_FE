@@ -1,29 +1,25 @@
 /* global RequestInit, HeadersInit */
-// 백엔드 기본 주소
-export const BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 
-// API 서버의 ORIGIN (정적 리소스, 이미지 등에 사용)
-export const API_ORIGIN = BASE_URL.replace(/\/api$/, '');
+const BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 
-export async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
-  // 경로 설정
+export async function authedRequest<T>(path: string, options: RequestInit = {}): Promise<T> {
   const url = path.startsWith('http') ? path : `${BASE_URL}${path}`;
 
-  // 3) 기본 헤더 + 토큰
+  const token = localStorage.getItem('accessToken');
+
   const headers: HeadersInit = {
-    'Content-Type': 'application/json',
+    ...(options.body ? { 'Content-Type': 'application/json' } : {}), // body 있을 때만
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(options.headers || {}),
   };
 
-  // 4) fetch 호출
   const res = await fetch(url, {
     ...options,
     headers,
     credentials: 'include',
   });
 
-  // 5) 응답 파싱
-  let body: unknown;
+  let body: unknown = null;
   try {
     body = await res.json();
   } catch {

@@ -2,12 +2,12 @@ import { useEffect, useRef } from 'react';
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
 import type { IMessage, IFrame } from '@stomp/stompjs';
-import type { OutgoingChatMessage } from '@/features/interview/types/chatroom';
+import type { OutgoingChatMessage, IncomingNoteMessage } from '@/features/interview/types/chatroom';
 
 interface UseInterviewSocketProps {
   interviewId: number;
   onChatMessage?: (_msg: OutgoingChatMessage) => void;
-  onNoteMessage?: (_msg: any) => void;
+  onNoteMessage?: (_msg: IncomingNoteMessage) => void;
   onSystemMessage?: (_msg: any) => void;
 }
 
