@@ -38,7 +38,6 @@ export interface WeeklyCalendarType {
 
 export default function WeekendContainer() {
   const { resData } = useFetch<WeeklyCalendarType>('/api/v1/dashboard/week-calendar');
-  if (!resData) return <div></div>;
 
   return (
     <section className="flex flex-wrap justify-between gap-4">
