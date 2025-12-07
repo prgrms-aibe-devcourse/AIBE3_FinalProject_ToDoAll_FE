@@ -59,7 +59,7 @@ export default function StatusCountCardUI({
         <h3 className="font-bold">{STATUS_INFO[dataType][statusType].status}</h3>
         <p className="text-jd-gray-dark text-sm">{STATUS_INFO[dataType][statusType].description}</p>
       </div>
-      {!count ? (
+      {count == null ? (
         <Skeleton className="h-[30px] rounded-3xl pt-[5px] pr-[20px] pb-[5px] pl-[20px]" />
       ) : (
         <Badge text={count + '개'} color={STATUS_INFO[dataType][statusType].color} />
