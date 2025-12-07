@@ -11,7 +11,7 @@ export default function UpComingInterviewsCard() {
   return (
     <LongViewContainer
       title={'다가오는 면접'}
-      description={'이번 주 예정된 면접 일정'}
+      description={'7일 내 예정된 면접 일정'}
       className="jd-LongViewContainer-RWD min-h-[784px]"
       detailUrl={'/interview/manage'}
     >

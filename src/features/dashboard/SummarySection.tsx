@@ -3,28 +3,28 @@ import SummationCardUI from '@features/dashboard/card/SummationCardUI.tsx';
 const summaryCards = [
   {
     title: '활성 공고',
-    description: '진행 중인 채용 공고',
+    description: '모집 중인 채용 공고',
     detailUrl: '/jobs',
     fetchUrl: '/api/v1/dashboard/summary/actives',
     iconName: 'book-text',
   },
   {
     title: '총 지원자',
-    description: '전체 지원자 수',
+    description: '모집 중인 공고의 전체 지원자',
     detailUrl: '/matches',
     fetchUrl: '/api/v1/dashboard/summary/applicants',
     iconName: 'users',
   },
   {
     title: '예정된 면접',
-    description: '이번 주 면접 일정',
+    description: '7일 내 다가오는 면접',
     detailUrl: '/interview/manage',
     fetchUrl: '/api/v1/dashboard/summary/interviews',
     iconName: 'calendar',
   },
   {
     title: '채용 완료',
-    description: '이번 달 채용 완료',
+    description: '이번 달 합격자',
     detailUrl: '/interview/manage',
     fetchUrl: '/api/v1/dashboard/summary/hires',
     iconName: 'user-check',

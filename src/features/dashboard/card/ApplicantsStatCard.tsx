@@ -13,7 +13,7 @@ export default function ApplicantsStatCard() {
   return (
     <LongViewContainer
       title={'공고별 합격 현황'}
-      description={'각 채용공고의 진행 현황'}
+      description={'각 채용 공고 별 지원자 현황'}
       className="jd-LongViewContainer-RWD min-h-[784px]"
       detailUrl={'/jobs'}
     >
