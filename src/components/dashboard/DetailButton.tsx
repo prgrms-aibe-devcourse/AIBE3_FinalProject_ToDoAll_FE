@@ -1,5 +1,5 @@
-import { ArrowRight } from 'lucide-react';
 import cn from '@lib/utils/cn.ts';
+import SelectIcon from '@components/SelectIcon.tsx';
 
 export default function DetailButton({ className, url }: { className?: string; url: string }) {
   return (
@@ -10,7 +10,7 @@ export default function DetailButton({ className, url }: { className?: string; u
           className
         )}
       >
-        <ArrowRight size="15px" className="mr-[2px]" />
+        <SelectIcon name="arrow-right" className="mr-[2px]" size={15} />
         <p className="text-sm">상세 보기</p>
       </div>
     </a>

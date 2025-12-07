@@ -6,24 +6,28 @@ const summaryCards = [
     description: '진행 중인 채용 공고',
     detailUrl: '/jobs',
     fetchUrl: '/api/v1/dashboard/summary/actives',
+    iconName: 'book-text',
   },
   {
     title: '총 지원자',
     description: '전체 지원자 수',
     detailUrl: '/matches',
     fetchUrl: '/api/v1/dashboard/summary/applicants',
+    iconName: 'users',
   },
   {
     title: '예정된 면접',
     description: '이번 주 면접 일정',
     detailUrl: '/interview/manage',
     fetchUrl: '/api/v1/dashboard/summary/interviews',
+    iconName: 'calendar',
   },
   {
     title: '채용 완료',
     description: '이번 달 채용 완료',
     detailUrl: '/interview/manage',
     fetchUrl: '/api/v1/dashboard/summary/hires',
+    iconName: 'user-check',
   },
 ];
 

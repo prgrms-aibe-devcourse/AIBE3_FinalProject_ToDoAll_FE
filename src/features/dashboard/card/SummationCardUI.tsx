@@ -1,12 +1,14 @@
 import DetailButton from '@components/dashboard/DetailButton.tsx';
-import { BookText } from 'lucide-react';
+
 import useFetch from '@/hooks/useFetch.ts';
+import SelectIcon from '@components/SelectIcon.tsx';
 
 type SummationCardProps = {
   title: string;
   description: string;
   detailUrl: string;
   fetchUrl: string;
+  iconName?: string;
 };
 
 export default function SummationCardUI({
@@ -14,6 +16,7 @@ export default function SummationCardUI({
   description,
   detailUrl,
   fetchUrl,
+  iconName = 'book-text',
 }: SummationCardProps) {
   const { resData } = useFetch<number>(fetchUrl);
 
@@ -27,7 +30,11 @@ export default function SummationCardUI({
         <p className="text-sm font-light text-gray-500">{description}</p>
       </div>
       <DetailButton className="relative top-3" url={detailUrl} />
-      <BookText className="text-jd-gray-dark absolute top-[30px] right-[30px]" size="20px" />
+      <SelectIcon
+        name={iconName}
+        className="text-jd-gray-dark absolute top-[30px] right-[30px]"
+        size={20}
+      />
     </div>
   );
 }
