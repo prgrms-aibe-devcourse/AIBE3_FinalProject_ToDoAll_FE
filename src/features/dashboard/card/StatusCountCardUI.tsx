@@ -43,7 +43,7 @@ const STATUS_INFO = {
 type DataType = keyof typeof STATUS_INFO;
 type StatusType = keyof (typeof STATUS_INFO)[DataType];
 
-export default function StatusCountCard({
+export default function StatusCountCardUI({
   count,
   dataType,
   statusType,

@@ -3,7 +3,7 @@ import cn from '@lib/utils/cn.ts';
 
 export default function DetailButton({ className, url }: { className?: string; url: string }) {
   return (
-    <a href={url} target="_blank" rel="noopener noreferrer">
+    <a href={url} rel="noopener noreferrer">
       <div
         className={cn(
           'text-jd-gray-dark flex w-fit items-center justify-center font-semibold',

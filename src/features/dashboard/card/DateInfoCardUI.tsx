@@ -8,7 +8,7 @@ export type DataInfoCardProps = {
   interviewers: string;
 };
 
-export default function DateInfoCard({
+export default function DateInfoCardUI({
   interviewDate,
   applicantName,
   jobTitle,

@@ -31,10 +31,10 @@
 }
 
 @layer components {
-  .jd-LongViewSection-RWD {
+  .jd-LongViewContainer-RWD {
     @apply max-w-sm md:max-w-[584px];
   }
-  .jd-LongViewSection-RWD-full {
+  .jd-LongViewContainer-RWD-full {
     @apply max-w-sm md:max-w-[584px] xl:max-w-full;
   }
 }

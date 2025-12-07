@@ -34,7 +34,7 @@ export interface WeeklyCalendarType {
   };
 }
 
-export default function WeekendSection({ calendarData }: { calendarData: WeeklyCalendarType }) {
+export default function WeekendContainer({ calendarData }: { calendarData: WeeklyCalendarType }) {
   return (
     <section className="flex flex-wrap justify-between gap-4">
       {Object.entries(calendarData.dailyCalendars).map(([week, data], i) => (
