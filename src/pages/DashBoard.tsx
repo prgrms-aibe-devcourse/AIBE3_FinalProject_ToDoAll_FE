@@ -1,6 +1,5 @@
 import SummarySection from '@features/dashboard/SummarySection.tsx';
 import DetailSection from '@features/dashboard/DetailSection.tsx';
-import CalendarSection from '@features/dashboard/CalendarSection.tsx';
 
 export default function DashBoard() {
   //TODO : 로딩 프로그레스나 스켈레톤 처리
@@ -13,7 +12,6 @@ export default function DashBoard() {
         <section className="flex flex-col items-center gap-5">
           <SummarySection />
           <DetailSection />
-          <CalendarSection />
         </section>
       </section>
     </section>

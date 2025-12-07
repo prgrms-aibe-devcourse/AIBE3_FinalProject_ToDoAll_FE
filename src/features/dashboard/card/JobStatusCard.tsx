@@ -10,7 +10,6 @@ type NumByProgressStatus = {
 
 export default function JobStatusCard() {
   const { resData } = useFetch<NumByProgressStatus>('/api/v1/dashboard/detail/job-status');
-  if (!resData) return <></>;
 
   return (
     <LongViewContainer
@@ -20,10 +19,22 @@ export default function JobStatusCard() {
       detailUrl={'/jobs'}
     >
       <div className="flex w-full flex-col justify-between gap-4 md:flex-row">
-        <StatusCountCardUI count={resData.in} dataType={'byJob'} statusType={'in'} />
-        <StatusCountCardUI count={resData.before} dataType={'byJob'} statusType={'before'} />
+        <StatusCountCardUI
+          count={resData ? resData.in : null}
+          dataType={'byJob'}
+          statusType={'in'}
+        />
+        <StatusCountCardUI
+          count={resData ? resData.before : null}
+          dataType={'byJob'}
+          statusType={'before'}
+        />
       </div>
-      <StatusCountCardUI count={resData.close} dataType={'byJob'} statusType={'closed'} />
+      <StatusCountCardUI
+        count={resData ? resData.close : null}
+        dataType={'byJob'}
+        statusType={'closed'}
+      />
     </LongViewContainer>
   );
 }

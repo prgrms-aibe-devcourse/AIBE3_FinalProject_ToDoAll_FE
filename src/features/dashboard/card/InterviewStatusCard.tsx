@@ -10,7 +10,6 @@ type NumByProgressStatus = {
 
 export default function InterviewStatusCard() {
   const { resData } = useFetch<NumByProgressStatus>('/api/v1/dashboard/detail/interview-status');
-  if (!resData) return <></>;
 
   return (
     <LongViewContainer
@@ -20,10 +19,22 @@ export default function InterviewStatusCard() {
       detailUrl={'/interview/manage'}
     >
       <div className="flex w-full flex-col justify-between gap-4 md:flex-row">
-        <StatusCountCardUI count={resData.in} dataType={'byInterview'} statusType={'in'} />
-        <StatusCountCardUI count={resData.before} dataType={'byInterview'} statusType={'before'} />
+        <StatusCountCardUI
+          count={resData ? resData.in : null}
+          dataType={'byInterview'}
+          statusType={'in'}
+        />
+        <StatusCountCardUI
+          count={resData ? resData.before : null}
+          dataType={'byInterview'}
+          statusType={'before'}
+        />
       </div>
-      <StatusCountCardUI count={resData.close} dataType={'byInterview'} statusType={'closed'} />
+      <StatusCountCardUI
+        count={resData ? resData.close : null}
+        dataType={'byInterview'}
+        statusType={'closed'}
+      />
     </LongViewContainer>
   );
 }
