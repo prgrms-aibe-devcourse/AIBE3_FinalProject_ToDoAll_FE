@@ -203,9 +203,18 @@ export default function MyPage() {
 
   // 6) 내 정보 저장
   const onSave = async () => {
+    if (!form.name?.trim() || !form.nickname?.trim()) {
+      showAlert('이름과 닉네임은 필수 항목입니다.', 'warning', '필수 항목 확인');
+      return;
+    }
     try {
       const finalPosition =
         positionType === 'OTHER' ? positionCustom.trim() : positionType || form.position;
+
+      if (!finalPosition?.trim()) {
+        showAlert('직책은 필수 항목입니다.', 'warning', '필수 항목 확인');
+        return;
+      }
 
       console.log('[MyPage] 저장 요청 payload:', {
         name: form.name,
@@ -216,8 +225,8 @@ export default function MyPage() {
         gender: form.gender || undefined,
       });
       await updateMe({
-        name: form.name,
-        nickname: form.nickname,
+        name: form.name.trim(),
+        nickname: form.nickname.trim(),
         phoneNumber: form.phone,
         position: finalPosition || undefined,
         birthDate: form.birthDate,
@@ -422,12 +431,12 @@ export default function MyPage() {
 
             <div className="grid grid-cols-1 gap-x-4 gap-y-6 text-[var(--color-jd-black)] sm:grid-cols-[110px_1fr] md:gap-y-7">
               <label className="self-center font-semibold text-[var(--color-jd-gray-dark)]">
-                이메일
+                이메일<span className="ml-0.5 text-red-500">*</span>
               </label>
               <div className="self-center font-semibold">{user.email}</div>
 
               <label className="self-center font-semibold text-[var(--color-jd-gray-dark)]">
-                이름
+                이름<span className="ml-0.5 text-red-500">*</span>
               </label>
               {editing ? (
                 <input
@@ -441,7 +450,7 @@ export default function MyPage() {
               )}
 
               <label className="self-center font-semibold text-[var(--color-jd-gray-dark)]">
-                닉네임
+                닉네임<span className="ml-0.5 text-red-500">*</span>
               </label>
               {editing ? (
                 <input
@@ -457,7 +466,7 @@ export default function MyPage() {
               )}
 
               <label className="self-center font-semibold text-[var(--color-jd-gray-dark)]">
-                전화번호 (선택)
+                전화번호
               </label>
               {editing ? (
                 <input
@@ -473,7 +482,7 @@ export default function MyPage() {
               )}
 
               <label className="self-center font-semibold text-[var(--color-jd-gray-dark)]">
-                생일 (선택)
+                생일
               </label>
               {editing ? (
                 <input
@@ -489,7 +498,7 @@ export default function MyPage() {
               )}
 
               <label className="self-center font-semibold text-[var(--color-jd-gray-dark)]">
-                성별 (선택)
+                성별
               </label>
               {editing ? (
                 <select
@@ -523,12 +532,12 @@ export default function MyPage() {
 
             <div className="grid grid-cols-1 gap-x-4 gap-y-6 text-[var(--color-jd-black)] sm:grid-cols-[110px_1fr] md:gap-y-7">
               <label className="self-center font-semibold text-[var(--color-jd-gray-dark)]">
-                회사
+                회사<span className="ml-0.5 text-red-500">*</span>
               </label>
               <div className="self-center font-semibold">{user.company}</div>
 
               <label className="self-center font-semibold text-[var(--color-jd-gray-dark)]">
-                직책
+                직책<span className="ml-0.5 text-red-500">*</span>
               </label>
               {editing ? (
                 <div className="flex flex-col gap-2">
