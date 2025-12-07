@@ -15,13 +15,13 @@ type NumByProgressStatus = {
 
 // TODO : 리렌더링 최적화 (요청 별 컴포넌트 분리)
 export default function DashBoard() {
-  const { resData: summaryActive } = useFetch<number>('/api/v1/dashboard/summary/active');
-  const { resData: summaryApplicant } = useFetch<number>('/api/v1/dashboard/summary/applicant');
-  const { resData: summaryInterview } = useFetch<number>('/api/v1/dashboard/summary/interview');
-  const { resData: summaryHired } = useFetch<number>('/api/v1/dashboard/summary/hired');
+  const { resData: summaryActive } = useFetch<number>('/api/v1/dashboard/summary/actives');
+  const { resData: summaryApplicant } = useFetch<number>('/api/v1/dashboard/summary/applicants');
+  const { resData: summaryInterview } = useFetch<number>('/api/v1/dashboard/summary/interviews');
+  const { resData: summaryHired } = useFetch<number>('/api/v1/dashboard/summary/hires');
 
   const { resData: jobResults } = useFetch<NumberSlotsCardProps[]>(
-    '/api/v1/dashboard/detail/job-result'
+    '/api/v1/dashboard/detail/applicant-stat-byJob'
   );
   const { resData: upcomingInterviews } = useFetch<DataInfoCardProps[]>(
     '/api/v1/dashboard/detail/upcoming-interview'

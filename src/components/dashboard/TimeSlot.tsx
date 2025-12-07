@@ -21,18 +21,17 @@ const TimeSlotVariants = cva(
 );
 
 interface TimeSlotProps extends VariantProps<typeof TimeSlotVariants> {
+  id: number;
   time: string;
-  count: number;
+  title: string;
   type: TimeSlotType;
 }
 
-export default function TimeSlot({ time, count, type = 'INTERVIEW' }: TimeSlotProps) {
+export default function TimeSlot({ time, type = 'INTERVIEW' }: TimeSlotProps) {
   return (
     <div className={cn(TimeSlotVariants({ type }))}>
       <p className="text-xl font-semibold">{time}</p>
-      <p>
-        {SLOT_STATUS[type]} {count}건
-      </p>
+      <p className="break-keep">{SLOT_STATUS[type]}</p>
     </div>
   );
 }

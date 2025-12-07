@@ -13,9 +13,10 @@ const WeekName = {
 interface DailyCalendarType {
   date: string; // 0000-00-00
   events: {
+    id: number;
     time: 'string'; // 오전 10:00
+    title: string;
     type: TimeSlotType;
-    count: number;
   }[];
 }
 
@@ -37,7 +38,7 @@ export default function WeekendSection({ calendarData }: { calendarData: WeeklyC
   return (
     <section className="flex flex-wrap justify-between gap-4">
       {Object.entries(calendarData.dailyCalendars).map(([week, data], i) => (
-        <div key={i} className="flex grow flex-col gap-5">
+        <div key={i} className="flex min-w-[70px] flex-1 grow flex-col gap-5">
           <div className="bg-jd-gray-light flex h-[40px] w-full items-center justify-center rounded-[10px] text-2xl font-semibold">
             {WeekName[week as keyof typeof WeekName]}
           </div>
