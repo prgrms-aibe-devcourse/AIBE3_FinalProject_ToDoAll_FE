@@ -1,4 +1,5 @@
 import Badge, { type BadgeType } from '@components/dashboard/Badge.tsx';
+import { Skeleton } from '@components/Skeleton.tsx';
 
 const STATUS_INFO = {
   byJob: {
@@ -20,18 +21,18 @@ const STATUS_INFO = {
   },
   byInterview: {
     in: {
-      status: '전체 면접 수',
-      description: '총 면접 예정 건수',
+      status: '진행 중',
+      description: '진행 중인 면접',
       color: 'scarlet',
     },
     before: {
       status: '미진행 면접',
-      description: '대기/진행 중인 면접',
+      description: '대기 중인 면접',
       color: 'violet',
     },
     closed: {
       status: '면접 완료',
-      description: '완료된 면접 건수',
+      description: '완료된 면접',
       color: 'gray',
     },
   },
@@ -43,12 +44,12 @@ const STATUS_INFO = {
 type DataType = keyof typeof STATUS_INFO;
 type StatusType = keyof (typeof STATUS_INFO)[DataType];
 
-export default function StatusCountCard({
+export default function StatusCountCardUI({
   count,
   dataType,
   statusType,
 }: {
-  count: number;
+  count: number | null;
   dataType: DataType;
   statusType: StatusType;
 }) {
@@ -58,7 +59,11 @@ export default function StatusCountCard({
         <h3 className="font-bold">{STATUS_INFO[dataType][statusType].status}</h3>
         <p className="text-jd-gray-dark text-sm">{STATUS_INFO[dataType][statusType].description}</p>
       </div>
-      <Badge text={count + '개'} color={STATUS_INFO[dataType][statusType].color} />
+      {count == null ? (
+        <Skeleton className="h-[30px] rounded-3xl pt-[5px] pr-[20px] pb-[5px] pl-[20px]" />
+      ) : (
+        <Badge text={count + '개'} color={STATUS_INFO[dataType][statusType].color} />
+      )}
     </section>
   );
 }
