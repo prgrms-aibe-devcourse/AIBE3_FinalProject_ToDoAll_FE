@@ -2,8 +2,6 @@ import SummarySection from '@features/dashboard/SummarySection.tsx';
 import DetailSection from '@features/dashboard/DetailSection.tsx';
 
 export default function DashBoard() {
-  //TODO : 로딩 프로그레스나 스켈레톤 처리
-
   return (
     <section className="bg-jd-white flex justify-center pb-20">
       <section className="flex h-full w-[337px] flex-col p-[1rem] pt-[2rem] sm:w-[640px] md:w-[768px] md:pr-[3rem] md:pl-[3rem] xl:w-[1280px]">
