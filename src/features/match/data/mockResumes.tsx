@@ -17,8 +17,14 @@ export const mockResumes: ResumeData[] = [
       detail: '강남구 테헤란로 123',
     },
     files: {
-      resume: '/resumes/sumin.pdf',
-      portfolio: '/portfolios/sumin.pdf',
+      resume: null,
+      portfolio: null,
+      etc: [],
+      resumeKey: '/resumes/sumin.pdf',
+      portfolioKey: '/portfolios/sumin.pdf',
+      resumeName: 'sumin.pdf',
+      portfolioName: 'sumin.pdf',
+      etcNames: [],
     },
     education: [],
     career: [
@@ -58,8 +64,14 @@ export const mockResumes: ResumeData[] = [
       detail: '해운대구 달맞이길 42',
     },
     files: {
-      resume: '/resumes/junghoon.pdf',
-      portfolio: '/portfolios/junghoon.pdf',
+      resume: null,
+      portfolio: null,
+      etc: [],
+      resumeKey: '/resumes/junghoon.pdf',
+      portfolioKey: '/portfolios/junghoon.pdf',
+      resumeName: 'junghoon.pdf',
+      portfolioName: 'junghoon.pdf',
+      etcNames: [],
     },
     education: [],
     career: [

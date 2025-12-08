@@ -4,29 +4,29 @@ import type { ResumeData } from '../types/resumes.types';
 
 type Props = {
   formData: ResumeData;
-  onChange: (
-    _field: keyof ResumeData,
-
-    _value: ResumeData['files']
-  ) => void;
+  onChange: (_field: keyof ResumeData, _value: any) => void;
 };
 
 export default function FileUploadForm({ formData, onChange }: Props) {
   const [showForm, setShowForm] = useState(false);
   const [newFile, setNewFile] = useState<{ name: string; file?: File }>({ name: '' });
 
-  const addFile = () => {
+  const addPortfolioFile = () => {
     if (!newFile.file) {
       alert('파일을 선택해주세요.');
       return;
     }
-    const currentEtc = formData.files.etc ?? [];
+
     const displayName = newFile.name?.trim() || newFile.file.name;
-    const updatedFiles = {
+
+    // ✅ 포트폴리오 "1개만" 저장(덮어쓰기)
+    onChange('files', {
       ...formData.files,
-      etc: [...currentEtc, displayName],
-    };
-    onChange('files', updatedFiles);
+      portfolio: newFile.file, // ✅ 실제 업로드용 File
+      portfolioName: displayName, // ✅ 화면 표시용
+      portfolioKey: '', // ✅ 생성 전이니 비움
+    });
+
     setShowForm(false);
     setNewFile({ name: '', file: undefined });
   };
@@ -44,7 +44,7 @@ export default function FileUploadForm({ formData, onChange }: Props) {
           onClick={() => setShowForm(!showForm)}
         >
           <img src={purplePlusImg} alt="plus" className="h-4 w-4" />
-          포트폴리오 및 기타문서 추가
+          포트폴리오 추가
         </button>
       </div>
 
@@ -53,14 +53,14 @@ export default function FileUploadForm({ formData, onChange }: Props) {
           <div className="flex items-center gap-3">
             <input
               type="file"
-              accept=".pdf,.docx,.pptx,.zip,.jpg,.png"
+              accept=".pdf,.doc,.docx,.ppt,.pptx,.zip,.jpg,.jpeg,.png"
               className="rounded-[10px] border p-2"
               onChange={(e) => setNewFile({ ...newFile, file: e.target.files?.[0] })}
             />
             <button
               type="button"
               className="rounded-[8px] bg-[#E3DBDB] px-4 py-2 transition hover:bg-[#B1A0A0]"
-              onClick={addFile}
+              onClick={addPortfolioFile}
             >
               추가
             </button>
@@ -68,14 +68,11 @@ export default function FileUploadForm({ formData, onChange }: Props) {
         </div>
       )}
 
-      {((formData.files.etc && formData.files.etc.length > 0) || formData.files.portfolio) && (
+      {(formData.files.portfolioName || formData.files.portfolioKey) && (
         <div className="-mt-2 rounded-[10px] border border-[#E5E5E5] bg-white p-4">
           <div className="mb-2 text-sm font-medium">첨부된 파일</div>
           <ul className="list-disc space-y-1 pl-5 text-sm">
-            {formData.files.portfolio ? <li>{formData.files.portfolio}</li> : null}
-            {formData.files.etc?.map((name, i) => (
-              <li key={name + i}>{name}</li>
-            ))}
+            <li>{formData.files.portfolioName || formData.files.portfolioKey}</li>
           </ul>
         </div>
       )}
