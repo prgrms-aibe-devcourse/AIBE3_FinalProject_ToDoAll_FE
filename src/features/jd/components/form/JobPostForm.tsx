@@ -15,6 +15,8 @@ export type JobPostFormValues = {
   description: string;
   requiredSkills: string[];
   preferredSkills: string[];
+  thumbnailFile?: File | null;
+  originalThumbnailUrl?: string | null;
 };
 
 export default function JobPostForm({
@@ -56,6 +58,11 @@ export default function JobPostForm({
     onSubmit(values);
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files ? e.target.files[0] : null;
+    update('thumbnailFile', file);
+  };
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -71,6 +78,43 @@ export default function JobPostForm({
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => update('title', e.target.value)}
               placeholder="제목"
             />
+          </Field>
+        </div>
+        <div className="sm:col-span-2">
+          <Field label="썸네일 이미지 (선택)">
+            {defaultValues?.originalThumbnailUrl && !values.thumbnailFile && (
+              <div className="mb-2">
+                <img
+                  src={defaultValues.originalThumbnailUrl}
+                  alt="Current Thumbnail"
+                  className="h-24 w-24 rounded-md object-cover"
+                />
+                <button
+                  type="button"
+                  className="mt-1 text-sm text-red-500"
+                  onClick={() => update('originalThumbnailUrl', null)}
+                >
+                  기존 이미지 삭제
+                </button>
+              </div>
+            )}
+            <Input
+              type="file"
+              accept="image/*" // 이미지 파일만 허용
+              onChange={handleFileChange} // 전용 핸들러 사용
+            />
+            {values.thumbnailFile && (
+              <p className="mt-1 text-xs text-gray-500">
+                선택된 파일: {values.thumbnailFile.name}
+                <button
+                  type="button"
+                  className="ml-2 text-red-500 hover:text-red-700"
+                  onClick={() => update('thumbnailFile', null)}
+                >
+                  [취소]
+                </button>
+              </p>
+            )}
           </Field>
         </div>
       </div>

@@ -7,6 +7,15 @@ import ReqBadge from '../components/ReqBadge';
 import { buildPasswordChecks } from '../utils/passwordChecks';
 import { signup } from '../api/auth.api.ts';
 import AlertModal from '@components/Alertmodal.tsx';
+import type { PositionValue } from '@features/user/components/PositionSelect.tsx';
+
+const POSITION_OPTIONS: { value: PositionValue; label: string }[] = [
+  { value: 'OWNER', label: '대표 / Founder' },
+  { value: 'HR_MANAGER', label: '인사/채용 담당자' },
+  { value: 'TEAM_LEAD', label: '팀장 / 리더' },
+  { value: 'INTERVIEWER', label: '실무 인터뷰어' },
+  { value: 'OTHER', label: '기타' },
+];
 
 export default function SignupFormPage() {
   const [searchParams] = useSearchParams();
@@ -22,7 +31,9 @@ export default function SignupFormPage() {
   // 필수 입력값 상태들 — 컴포넌트 "안"에서 선언
   const [name, setName] = useState('');
   const [companyName, setCompanyName] = useState('');
-  const [position, setPosition] = useState('');
+  const [position, setPosition] = useState<PositionValue | ''>('');
+  const [customPosition, setCustomPosition] = useState('');
+
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [nickname, setNickname] = useState('');
 
@@ -63,7 +74,10 @@ export default function SignupFormPage() {
 
   const isPasswordMatch = password.length > 0 && password === passwordConfirm; // 일치
   const isRequiredFilled =
-    !!companyName.trim() && !!name.trim() && !!position.trim() && !!nickname.trim(); // 반드시 boolean
+    !!companyName.trim() &&
+    !!name.trim() &&
+    !!nickname.trim() &&
+    (position === 'OTHER' ? !!customPosition.trim() : !!position);
 
   // touched 상태 추가
   const [touched, setTouched] = useState({
@@ -141,7 +155,10 @@ export default function SignupFormPage() {
     const newErrors: { [key: string]: string } = {};
     if (!companyName.trim()) newErrors.companyName = '회사명을 입력해주세요.';
     if (!name.trim()) newErrors.name = '이름을 입력해주세요.';
-    if (!position.trim()) newErrors.position = '직책을 입력해주세요.';
+    // 직책 검증: OTHER일 때는 customPosition도 필수
+    if (!position || (position === 'OTHER' && !customPosition.trim())) {
+      newErrors.position = '직책을 선택하거나 직접 입력해주세요.';
+    }
     if (!nickname.trim()) newErrors.nickname = '닉네임을 입력해주세요.';
 
     if (Object.keys(newErrors).length > 0) {
@@ -155,13 +172,15 @@ export default function SignupFormPage() {
     setErrors({});
     setSubmitting(true); // 전송 시작
 
+    const finalPosition = position === 'OTHER' ? customPosition.trim() : (position as string);
+
     try {
       await signup({
         token,
         email: companyEmail,
         name,
         nickname,
-        position,
+        position: finalPosition,
         companyName,
         password,
       });
@@ -301,25 +320,54 @@ export default function SignupFormPage() {
                   <path d="M26 6c-2.18 0-4 1.82-4 4v2H5v17c0 2.21 1.79 4 4 4h19v-4h8v4h19c2.21 0 4-1.79 4-4V12H42v-2c0-2.18-1.82-4-4-4H26zm0 4h12v2H26v-2zm4 21v6h4v-6h-4zM5 35v15c0 2.21 1.79 4 4 4h46c2.21 0 4-1.79 4-4V36l-23-.43V39h-8v-3.57L5 35z" />
                 </svg>
               </div>
-              <input
+              <select
                 value={position}
                 onChange={(e) => {
-                  setPosition(e.target.value); // ← 상태 실제 사용
+                  const value = e.target.value as PositionValue | '';
+                  setPosition(value);
+                  if (value !== 'OTHER') {
+                    // 기타가 아니면 커스텀 입력 초기화
+                    setCustomPosition('');
+                  }
                   if (errors.position) {
                     setErrors((prev) => ({ ...prev, position: '' }));
                   }
                 }}
                 onBlur={() => {
                   setTouched((p) => ({ ...p, position: true }));
-                  setFieldError('position', position);
+                  setFieldError('position', position || '');
                 }}
-                placeholder="예: 매니저"
-                name="user_field"
-                autoComplete="off"
-                className="border-jd-gray-light bg-jd-white placeholder:text-jd-gray-dark/70 focus:border-jd-gray-light h-12 w-full rounded-full border pr-5 pl-12 text-[#413F3F] shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)] outline-none focus:ring-0"
+                name="user_position"
+                className="border-jd-gray-light bg-jd-white focus:border-jd-gray-light h-12 w-full rounded-full border pr-5 pl-12 text-sm text-[#413F3F] shadow-[inset_0_1px_0_rgba(255,255,255,.7),0_2px_8px_rgba(0,0,0,.06)] outline-none focus:ring-0"
                 style={{ borderRadius: 15, paddingLeft: '3rem' }}
-              />
+              >
+                <option value="">직책을 선택하세요</option>
+                {POSITION_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
             </div>
+
+            {/* 기타 선택 시에만 직접 입력 필드 노출 */}
+            {position === 'OTHER' && (
+              <div className="mt-2">
+                <input
+                  value={customPosition}
+                  onChange={(e) => {
+                    setCustomPosition(e.target.value);
+                    if (errors.position) {
+                      setErrors((prev) => ({ ...prev, position: '' }));
+                    }
+                  }}
+                  placeholder="직책을 직접 입력해주세요 (예: 매니저)"
+                  autoComplete="off"
+                  className="border-jd-gray-light bg-jd-white focus:border-jd-gray-light h-10 w-full rounded-md border px-3 text-sm text-[#413F3F] outline-none focus:ring-0"
+                />
+              </div>
+            )}
+
             {(touched.position || didSubmit) && errors.position && (
               <p className="mt-0.5 flex items-center gap-1 text-xs text-red-600">
                 <span aria-hidden>ⓘ</span> {errors.position}

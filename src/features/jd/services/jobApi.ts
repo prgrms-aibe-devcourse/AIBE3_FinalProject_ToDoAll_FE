@@ -31,7 +31,11 @@ type JobPostListItemResponse = {
 };
 
 export async function fetchJobPosts(page = 0, size = 10): Promise<JobPost[]> {
-  const res = await fetch(`http://localhost:8080/api/v1/jd?page=${page}&size=${size}`);
+  const res = await fetch(`http://localhost:8080/api/v1/jd?page=${page}&size=${size}`, {
+    method: 'GET',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+  });
   const body = (await res.json()) as ApiResponse<SpringPage<JobPostListItemResponse>>;
   if (!body.data) throw new Error(body.message ?? 'Empty response');
   return body.data.content.map((it) => ({
@@ -116,7 +120,6 @@ export type JobCreateRequest = {
   benefits?: string | null;
   location?: string | null;
   thumbnailUrl?: string | null;
-  authorId: number;
   requiredSkills?: string[];
   preferredSkills?: string[];
 };
@@ -124,6 +127,7 @@ export type JobCreateRequest = {
 export async function createJobPost(request: JobCreateRequest): Promise<string> {
   const res = await fetch(`http://localhost:8080/api/v1/jd`, {
     method: 'POST',
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
     },
@@ -141,7 +145,11 @@ export type Skill = {
 };
 
 export async function fetchSkills(): Promise<Skill[]> {
-  const res = await fetch('http://localhost:8080/api/v1/jd/skills');
+  const res = await fetch('http://localhost:8080/api/v1/jd/skills', {
+    method: 'GET',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+  });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
   const body = (await res.json()) as ApiResponse<Skill[]>;
@@ -179,4 +187,23 @@ export async function updateJobPost(id: string | number, request: JobCreateReque
     const body = (await res.json().catch(() => null)) as ApiResponse<unknown> | null;
     throw new Error(body?.message ?? `공고 수정 실패 (HTTP ${res.status})`);
   }
+}
+
+export async function updateJobThumbnail(jobId: string, thumbnailFile: File): Promise<string> {
+  const formData = new FormData();
+
+  // 💡 백엔드 @RequestPart("thumbnailFile") 이름과 일치
+  formData.append('thumbnailFile', thumbnailFile);
+
+  const res = await fetch(`http://localhost:8080/api/v1/jd/${jobId}/thumbnail`, {
+    method: 'PATCH', // 💡 HTTP 메서드는 PATCH
+    credentials: 'include',
+    // 🚨 Content-Type 헤더를 설정하지 않아야 합니다. 브라우저가 자동으로 multipart/form-data를 설정합니다.
+    body: formData,
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+  const body = (await res.json()) as ApiResponse<string>; // 서버는 File Key를 반환함
+  if (!body.data) throw new Error(body.message ?? 'Empty response');
+  return body.data;
 }

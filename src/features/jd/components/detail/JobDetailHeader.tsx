@@ -3,7 +3,18 @@ import type { JobDetail } from '../../types/JobDetail.types';
 import JobStatusDropdown from './JobStatusDropdown';
 import { updateJobStatus } from '../../services/jobApi';
 
-export function JobDetailHeader({ job, onEdit }: { job: JobDetail; onEdit?: () => void }) {
+type Mode = 'owner' | 'public';
+
+export function JobDetailHeader({
+  job,
+  mode,
+  onEdit,
+}: {
+  job: JobDetail;
+  mode: Mode;
+  onEdit?: () => void;
+}) {
+  const isOwner = mode === 'owner';
   const statusLabel = job.status === 'OPEN' ? '진행중' : '마감';
   return (
     <header className="flex items-start justify-between gap-4">
@@ -30,27 +41,28 @@ export function JobDetailHeader({ job, onEdit }: { job: JobDetail; onEdit?: () =
           </div>
         ) : null}
       </div>
-
-      <div className="flex shrink-0 items-center gap-2">
-        <JobStatusDropdown
-          value={job.status}
-          onChange={async (next) => {
-            try {
-              await updateJobStatus(job.id, next);
-              alert('상태가 변경되었습니다.');
-              window.location.reload();
-            } catch (error) {
-              alert('상태 변경에 실패했습니다.' + error);
-            }
-          }}
-        />
-        <button
-          onClick={onEdit}
-          className="rounded-full bg-orange-500 px-3 py-1.5 text-sm text-white shadow hover:bg-orange-600"
-        >
-          수정
-        </button>
-      </div>
+      {isOwner && (
+        <div className="flex shrink-0 items-center gap-2">
+          <JobStatusDropdown
+            value={job.status}
+            onChange={async (next) => {
+              try {
+                await updateJobStatus(job.id, next);
+                alert('상태가 변경되었습니다.');
+                window.location.reload();
+              } catch (error) {
+                alert('상태 변경에 실패했습니다.' + error);
+              }
+            }}
+          />
+          <button
+            onClick={onEdit}
+            className="rounded-full bg-orange-500 px-3 py-1.5 text-sm text-white shadow hover:bg-orange-600"
+          >
+            수정
+          </button>
+        </div>
+      )}
     </header>
   );
 }
