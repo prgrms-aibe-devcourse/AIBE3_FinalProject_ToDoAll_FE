@@ -1,14 +1,26 @@
+// src/hooks/useInterviewSocket.ts
 import { useEffect, useRef } from 'react';
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
 import type { IMessage, IFrame } from '@stomp/stompjs';
 import type { OutgoingChatMessage, IncomingNoteMessage } from '@/features/interview/types/chatroom';
+import { toNumId } from '../features/interview/util/avatar';
+
+type AnyObj = Record<string, any>;
 
 interface UseInterviewSocketProps {
   interviewId: number;
-  onChatMessage?: (_msg: OutgoingChatMessage) => void;
+  onChatMessage?: (_msg: AnyObj) => void; // 디버그 동안 Any
   onNoteMessage?: (_msg: IncomingNoteMessage) => void;
   onSystemMessage?: (_msg: any) => void;
+  isGuest?: boolean;
+  guestToken?: string;
+}
+
+function maskToken(token?: string | null) {
+  if (!token) return undefined;
+  if (token.length <= 10) return token;
+  return `${token.slice(0, 6)}...${token.slice(-4)}`;
 }
 
 export default function useInterviewSocket({
@@ -16,8 +28,11 @@ export default function useInterviewSocket({
   onChatMessage,
   onNoteMessage,
   onSystemMessage,
+  isGuest = false,
+  guestToken,
 }: UseInterviewSocketProps) {
   const clientRef = useRef<Client | null>(null);
+  const subscriptionsRef = useRef<Set<string>>(new Set());
 
   const chatRef = useRef(onChatMessage);
   const noteRef = useRef(onNoteMessage);
@@ -34,46 +49,106 @@ export default function useInterviewSocket({
 
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
     const wsUrl = `${apiUrl.replace(/\/$/, '')}/ws/interview`;
-
     const socket = new SockJS(wsUrl);
+
+    const accessToken = !isGuest ? localStorage.getItem('accessToken') : '';
+    console.log('[WS INIT]', {
+      interviewId,
+      wsUrl,
+      isGuest,
+      accessToken: maskToken(accessToken),
+      guestToken: maskToken(guestToken),
+    });
 
     const client = new Client({
       webSocketFactory: () => socket as any,
       reconnectDelay: 3000,
-
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
       connectHeaders: {
         interviewId: `${interviewId}`,
-        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        ...(isGuest && guestToken ? { 'Interview-Token': guestToken } : {}),
       },
-
-      debug: () => {},
+      debug: (str) => {
+        if (import.meta.env.DEV) console.log('[STOMP DEBUG]', str);
+      },
 
       onConnect: () => {
-        console.log('%c[WS CONNECTED]', 'color: green');
+        console.log('%c[WS CONNECTED]', 'color: green', { interviewId, isGuest });
 
-        client.subscribe(`/topic/interview/${interviewId}/chat`, (msg: IMessage) => {
-          chatRef.current?.(JSON.parse(msg.body));
-        });
+        const chatTopic = `/topic/interview/${interviewId}/chat`;
+        const noteTopic = `/topic/interview/${interviewId}/note`;
+        const systemTopic = `/topic/interview/${interviewId}/system`;
 
-        client.subscribe(`/topic/interview/${interviewId}/note`, (msg: IMessage) => {
-          noteRef.current?.(JSON.parse(msg.body));
-        });
+        if (!subscriptionsRef.current.has(chatTopic)) {
+          client.subscribe(chatTopic, (msg: IMessage) => {
+            let body: AnyObj;
+            try {
+              body = JSON.parse(msg.body);
+            } catch {
+              console.error('[WS CHAT PARSE FAIL]', msg.body);
+              return;
+            }
 
-        client.subscribe(`/topic/interview/${interviewId}/system`, (msg: IMessage) => {
-          systemRef.current?.(JSON.parse(msg.body));
-        });
+            const senderId = toNumId(
+              body.senderId ?? body.sender_id ?? body.senderID ?? body.userId ?? body.user_id,
+              -1
+            );
+
+            const normalized: AnyObj = { ...body, senderId };
+
+            console.log('[WS CHAT RAW]', body);
+            console.log('[WS CHAT NORMALIZED]', {
+              senderId: normalized.senderId,
+              sender: normalized.sender,
+              content: normalized.content,
+              keys: Object.keys(body),
+            });
+
+            chatRef.current?.(normalized);
+          });
+          subscriptionsRef.current.add(chatTopic);
+        }
+
+        if (!isGuest && !subscriptionsRef.current.has(noteTopic)) {
+          client.subscribe(noteTopic, (msg: IMessage) => {
+            try {
+              noteRef.current?.(JSON.parse(msg.body));
+            } catch {
+              console.error('[WS NOTE PARSE FAIL]', msg.body);
+            }
+          });
+          subscriptionsRef.current.add(noteTopic);
+        }
+
+        if (!subscriptionsRef.current.has(systemTopic)) {
+          client.subscribe(systemTopic, (msg: IMessage) => {
+            let body: any = msg.body;
+            try {
+              body = JSON.parse(msg.body);
+            } catch {
+              // JSON 파싱 실패 시 원본 body 사용
+            }
+            console.log('[WS SYSTEM]', body);
+            systemRef.current?.(body);
+          });
+          subscriptionsRef.current.add(systemTopic);
+        }
       },
+
+      onDisconnect: () => console.log('[WS DISCONNECTED]'),
 
       onStompError: (frame: IFrame) => {
         console.error('[STOMP ERROR]', {
-          message: frame.headers['message'],
+          message: frame.headers['message'] || '',
           headers: frame.headers,
           body: frame.body,
         });
       },
 
       onWebSocketError: (err: Event) => {
-        console.error('[WS ERROR]', err);
+        console.error('[WS ERROR] WebSocket 연결 에러:', err);
       },
     });
 
@@ -82,11 +157,18 @@ export default function useInterviewSocket({
 
     return () => {
       clientRef.current?.deactivate();
+      const subscriptions = subscriptionsRef.current;
+      subscriptions.clear();
     };
-  }, [interviewId]);
+  }, [interviewId, isGuest, guestToken]);
 
   const sendChat = (message: OutgoingChatMessage) => {
-    if (!clientRef.current?.connected) return;
+    console.log('[WS SEND CHAT]', message);
+
+    if (!clientRef.current?.connected) {
+      console.warn('[WS] 연결되지 않음 - 메시지 전송 실패');
+      return;
+    }
 
     clientRef.current.publish({
       destination: `/app/interview/${interviewId}/chat`,
@@ -95,6 +177,7 @@ export default function useInterviewSocket({
   };
 
   const sendNote = (content: string) => {
+    if (isGuest) return;
     if (!clientRef.current?.connected) return;
 
     clientRef.current.publish({

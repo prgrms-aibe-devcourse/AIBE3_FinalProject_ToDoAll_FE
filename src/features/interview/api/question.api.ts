@@ -59,6 +59,37 @@ export async function getChatHistory(interviewId: number): Promise<ChatMessage[]
   return res.data ?? [];
 }
 
+export async function getChatHistoryWithGuestToken(
+  interviewId: number,
+  guestToken: string
+): Promise<ChatMessage[]> {
+  const BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+  const url = `${BASE_URL}/api/v1/interviews/${interviewId}/chat`;
+
+  const res = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Interview-Token': guestToken,
+    },
+    credentials: 'include',
+  });
+
+  let body: unknown = null;
+  try {
+    body = await res.json();
+  } catch {
+    body = null;
+  }
+
+  if (!res.ok) {
+    const message = (body as any)?.message ?? `요청 실패 (status=${res.status})`;
+    throw new Error(message);
+  }
+
+  const response = body as CommonResponse<ChatMessage[]>;
+  return response.data ?? [];
+}
+
 export async function getInterviewMemos(interviewId: number): Promise<InterviewMemo[]> {
   const res = await authedRequest<CommonResponse<InterviewMemo[]>>(
     `/api/v1/interviews/${interviewId}/memos`,
