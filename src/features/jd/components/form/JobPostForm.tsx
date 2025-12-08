@@ -16,6 +16,7 @@ export type JobPostFormValues = {
   requiredSkills: string[];
   preferredSkills: string[];
   thumbnailFile?: File | null;
+  originalThumbnailUrl?: string | null;
 };
 
 export default function JobPostForm({
@@ -81,6 +82,22 @@ export default function JobPostForm({
         </div>
         <div className="sm:col-span-2">
           <Field label="썸네일 이미지 (선택)">
+            {defaultValues?.originalThumbnailUrl && !values.thumbnailFile && (
+              <div className="mb-2">
+                <img
+                  src={defaultValues.originalThumbnailUrl}
+                  alt="Current Thumbnail"
+                  className="h-24 w-24 rounded-md object-cover"
+                />
+                <button
+                  type="button"
+                  className="mt-1 text-sm text-red-500"
+                  onClick={() => update('originalThumbnailUrl', null)}
+                >
+                  기존 이미지 삭제
+                </button>
+              </div>
+            )}
             <Input
               type="file"
               accept="image/*" // 이미지 파일만 허용

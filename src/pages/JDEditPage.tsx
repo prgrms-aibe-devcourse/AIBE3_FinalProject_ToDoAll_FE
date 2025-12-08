@@ -40,6 +40,8 @@ const JDEditPage: React.FC = () => {
           requiredSkills: job.skills ?? [],
           preferredSkills: job.preferredSkills ?? [],
           postedAt: job.postedAt || '',
+          originalThumbnailUrl: job.thumbnailUrl,
+          thumbnailFile: null,
         });
       } catch (err) {
         console.error('JDEditPage load error:', err);
