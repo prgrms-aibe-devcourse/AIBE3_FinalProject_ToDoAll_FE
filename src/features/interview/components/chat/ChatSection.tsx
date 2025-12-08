@@ -1,83 +1,77 @@
+// src/components/chat/ChatSection.tsx
 import { useEffect, useRef, useState } from 'react';
 import { DEFAULT_AVATAR } from '../../util/avatar';
 
+type UiMsg = { id: number; text: string; senderId: number; isMine: boolean };
+
 interface ChatSectionProps {
-  initialMessages: { id: number; text: string; senderId: number; isMine: boolean }[];
-  avatar?: string;
+  initialMessages: UiMsg[];
+  getAvatarForSender?: (_senderId: number) => string | undefined;
   onSend?: (_content: string) => void;
 }
 
-export default function ChatSection({ initialMessages, avatar, onSend }: ChatSectionProps) {
-  const [messages, setMessages] =
-    useState<{ id: number; text: string; senderId: number; isMine: boolean }[]>(initialMessages);
+export default function ChatSection({
+  initialMessages,
+  getAvatarForSender,
+  onSend,
+}: ChatSectionProps) {
   const [newMessage, setNewMessage] = useState('');
   const [isComposing, setIsComposing] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const safeAvatar = avatar ?? DEFAULT_AVATAR;
-
-  useEffect(() => {
-    // initialMessages가 실제로 변경되었을 때만 업데이트
-    setMessages((prev) => {
-      // 길이와 내용이 같으면 업데이트하지 않음
-      if (
-        prev.length === initialMessages.length &&
-        prev.every((m, i) => m.id === initialMessages[i]?.id && m.text === initialMessages[i]?.text)
-      ) {
-        return prev;
-      }
-      return initialMessages;
-    });
-  }, [initialMessages]);
-
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [initialMessages]);
 
   const handleSend = () => {
     const trimmed = newMessage.trim();
     if (!trimmed) return;
-
     onSend?.(trimmed);
     setNewMessage('');
   };
 
   return (
     <div className="border-jd-gray-light flex max-h-full flex-1 flex-col overflow-hidden rounded-2xl border bg-white p-6 shadow-md">
-      {/* 채팅 리스트 */}
       <div className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent mb-4 flex-1 space-y-3 overflow-y-auto pr-2">
-        {messages.length === 0 ? (
+        {initialMessages.length === 0 ? (
           <div className="text-jd-gray-black flex h-full items-center justify-center text-sm">
             채팅 내역이 없습니다.
           </div>
         ) : (
           <>
-            {messages.map((m) => (
-              <div key={m.id} className={`flex ${m.isMine ? 'justify-end' : 'justify-start'}`}>
-                {!m.isMine && (
-                  <img
-                    src={safeAvatar}
-                    alt="상대방 프로필"
-                    className="border-jd-gray-light mr-3 h-8 w-8 rounded-full border"
-                  />
-                )}
-                <div
-                  className={`max-w-[75%] rounded-2xl px-4 py-2 ${
-                    m.isMine
-                      ? 'bg-jd-gray-light text-jd-black shadow'
-                      : 'border-jd-gray-light text-jd-black border bg-white shadow'
-                  }`}
-                >
-                  {m.text}
+            {initialMessages.map((m) => {
+              const avatarUrl = !m.isMine
+                ? (getAvatarForSender?.(m.senderId) ?? DEFAULT_AVATAR)
+                : undefined;
+
+              return (
+                <div key={m.id} className={`flex ${m.isMine ? 'justify-end' : 'justify-start'}`}>
+                  {!m.isMine && (
+                    <img
+                      src={avatarUrl}
+                      alt="상대방 프로필"
+                      className="border-jd-gray-light mr-3 h-8 w-8 rounded-full border object-cover"
+                      onLoad={() => console.log('[AVATAR] load OK', m.senderId, avatarUrl)}
+                      onError={() => console.error('[AVATAR] load FAIL', m.senderId, avatarUrl)}
+                    />
+                  )}
+                  <div
+                    className={`max-w-[75%] rounded-2xl px-4 py-2 ${
+                      m.isMine
+                        ? 'bg-jd-gray-light text-jd-black shadow'
+                        : 'border-jd-gray-light text-jd-black border bg-white shadow'
+                    }`}
+                  >
+                    {m.text}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
             <div ref={messagesEndRef} />
           </>
         )}
       </div>
 
-      {/* 입력창 */}
       <div className="shrink-0">
         <div className="border-jd-gray-light flex w-full items-center rounded-full border bg-white px-4 py-1.5 shadow-sm">
           <input

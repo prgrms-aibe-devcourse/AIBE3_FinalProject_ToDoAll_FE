@@ -1,16 +1,26 @@
+// src/hooks/useInterviewSocket.ts
 import { useEffect, useRef } from 'react';
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
 import type { IMessage, IFrame } from '@stomp/stompjs';
 import type { OutgoingChatMessage, IncomingNoteMessage } from '@/features/interview/types/chatroom';
+import { toNumId } from '../features/interview/util/avatar';
+
+type AnyObj = Record<string, any>;
 
 interface UseInterviewSocketProps {
   interviewId: number;
-  onChatMessage?: (_msg: OutgoingChatMessage) => void;
+  onChatMessage?: (_msg: AnyObj) => void; // 디버그 동안 Any
   onNoteMessage?: (_msg: IncomingNoteMessage) => void;
   onSystemMessage?: (_msg: any) => void;
-  isGuest?: boolean; // 게스트 모드 (accessToken 없이 접속)
-  guestToken?: string; // 게스트 면접 토큰 (URL 파라미터)
+  isGuest?: boolean;
+  guestToken?: string;
+}
+
+function maskToken(token?: string | null) {
+  if (!token) return undefined;
+  if (token.length <= 10) return token;
+  return `${token.slice(0, 6)}...${token.slice(-4)}`;
 }
 
 export default function useInterviewSocket({
@@ -42,106 +52,96 @@ export default function useInterviewSocket({
     const socket = new SockJS(wsUrl);
 
     const accessToken = !isGuest ? localStorage.getItem('accessToken') : '';
-    if (!isGuest && !accessToken) {
-      console.warn('[WS] accessToken이 없습니다. 로그인이 필요할 수 있습니다.');
-    }
+    console.log('[WS INIT]', {
+      interviewId,
+      wsUrl,
+      isGuest,
+      accessToken: maskToken(accessToken),
+      guestToken: maskToken(guestToken),
+    });
 
     const client = new Client({
       webSocketFactory: () => socket as any,
       reconnectDelay: 3000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
-
-      // ✅ 게스트 토큰은 Authorization이 아니라 Interview-Token으로만 보냄
       connectHeaders: {
         interviewId: `${interviewId}`,
         ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         ...(isGuest && guestToken ? { 'Interview-Token': guestToken } : {}),
       },
-
       debug: (str) => {
-        if (import.meta.env.DEV) {
-          console.log('[STOMP DEBUG]', str);
-        }
+        if (import.meta.env.DEV) console.log('[STOMP DEBUG]', str);
       },
 
       onConnect: () => {
-        console.log('%c[WS CONNECTED]', 'color: green');
+        console.log('%c[WS CONNECTED]', 'color: green', { interviewId, isGuest });
 
         const chatTopic = `/topic/interview/${interviewId}/chat`;
         const noteTopic = `/topic/interview/${interviewId}/note`;
         const systemTopic = `/topic/interview/${interviewId}/system`;
 
-        // ✅ chat 구독
         if (!subscriptionsRef.current.has(chatTopic)) {
           client.subscribe(chatTopic, (msg: IMessage) => {
-            chatRef.current?.(JSON.parse(msg.body));
+            let body: AnyObj;
+            try {
+              body = JSON.parse(msg.body);
+            } catch {
+              console.error('[WS CHAT PARSE FAIL]', msg.body);
+              return;
+            }
+
+            const senderId = toNumId(
+              body.senderId ?? body.sender_id ?? body.senderID ?? body.userId ?? body.user_id,
+              -1
+            );
+
+            const normalized: AnyObj = { ...body, senderId };
+
+            console.log('[WS CHAT RAW]', body);
+            console.log('[WS CHAT NORMALIZED]', {
+              senderId: normalized.senderId,
+              sender: normalized.sender,
+              content: normalized.content,
+              keys: Object.keys(body),
+            });
+
+            chatRef.current?.(normalized);
           });
           subscriptionsRef.current.add(chatTopic);
         }
 
-        // ✅ 게스트는 note 구독 금지 (서버에서 차단하므로 구독하면 에러 남)
         if (!isGuest && !subscriptionsRef.current.has(noteTopic)) {
           client.subscribe(noteTopic, (msg: IMessage) => {
-            noteRef.current?.(JSON.parse(msg.body));
+            try {
+              noteRef.current?.(JSON.parse(msg.body));
+            } catch {
+              console.error('[WS NOTE PARSE FAIL]', msg.body);
+            }
           });
           subscriptionsRef.current.add(noteTopic);
         }
 
-        // system은 게스트에게 보여줄지 정책에 따라 유지/차단 가능
         if (!subscriptionsRef.current.has(systemTopic)) {
           client.subscribe(systemTopic, (msg: IMessage) => {
-            systemRef.current?.(JSON.parse(msg.body));
+            let body: any = msg.body;
+            try {
+              body = JSON.parse(msg.body);
+            } catch {
+              // JSON 파싱 실패 시 원본 body 사용
+            }
+            console.log('[WS SYSTEM]', body);
+            systemRef.current?.(body);
           });
           subscriptionsRef.current.add(systemTopic);
         }
       },
 
-      onDisconnect: () => {
-        console.log('[WS DISCONNECTED]');
-        // 구독 정보는 유지 (재연결 시 다시 구독하지 않도록)
-      },
+      onDisconnect: () => console.log('[WS DISCONNECTED]'),
 
       onStompError: (frame: IFrame) => {
-        const errorMessage = frame.headers['message'] || '';
-
-        if (
-          errorMessage.includes('ExecutorSubscribableChannel') ||
-          errorMessage.includes('clientInboundChannel')
-        ) {
-          if (!isGuest) {
-            const token = localStorage.getItem('accessToken');
-            if (!token) {
-              console.warn(
-                '[STOMP WARNING] 서버 채널 에러 - accessToken이 없어 인증 문제일 수 있습니다.'
-              );
-            } else {
-              console.warn('[STOMP WARNING] 서버 채널 에러 (일시적일 수 있음):', errorMessage);
-            }
-          } else {
-            console.warn('[STOMP WARNING] 서버 채널 에러 (일시적일 수 있음):', errorMessage);
-          }
-          return;
-        }
-
-        // 인증 관련 에러는 더 명확하게 표시 (게스트 모드가 아닐 때만)
-        if (
-          !isGuest &&
-          (errorMessage.includes('unauthorized') ||
-            errorMessage.includes('authentication') ||
-            errorMessage.includes('access') ||
-            errorMessage.includes('token'))
-        ) {
-          console.error('[STOMP ERROR] 인증 실패:', errorMessage);
-          const token = localStorage.getItem('accessToken');
-          if (!token) {
-            console.error('[STOMP ERROR] accessToken이 없습니다. 로그인이 필요합니다.');
-          }
-          return;
-        }
-
         console.error('[STOMP ERROR]', {
-          message: errorMessage,
+          message: frame.headers['message'] || '',
           headers: frame.headers,
           body: frame.body,
         });
@@ -157,43 +157,33 @@ export default function useInterviewSocket({
 
     return () => {
       clientRef.current?.deactivate();
-      subscriptionsRef.current.clear();
+      const subscriptions = subscriptionsRef.current;
+      subscriptions.clear();
     };
   }, [interviewId, isGuest, guestToken]);
 
   const sendChat = (message: OutgoingChatMessage) => {
+    console.log('[WS SEND CHAT]', message);
+
     if (!clientRef.current?.connected) {
       console.warn('[WS] 연결되지 않음 - 메시지 전송 실패');
       return;
     }
 
-    try {
-      clientRef.current.publish({
-        destination: `/app/interview/${interviewId}/chat`,
-        body: JSON.stringify(message),
-      });
-    } catch (error) {
-      console.error('[WS] 메시지 전송 중 에러:', error);
-    }
+    clientRef.current.publish({
+      destination: `/app/interview/${interviewId}/chat`,
+      body: JSON.stringify(message),
+    });
   };
 
   const sendNote = (content: string) => {
-    // ✅ 게스트는 노트 전송 금지
     if (isGuest) return;
+    if (!clientRef.current?.connected) return;
 
-    if (!clientRef.current?.connected) {
-      console.warn('[WS] 연결되지 않음 - 노트 전송 실패');
-      return;
-    }
-
-    try {
-      clientRef.current.publish({
-        destination: `/app/interview/${interviewId}/note`,
-        body: JSON.stringify({ content }),
-      });
-    } catch (error) {
-      console.error('[WS] 노트 전송 중 에러:', error);
-    }
+    clientRef.current.publish({
+      destination: `/app/interview/${interviewId}/note`,
+      body: JSON.stringify({ content }),
+    });
   };
 
   return { sendChat, sendNote };

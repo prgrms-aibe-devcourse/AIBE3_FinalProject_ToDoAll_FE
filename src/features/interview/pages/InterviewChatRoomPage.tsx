@@ -1,5 +1,6 @@
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+// src/pages/InterviewChatRoomPage.tsx
+import { useNavigate, useParams } from 'react-router-dom';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import ChatSection from '../components/chat/ChatSection';
 import QuestionNoteSection from '../components/chat/QuestionNoteSection';
@@ -30,34 +31,34 @@ import {
 } from '../types/chatroom';
 
 import { getResumeAuthed, getUserProfileAuthed } from '@/features/interview/api/profile.api';
-import { DEFAULT_AVATAR, normalizeAvatarUrl } from '../util/avatar';
+import { DEFAULT_AVATAR, normalizeAvatarUrl, toNumId } from '../util/avatar';
+import { getInterviewDetailAuthed } from '@/features/interview/api/interview-detail.api';
+import { getPresignedDownloadUrlAuthed } from '@/features/interview/api/file.api';
 
 type UiMsg = { id: number; text: string; senderId: number; isMine: boolean };
 
 export default function InterviewChatRoomPage() {
-  const location = useLocation();
   const { interviewId: interviewIdParam } = useParams();
   const navigate = useNavigate();
-
-  const numericInterviewId = Number(interviewIdParam);
+  const interviewId = Number(interviewIdParam);
 
   const [me, setMe] = useState<Me | null>(null);
   const [messages, setMessages] = useState<UiMsg[]>([]);
-  const [peerAvatar, setPeerAvatar] = useState<string>(DEFAULT_AVATAR);
-
   const [questionNotes, setQuestionNotes] = useState<QuestionSection[]>([]);
   const [summaries, setSummaries] = useState<InterviewSummary[]>([]);
 
-  // 익명일 때 필요: 라우팅 state로 resumeId를 받는다고 가정
-  const resumeIdFromState = (location.state as any)?.resumeId as number | undefined;
+  const [avatarBySender, setAvatarBySender] = useState<Record<number, string>>({});
+  const loadingAvatarRef = useRef<Set<number>>(new Set());
 
-  // 중복 아바타 호출 방지
-  const lastPeerKeyRef = useRef<string>('');
+  const [candidateAvatar, setCandidateAvatar] = useState<string>(DEFAULT_AVATAR);
+  const [resumeId, setResumeId] = useState<number | null>(null);
 
+  // me 로딩
   useEffect(() => {
     (async () => {
       try {
         const user = await getMeAuthed();
+        console.log('[ME LOADED]', user);
         setMe(user);
       } catch (error) {
         console.error('사용자 정보 가져오기 실패:', error);
@@ -65,103 +66,162 @@ export default function InterviewChatRoomPage() {
     })();
   }, []);
 
-  // 채팅 내역 불러오기
+  // 인터뷰 상세로 resumeId / candidateAvatar 확보
   useEffect(() => {
-    if (!numericInterviewId) {
-      console.error('잘못된 interviewId:', interviewIdParam);
-      return;
-    }
+    if (!Number.isFinite(interviewId) || interviewId <= 0) return;
 
     (async () => {
       try {
-        const history = await getChatHistory(numericInterviewId);
+        const detail = await getInterviewDetailAuthed(interviewId);
+        console.log('[DETAIL]', detail);
+
+        setResumeId(detail.resumeId ?? null);
+
+        setCandidateAvatar(
+          detail.candidateAvatar
+            ? (normalizeAvatarUrl(detail.candidateAvatar) ?? DEFAULT_AVATAR)
+            : DEFAULT_AVATAR
+        );
+      } catch (e) {
+        console.error('인터뷰 상세 조회 실패:', e);
+      }
+    })();
+  }, [interviewId]);
+
+  // 채팅 내역 불러오기 (senderId 숫자 정규화)
+  useEffect(() => {
+    if (!Number.isFinite(interviewId) || interviewId <= 0) return;
+
+    (async () => {
+      try {
+        const history = await getChatHistory(interviewId);
+        console.log('[HISTORY RAW]', history);
 
         const mapped: UiMsg[] = history.map((m: ChatMessage) => ({
           id: m.id,
           text: m.content,
-          senderId: m.senderId,
+          senderId: toNumId(m.senderId),
           isMine: false, // me 로딩 후 보정
         }));
-
         setMessages(mapped);
       } catch (e) {
         console.error('채팅 내역 불러오기 실패:', e);
       }
     })();
-  }, [numericInterviewId, interviewIdParam]);
+  }, [interviewId]);
 
-  // me 로딩 후 isMine 보정
+  // me 로딩 후 isMine 보정 (Number 비교)
   useEffect(() => {
     if (!me) return;
-    setMessages((prev) => prev.map((m) => ({ ...m, isMine: m.senderId === me.id })));
+    setMessages((prev) =>
+      prev.map((m) => ({
+        ...m,
+        isMine: toNumId(m.senderId) === toNumId(me.id),
+      }))
+    );
   }, [me]);
 
-  // 상대 senderId (내 메시지 제외해서 1명만)
-  const peerSenderId = useMemo(() => {
-    if (!messages.length) return undefined;
-    const peer = messages.find((m) => !m.isMine);
-    return peer?.senderId;
-  }, [messages]);
-
-  // 상대 아바타 로딩
+  /**
+   * ✅ 지원자(senderId=0) 아바타 전용 로딩
+   * - 기존 문제: 처음엔 resumeId가 null이라 0번을 DEFAULT로 박고, resumeId가 나중에 와도 다시 fetch를 안 함
+   * - 해결: resumeId / candidateAvatar 변경에 반응해서 0번을 항상 최신으로 재계산
+   */
   useEffect(() => {
-    if (peerSenderId === undefined) {
-      return;
-    }
+    if (!Number.isFinite(interviewId) || interviewId <= 0) return;
 
-    const key = `peerSenderId:${peerSenderId}|resumeId:${resumeIdFromState ?? 'none'}`;
-    if (lastPeerKeyRef.current === key) {
-      return;
-    }
-    lastPeerKeyRef.current = key;
-
-    let cancelled = false;
     (async () => {
       try {
-        // 로그인 유저로 판단
-        if (peerSenderId > 0) {
-          const user = await getUserProfileAuthed(peerSenderId);
-          if (cancelled) return;
-
-          const avatarUrl = normalizeAvatarUrl(user.profileUrl);
-          setPeerAvatar(avatarUrl);
+        // 1) candidateAvatar가 있으면 우선 사용 (단, DEFAULT면 의미 없으니 제외)
+        if (candidateAvatar && candidateAvatar !== DEFAULT_AVATAR) {
+          console.log('[CANDIDATE AVATAR] use candidateAvatar', candidateAvatar);
+          setAvatarBySender((prev) => ({ ...prev, 0: candidateAvatar }));
           return;
         }
 
-        // 익명(게스트)로 판단
-        if (resumeIdFromState) {
-          const resume = await getResumeAuthed(resumeIdFromState);
-          if (cancelled) return;
-
-          const avatarUrl = normalizeAvatarUrl(resume.resumeFileUrl);
-          setPeerAvatar(avatarUrl);
+        // 2) resumeId 없으면 default
+        if (!resumeId) {
+          console.log('[CANDIDATE AVATAR] no resumeId -> default');
+          setAvatarBySender((prev) => ({ ...prev, 0: DEFAULT_AVATAR }));
           return;
         }
 
-        // 정보가 없으면 기본
-        if (cancelled) return;
-        setPeerAvatar(DEFAULT_AVATAR);
+        // 3) resumeFileUrl(fileKey) -> presigned
+        const resume = await getResumeAuthed(resumeId);
+        const fileKey = resume.resumeFileUrl;
+        console.log('[CANDIDATE AVATAR] resumeFileUrl', fileKey);
+
+        if (!fileKey) {
+          console.log('[CANDIDATE AVATAR] no fileKey -> default');
+          setAvatarBySender((prev) => ({ ...prev, 0: DEFAULT_AVATAR }));
+          return;
+        }
+
+        const presigned = await getPresignedDownloadUrlAuthed(fileKey);
+        console.log('[CANDIDATE AVATAR] presigned OK', presigned);
+
+        setAvatarBySender((prev) => ({ ...prev, 0: presigned }));
       } catch (e) {
-        if (cancelled) return;
-        console.error('[프로필] 상대방 아바타 로딩 실패:', e);
-        setPeerAvatar(DEFAULT_AVATAR);
+        console.error('[CANDIDATE AVATAR] FAIL', e);
+        setAvatarBySender((prev) => ({ ...prev, 0: DEFAULT_AVATAR }));
       }
     })();
+  }, [interviewId, resumeId, candidateAvatar]);
 
-    return () => {
-      cancelled = true;
-    };
-  }, [peerSenderId, resumeIdFromState]);
+  /**
+   * ✅ 면접관(senderId>0) 아바타 로딩 (0번 제외)
+   * - messages에 등장한 유저 중 avatarBySender에 없는 것만 로딩
+   */
+  useEffect(() => {
+    if (messages.length === 0) return;
+
+    const senderIds = Array.from(new Set(messages.map((m) => toNumId(m.senderId))));
+    const interviewerIds = senderIds.filter((id) => id > 0);
+
+    const missing = interviewerIds.filter(
+      (id) => !avatarBySender[id] && !loadingAvatarRef.current.has(id)
+    );
+
+    if (missing.length === 0) return;
+
+    console.log('[AVATAR EFFECT] interviewerIds', interviewerIds, 'missing', missing);
+    missing.forEach((id) => loadingAvatarRef.current.add(id));
+
+    (async () => {
+      const updates: Record<number, string> = {};
+
+      try {
+        await Promise.all(
+          missing.map(async (senderId) => {
+            try {
+              const user = await getUserProfileAuthed(senderId);
+              console.log('[AVATAR] user raw', user);
+
+              updates[senderId] = normalizeAvatarUrl(user.profileUrl) ?? DEFAULT_AVATAR;
+            } catch (e) {
+              console.warn('[AVATAR] user fetch fail senderId=', senderId, e);
+              updates[senderId] = DEFAULT_AVATAR;
+            }
+          })
+        );
+      } finally {
+        missing.forEach((id) => loadingAvatarRef.current.delete(id));
+      }
+
+      console.log('[AVATAR] updates', updates);
+      setAvatarBySender((prev) => ({ ...prev, ...updates }));
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages]); // avatarBySender는 의도적으로 deps 제외 (무한루프 방지)
 
   // 질문 불러오기
   useEffect(() => {
-    if (!numericInterviewId) return;
+    if (!Number.isFinite(interviewId) || interviewId <= 0) return;
 
     (async () => {
       try {
-        const questions = await getInterviewQuestions(numericInterviewId);
-
+        const questions = await getInterviewQuestions(interviewId);
         const map = new Map<string, InterviewQuestion[]>();
+
         questions.forEach((q: InterviewQuestion) => {
           const topic = q.questionType ?? '기타';
           if (!map.has(topic)) map.set(topic, []);
@@ -182,15 +242,15 @@ export default function InterviewChatRoomPage() {
         console.error('질문 불러오기 실패:', e);
       }
     })();
-  }, [numericInterviewId]);
+  }, [interviewId]);
 
   // 메모 불러오기
   useEffect(() => {
-    if (!numericInterviewId) return;
+    if (!Number.isFinite(interviewId) || interviewId <= 0) return;
 
     (async () => {
       try {
-        const memos = await getInterviewMemos(numericInterviewId);
+        const memos = await getInterviewMemos(interviewId);
 
         const memoMap = new Map<number, InterviewMemo>();
         memos.forEach((memo: InterviewMemo) => {
@@ -204,15 +264,14 @@ export default function InterviewChatRoomPage() {
         const summaryList: InterviewSummary[] = Array.from(memoMap.values()).map((memo) => {
           let content = memo.content;
 
-          // memo.content 가 중첩 JSON 문자열일 수 있는 케이스 처리(너 코드 유지)
           try {
             const parsed = JSON.parse(memo.content);
-            if (typeof parsed === 'object' && parsed.content) {
-              let finalContent = parsed.content;
+            if (typeof parsed === 'object' && (parsed as any).content) {
+              let finalContent: any = (parsed as any).content;
               while (typeof finalContent === 'string' && finalContent.startsWith('{')) {
                 try {
                   const nested = JSON.parse(finalContent);
-                  if (nested.content) finalContent = nested.content;
+                  if ((nested as any).content) finalContent = (nested as any).content;
                   else break;
                 } catch {
                   break;
@@ -237,31 +296,34 @@ export default function InterviewChatRoomPage() {
         console.error('메모 불러오기 실패:', e);
       }
     })();
-  }, [numericInterviewId]);
+  }, [interviewId]);
 
+  // WS 메시지 수신 (senderId 정규화)
   const handleChatMessage = useCallback(
-    (msg: OutgoingChatMessage) => {
+    (msg: any) => {
+      const senderId = toNumId(msg.senderId ?? msg.sender_id ?? msg.userId ?? msg.user_id);
+      const content = String(msg.content ?? '').trim();
+      if (!content) return;
+
       setMessages((prev) => {
+        const now = Date.now();
         const isDuplicate = prev.some(
-          (m) =>
-            m.text === msg.content &&
-            m.senderId === msg.senderId &&
-            Math.abs(m.id - Date.now()) < 5000
+          (m) => m.text === content && m.senderId === senderId && Math.abs(m.id - now) < 2500
         );
         if (isDuplicate) return prev;
 
         return [
           ...prev,
           {
-            id: Date.now(),
-            text: msg.content,
-            senderId: msg.senderId,
-            isMine: msg.senderId === me?.id,
+            id: now,
+            text: content,
+            senderId,
+            isMine: me ? senderId === toNumId(me.id) : false,
           },
         ];
       });
     },
-    [me?.id]
+    [me]
   );
 
   const handleNoteMessage = useCallback((msg: IncomingNoteMessage) => {
@@ -280,13 +342,13 @@ export default function InterviewChatRoomPage() {
   }, []);
 
   const { sendChat, sendNote } = useInterviewSocket({
-    interviewId: numericInterviewId,
+    interviewId,
     onChatMessage: handleChatMessage,
     onNoteMessage: handleNoteMessage,
   });
 
   const handleToggleQuestionCheck = async (questionId: number) => {
-    await toggleQuestionCheck(numericInterviewId, questionId);
+    await toggleQuestionCheck(interviewId, questionId);
     setQuestionNotes((prev) =>
       prev.map((section) => ({
         ...section,
@@ -299,16 +361,21 @@ export default function InterviewChatRoomPage() {
 
   const handleSend = (content: string) => {
     if (!me) return;
+    const trimmed = content.trim();
+    if (!trimmed) return;
 
     const tempId = Date.now();
-    setMessages((prev) => [...prev, { id: tempId, text: content, senderId: me.id, isMine: true }]);
+    setMessages((prev) => [
+      ...prev,
+      { id: tempId, text: trimmed, senderId: toNumId(me.id), isMine: true },
+    ]);
 
     const payload: OutgoingChatMessage = {
       type: MessageType.CHAT,
-      interviewId: numericInterviewId,
-      senderId: me.id,
+      interviewId,
+      senderId: toNumId(me.id),
       sender: me.name ?? me.nickname ?? '사용자',
-      content,
+      content: trimmed,
     };
 
     sendChat(payload);
@@ -320,7 +387,7 @@ export default function InterviewChatRoomPage() {
   };
 
   const handleUpdateMemo = async (memoId: number, content: string) => {
-    const data = await updateInterviewMemo(numericInterviewId, memoId, content);
+    const data = await updateInterviewMemo(interviewId, memoId, content);
     setSummaries((prev) =>
       prev.map((s) => (s.id === data.memoId ? { ...s, content: data.content } : s))
     );
@@ -328,7 +395,7 @@ export default function InterviewChatRoomPage() {
 
   const handleEndInterview = async () => {
     try {
-      await endInterview(numericInterviewId);
+      await endInterview(interviewId);
       navigate('/interview/manage');
     } catch (e) {
       console.error('면접 종료 실패:', e);
@@ -349,7 +416,11 @@ export default function InterviewChatRoomPage() {
 
       <div className="flex flex-1 gap-6 overflow-hidden px-8 pb-8">
         <div className="flex h-full flex-1 gap-6 overflow-hidden">
-          <ChatSection initialMessages={messages} avatar={peerAvatar} onSend={handleSend} />
+          <ChatSection
+            initialMessages={messages}
+            getAvatarForSender={(senderId) => avatarBySender[toNumId(senderId)]}
+            onSend={handleSend}
+          />
           <QuestionNoteSection
             questionNotes={questionNotes}
             onToggleCheck={handleToggleQuestionCheck}
