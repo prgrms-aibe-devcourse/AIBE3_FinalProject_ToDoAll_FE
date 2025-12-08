@@ -6,6 +6,7 @@ import {
   fetchJobDetail,
   updateJobPost,
   type JobCreateRequest,
+  updateJobThumbnail,
 } from '../features/jd/services/jobApi';
 
 type Skill = {
@@ -39,6 +40,8 @@ const JDEditPage: React.FC = () => {
           requiredSkills: job.skills ?? [],
           preferredSkills: job.preferredSkills ?? [],
           postedAt: job.postedAt || '',
+          originalThumbnailUrl: job.thumbnailUrl,
+          thumbnailFile: null,
         });
       } catch (err) {
         console.error('JDEditPage load error:', err);
@@ -63,8 +66,7 @@ const JDEditPage: React.FC = () => {
       deadline: values.deadline && values.deadline.length > 0 ? values.deadline : null,
       benefits: emptyToNull(values.benefits),
       location: emptyToNull(values.location),
-      thumbnailUrl: null, // 아직 업로드 안 붙였으면 그대로
-      authorId: 1, // TODO: 로그인 붙으면 교체
+      thumbnailUrl: null,
       requiredSkills: values.requiredSkills ?? [],
       preferredSkills: values.preferredSkills ?? [],
     };
@@ -99,9 +101,13 @@ const JDEditPage: React.FC = () => {
         );
         return;
       }
-
-      const request = mapToJobUpdateRequest(values);
+      const { thumbnailFile, ...otherValues } = values;
+      const baseRequest = mapToJobUpdateRequest(otherValues);
+      const request = { ...baseRequest, thumbnailUrl: null };
       await updateJobPost(id, request);
+      if (thumbnailFile instanceof File) {
+        await updateJobThumbnail(id, thumbnailFile);
+      }
 
       alert('공고가 수정되었습니다.');
       // 필요하면 상세 페이지로 이동 등

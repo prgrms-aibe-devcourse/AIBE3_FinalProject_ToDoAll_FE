@@ -1,3 +1,4 @@
+// src/features/resumes/data/resumes.mapper.ts
 import type { ResumeData, EducationItem, Skill } from '../types/resumes.types';
 
 function mapEducationLevel(type: EducationItem['type']) {
@@ -45,8 +46,10 @@ export function convertToBackendRequest(form: ResumeData) {
     phone: form.phone,
     address: form.address.city,
     detailAddress: form.address.detail,
-    resumeFileUrl: form.files.resume,
-    portfolioFileUrl: form.files.portfolio,
+
+    // ✅ multipart로 파일을 보내므로 JSON에는 null
+    resumeFileUrl: null,
+    portfolioFileUrl: null,
 
     education: form.education.map((e) => ({
       educationLevel: mapEducationLevel(e.type),

@@ -21,6 +21,21 @@ const Header = () => {
 
   const [notices, setNotices] = useState<Notice[]>([]);
 
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('drawer-state-change', { detail: leftOpen }));
+  }, [leftOpen]);
+
+  useEffect(() => {
+    const handleCloseDrawer = () => {
+      setLeftOpen(false);
+    };
+
+    window.addEventListener('close-drawer', handleCloseDrawer);
+    return () => {
+      window.removeEventListener('close-drawer', handleCloseDrawer);
+    };
+  }, []);
+
   /** GET 알림 목록 */
   const { resData: notifications } = useFetch<
     {
@@ -220,11 +235,17 @@ const Header = () => {
     <>
       {/* 헤더 영역 */}
       <header className="fixed top-0 right-0 left-0 z-50 flex h-12 w-full items-center justify-between bg-[var(--color-jd-violet)] px-4 text-white shadow-[0_6px_22px_rgba(0,0,0,.15)]">
-        <button onClick={() => setLeftOpen((v) => !v)}>
-          <svg width="20" height="18" fill="currentColor">
-            <path d="M3 6h18v2H3V6Zm0 5h18v2H3v-2Zm0 5h18v2H3v-2Z" />
-          </svg>
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            aria-label={leftOpen ? '메뉴 닫기' : '메뉴 열기'}
+            onClick={() => setLeftOpen((prev) => !prev)}
+          >
+            <svg width="20" height="18" viewBox="0 0 24 24" fill="none" className="text-white">
+              <path d="M3 6h18v2H3V6Zm0 5h18v2H3v-2Zm0 5h18v2H3v-2Z" fill="currentColor" />
+            </svg>
+          </button>
+        </div>
 
         {/* 알림 버튼 */}
         <div className="relative">

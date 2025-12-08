@@ -1,20 +1,78 @@
 import type { ResumeData, EducationItem, Skill } from '../types/resumes.types';
+import { useEffect, useMemo, useState } from 'react';
+import { getDownloadUrl } from '../data/resumes.api';
 
 interface ResumeInfoProps {
   data: ResumeData;
 }
 
 export default function ResumeInfo({ data }: ResumeInfoProps) {
+  // ✅ 파일 표시용 텍스트 (File이면 name, 없으면 key/name 사용)
+  const resumeLabel = useMemo(() => {
+    const f = data.files?.resume;
+    if (f && typeof f === 'object' && 'name' in f) return (f as File).name;
+    return data.files?.resumeName || data.files?.resumeKey || '';
+  }, [data]);
+
+  const portfolioLabel = useMemo(() => {
+    const f = data.files?.portfolio;
+    if (f && typeof f === 'object' && 'name' in f) return (f as File).name;
+    return data.files?.portfolioName || data.files?.portfolioKey || '';
+  }, [data]);
+
+  // ✅ 다운로드 링크(presigned url) 만들기 (fileKey가 있을 때만)
+  const [resumeHref, setResumeHref] = useState<string>('');
+  const [portfolioHref, setPortfolioHref] = useState<string>('');
+
+  useEffect(() => {
+    let alive = true;
+
+    async function load() {
+      // resume
+      if (data.files?.resumeKey) {
+        try {
+          const url = await getDownloadUrl(data.files.resumeKey);
+          if (alive) setResumeHref(url);
+        } catch {
+          if (alive) setResumeHref('');
+        }
+      } else {
+        setResumeHref('');
+      }
+
+      // portfolio
+      if (data.files?.portfolioKey) {
+        try {
+          const url = await getDownloadUrl(data.files.portfolioKey);
+          if (alive) setPortfolioHref(url);
+        } catch {
+          if (alive) setPortfolioHref('');
+        }
+      } else {
+        setPortfolioHref('');
+      }
+    }
+
+    load();
+    return () => {
+      alive = false;
+    };
+  }, [data.files?.resumeKey, data.files?.portfolioKey]);
+
+  const profileSrc = data.profileImage || ''; // 빈 문자열이면 아래에서 렌더 안 함
+
   return (
     <div>
       <h2 className="text-[30px] font-semibold text-[#413F3F]">지원서</h2>
       <div className="relative rounded-2xl bg-white p-6 shadow">
-        {/* 프로필 이미지 */}
-        <img
-          src={data.profileImage}
-          alt={`${data.name} 프로필`}
-          className="absolute top-6 right-6 h-48 w-36 rounded-[10px] object-cover shadow-md"
-        />
+        {/* ✅ 프로필 이미지: src="" 방지 */}
+        {profileSrc ? (
+          <img
+            src={profileSrc}
+            alt={`${data.name} 프로필`}
+            className="absolute top-6 right-6 h-48 w-36 rounded-[10px] object-cover shadow-md"
+          />
+        ) : null}
 
         {/* 이름 / 직무 */}
         <header className="mb-8 flex items-center justify-between">
@@ -50,13 +108,21 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
         <section className="mt-6 flex flex-row gap-2">
           <div className="flex-1 rounded-[10px] border border-[#E3DBDB] p-5">
             <h2 className="font-semibold text-[#413F3F]">자기소개서</h2>
-            {data.files.resume ? (
-              <a
-                href="#"
-                className="font-light text-[#413F3F] hover:text-[#2E2C2C] hover:underline"
-              >
-                {data.files.resume}
-              </a>
+
+            {/* ✅ File 객체를 직접 렌더하지 말고 label만 */}
+            {resumeLabel ? (
+              resumeHref ? (
+                <a
+                  href={resumeHref}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-light text-[#413F3F] hover:text-[#2E2C2C] hover:underline"
+                >
+                  {resumeLabel}
+                </a>
+              ) : (
+                <span className="font-light text-[#413F3F]">{resumeLabel}</span>
+              )
             ) : (
               <p className="text-sm text-[#837C7C]">자기소개서가 없습니다.</p>
             )}
@@ -64,13 +130,21 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
 
           <div className="flex-1 rounded-[10px] border border-[#E3DBDB] p-5">
             <h2 className="font-semibold text-[#413F3F]">포트폴리오</h2>
-            {data.files.portfolio ? (
-              <a
-                href="#"
-                className="font-light text-[#413F3F] hover:text-[#2E2C2C] hover:underline"
-              >
-                {data.files.portfolio}
-              </a>
+
+            {/* ✅ File 객체를 직접 렌더하지 말고 label만 */}
+            {portfolioLabel ? (
+              portfolioHref ? (
+                <a
+                  href={portfolioHref}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-light text-[#413F3F] hover:text-[#2E2C2C] hover:underline"
+                >
+                  {portfolioLabel}
+                </a>
+              ) : (
+                <span className="font-light text-[#413F3F]">{portfolioLabel}</span>
+              )
             ) : (
               <p className="text-sm text-[#837C7C]">포트폴리오가 없습니다.</p>
             )}
