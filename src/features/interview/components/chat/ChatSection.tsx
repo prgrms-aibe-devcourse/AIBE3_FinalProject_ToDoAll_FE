@@ -1,4 +1,5 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { DEFAULT_AVATAR } from '../../util/avatar';
 
 interface ChatSectionProps {
   initialMessages: { id: number; text: string; senderId: number; isMine: boolean }[];
@@ -13,9 +14,20 @@ export default function ChatSection({ initialMessages, avatar, onSend }: ChatSec
   const [isComposing, setIsComposing] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const safeAvatar = avatar ?? DEFAULT_AVATAR;
+
   useEffect(() => {
-    console.log(' ChatSection initialMessages 업데이트:', initialMessages);
-    setMessages(initialMessages);
+    // initialMessages가 실제로 변경되었을 때만 업데이트
+    setMessages((prev) => {
+      // 길이와 내용이 같으면 업데이트하지 않음
+      if (
+        prev.length === initialMessages.length &&
+        prev.every((m, i) => m.id === initialMessages[i]?.id && m.text === initialMessages[i]?.text)
+      ) {
+        return prev;
+      }
+      return initialMessages;
+    });
   }, [initialMessages]);
 
   useEffect(() => {
@@ -44,7 +56,7 @@ export default function ChatSection({ initialMessages, avatar, onSend }: ChatSec
               <div key={m.id} className={`flex ${m.isMine ? 'justify-end' : 'justify-start'}`}>
                 {!m.isMine && (
                   <img
-                    src={avatar}
+                    src={safeAvatar}
                     alt="상대방 프로필"
                     className="border-jd-gray-light mr-3 h-8 w-8 rounded-full border"
                   />
@@ -78,7 +90,6 @@ export default function ChatSection({ initialMessages, avatar, onSend }: ChatSec
             onCompositionEnd={() => setIsComposing(false)}
             onKeyDown={(e) => {
               if (isComposing) return;
-
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 handleSend();

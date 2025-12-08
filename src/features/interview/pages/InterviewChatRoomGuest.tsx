@@ -1,27 +1,33 @@
-import { useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 import ChatSection from '../components/chat/ChatSection';
 import useInterviewSocket from '@/hooks/useInterviewSocket';
 import { MessageType, type OutgoingChatMessage } from '@/features/interview/types/chatroom';
+
+import { getUserProfileAuthed } from '@/features/interview/api/profile.api';
+import { DEFAULT_AVATAR, normalizeAvatarUrl } from '../util/avatar';
 
 type UiMsg = { id: number; text: string; senderId: number; isMine: boolean };
 
 export default function InterviewChatRoomGuest() {
   const { interviewId: interviewIdParam } = useParams();
+  const [searchParams] = useSearchParams();
   const interviewId = Number(interviewIdParam);
+  const interviewToken = searchParams.get('token'); // URL 파라미터의 토큰
 
   const [messages, setMessages] = useState<UiMsg[]>([]);
+  const [peerAvatar, setPeerAvatar] = useState<string>(DEFAULT_AVATAR);
 
   const pendingRef = useRef<{ content: string; at: number }[]>([]);
+  const lastLoadedPeerRef = useRef<number | null>(null);
 
-  const cleanupPending = () => {
+  const cleanupPending = useCallback(() => {
     const now = Date.now();
     pendingRef.current = pendingRef.current.filter((p) => now - p.at < 7000);
-  };
+  }, []);
 
-  const { sendChat } = useInterviewSocket({
-    interviewId,
-    onChatMessage: (msg) => {
+  const handleChatMessage = useCallback(
+    (msg: OutgoingChatMessage) => {
       const incoming = (msg.content ?? '').trim();
       if (!incoming) return;
 
@@ -46,7 +52,47 @@ export default function InterviewChatRoomGuest() {
         },
       ]);
     },
+    [cleanupPending]
+  );
+
+  const { sendChat } = useInterviewSocket({
+    interviewId,
+    onChatMessage: handleChatMessage,
+    isGuest: true, // 게스트 모드 활성화
+    guestToken: interviewToken || undefined, // URL 파라미터의 토큰 전달
   });
+
+  // 상대 아바타 로딩: senderId > 0인 상대가 보이면 1회만 호출
+  useEffect(() => {
+    const peer = messages.find((m) => !m.isMine && m.senderId > 0);
+    if (!peer) {
+      return;
+    }
+
+    if (lastLoadedPeerRef.current === peer.senderId) {
+      return;
+    }
+    lastLoadedPeerRef.current = peer.senderId;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const user = await getUserProfileAuthed(peer.senderId);
+        if (cancelled) return;
+
+        const avatarUrl = normalizeAvatarUrl(user.profileUrl);
+        setPeerAvatar(avatarUrl);
+      } catch (e) {
+        if (cancelled) return;
+        console.error('[프로필] 상대방 아바타 로딩 실패:', e);
+        setPeerAvatar(DEFAULT_AVATAR);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [messages]);
 
   const handleSend = (content: string) => {
     const trimmed = content.trim();
@@ -59,7 +105,7 @@ export default function InterviewChatRoomGuest() {
       {
         id: Date.now(),
         text: trimmed,
-        senderId: 0,
+        senderId: 0, // 게스트 senderId
         isMine: true,
       },
     ]);
@@ -82,7 +128,7 @@ export default function InterviewChatRoomGuest() {
       </header>
 
       <div className="flex flex-1 overflow-hidden px-8 pb-8">
-        <ChatSection initialMessages={messages} onSend={handleSend} />
+        <ChatSection initialMessages={messages} avatar={peerAvatar} onSend={handleSend} />
       </div>
     </div>
   );

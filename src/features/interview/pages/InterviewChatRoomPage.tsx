@@ -1,13 +1,12 @@
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
 import ChatSection from '../components/chat/ChatSection';
 import QuestionNoteSection from '../components/chat/QuestionNoteSection';
 import InterviewSummarySection from '../components/chat/InterviewSummarySection';
 
 import { endInterview } from '@/features/interview/api/interview.api';
-
-import { useEffect, useState } from 'react';
-
-import { getMeAuthed } from '@/features/interview/api/me.authed.api';
+import { getMeAuthed, type Me } from '@/features/interview/api/me.authed.api';
 
 import {
   getInterviewQuestions,
@@ -30,27 +29,30 @@ import {
   type IncomingNoteMessage,
 } from '../types/chatroom';
 
+import { getResumeAuthed, getUserProfileAuthed } from '@/features/interview/api/profile.api';
+import { DEFAULT_AVATAR, normalizeAvatarUrl } from '../util/avatar';
+
+type UiMsg = { id: number; text: string; senderId: number; isMine: boolean };
+
 export default function InterviewChatRoomPage() {
   const location = useLocation();
   const { interviewId: interviewIdParam } = useParams();
-
   const navigate = useNavigate();
+
   const numericInterviewId = Number(interviewIdParam);
 
-  const [me, setMe] = useState<any>(null);
-  const [messages, setMessages] = useState<
-    { id: number; text: string; senderId: number; isMine: boolean }[]
-  >([]);
+  const [me, setMe] = useState<Me | null>(null);
+  const [messages, setMessages] = useState<UiMsg[]>([]);
+  const [peerAvatar, setPeerAvatar] = useState<string>(DEFAULT_AVATAR);
+
   const [questionNotes, setQuestionNotes] = useState<QuestionSection[]>([]);
   const [summaries, setSummaries] = useState<InterviewSummary[]>([]);
 
-  useEffect(() => {
-    console.log('InterviewChatRoomPage 초기화:', {
-      interviewIdParam,
-      numericInterviewId,
-      state: location.state,
-    });
-  }, [interviewIdParam, numericInterviewId, location.state]);
+  // 익명일 때 필요: 라우팅 state로 resumeId를 받는다고 가정
+  const resumeIdFromState = (location.state as any)?.resumeId as number | undefined;
+
+  // 중복 아바타 호출 방지
+  const lastPeerKeyRef = useRef<string>('');
 
   useEffect(() => {
     (async () => {
@@ -63,6 +65,7 @@ export default function InterviewChatRoomPage() {
     })();
   }, []);
 
+  // 채팅 내역 불러오기
   useEffect(() => {
     if (!numericInterviewId) {
       console.error('잘못된 interviewId:', interviewIdParam);
@@ -73,11 +76,11 @@ export default function InterviewChatRoomPage() {
       try {
         const history = await getChatHistory(numericInterviewId);
 
-        const mapped = history.map((m: ChatMessage) => ({
+        const mapped: UiMsg[] = history.map((m: ChatMessage) => ({
           id: m.id,
           text: m.content,
           senderId: m.senderId,
-          isMine: false,
+          isMine: false, // me 로딩 후 보정
         }));
 
         setMessages(mapped);
@@ -87,17 +90,70 @@ export default function InterviewChatRoomPage() {
     })();
   }, [numericInterviewId, interviewIdParam]);
 
+  // me 로딩 후 isMine 보정
   useEffect(() => {
     if (!me) return;
-
-    setMessages((prev) =>
-      prev.map((m) => ({
-        ...m,
-        isMine: m.senderId === me.id,
-      }))
-    );
+    setMessages((prev) => prev.map((m) => ({ ...m, isMine: m.senderId === me.id })));
   }, [me]);
 
+  // 상대 senderId (내 메시지 제외해서 1명만)
+  const peerSenderId = useMemo(() => {
+    if (!messages.length) return undefined;
+    const peer = messages.find((m) => !m.isMine);
+    return peer?.senderId;
+  }, [messages]);
+
+  // 상대 아바타 로딩
+  useEffect(() => {
+    if (peerSenderId === undefined) {
+      return;
+    }
+
+    const key = `peerSenderId:${peerSenderId}|resumeId:${resumeIdFromState ?? 'none'}`;
+    if (lastPeerKeyRef.current === key) {
+      return;
+    }
+    lastPeerKeyRef.current = key;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        // 로그인 유저로 판단
+        if (peerSenderId > 0) {
+          const user = await getUserProfileAuthed(peerSenderId);
+          if (cancelled) return;
+
+          const avatarUrl = normalizeAvatarUrl(user.profileUrl);
+          setPeerAvatar(avatarUrl);
+          return;
+        }
+
+        // 익명(게스트)로 판단
+        if (resumeIdFromState) {
+          const resume = await getResumeAuthed(resumeIdFromState);
+          if (cancelled) return;
+
+          const avatarUrl = normalizeAvatarUrl(resume.resumeFileUrl);
+          setPeerAvatar(avatarUrl);
+          return;
+        }
+
+        // 정보가 없으면 기본
+        if (cancelled) return;
+        setPeerAvatar(DEFAULT_AVATAR);
+      } catch (e) {
+        if (cancelled) return;
+        console.error('[프로필] 상대방 아바타 로딩 실패:', e);
+        setPeerAvatar(DEFAULT_AVATAR);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [peerSenderId, resumeIdFromState]);
+
+  // 질문 불러오기
   useEffect(() => {
     if (!numericInterviewId) return;
 
@@ -106,7 +162,6 @@ export default function InterviewChatRoomPage() {
         const questions = await getInterviewQuestions(numericInterviewId);
 
         const map = new Map<string, InterviewQuestion[]>();
-
         questions.forEach((q: InterviewQuestion) => {
           const topic = q.questionType ?? '기타';
           if (!map.has(topic)) map.set(topic, []);
@@ -129,6 +184,7 @@ export default function InterviewChatRoomPage() {
     })();
   }, [numericInterviewId]);
 
+  // 메모 불러오기
   useEffect(() => {
     if (!numericInterviewId) return;
 
@@ -147,6 +203,8 @@ export default function InterviewChatRoomPage() {
 
         const summaryList: InterviewSummary[] = Array.from(memoMap.values()).map((memo) => {
           let content = memo.content;
+
+          // memo.content 가 중첩 JSON 문자열일 수 있는 케이스 처리(너 코드 유지)
           try {
             const parsed = JSON.parse(memo.content);
             if (typeof parsed === 'object' && parsed.content) {
@@ -163,7 +221,7 @@ export default function InterviewChatRoomPage() {
               content = typeof finalContent === 'string' ? finalContent : memo.content;
             }
           } catch {
-            // JSON 파싱 실패 시 원본 content 사용
+            // ignore
           }
 
           return {
@@ -181,9 +239,8 @@ export default function InterviewChatRoomPage() {
     })();
   }, [numericInterviewId]);
 
-  const { sendChat, sendNote } = useInterviewSocket({
-    interviewId: numericInterviewId,
-    onChatMessage: (msg: OutgoingChatMessage) => {
+  const handleChatMessage = useCallback(
+    (msg: OutgoingChatMessage) => {
       setMessages((prev) => {
         const isDuplicate = prev.some(
           (m) =>
@@ -204,49 +261,47 @@ export default function InterviewChatRoomPage() {
         ];
       });
     },
-    onNoteMessage: (msg: IncomingNoteMessage) => {
-      setSummaries((prev) => {
-        const filtered = prev.filter((s) => s.authorId !== msg.senderId);
-        return [
-          ...filtered,
-          {
-            id: msg.noteId ?? Date.now(),
-            authorId: msg.senderId,
-            title: msg.sender,
-            content: msg.content,
-          },
-        ];
-      });
-    },
+    [me?.id]
+  );
+
+  const handleNoteMessage = useCallback((msg: IncomingNoteMessage) => {
+    setSummaries((prev) => {
+      const filtered = prev.filter((s) => s.authorId !== msg.senderId);
+      return [
+        ...filtered,
+        {
+          id: msg.noteId ?? Date.now(),
+          authorId: msg.senderId,
+          title: msg.sender,
+          content: msg.content,
+        },
+      ];
+    });
+  }, []);
+
+  const { sendChat, sendNote } = useInterviewSocket({
+    interviewId: numericInterviewId,
+    onChatMessage: handleChatMessage,
+    onNoteMessage: handleNoteMessage,
   });
 
   const handleToggleQuestionCheck = async (questionId: number) => {
-    try {
-      await toggleQuestionCheck(numericInterviewId, questionId);
-
-      setQuestionNotes((prev) =>
-        prev.map((section) => ({
-          ...section,
-          questions: section.questions.map((q) =>
-            q.id === questionId ? { ...q, checked: !q.checked } : q
-          ),
-        }))
-      );
-    } catch (error) {
-      console.error('질문 체크 토글 실패:', error);
-      throw error;
-    }
+    await toggleQuestionCheck(numericInterviewId, questionId);
+    setQuestionNotes((prev) =>
+      prev.map((section) => ({
+        ...section,
+        questions: section.questions.map((q) =>
+          q.id === questionId ? { ...q, checked: !q.checked } : q
+        ),
+      }))
+    );
   };
 
   const handleSend = (content: string) => {
-    if (!me) {
-      console.warn('사용자 정보가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.');
-      return;
-    }
+    if (!me) return;
 
     const tempId = Date.now();
-    const newMessage = { id: tempId, text: content, senderId: me.id, isMine: true };
-    setMessages((prev) => [...prev, newMessage]);
+    setMessages((prev) => [...prev, { id: tempId, text: content, senderId: me.id, isMine: true }]);
 
     const payload: OutgoingChatMessage = {
       type: MessageType.CHAT,
@@ -256,22 +311,16 @@ export default function InterviewChatRoomPage() {
       content,
     };
 
-    console.log('WebSocket 전송:', payload);
     sendChat(payload);
   };
 
   const handleSendNote = (content: string) => {
-    if (!me) {
-      console.warn('사용자 정보가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.');
-      return;
-    }
-    console.log('노트 전송:', content);
+    if (!me) return;
     sendNote(content);
   };
 
   const handleUpdateMemo = async (memoId: number, content: string) => {
     const data = await updateInterviewMemo(numericInterviewId, memoId, content);
-
     setSummaries((prev) =>
       prev.map((s) => (s.id === data.memoId ? { ...s, content: data.content } : s))
     );
@@ -300,7 +349,7 @@ export default function InterviewChatRoomPage() {
 
       <div className="flex flex-1 gap-6 overflow-hidden px-8 pb-8">
         <div className="flex h-full flex-1 gap-6 overflow-hidden">
-          <ChatSection initialMessages={messages} onSend={handleSend} />
+          <ChatSection initialMessages={messages} avatar={peerAvatar} onSend={handleSend} />
           <QuestionNoteSection
             questionNotes={questionNotes}
             onToggleCheck={handleToggleQuestionCheck}
