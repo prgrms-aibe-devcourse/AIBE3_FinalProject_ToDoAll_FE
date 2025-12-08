@@ -16,7 +16,16 @@ export function mapRecommendationToResumeData(rec: ResumeRecommendation): Resume
     phone: '',
     applyDate: new Date().toISOString(),
     address: { country: '', city: '', detail: '' },
-    files: { resume: '', portfolio: '' },
+    files: {
+      resume: null,
+      portfolio: null,
+      etc: [],
+      resumeKey: '',
+      portfolioKey: '',
+      resumeName: '',
+      portfolioName: '',
+      etcNames: [],
+    },
 
     education: [],
     career: [],
