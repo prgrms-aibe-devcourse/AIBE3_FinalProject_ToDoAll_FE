@@ -54,6 +54,7 @@ export default function SidebarDrawer({ open, onClose }: Props) {
     <>
       {/* 드로어 패널 */}
       <aside
+        onClick={(e) => e.stopPropagation()}
         className={`fixed top-12 left-0 z-50 h-[calc(100vh-3rem)] w-[200px] bg-white text-[var(--color-jd-black)] shadow-[0_12px_30px_rgba(0,0,0,.25)] ring-1 ring-[var(--color-jd-violet)]/25 transition-transform duration-300 will-change-transform sm:w-[220px] md:w-[240px] ${open ? 'translate-x-0' : '-translate-x-full'} `}
         aria-label="Side controller"
       >
