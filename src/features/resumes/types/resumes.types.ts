@@ -66,6 +66,8 @@ export type ResumeData = {
   activities: string;
   certifications: string;
   memo: string;
+  summary?: string; // 이력서 요약 (match 기능용)
+  matchScore?: number; // 기술 매칭률 (match 기능용)
 };
 
 export type OnResumeChange = <K extends keyof ResumeData>(_field: K, _value: ResumeData[K]) => void;
