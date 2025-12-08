@@ -24,6 +24,11 @@ export default function useFetch<T>(
   const controller = useRef<AbortController | null>(null);
 
   useEffect(() => {
+    if (!url || url.trim() === '') {
+      console.warn('useFetch: 빈 URL로는 요청을 보내지 않습니다.');
+      return;
+    }
+
     controller.current = new AbortController();
     const signal = controller.current.signal;
     // URL 앞쪽 / 을 제거 → 중복 /api 방지
