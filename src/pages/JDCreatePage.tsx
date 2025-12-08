@@ -1,7 +1,7 @@
 // JDCreatePage.tsx
 import React, { useEffect, useState } from 'react';
 import JobPostForm, { type JobPostFormValues } from '../features/jd/components/form/JobPostForm';
-import { createJobPost, fetchSkills } from '../features/jd/services/jobApi';
+import { createJobPost, fetchSkills, updateJobThumbnail } from '../features/jd/services/jobApi';
 import type { JobCreateRequest } from '../features/jd/services/jobApi';
 
 type Skill = {
@@ -23,9 +23,9 @@ const JDCreatePage: React.FC = () => {
     loadSkills();
   }, []);
 
-  // TODO: 나중에 로그인 붙으면 실제 로그인 유저의 ID로 교체
-  const authorId = 1;
-  const mapToJobCreateRequest = (values: JobPostFormValues): JobCreateRequest => {
+  const mapToJobCreateRequest = (
+    values: Omit<JobPostFormValues, 'thumbnailFile'>
+  ): JobCreateRequest => {
     const emptyToNull = (v?: string): string | null => (v && v.trim().length > 0 ? v : null);
 
     return {
@@ -40,7 +40,6 @@ const JDCreatePage: React.FC = () => {
       benefits: emptyToNull(values.benefits),
       location: emptyToNull(values.location),
       thumbnailUrl: null,
-      authorId,
       requiredSkills: values.requiredSkills ?? [],
       preferredSkills: values.preferredSkills ?? [],
     };
@@ -72,11 +71,15 @@ const JDCreatePage: React.FC = () => {
         );
         return;
       }
+      const { thumbnailFile, ...otherValues } = values;
+      const baseRequest = mapToJobCreateRequest(otherValues);
+      const request = { ...baseRequest, thumbnailUrl: null };
+      const jobId = await createJobPost(request);
+      if (thumbnailFile instanceof File) {
+        await updateJobThumbnail(jobId, thumbnailFile);
+      }
 
-      const request = mapToJobCreateRequest(values);
-      const id = await createJobPost(request);
-
-      alert(`공고가 등록되었습니다. ID: ${id}`);
+      alert(`공고가 등록되었습니다. ID: ${jobId}`);
     } catch (error) {
       console.error('createJobPost error:', error);
       alert('공고 등록 중 오류가 발생했습니다.');
