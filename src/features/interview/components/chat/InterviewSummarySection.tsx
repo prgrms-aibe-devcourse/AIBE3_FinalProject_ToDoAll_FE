@@ -3,7 +3,7 @@ import type { InterviewSummary } from '../../types/chatroom';
 
 interface InterviewSummarySectionProps {
   summaries: InterviewSummary[];
-  currentUserId: number;
+  currentUserId?: number;
   onSendNote?: (_content: string) => void;
 
   onUpdateMemo?: (_memoId: number, _content: string) => Promise<void> | void;
@@ -37,7 +37,7 @@ export default function InterviewSummarySection({
     const item = summaryList[idx];
     if (!item) return;
 
-    if (item.authorId !== currentUserId) return;
+    if (currentUserId === undefined || item.authorId !== currentUserId) return;
 
     if (!onUpdateMemo) return;
 
@@ -63,7 +63,9 @@ export default function InterviewSummarySection({
     setIsWriting(false);
   };
 
-  const mySummary = summaryList.find((s) => s.authorId === currentUserId);
+  const mySummary = summaryList.find(
+    (s) => currentUserId !== undefined && s.authorId === currentUserId
+  );
 
   return (
     <div className="border-jd-gray-light flex max-h-full w-[25%] flex-col overflow-hidden rounded-2xl border bg-white shadow-md">
@@ -114,7 +116,7 @@ export default function InterviewSummarySection({
 
         {/* 기존 메모 목록 */}
         {summaryList.map((item, idx) => {
-          const isMine = item.authorId === currentUserId;
+          const isMine = currentUserId !== undefined && item.authorId === currentUserId;
           const isEditing = editingIdx === idx;
 
           return (
