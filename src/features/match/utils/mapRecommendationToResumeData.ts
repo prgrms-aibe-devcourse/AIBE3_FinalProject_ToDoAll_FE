@@ -5,7 +5,7 @@ export function mapRecommendationToCardData(dto: ResumeRecommendation): MatchCar
   return {
     resumeId: dto.resumeId,
     name: dto.name,
-    profileImage: null,
+    profileImage: dto.profileImage,
     experience: null,
     skills: dto.skills.map((s) => ({ name: s })),
     summary: dto.summary,
