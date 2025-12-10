@@ -10,7 +10,7 @@ export default function DetailButton({ className, url }: { className?: string; u
           className
         )}
       >
-        <SelectIcon name="arrow-right" className="mr-[2px]" size={15} />
+        <SelectIcon name="arrow-right" className="mr-[2px]" customize={{ size: 15 }} />
         <p className="text-sm">상세 보기</p>
       </div>
     </a>
