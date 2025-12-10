@@ -2,6 +2,8 @@
 import type { ResumeData } from '../types/resumes.types';
 import { convertToBackendRequest } from './resumes.mapper';
 
+const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8080').replace(/\/$/, '');
+
 export async function createResume(resume: ResumeData) {
   const requestBody = convertToBackendRequest(resume);
 
@@ -27,7 +29,7 @@ export async function createResume(resume: ResumeData) {
     }
   }
 
-  const res = await fetch('http://localhost:8080/api/v1/resumes', {
+  const res = await fetch(`${BASE_URL}/api/v1/resumes`, {
     method: 'POST',
     body: form,
     credentials: 'include',
@@ -49,7 +51,7 @@ export async function createResume(resume: ResumeData) {
 }
 
 export async function getResume(resumeId: string): Promise<ResumeData> {
-  const res = await fetch(`http://localhost:8080/api/v1/resumes/${resumeId}`, {
+  const res = await fetch(`${BASE_URL}/api/v1/resumes/${resumeId}`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
@@ -135,7 +137,7 @@ export async function getResume(resumeId: string): Promise<ResumeData> {
 }
 
 export async function updateResumeMemo(resumeId: string, memo: string) {
-  const res = await fetch(`http://localhost:8080/api/v1/resumes/${resumeId}/memo`, {
+  const res = await fetch(`${BASE_URL}/api/v1/resumes/${resumeId}/memo`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
@@ -153,7 +155,7 @@ export async function updateResumeMemo(resumeId: string, memo: string) {
 
 export async function getDownloadUrl(fileKey: string): Promise<string> {
   const res = await fetch(
-    `http://localhost:8080/api/v1/files/download?fileKey=${encodeURIComponent(fileKey)}`,
+    `${BASE_URL}/api/v1/files/download?fileKey=${encodeURIComponent(fileKey)}`,
     { credentials: 'include' }
   );
   const response = await res.json();
