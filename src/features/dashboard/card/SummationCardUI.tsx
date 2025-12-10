@@ -36,7 +36,7 @@ export default function SummationCardUI({
       <SelectIcon
         name={iconName}
         className="text-jd-gray-dark absolute top-[30px] right-[30px]"
-        size={20}
+        customize={{ size: 20 }}
       />
     </div>
   );

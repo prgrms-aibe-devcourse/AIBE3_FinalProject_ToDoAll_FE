@@ -4,6 +4,7 @@ import NumberSlotsCard, {
 } from '@features/dashboard/card/NumberSlotCardUI.tsx';
 import useFetch from '@/hooks/useFetch.ts';
 import { Skeleton } from '@components/Skeleton.tsx';
+import BlankCard from '@components/dashboard/BlankCard.tsx';
 
 export default function ApplicantsStatCard() {
   const { resData } = useFetch<NumberSlotsCardProps[]>(
@@ -23,8 +24,10 @@ export default function ApplicantsStatCard() {
           <Skeleton className="relative h-[190px] rounded-[10px] p-[20px] sm:items-start" />
           <Skeleton className="relative h-[190px] rounded-[10px] p-[20px] sm:items-start" />
         </>
-      ) : (
+      ) : resData.length > 0 ? (
         resData.map((item, i) => <NumberSlotsCard key={i} {...item} />)
+      ) : (
+        <BlankCard text="새로운 공고를 등록해주세요." />
       )}
     </LongViewContainer>
   );
