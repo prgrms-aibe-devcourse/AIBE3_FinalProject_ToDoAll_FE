@@ -7,8 +7,7 @@ export default function ResumePreviewPage() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Create 페이지에서 state로 전달된 데이터
-  const formData = location.state?.formData as ResumeData;
+  const formData = location.state?.formData as ResumeData | undefined;
 
   if (!formData) {
     return (

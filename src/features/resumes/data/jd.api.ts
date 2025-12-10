@@ -34,7 +34,8 @@ const toArray = (v?: string[] | string | null): string[] => {
 };
 
 export async function getJobDescription(id: number): Promise<JobDescription> {
-  const res = await fetch(`http://localhost:8080/api/v1/jd/${id}`);
+  const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8080').replace(/\/$/, '');
+  const res = await fetch(`${BASE_URL}/api/v1/jd/${id}`);
 
   if (!res.ok) {
     throw new Error(`공고 정보를 불러올 수 없습니다. (HTTP ${res.status})`);

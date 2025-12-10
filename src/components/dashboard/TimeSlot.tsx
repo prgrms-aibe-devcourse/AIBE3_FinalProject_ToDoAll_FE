@@ -21,18 +21,41 @@ const TimeSlotVariants = cva(
 );
 
 interface TimeSlotProps extends VariantProps<typeof TimeSlotVariants> {
+  id: number;
   time: string;
-  count: number;
+  title: string;
   type: TimeSlotType;
 }
 
-export default function TimeSlot({ time, count, type = 'INTERVIEW' }: TimeSlotProps) {
+export default function TimeSlot({ time, title, type = 'INTERVIEW' }: TimeSlotProps) {
   return (
-    <div className={cn(TimeSlotVariants({ type }))}>
-      <p className="text-xl font-semibold">{time}</p>
-      <p>
-        {SLOT_STATUS[type]} {count}건
-      </p>
-    </div>
+    <>
+      <div className={cn(TimeSlotVariants({ type }), 'group relative')}>
+        <p className="text-xl font-semibold">{time}</p>
+        <p className="break-keep">{SLOT_STATUS[type]}</p>
+
+        <div
+          className={cn(
+            'pointer-events-none',
+            'absolute bottom-full left-1/2',
+            'mb-2 -translate-x-1/2',
+            'bg-jd-gray-light border-jd-gray-dark rounded-lg border px-3 py-2',
+            'text-xs shadow-md',
+            'translate-y-1 opacity-0',
+            'transition-all duration-150',
+            'group-hover:translate-y-0 group-hover:opacity-100'
+          )}
+        >
+          {type == 'INTERVIEW' ? (
+            <p className="w-max">[{title}] 님 면접</p>
+          ) : (
+            <p>
+              <span className="inline-block w-max">[{title}]</span>
+              접수 마감
+            </p>
+          )}
+        </div>
+      </div>
+    </>
   );
 }

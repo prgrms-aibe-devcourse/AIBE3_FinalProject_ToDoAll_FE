@@ -24,10 +24,7 @@ export default function useFetch<T>(
   const controller = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    if (!url || url.trim() === '') {
-      console.warn('useFetch: 빈 URL로는 요청을 보내지 않습니다.');
-      return;
-    }
+    if (!url) return;
 
     controller.current = new AbortController();
     const signal = controller.current.signal;
@@ -42,6 +39,7 @@ export default function useFetch<T>(
       method,
       credentials: 'include',
       headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         'Content-Type': 'application/json',
         ...headers,
       },

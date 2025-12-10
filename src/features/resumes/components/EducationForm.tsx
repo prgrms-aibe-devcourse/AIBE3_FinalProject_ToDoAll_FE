@@ -69,7 +69,7 @@ export default function EducationForm({ formData, onChange }: Props) {
     });
   };
 
-  const displayDayTime = (value: 'DAY' | 'NIGHT') => (value === 'DAY' ? '주간' : '야간');
+  const displayDayTime = (value?: 'DAY' | 'NIGHT') => (value === 'NIGHT' ? '야간' : '주간');
 
   return (
     <>

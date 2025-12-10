@@ -24,6 +24,7 @@ import ResumePreviewPage from '@features/resumes/pages/ResumePreviewPage';
 import ResumeSubmitSuccessPage from '@features/resumes/pages/ResumeSubmitSuccessPage';
 import MyPage from '@features/user/pages/MyPage.tsx';
 import InterviewCHatRoomGuestPage from '@features/interview/pages/InterviewChatRoomGuest';
+import JDApplyPage from '@/pages/JDApplyPage';
 // 레이아웃 없는 페이지 (로그인/회원가입 관련)
 export const noLayoutRoutes = [
   { path: '/login', element: <LoginPage /> },
@@ -35,6 +36,7 @@ export const noLayoutRoutes = [
   { path: '/resume/preview', element: <ResumePreviewPage /> },
   { path: '/resume/submit-success', element: <ResumeSubmitSuccessPage /> },
   { path: '/interview/:interviewId/chat-room/guest', element: <InterviewCHatRoomGuestPage /> },
+  { path: '/jobs/:id/apply', element: <JDApplyPage /> },
 ];
 
 // 메인 레이아웃 적용되는 페이지
@@ -52,5 +54,5 @@ export const mainRoutes = [
   { path: '/jobs/:id', element: <JDDetailPage /> },
   { path: '/jobs/:id/update', element: <JDEditPage /> },
   { path: '/interview/manage/question-create', element: <InterviewQuestionCreatePage /> },
-  { path: '/jobs/:id/matches', element: <MatchList /> },
+  { path: '/matches', element: <MatchList /> },
 ];

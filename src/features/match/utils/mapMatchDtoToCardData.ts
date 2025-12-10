@@ -5,7 +5,7 @@ export function mapMatchDtoToCardData(dto: MatchListResponseDto): MatchCardData 
   return {
     resumeId: dto.resumeId,
     name: dto.resumeName,
-    profileImage: null,
+    profileImage: dto.resumeProfileImage,
     experience: null,
     skills: [],
     summary: dto.resumeSummary ?? null,
