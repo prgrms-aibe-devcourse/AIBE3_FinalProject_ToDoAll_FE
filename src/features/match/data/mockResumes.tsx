@@ -1,0 +1,101 @@
+import type { ResumeData } from '../../resumes/types/resumes.types';
+
+export const mockResumes: ResumeData[] = [
+  {
+    id: '1',
+    jdId: 1,
+    name: '김수민',
+    gender: '여',
+    birth: '1999-05-12',
+    profileImage: 'https://randomuser.me/api/portraits/women/10.jpg',
+    email: 'sumin.kim@example.com',
+    phone: '010-1234-5678',
+    applyDate: '2025-11-01',
+    address: {
+      country: '대한민국',
+      city: '서울특별시',
+      detail: '강남구 테헤란로 123',
+    },
+    files: {
+      resume: null,
+      portfolio: null,
+      etc: [],
+      resumeKey: '/resumes/sumin.pdf',
+      portfolioKey: '/portfolios/sumin.pdf',
+      resumeName: 'sumin.pdf',
+      portfolioName: 'sumin.pdf',
+      etcNames: [],
+    },
+    education: [],
+    career: [
+      {
+        company: '카카오',
+        position: '백엔드 개발자',
+        department: '플랫폼개발팀',
+        startDate: '2023-01-01',
+        endDate: '2024-12-31',
+        job: 'API 서버 개발 및 유지보수',
+      },
+    ],
+    skills: [
+      { name: 'React', level: '고급' },
+      { name: 'TypeScript', level: '고급' },
+    ],
+    experience: '3년차 프론트 및 백엔드 개발 경험',
+    summary: 'React 기반의 웹 서비스 개발과 사용자 경험 개선 프로젝트를 주도하였습니다.',
+    matchScore: 87.3,
+    activities: '',
+    certifications: '',
+    memo: '',
+  },
+  {
+    id: '2',
+    jdId: 1,
+    name: '이정훈',
+    gender: '남',
+    birth: '1997-08-21',
+    profileImage: 'https://randomuser.me/api/portraits/men/20.jpg',
+    email: 'jh.lee@example.com',
+    phone: '010-5678-1234',
+    applyDate: '2025-11-02',
+    address: {
+      country: '대한민국',
+      city: '부산광역시',
+      detail: '해운대구 달맞이길 42',
+    },
+    files: {
+      resume: null,
+      portfolio: null,
+      etc: [],
+      resumeKey: '/resumes/junghoon.pdf',
+      portfolioKey: '/portfolios/junghoon.pdf',
+      resumeName: 'junghoon.pdf',
+      portfolioName: 'junghoon.pdf',
+      etcNames: [],
+    },
+    education: [],
+    career: [
+      {
+        company: '네이버',
+        position: '서버 엔지니어',
+        department: '검색시스템팀',
+        startDate: '2021-03-01',
+        endDate: '2025-10-31',
+        job: '데이터 파이프라인 및 API 설계',
+      },
+    ],
+    skills: [
+      { name: 'Python', level: '고급' },
+      { name: 'Django', level: '고급' },
+    ],
+    experience: '데이터 파이프라인 구축 및 보안 시스템 설계',
+    summary: 'Django 기반의 데이터 파이프라인과 보안 인프라를 설계하고 운영한 경험이 있습니다.',
+    matchScore: 75.6,
+    activities: '',
+    certifications: '',
+    memo: '',
+  },
+];
+
+// 빈 배열 예시 (검색 결과 없음)
+export const mockResumesEmpty: ResumeData[] = [];

@@ -1,0 +1,235 @@
+import type { ResumeData, EducationItem, Skill } from '../types/resumes.types';
+import { useEffect, useMemo, useState } from 'react';
+import { getDownloadUrl } from '../data/resumes.api';
+
+interface ResumeInfoProps {
+  data: ResumeData;
+}
+
+export default function ResumeInfo({ data }: ResumeInfoProps) {
+  // ✅ 파일 표시용 텍스트 (File이면 name, 없으면 key/name 사용)
+  const resumeLabel = useMemo(() => {
+    const f = data.files?.resume;
+    if (f && typeof f === 'object' && 'name' in f) return (f as File).name;
+    return data.files?.resumeName || data.files?.resumeKey || '';
+  }, [data]);
+
+  const portfolioLabel = useMemo(() => {
+    const f = data.files?.portfolio;
+    if (f && typeof f === 'object' && 'name' in f) return (f as File).name;
+    return data.files?.portfolioName || data.files?.portfolioKey || '';
+  }, [data]);
+
+  // ✅ 다운로드 링크(presigned url) 만들기 (fileKey가 있을 때만)
+  const [resumeHref, setResumeHref] = useState<string>('');
+  const [portfolioHref, setPortfolioHref] = useState<string>('');
+
+  useEffect(() => {
+    let alive = true;
+
+    async function load() {
+      // resume
+      if (data.files?.resumeKey) {
+        try {
+          const url = await getDownloadUrl(data.files.resumeKey);
+          if (alive) setResumeHref(url);
+        } catch {
+          if (alive) setResumeHref('');
+        }
+      } else {
+        setResumeHref('');
+      }
+
+      // portfolio
+      if (data.files?.portfolioKey) {
+        try {
+          const url = await getDownloadUrl(data.files.portfolioKey);
+          if (alive) setPortfolioHref(url);
+        } catch {
+          if (alive) setPortfolioHref('');
+        }
+      } else {
+        setPortfolioHref('');
+      }
+    }
+
+    load();
+    return () => {
+      alive = false;
+    };
+  }, [data.files?.resumeKey, data.files?.portfolioKey]);
+
+  const profileSrc = data.profileImage || ''; // 빈 문자열이면 아래에서 렌더 안 함
+
+  return (
+    <div>
+      <h2 className="text-[30px] font-semibold text-[#413F3F]">지원서</h2>
+      <div className="relative rounded-2xl bg-white p-6 shadow">
+        {/* ✅ 프로필 이미지: src="" 방지 */}
+        {profileSrc ? (
+          <img
+            src={profileSrc}
+            alt={`${data.name} 프로필`}
+            className="absolute top-6 right-6 h-48 w-36 rounded-[10px] object-cover shadow-md"
+          />
+        ) : null}
+
+        {/* 이름 / 직무 */}
+        <header className="mb-8 flex items-center justify-between">
+          <div>
+            <h2 className="font-regular text-[25px] text-[#413F3F]">{data.name}</h2>
+            <p className="text-[18px] text-[#837C7C]">프론트엔드 개발자 지원</p>
+          </div>
+        </header>
+
+        {/* 기본 정보 */}
+        <div className="space-y-6 text-sm font-medium text-[#413F3F]">
+          <div>
+            <b>이메일:</b> {data.email}
+          </div>
+          <div>
+            <b>연락처:</b> {data.phone}
+          </div>
+          <div>
+            <b>접수일:</b> {data.applyDate}
+          </div>
+          <div>
+            <b>생년월일:</b> {data.birth}
+          </div>
+          <div>
+            <b>주소:</b> {`${data.address.country} ${data.address.city} ${data.address.detail}`}
+          </div>
+          <div>
+            <b>성별:</b> {data.gender}
+          </div>
+        </div>
+
+        {/* 파일 섹션 */}
+        <section className="mt-6 flex flex-row gap-2">
+          <div className="flex-1 rounded-[10px] border border-[#E3DBDB] p-5">
+            <h2 className="font-semibold text-[#413F3F]">자기소개서</h2>
+
+            {/* ✅ File 객체를 직접 렌더하지 말고 label만 */}
+            {resumeLabel ? (
+              resumeHref ? (
+                <a
+                  href={resumeHref}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-light text-[#413F3F] hover:text-[#2E2C2C] hover:underline"
+                >
+                  {resumeLabel}
+                </a>
+              ) : (
+                <span className="font-light text-[#413F3F]">{resumeLabel}</span>
+              )
+            ) : (
+              <p className="text-sm text-[#837C7C]">자기소개서가 없습니다.</p>
+            )}
+          </div>
+
+          <div className="flex-1 rounded-[10px] border border-[#E3DBDB] p-5">
+            <h2 className="font-semibold text-[#413F3F]">포트폴리오</h2>
+
+            {/* ✅ File 객체를 직접 렌더하지 말고 label만 */}
+            {portfolioLabel ? (
+              portfolioHref ? (
+                <a
+                  href={portfolioHref}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-light text-[#413F3F] hover:text-[#2E2C2C] hover:underline"
+                >
+                  {portfolioLabel}
+                </a>
+              ) : (
+                <span className="font-light text-[#413F3F]">{portfolioLabel}</span>
+              )
+            ) : (
+              <p className="text-sm text-[#837C7C]">포트폴리오가 없습니다.</p>
+            )}
+          </div>
+        </section>
+
+        {/* 학력사항 */}
+        <section className="mt-6">
+          <h3 className="mb-3 border-y border-[#837C7C] bg-[#FAF8F8] px-3 py-2 font-semibold text-[#413F3F]">
+            학력사항
+          </h3>
+          {data.education.length > 0 ? (
+            <div className="space-y-2 px-3">
+              {data.education.map((edu: EducationItem, idx) => {
+                const isUniversity = edu.type === '대학' || edu.type === '대학원';
+                return (
+                  <div key={idx}>
+                    {isUniversity ? (
+                      <p>
+                        [{edu.type}] {edu.universityType} {edu.name} ({edu.startDate} ~{' '}
+                        {edu.endDate}) {edu.transferred ? '편입' : ''} 전공: {edu.major}{' '}
+                        {edu.dayTime} {edu.graduated ? '졸업' : '재학중'}{' '}
+                        {edu.gpa ? `GPA: ${edu.gpa}` : ''}
+                      </p>
+                    ) : (
+                      <p>
+                        [{edu.type}] {edu.name} ({edu.startDate} ~ {edu.endDate}){' '}
+                        {edu.graduated ? '졸업' : '재학중'}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="px-3 text-sm text-[#837C7C]">학력사항이 없습니다.</p>
+          )}
+        </section>
+
+        {/* 스킬 */}
+        <section className="mt-4">
+          <h3 className="mb-3 border-y border-[#837C7C] bg-[#FAF8F8] px-3 py-2 font-semibold text-[#413F3F]">
+            스킬
+          </h3>
+          {data.skills.length > 0 ? (
+            <ul className="flex flex-wrap gap-2 px-3">
+              {data.skills.map((skill: Skill, idx) => (
+                <li
+                  key={idx}
+                  className="flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-1 text-gray-700"
+                >
+                  <span>{skill.name}</span>
+                  <span className="text-xs text-gray-500">({skill.level})</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="px-3 text-sm text-[#837C7C]">스킬이 없습니다.</p>
+          )}
+        </section>
+
+        {/* 경험/활동/교육 */}
+        <section className="mt-4">
+          <h3 className="mb-3 border-y border-[#837C7C] bg-[#FAF8F8] px-3 py-2 font-semibold text-[#413F3F]">
+            경험/활동/교육
+          </h3>
+          {data.activities ? (
+            <p className="px-3">{data.activities}</p>
+          ) : (
+            <p className="px-3 text-sm text-[#837C7C]">경험/활동/교육 내역이 없습니다.</p>
+          )}
+        </section>
+
+        {/* 자격/어학/수상 */}
+        <section className="mt-4">
+          <h3 className="mb-3 border-y border-[#837C7C] bg-[#FAF8F8] px-3 py-2 font-semibold text-[#413F3F]">
+            자격/어학/수상
+          </h3>
+          {data.certifications ? (
+            <p className="px-3">{data.certifications}</p>
+          ) : (
+            <p className="px-3 text-sm text-[#837C7C]">자격/어학/수상 내역이 없습니다.</p>
+          )}
+        </section>
+      </div>
+    </div>
+  );
+}

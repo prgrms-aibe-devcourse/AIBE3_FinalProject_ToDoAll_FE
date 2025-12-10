@@ -1,0 +1,46 @@
+@import 'tailwindcss';
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Pretendard Variable';
+  src: url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/packages/pretendard/dist/web/variable/woff2/PretendardVariable.woff2')
+    format('woff2');
+  font-weight: 45 920;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  /* 폰트 */
+  --default-font-family: 'Pretendard Variable', var(--font-sans);
+
+  /* 색상 */
+  --color-jd-violet: #752f6d;
+  --color-jd-violet-hover: #601f58;
+  --color-jd-yellow: #f7a534;
+  --color-jd-yellow-hover: #e6962f;
+  --color-jd-scarlet: #de4f36;
+  --color-jd-white: #faf8f8;
+  --color-jd-black: #413f3f;
+  --color-jd-gray-light: #e3dbdb;
+  --color-jd-gray-light-hover: #d5cbcb;
+  --color-jd-gray-dark: #837c7c;
+  --color-jd-green: #5cc46f;
+  --color-jd-green-hover: #52b664;
+  --color-jd-blue: #4a90e2;
+}
+
+@layer components {
+  .jd-LongViewContainer-RWD {
+    @apply max-w-sm md:max-w-[584px];
+  }
+  .jd-LongViewContainer-RWD-full {
+    @apply max-w-sm md:max-w-[584px] xl:max-w-full;
+  }
+}
+
+@layer utilities {
+  .jd-dashboard-section {
+    box-shadow: 0 4px 4px 0 #00000040;
+  }
+}

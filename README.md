@@ -39,3 +39,4 @@
 |:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|
 |[유승인 (팀장)](https://github.com/seung-in-Yoo)|[김정호](https://github.com/Unoguna)|[김지윤](https://github.com/jiyoon-00)|[심수민](https://github.com/SWWWin)|[유승재](https://github.com/JaeSeungJae)|[정다솔](https://github.com/dbjoung)|
 |FE, BE|FE, BE|FE, BE|FE, BE|FE, BE|FE, BE|
+
