@@ -24,6 +24,8 @@ export default function useFetch<T>(
   const controller = useRef<AbortController | null>(null);
 
   useEffect(() => {
+    if (!url) return;
+
     controller.current = new AbortController();
     const signal = controller.current.signal;
     // URL 앞쪽 / 을 제거 → 중복 /api 방지
