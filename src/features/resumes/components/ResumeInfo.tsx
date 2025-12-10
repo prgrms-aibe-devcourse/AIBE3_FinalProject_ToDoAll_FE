@@ -7,12 +7,6 @@ interface ResumeInfoProps {
 }
 
 export default function ResumeInfo({ data }: ResumeInfoProps) {
-  const _resumeLabel = useMemo(() => {
-    const f = data.files?.resume;
-    if (f && typeof f === 'object' && 'name' in f) return (f as File).name;
-    return data.files?.resumeName || data.files?.resumeKey || '';
-  }, [data]);
-
   const portfolioLabel = useMemo(() => {
     const f = data.files?.portfolio;
     if (f && typeof f === 'object' && 'name' in f) return (f as File).name;
