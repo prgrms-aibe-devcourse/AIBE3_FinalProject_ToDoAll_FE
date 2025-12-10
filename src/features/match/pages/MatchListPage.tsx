@@ -26,11 +26,13 @@ export default function MatchListPage() {
   const [totalPages, setTotalPages] = useState(1);
 
   const [jdId, setJobId] = useState<number | null>(null);
-  const [sortType, setSortType] = useState<string>('latest');
+  const [sortType, setSortType] = useState<string>('LATEST');
 
-  const [searchTrigger, setSearchTrigger] = useState(0); // 🔥 검색 버튼 눌렀을 때만 조회
+  const [status, setStatus] = useState<string>('');
 
-  // 🔥 조회 로직: 검색 버튼을 눌렀을 때(searchTrigger 변경 시)만 실행됨
+  const [searchTrigger, setSearchTrigger] = useState(0); // 검색 버튼 눌렀을 때만 조회
+
+  // 조회 로직 — 검색 버튼 눌렀을 때만 실행됨
   useEffect(() => {
     if (jdId === null) {
       setResumes([]);
@@ -46,7 +48,7 @@ export default function MatchListPage() {
           const recs = await fetchRecommendedResumes(jdId, limit, sortType);
           setResumes(recs.map(mapRecommendationToCardData));
         } else {
-          const all = await fetchAllMatchedResumes(jdId, page, limit, sortType);
+          const all = await fetchAllMatchedResumes(jdId, page, limit, sortType, status);
           setResumes(all.content.map(mapMatchDtoToCardData));
           setTotalPages(all.totalPages);
         }
@@ -59,7 +61,7 @@ export default function MatchListPage() {
     };
 
     load();
-  }, [searchTrigger, jdId, tab, limit, page, sortType]); // ⭐ 검색 버튼 눌렀을 때(searchTrigger)만 실행됨
+  }, [searchTrigger, jdId, tab, limit, page, sortType, status]);
 
   const handleInvite = async (resumeId: number) => {
     if (jdId === null) {
@@ -83,7 +85,7 @@ export default function MatchListPage() {
 
       <MatchFilterSection
         onSearch={() => {
-          setSearchTrigger((prev) => prev + 1); // 🔥 검색 버튼 눌렀을 때만 조회되도록
+          setSearchTrigger((prev) => prev + 1);
           setPage(0);
         }}
         onTabChange={(t) => {
@@ -100,21 +102,22 @@ export default function MatchListPage() {
         onSortChange={(sort) => {
           setSortType(sort);
         }}
+        onStatusChange={(s) => {
+          setStatus(s);
+          setPage(0);
+        }}
       />
 
       <div className="mt-6 flex flex-col gap-4">
         {loading && <p className="text-center">불러오는 중...</p>}
         {error && <p className="text-center text-red-500">{error}</p>}
 
-        {/* 🔥 JD 선택 전에는 아무것도 보여주지 않음 */}
         {!jdId && !loading && (
           <p className="text-center text-[#8B8B8B]">조회할 공고를 선택하세요.</p>
         )}
 
-        {/* 목록 없음 */}
         {jdId && !loading && !error && resumes.length === 0 && <NoSearchResult />}
 
-        {/* 목록 표시 */}
         {!loading &&
           !error &&
           resumes.map((resume) => (

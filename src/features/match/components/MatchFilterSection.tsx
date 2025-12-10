@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 
+import AllFilterSection from './AllFilterSection';
+import RecommendedFilterSection from './RecommendedFilterSection';
+
 import sparkleImg from '../../../assets/Sparkles.png';
 import peopleImg from '../../../assets/People.png';
-import arrowImg from '../../../assets/Expand Arrow-2.png';
 
 let baseUrl = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 
@@ -18,6 +20,7 @@ type Props = {
   onLimitChange: (_limit: number) => void;
   onJobChange: (_jobId: number | null) => void;
   onSortChange: (_sortType: string) => void;
+  onStatusChange?: (_status: string) => void;
 };
 
 export default function MatchFilterSection({
@@ -26,23 +29,25 @@ export default function MatchFilterSection({
   onLimitChange,
   onJobChange,
   onSortChange,
+  onStatusChange,
 }: Props) {
   const [activeTab, setActiveTab] = useState<'all' | 'recommended'>('recommended');
   const [selectedLimit, setSelectedLimit] = useState<number>(10);
   const [selectedJob, setSelectedJob] = useState<number | null>(null);
-  const [sortType, setSortType] = useState<string>('latest');
+  const [sortType, setSortType] = useState<string>('LATEST');
   const [jdOptions, setJdOptions] = useState<JdOption[]>([]);
+  const [status, setStatus] = useState<string>('');
 
   // JD 목록 불러오기
   useEffect(() => {
     const load = async () => {
       try {
-        const token = localStorage.getItem('accessToken'); // ⭐ JWT 가져오기
+        const token = localStorage.getItem('accessToken');
 
         const response = await fetch(`${baseUrl}/api/v1/jd/options`, {
           method: 'GET',
           headers: {
-            Authorization: `Bearer ${token}`, // ⭐ JWT 추가
+            Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
@@ -54,7 +59,6 @@ export default function MatchFilterSection({
         }
 
         const json = await response.json();
-        console.log('JD 목록:', json);
         setJdOptions(json.data ?? []);
       } catch (err) {
         console.error('JD 목록 불러오기 실패:', err);
@@ -92,6 +96,12 @@ export default function MatchFilterSection({
     onSortChange(val);
   };
 
+  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    setStatus(val);
+    onStatusChange?.(val); // 상위 컴포넌트로도 전달
+  };
+
   return (
     <div className="flex flex-col gap-0 rounded-lg p-4">
       {/* 상단 탭 */}
@@ -119,67 +129,27 @@ export default function MatchFilterSection({
 
       {/* 필터 영역 */}
       <div className="flex w-full rounded-b-lg bg-white p-8 shadow-md">
-        <div className="flex w-full flex-col gap-6">
-          {/* 상단 필드 */}
-          <div className="grid grid-cols-2 gap-6">
-            {/* JD 선택 */}
-            <div className="flex flex-col">
-              <h2 className="mb-1 text-[14px] font-medium text-[#413F3F]">채용 공고</h2>
-              <select
-                value={selectedJob ?? ''}
-                onChange={handleJobChange}
-                className="rounded-md border border-[#E3DBDB] p-2 text-[15px] text-[#413F3F]"
-              >
-                <option value="">조회할 공고 선택</option>
-                {jdOptions.map((jd) => (
-                  <option key={jd.jdId} value={jd.jdId}>
-                    {jd.title}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* 추천 인원 */}
-            {activeTab === 'recommended' ? (
-              <div className="relative flex flex-col">
-                <h2 className="mb-1 text-[14px] font-medium text-[#413F3F]">추천 인원</h2>
-                <select
-                  value={selectedLimit}
-                  onChange={handleLimitChange}
-                  className="w-full appearance-none rounded-md border border-[#E3DBDB] bg-white p-2 pr-10 text-[15px] text-[#413F3F]"
-                >
-                  <option value={3}>3명</option>
-                  <option value={5}>5명</option>
-                  <option value={10}>10명</option>
-                  <option value={20}>20명</option>
-                  <option value={30}>30명</option>
-                </select>
-
-                <img
-                  src={arrowImg}
-                  alt="arrow"
-                  className="pointer-events-none absolute top-9 right-2 h-4 w-4"
-                />
-              </div>
-            ) : (
-              <div></div>
-            )}
-          </div>
-
-          {/* 정렬 */}
-          <div className="flex w-1/2 flex-col">
-            <h2 className="mb-1 text-[14px] font-medium text-[#413F3F]">정렬순</h2>
-            <select
-              value={sortType}
-              onChange={handleSortChange}
-              className="rounded-md border border-[#E3DBDB] p-2 text-[15px] text-[#413F3F]"
-            >
-              <option value="latest">최신순</option>
-              <option value="high">매칭 높은순</option>
-              <option value="low">매칭 낮은순</option>
-            </select>
-          </div>
-        </div>
+        {activeTab === 'all' ? (
+          <AllFilterSection
+            selectedJob={selectedJob}
+            onJobChange={handleJobChange}
+            sortType={sortType}
+            onSortChange={handleSortChange}
+            jdOptions={jdOptions}
+            status={status}
+            onStatusChange={handleStatusChange}
+          />
+        ) : (
+          <RecommendedFilterSection
+            selectedJob={selectedJob}
+            onJobChange={handleJobChange}
+            sortType={sortType}
+            onSortChange={handleSortChange}
+            selectedLimit={selectedLimit}
+            onLimitChange={handleLimitChange}
+            jdOptions={jdOptions}
+          />
+        )}
 
         {/* 검색 버튼 */}
         <div className="ml-auto flex items-end pb-6">

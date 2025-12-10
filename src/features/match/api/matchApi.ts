@@ -7,10 +7,19 @@ export async function fetchAllMatchedResumes(
   jdId: number | null,
   page: number,
   size: number,
-  sortType: string
+  sortType: string,
+  status: string
 ): Promise<PagedResponse<MatchListResponseDto>> {
+  const sortMap: Record<string, string> = {
+    LATEST: 'appliedAt,desc',
+    SCORE_DESC: 'matchScore,desc',
+  };
+
+  const sortParam = sortMap[sortType] ?? 'createdAt,desc'; // fallback
+
+  console.log('Fetching all matched resumes with params:', { jdId, page, size, sortParam, status });
   const raw = await request(
-    `/api/v1/matches?jdId=${jdId}&page=${page}&size=${size}&sort=${sortType}`,
+    `/api/v1/matches?jdId=${jdId}&page=${page}&size=${size}&sort=${sortParam}&status=${status}`,
     {
       method: 'GET',
     }

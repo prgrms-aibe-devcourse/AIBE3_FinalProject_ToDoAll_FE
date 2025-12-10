@@ -3,11 +3,11 @@ import type { ResumeRecommendation } from '../types/recommendation.types';
 
 export async function fetchRecommendedResumes(
   jdId: number | null,
-  limit = 10,
+  limit: number,
   sortType: string
 ): Promise<ResumeRecommendation[]> {
   const raw = await request(
-    `/api/v1/matches/recommendations?jdId=${jdId}&limit=${limit}&sort=${sortType}`,
+    `/api/v1/matches/recommendations?jdId=${jdId}&limit=${limit}&sortType=${sortType}`,
     {
       method: 'GET',
     }
