@@ -4,13 +4,17 @@ import type { MatchListResponseDto } from '../types/match.types';
 import type { MatchResponseDto } from '../types/matchResponse.types';
 
 export async function fetchAllMatchedResumes(
-  jdId: number,
+  jdId: number | null,
   page: number,
-  size: number
+  size: number,
+  sortType: string
 ): Promise<PagedResponse<MatchListResponseDto>> {
-  const raw = await request(`/api/v1/matches?jdId=${jdId}&page=${page}&size=${size}`, {
-    method: 'GET',
-  });
+  const raw = await request(
+    `/api/v1/matches?jdId=${jdId}&page=${page}&size=${size}&sort=${sortType}`,
+    {
+      method: 'GET',
+    }
+  );
 
   return unwrap<PagedResponse<MatchListResponseDto>>(raw);
 }
