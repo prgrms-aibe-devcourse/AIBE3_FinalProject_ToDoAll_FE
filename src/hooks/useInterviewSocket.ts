@@ -46,8 +46,14 @@ export default function useInterviewSocket({
 
   useEffect(() => {
     if (!interviewId) return;
+    const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+    // 배포(https 페이지)에서는 API도 https로 강제
+    const apiUrl =
+      window.location.protocol === 'https:'
+        ? rawApiUrl.replace(/^http:\/\//, 'https://')
+        : rawApiUrl;
+
     const wsUrl = `${apiUrl.replace(/\/$/, '')}/ws/interview`;
     const socket = new SockJS(wsUrl);
 
