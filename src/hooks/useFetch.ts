@@ -37,6 +37,7 @@ export default function useFetch<T>(
       method,
       credentials: 'include',
       headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         'Content-Type': 'application/json',
         ...headers,
       },

@@ -25,7 +25,7 @@ export default function SummationCardUI({
     <div className="jd-dashboard-section relative flex aspect-[12/8] w-full max-w-sm flex-col justify-between rounded-[20px] bg-white p-[30px] md:max-w-[279px]">
       <h2 className="text-jd-gray-dark mb-[20px] font-bold">{title}</h2>
       <div>
-        {!resData ? (
+        {resData == null ? (
           <Skeleton className="h-[2.25rem] w-full" />
         ) : (
           <h3 className="text-4xl font-semibold text-gray-700">{resData}</h3>
