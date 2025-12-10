@@ -18,7 +18,7 @@ export default function LongViewContainer({
   return (
     <section
       className={cn(
-        'jd-dashboard-section h-fit w-full rounded-[20px] bg-white p-[30px]',
+        'jd-dashboard-section flex w-full flex-col rounded-[20px] bg-white p-[30px]',
         className
       )}
     >
@@ -27,7 +27,7 @@ export default function LongViewContainer({
         <h2 className="text-jd-black font-bold">{title}</h2>
         <p className="text-jd-gray-dark text-sm">{description}</p>
       </section>
-      <section className="flex flex-col gap-3">{children}</section>
+      <section className="flex h-full flex-col gap-3">{children}</section>
     </section>
   );
 }
