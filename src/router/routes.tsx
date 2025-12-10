@@ -54,5 +54,5 @@ export const mainRoutes = [
   { path: '/jobs/:id', element: <JDDetailPage /> },
   { path: '/jobs/:id/update', element: <JDEditPage /> },
   { path: '/interview/manage/question-create', element: <InterviewQuestionCreatePage /> },
-  { path: '/jobs/:id/matches', element: <MatchList /> },
+  { path: '/matches', element: <MatchList /> },
 ];
