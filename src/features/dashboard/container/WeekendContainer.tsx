@@ -49,7 +49,7 @@ export default function WeekendContainer() {
       return acc + date.events.length;
     }, 0);
 
-    if (sum > 0) isBlank.current = true;
+    if (sum > 0) isBlank.current = false;
   }, [resData]);
 
   return (
