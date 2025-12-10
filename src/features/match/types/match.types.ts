@@ -1,6 +1,7 @@
 export interface MatchListResponseDto {
   resumeId: number;
   resumeName: string;
+  resumeProfileImage: string | null;
   matchScore: number;
   status: 'APPLIED' | 'RECOMMENDED' | 'CONFIRMED' | 'BOOKMARK' | 'HOLD' | 'REJECTED';
   skillMatchRate: string;
