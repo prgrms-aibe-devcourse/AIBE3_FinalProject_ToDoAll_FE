@@ -1,4 +1,3 @@
-// src/features/resumes/pages/ResumeCreatePage.tsx
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { ResumeData } from '../types/resumes.types';
@@ -28,8 +27,8 @@ export default function ResumeCreatePage() {
     address: { country: '대한민국', city: '', detail: '' },
 
     files: {
-      resume: null, // (다른 곳에서 연결)
-      portfolio: null, // FileUploadForm에서 연결
+      resume: null,
+      portfolio: null,
       etc: [],
       resumeKey: '',
       portfolioKey: '',
@@ -108,15 +107,33 @@ export default function ResumeCreatePage() {
   };
 
   // ✅ 입력 변경 시: state 업데이트 + 즉시 draft 저장
-  const handleChange = (field: keyof ResumeData, value: any) => {
+  // ✅ files는 "merge" 처리 (핵심 수정)
+  const handleChange = <K extends keyof ResumeData>(field: K, value: ResumeData[K]) => {
     setFormData((prev) => {
-      const next = { ...prev, [field]: value };
+      const next =
+        field === 'files'
+          ? ({
+              ...prev,
+              files: {
+                ...prev.files,
+                ...(value as ResumeData['files']),
+              },
+            } as ResumeData)
+          : ({ ...prev, [field]: value } as ResumeData);
+
       saveDraft(next);
       return next;
     });
   };
 
   const handleSubmit = async () => {
+    // 제출 전 파일 확인
+    console.log('[SUBMIT] 제출 전 formData.files:', formData.files);
+    console.log('[SUBMIT] resume 파일:', formData.files.resume);
+    console.log('[SUBMIT] portfolio 파일:', formData.files.portfolio);
+    console.log('[SUBMIT] resume instanceof File:', formData.files.resume instanceof File);
+    console.log('[SUBMIT] portfolio instanceof File:', formData.files.portfolio instanceof File);
+
     try {
       const result = await createResume(formData);
 
@@ -137,8 +154,6 @@ export default function ResumeCreatePage() {
   };
 
   const handlePreview = () => {
-    // (선택) 디버그
-    // console.log('[Create] before preview draft=', localStorage.getItem(DRAFT_KEY(jdId)));
     navigate('/resume/preview', { state: { formData } });
   };
 
@@ -158,6 +173,7 @@ export default function ResumeCreatePage() {
           기본 정보 <span className="mb-3 text-[14px] font-medium text-[#DE4F36]">*필수</span>
         </h2>
 
+        {/* ✅ onChange 타입/동작 통일 */}
         <BasicInfoForm formData={formData} onChange={handleChange} />
         <ResumeForm formData={formData} onChange={handleChange} />
 
