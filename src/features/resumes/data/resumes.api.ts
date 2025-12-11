@@ -10,22 +10,59 @@ export async function createResume(resume: ResumeData) {
   const form = new FormData();
   form.append('data', new Blob([JSON.stringify(requestBody)], { type: 'application/json' }));
 
-  if (resume.files.resume) form.append('resumeFile', resume.files.resume);
-  if (resume.files.portfolio) form.append('portfolioFile', resume.files.portfolio);
+  // 프로필 이미지는 resumeFile로 전송 (BasicInfoForm에서 files.resume에 저장됨)
+  if (resume.files.resume) {
+    if (resume.files.resume instanceof File) {
+      form.append('resumeFile', resume.files.resume);
+      console.log(
+        '[CREATE RESUME] resumeFile 추가됨:',
+        resume.files.resume.name,
+        resume.files.resume.type,
+        resume.files.resume.size
+      );
+    } else {
+      console.warn(
+        '[CREATE RESUME] resume.files.resume이 File 객체가 아닙니다:',
+        resume.files.resume
+      );
+    }
+  } else {
+    console.warn('[CREATE RESUME] resumeFile이 없습니다!');
+  }
+
+  if (resume.files.portfolio) {
+    if (resume.files.portfolio instanceof File) {
+      form.append('portfolioFile', resume.files.portfolio);
+      console.log(
+        '[CREATE RESUME] portfolioFile 추가됨:',
+        resume.files.portfolio.name,
+        resume.files.portfolio.type,
+        resume.files.portfolio.size
+      );
+    } else {
+      console.warn(
+        '[CREATE RESUME] resume.files.portfolio가 File 객체가 아닙니다:',
+        resume.files.portfolio
+      );
+    }
+  } else {
+    console.warn('[CREATE RESUME] portfolioFile이 없습니다!');
+  }
 
   // ✅ 디버그(요청 전에 파일이 붙었는지 확정)
-  console.log('resume file:', resume.files.resume);
-  console.log('portfolio file:', resume.files.portfolio);
-  console.log('form.has(resumeFile)=', form.has('resumeFile'));
-  console.log('form.has(portfolioFile)=', form.has('portfolioFile'));
+  console.log('[CREATE RESUME] resume file:', resume.files.resume);
+  console.log('[CREATE RESUME] portfolio file:', resume.files.portfolio);
+  console.log('[CREATE RESUME] profileImage:', resume.profileImage);
+  console.log('[CREATE RESUME] form.has(resumeFile)=', form.has('resumeFile'));
+  console.log('[CREATE RESUME] form.has(portfolioFile)=', form.has('portfolioFile'));
 
   for (const [k, v] of form.entries()) {
     if (typeof v === 'string') {
-      console.log(`[form] ${k}:`, v);
+      console.log(`[CREATE RESUME] [form] ${k}:`, v.substring(0, 100) + '...');
     } else {
       // Blob/File
-      console.log(`[form] ${k}: Blob(type=${v.type}, size=${v.size})`);
-      if ('name' in v) console.log(`[form] ${k} filename:`, (v as File).name);
+      console.log(`[CREATE RESUME] [form] ${k}: Blob(type=${v.type}, size=${v.size})`);
+      if ('name' in v) console.log(`[CREATE RESUME] [form] ${k} filename:`, (v as File).name);
     }
   }
 
@@ -71,7 +108,8 @@ export async function getResume(resumeId: string): Promise<ResumeData> {
     name: data.name,
     gender: data.gender,
     birth: data.birthDate,
-    profileImage: 'https://via.placeholder.com/150?text=Profile',
+    // profileImage는 key이므로 presigned URL로 변환은 ResumeInfo에서 처리
+    profileImage: data.resumeImage || data.profileImageUrl || data.profileImage || '',
     email: data.email,
     phone: data.phone,
     applyDate: data.applyDate || '',
