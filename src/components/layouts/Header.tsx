@@ -254,9 +254,16 @@ const Header = () => {
             onClick={toggleNotiOpen}
             className="relative flex h-9 w-9 items-center justify-center rounded-full bg-white/10 hover:bg-white/15"
           >
-            <svg width="18" height="18" fill="currentColor">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="flex-shrink-0"
+            >
               <path d="M12 22a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2Zm6-6V11a6 6 0 1 0-12 0v5l-2 2v1h16v-1l-2-2Z" />
             </svg>
+
             {notices.some((n) => !n.readFlag) && (
               <span className="absolute top-[2px] right-[2px] h-2.5 w-2.5 rounded-full bg-[var(--color-jd-scarlet)]"></span>
             )}

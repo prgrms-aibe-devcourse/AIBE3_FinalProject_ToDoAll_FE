@@ -1,6 +1,6 @@
 import type { JobPost, JobStatus } from '../types/JobPost.types';
 import type { JobDetail } from '../types/JobDetail.types';
-
+import { BASE_URL } from '@/lib/utils/base';
 export type ApiResponse<T> = {
   errorCode?: number;
   message?: string;
@@ -31,7 +31,7 @@ type JobPostListItemResponse = {
 };
 
 export async function fetchJobPosts(page = 0, size = 10): Promise<JobPost[]> {
-  const res = await fetch(`http://localhost:8080/api/v1/jd?page=${page}&size=${size}`, {
+  const res = await fetch(`${BASE_URL}/api/v1/jd?page=${page}&size=${size}`, {
     method: 'GET',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -80,7 +80,11 @@ const toArray = (v?: string[] | string | null): string[] => {
     .filter(Boolean);
 };
 export async function fetchJobDetail(id: string): Promise<JobDetail> {
-  const res = await fetch(`http://localhost:8080/api/v1/jd/${id}`);
+  const res = await fetch(`${BASE_URL}/api/v1/jd/${id}`, {
+    method: 'GET',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+  });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const body = (await res.json()) as ApiResponse<JobDetailResponse>;
   const dto = body.data!;
@@ -125,7 +129,7 @@ export type JobCreateRequest = {
 };
 
 export async function createJobPost(request: JobCreateRequest): Promise<string> {
-  const res = await fetch(`http://localhost:8080/api/v1/jd`, {
+  const res = await fetch(`${BASE_URL}/api/v1/jd`, {
     method: 'POST',
     credentials: 'include',
     headers: {
@@ -145,7 +149,7 @@ export type Skill = {
 };
 
 export async function fetchSkills(): Promise<Skill[]> {
-  const res = await fetch('http://localhost:8080/api/v1/jd/skills', {
+  const res = await fetch(`${BASE_URL}/api/v1/jd/skills`, {
     method: 'GET',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -160,7 +164,7 @@ export async function fetchSkills(): Promise<Skill[]> {
 }
 
 export async function updateJobStatus(id: string | number, status: JobStatus) {
-  const res = await fetch(`http://localhost:8080/api/v1/jd/${id}/status`, {
+  const res = await fetch(`${BASE_URL}/api/v1/jd/${id}/status`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ status }),
@@ -175,7 +179,7 @@ export async function updateJobStatus(id: string | number, status: JobStatus) {
 }
 
 export async function updateJobPost(id: string | number, request: JobCreateRequest): Promise<void> {
-  const res = await fetch(`http://localhost:8080/api/v1/jd/${id}`, {
+  const res = await fetch(`${BASE_URL}/api/v1/jd/${id}`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
@@ -195,7 +199,7 @@ export async function updateJobThumbnail(jobId: string, thumbnailFile: File): Pr
   // 💡 백엔드 @RequestPart("thumbnailFile") 이름과 일치
   formData.append('thumbnailFile', thumbnailFile);
 
-  const res = await fetch(`http://localhost:8080/api/v1/jd/${jobId}/thumbnail`, {
+  const res = await fetch(`${BASE_URL}/api/v1/jd/${jobId}/thumbnail`, {
     method: 'PATCH', // 💡 HTTP 메서드는 PATCH
     credentials: 'include',
     // 🚨 Content-Type 헤더를 설정하지 않아야 합니다. 브라우저가 자동으로 multipart/form-data를 설정합니다.

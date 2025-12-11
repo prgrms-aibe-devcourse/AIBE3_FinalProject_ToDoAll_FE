@@ -4,7 +4,7 @@ import type { ResumeData } from '../types/resumes.types';
 
 type Props = {
   formData: ResumeData;
-  onChange: (_field: keyof ResumeData, _value: any) => void;
+  onChange: <K extends keyof ResumeData>(_field: K, _value: ResumeData[K]) => void;
 };
 
 export default function FileUploadForm({ formData, onChange }: Props) {
@@ -12,6 +12,8 @@ export default function FileUploadForm({ formData, onChange }: Props) {
   const [newFile, setNewFile] = useState<{ name: string; file?: File }>({ name: '' });
 
   const addPortfolioFile = () => {
+    console.log('[addPortfolioFile] newFile:', newFile);
+
     if (!newFile.file) {
       alert('파일을 선택해주세요.');
       return;
@@ -19,13 +21,16 @@ export default function FileUploadForm({ formData, onChange }: Props) {
 
     const displayName = newFile.name?.trim() || newFile.file.name;
 
-    // ✅ 포트폴리오 "1개만" 저장(덮어쓰기)
+    console.log('[addPortfolioFile] 업로드되는 file:', newFile.file);
+
     onChange('files', {
       ...formData.files,
-      portfolio: newFile.file, // ✅ 실제 업로드용 File
-      portfolioName: displayName, // ✅ 화면 표시용
-      portfolioKey: '', // ✅ 생성 전이니 비움
+      portfolio: newFile.file,
+      portfolioName: displayName,
+      portfolioKey: '',
     });
+
+    console.log('[addPortfolioFile] onChange 호출됨');
 
     setShowForm(false);
     setNewFile({ name: '', file: undefined });

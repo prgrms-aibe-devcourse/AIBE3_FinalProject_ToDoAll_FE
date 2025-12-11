@@ -1,32 +1,31 @@
 // src/features/resumes/data/resumes.api.ts
+
 import type { ResumeData } from '../types/resumes.types';
 import { convertToBackendRequest } from './resumes.mapper';
 
 const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8080').replace(/\/$/, '');
 
+// ---------------------------------------
+// CREATE RESUME (multipart/form-data)
+// ---------------------------------------
 export async function createResume(resume: ResumeData) {
-  const requestBody = convertToBackendRequest(resume);
+  // 1) 백엔드 DTO 형태로 변환
+  const dto = convertToBackendRequest(resume);
 
+  // 2) FormData 생성
   const form = new FormData();
-  form.append('data', new Blob([JSON.stringify(requestBody)], { type: 'application/json' }));
 
-  if (resume.files.resume) form.append('resumeFile', resume.files.resume);
-  if (resume.files.portfolio) form.append('portfolioFile', resume.files.portfolio);
+  // ✅ 2-1) DTO 전체를 JSON으로 묶어서 "data"라는 파트로 전송
+  form.append('data', new Blob([JSON.stringify(dto)], { type: 'application/json' }));
+  // (환경에 따라) 아래처럼 해도 동작 가능
+  // form.append('data', JSON.stringify(dto));
 
-  // ✅ 디버그(요청 전에 파일이 붙었는지 확정)
-  console.log('resume file:', resume.files.resume);
-  console.log('portfolio file:', resume.files.portfolio);
-  console.log('form.has(resumeFile)=', form.has('resumeFile'));
-  console.log('form.has(portfolioFile)=', form.has('portfolioFile'));
-
-  for (const [k, v] of form.entries()) {
-    if (typeof v === 'string') {
-      console.log(`[form] ${k}:`, v);
-    } else {
-      // Blob/File
-      console.log(`[form] ${k}: Blob(type=${v.type}, size=${v.size})`);
-      if ('name' in v) console.log(`[form] ${k} filename:`, (v as File).name);
-    }
+  // ✅ 2-2) 파일 파트 그대로 추가
+  if (resume.files.resume instanceof File) {
+    form.append('resumeFile', resume.files.resume);
+  }
+  if (resume.files.portfolio instanceof File) {
+    form.append('portfolioFile', resume.files.portfolio);
   }
 
   const res = await fetch(`${BASE_URL}/api/v1/resumes`, {
@@ -36,20 +35,23 @@ export async function createResume(resume: ResumeData) {
   });
 
   const text = await res.text();
-  console.log('status', res.status);
-  console.log('raw response', text);
-
-  let response: any = {};
+  let response: any;
   try {
     response = JSON.parse(text);
   } catch {
-    // JSON 파싱 실패 시 빈 객체 사용
+    response = { message: text };
   }
 
-  if (!res.ok) throw new Error(response?.message || text || '이력서 제출 실패');
+  if (!res.ok) {
+    throw new Error(response?.message || '이력서 제출 실패');
+  }
+
   return response.data;
 }
 
+// ---------------------------------------
+// GET RESUME
+// ---------------------------------------
 export async function getResume(resumeId: string): Promise<ResumeData> {
   const res = await fetch(`${BASE_URL}/api/v1/resumes/${resumeId}`, {
     method: 'GET',
@@ -59,7 +61,7 @@ export async function getResume(resumeId: string): Promise<ResumeData> {
 
   const response = await res.json();
 
-  if (response.message !== 'success') {
+  if (!res.ok) {
     throw new Error(response.message || '이력서 조회 실패');
   }
 
@@ -71,10 +73,12 @@ export async function getResume(resumeId: string): Promise<ResumeData> {
     name: data.name,
     gender: data.gender,
     birth: data.birthDate,
-    profileImage: 'https://via.placeholder.com/150?text=Profile',
+
+    profileImage: data.resumeImage || data.profileImageUrl || data.profileImage || '',
     email: data.email,
     phone: data.phone,
     applyDate: data.applyDate || '',
+
     address: {
       country: data.address || '대한민국',
       city: data.detailAddress || '',
@@ -93,9 +97,18 @@ export async function getResume(resumeId: string): Promise<ResumeData> {
         endDate: edu.graduationDate,
         dayTime: edu.attendanceType,
         gpa: edu.gpa,
+        maxGpa: edu.gpaScale,
       })) || [],
 
-    career: [],
+    career:
+      data.experience?.map((exp: any) => ({
+        company: exp.companyName,
+        department: exp.department,
+        position: exp.position,
+        startDate: exp.startDate,
+        endDate: exp.endDate,
+        job: '',
+      })) || [],
 
     experience:
       data.experience
@@ -106,6 +119,7 @@ export async function getResume(resumeId: string): Promise<ResumeData> {
 
     activities:
       data.activities?.map((act: any) => `${act.title} (${act.organization})`).join(', ') || '',
+
     certifications:
       data.certifications
         ?.map((cert: any) => `${cert.name} (${cert.type}, ${cert.scoreOrLevel})`)
@@ -136,6 +150,9 @@ export async function getResume(resumeId: string): Promise<ResumeData> {
   return resume;
 }
 
+// ---------------------------------------
+// UPDATE MEMO
+// ---------------------------------------
 export async function updateResumeMemo(resumeId: string, memo: string) {
   const res = await fetch(`${BASE_URL}/api/v1/resumes/${resumeId}/memo`, {
     method: 'PATCH',
@@ -146,18 +163,81 @@ export async function updateResumeMemo(resumeId: string, memo: string) {
 
   const response = await res.json();
 
-  if (response.errorCode !== 0) {
+  if (!res.ok) {
     throw new Error(response.message || '메모 저장 실패');
   }
 
   return response.data;
 }
 
+// ---------------------------------------
+// DELETE RESUME
+// ---------------------------------------
+export async function deleteResume(resumeId: string): Promise<void> {
+  const res = await fetch(`${BASE_URL}/api/v1/resumes/${resumeId}`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+  });
+
+  const response = await res.json();
+
+  if (!res.ok) {
+    throw new Error(response.message || '이력서 삭제 실패');
+  }
+}
+
+// ---------------------------------------
+// UPDATE RESUME STATUS
+// ---------------------------------------
+export async function updateResumeStatus(
+  resumeId: string,
+  status: 'NEW' | 'BOOKMARK' | 'SUBMITTED' | string
+) {
+  const res = await fetch(`${BASE_URL}/api/v1/resumes/${resumeId}/status`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ resumeStatus: status }),
+  });
+
+  const response = await res.json();
+
+  if (!res.ok) {
+    throw new Error(response.message || '이력서 상태 수정 실패');
+  }
+
+  return response.data;
+}
+
+// ---------------------------------------
+// GET RESUME INTERVIEW INFO
+// ---------------------------------------
+export async function getResumeInterviewInfo(resumeId: string) {
+  const res = await fetch(`${BASE_URL}/api/v1/resumes/${resumeId}/interview-info`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+  });
+
+  const response = await res.json();
+
+  if (!res.ok) {
+    throw new Error(response.message || '인터뷰 정보 조회 실패');
+  }
+
+  return response.data;
+}
+
+// ---------------------------------------
+// GET DOWNLOAD URL (Presigned URL)
+// ---------------------------------------
 export async function getDownloadUrl(fileKey: string): Promise<string> {
   const res = await fetch(
     `${BASE_URL}/api/v1/files/download?fileKey=${encodeURIComponent(fileKey)}`,
     { credentials: 'include' }
   );
+
   const response = await res.json();
   if (!res.ok) throw new Error(response.message || '다운로드 URL 발급 실패');
   return response.data;

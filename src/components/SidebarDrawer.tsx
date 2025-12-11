@@ -50,6 +50,25 @@ export default function SidebarDrawer({ open, onClose }: Props) {
       });
   }, []);
 
+  //  MyPage에서 브로드캐스트한 프로필 변경 이벤트 수신
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const custom = e as CustomEvent<string | null>;
+      const nextProfileUrl = custom.detail ?? null;
+
+      setUser((prev) => ({
+        nickname: prev?.nickname ?? '',
+        email: prev?.email ?? '',
+        profileUrl: nextProfileUrl,
+      }));
+    };
+
+    window.addEventListener('profile-updated', handler);
+    return () => {
+      window.removeEventListener('profile-updated', handler);
+    };
+  }, []);
+
   return (
     <>
       {/* 드로어 패널 */}

@@ -29,6 +29,24 @@ type MeResponse = {
   profileUrl?: string | null;
 };
 
+// 프로필 이미지 변경을 전역으로 알리는 이벤트 헬퍼
+function broadcastProfileUpdate(profileUrl: string | null | undefined) {
+  window.dispatchEvent(
+    new CustomEvent('profile-updated', {
+      detail: profileUrl ?? null,
+    })
+  );
+}
+
+// 전화번호 하이픈 자동 입력
+function formatPhone(value: string) {
+  const digits = value.replace(/\D/g, '');
+
+  if (digits.length < 4) return digits;
+  if (digits.length < 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+  return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7, 11)}`;
+}
+
 export default function MyPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -129,6 +147,9 @@ export default function MyPage() {
         setUser(nextUser);
         setForm(nextUser);
         syncPositionFromSource({ position: nextUser.position });
+
+        // 사이드바로 현재 프로필 이미지보내기
+        broadcastProfileUpdate(nextUser.profileUrl);
       })
       .catch((err) => {
         console.log('getMe 응답:', err);
@@ -312,14 +333,19 @@ export default function MyPage() {
       setUploading(true);
       const updated = (await uploadProfileImage(file)) as MeResponse;
 
+      const newProfileUrl = updated.profileUrl ?? user.profileUrl ?? '/images/default-profile.jpg';
+
       setUser((prev) => ({
         ...prev,
-        profileUrl: updated.profileUrl ?? prev.profileUrl,
+        profileUrl: newProfileUrl,
       }));
       setForm((f) => ({
         ...f,
-        profileUrl: updated.profileUrl ?? f.profileUrl,
+        profileUrl: newProfileUrl,
       }));
+
+      // 프로필 변경 이벤트 브로드캐스트
+      broadcastProfileUpdate(newProfileUrl);
     } catch (err) {
       console.error('프로필 이미지 업로드 실패:', err);
       showAlert('프로필 이미지 변경에 실패했습니다. 다시 시도해주세요.', 'success', '변경 실패');
@@ -340,14 +366,19 @@ export default function MyPage() {
       setRemoving(true);
       const updated = (await removeProfileImage()) as MeResponse;
 
+      const newProfileUrl = updated.profileUrl ?? '/images/default-profile.jpg';
+
       setUser((prev) => ({
         ...prev,
-        profileUrl: updated.profileUrl ?? prev.profileUrl,
+        profileUrl: newProfileUrl,
       }));
       setForm((f) => ({
         ...f,
-        profileUrl: updated.profileUrl ?? f.profileUrl,
+        profileUrl: newProfileUrl,
       }));
+
+      // [추가] 삭제 후에도 변경된 프로필을 브로드캐스트
+      broadcastProfileUpdate(newProfileUrl);
 
       showAlert('프로필 이미지가 기본 이미지로 변경되었습니다.', 'success', '삭제 완료');
     } catch (err) {
@@ -472,7 +503,10 @@ export default function MyPage() {
                 <input
                   name="phone"
                   value={form.phone}
-                  onChange={onInputChange}
+                  onChange={(e) => {
+                    const formatted = formatPhone(e.target.value);
+                    updateForm('phone', formatted);
+                  }}
                   className="rounded-md border px-3 py-2"
                   type="tel"
                   placeholder="예: 010-1234-5678"
@@ -505,7 +539,7 @@ export default function MyPage() {
                   name="gender"
                   value={form.gender}
                   onChange={onSelectChange}
-                  className="rounded-md border bg-white px-3 py-2"
+                  className="h-10 w-full rounded-md border bg-white px-3 py-2"
                 >
                   <option value="">(선택 없음)</option>
                   <option value="MALE">남성</option>
