@@ -3,7 +3,7 @@ import CustomSelect from './CustomSelect';
 
 type Props = {
   formData: ResumeData;
-  onChange: (_field: keyof ResumeData, _value: ResumeData[keyof ResumeData]) => void;
+  onChange: <K extends keyof ResumeData>(_field: K, _value: ResumeData[K]) => void;
 };
 
 export default function BasicInfoForm({ formData, onChange }: Props) {
@@ -106,20 +106,20 @@ export default function BasicInfoForm({ formData, onChange }: Props) {
                 const file = e.target.files?.[0];
                 if (!file) return;
 
-                // 1) 미리보기용 dataURL 저장 (기존 그대로)
+                // 1) 미리보기용 dataURL 저장
                 const reader = new FileReader();
                 reader.onload = () => {
                   onChange('profileImage', reader.result as string);
                 };
                 reader.readAsDataURL(file);
 
-                // 2) ✅ 업로드용: resume 파일로 저장 (핵심)
+                // 2) ✅ 업로드용: files.resume에 저장
+                //    (부모 handleChange가 files를 merge 처리하므로 "부분 객체"만 넘겨도 안전)
                 onChange('files', {
-                  ...formData.files,
                   resume: file,
                   resumeName: file.name,
                   resumeKey: '',
-                });
+                } as any);
 
                 // 같은 파일 다시 선택 가능하게 초기화(선택사항)
                 e.currentTarget.value = '';

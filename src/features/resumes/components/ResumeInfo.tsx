@@ -7,48 +7,109 @@ interface ResumeInfoProps {
 }
 
 export default function ResumeInfo({ data }: ResumeInfoProps) {
-  // ✅ 파일 표시용 텍스트 (File이면 name, 없으면 key/name 사용)
-  const resumeLabel = useMemo(() => {
-    const f = data.files?.resume;
-    if (f && typeof f === 'object' && 'name' in f) return (f as File).name;
-    return data.files?.resumeName || data.files?.resumeKey || '';
-  }, [data]);
-
   const portfolioLabel = useMemo(() => {
     const f = data.files?.portfolio;
     if (f && typeof f === 'object' && 'name' in f) return (f as File).name;
     return data.files?.portfolioName || data.files?.portfolioKey || '';
   }, [data]);
 
-  // ✅ 다운로드 링크(presigned url) 만들기 (fileKey가 있을 때만)
-  const [resumeHref, setResumeHref] = useState<string>('');
+  const [profileHref, setProfileHref] = useState<string>('');
+  const [_resumeHref, setResumeHref] = useState<string>('');
   const [portfolioHref, setPortfolioHref] = useState<string>('');
+
+  const [resumeObjectUrl, setResumeObjectUrl] = useState<string>('');
 
   useEffect(() => {
     let alive = true;
 
     async function load() {
-      // resume
-      if (data.files?.resumeKey) {
-        try {
-          const url = await getDownloadUrl(data.files.resumeKey);
-          if (alive) setResumeHref(url);
-        } catch {
-          if (alive) setResumeHref('');
-        }
-      } else {
+      console.groupCollapsed('[ResumeInfo] load');
+      console.log('files.resume:', data.files?.resume);
+      console.log('files.resumeKey:', data.files?.resumeKey);
+      console.log('files.portfolio:', data.files?.portfolio);
+      console.log('files.portfolioKey:', data.files?.portfolioKey);
+      console.log('profileImage:', data.profileImage);
+      console.groupEnd();
+
+      // 초기화
+      if (alive) {
+        setProfileHref('');
         setResumeHref('');
+        setPortfolioHref('');
       }
 
-      // portfolio
-      if (data.files?.portfolioKey) {
+      /** ----------------------------------------------------
+       * 1) 프로필 사진은 "resumefileurl" (=resumeKey or resume File)로만 만든다
+       *  - Preview/Success: files.resume = File
+       *  - Detail: files.resumeKey = key
+       * ---------------------------------------------------- */
+      // A) File이면 objectURL로 프로필 + 자기소개서 링크 둘 다 설정
+      if (data.files?.resume && data.files.resume instanceof File) {
+        const objUrl = URL.createObjectURL(data.files.resume);
+        if (!alive) return;
+        setResumeObjectUrl(objUrl); // cleanup용 저장
+        setProfileHref(objUrl);
+        setResumeHref(objUrl);
+      }
+      // B) key면 presigned로 프로필 + 자기소개서 링크 둘 다 설정
+      else if (data.files?.resumeKey) {
+        try {
+          const url = await getDownloadUrl(data.files.resumeKey);
+          if (!alive) return;
+          setProfileHref(url);
+          setResumeHref(url);
+        } catch (e) {
+          console.error('[ResumeInfo] resumeKey presigned failed:', e);
+          if (!alive) return;
+          setProfileHref('');
+          setResumeHref('');
+        }
+      }
+      // C) 둘 다 없으면 profileImage 확인 (key일 수도 있음)
+      else {
+        const p = data.profileImage || '';
+        if (p) {
+          // 이미 URL인 경우
+          if (p.startsWith('http://') || p.startsWith('https://') || p.startsWith('data:')) {
+            if (!alive) return;
+            setProfileHref(p);
+          } else {
+            // key인 경우 presigned URL로 변환
+            try {
+              const url = await getDownloadUrl(p);
+              if (!alive) return;
+              setProfileHref(url);
+            } catch (e) {
+              console.error('[ResumeInfo] profileImage presigned failed:', e);
+              if (!alive) return;
+              setProfileHref('');
+            }
+          }
+        }
+      }
+
+      /** ----------------------------------------------------
+       *  2) 포트폴리오 링크
+       * ---------------------------------------------------- */
+      // File(미리보기/제출완료)면 objectURL
+      if (data.files?.portfolio && data.files.portfolio instanceof File) {
+        const objUrl = URL.createObjectURL(data.files.portfolio);
+        if (!alive) return;
+        setPortfolioHref(objUrl);
+        // portfolio objectURL은 따로 저장/정리 안 했는데,
+        // 필요하면 resumeObjectUrl처럼 별도 state로 관리해도 됨.
+      } else if (data.files?.portfolioKey) {
         try {
           const url = await getDownloadUrl(data.files.portfolioKey);
-          if (alive) setPortfolioHref(url);
-        } catch {
-          if (alive) setPortfolioHref('');
+          if (!alive) return;
+          setPortfolioHref(url);
+        } catch (e) {
+          console.error('[ResumeInfo] portfolioKey presigned failed:', e);
+          if (!alive) return;
+          setPortfolioHref('');
         }
       } else {
+        if (!alive) return;
         setPortfolioHref('');
       }
     }
@@ -57,22 +118,40 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
     return () => {
       alive = false;
     };
-  }, [data.files?.resumeKey, data.files?.portfolioKey]);
+    // resume/portfolio가 File일 수도 있어서 deps에 포함
+  }, [
+    data.files?.resume,
+    data.files?.resumeKey,
+    data.files?.portfolio,
+    data.files?.portfolioKey,
+    data.profileImage,
+  ]);
 
-  const profileSrc = data.profileImage || ''; // 빈 문자열이면 아래에서 렌더 안 함
+  useEffect(() => {
+    return () => {
+      if (resumeObjectUrl) URL.revokeObjectURL(resumeObjectUrl);
+    };
+  }, [resumeObjectUrl]);
 
   return (
     <div>
       <h2 className="text-[30px] font-semibold text-[#413F3F]">지원서</h2>
+
       <div className="relative rounded-2xl bg-white p-6 shadow">
-        {/* ✅ 프로필 이미지: src="" 방지 */}
-        {profileSrc ? (
+        {/* 프로필: resumefileurl 기반(profileHref) */}
+        {profileHref ? (
           <img
-            src={profileSrc}
+            src={profileHref}
             alt={`${data.name} 프로필`}
             className="absolute top-6 right-6 h-48 w-36 rounded-[10px] object-cover shadow-md"
+            onError={() => console.error('[PROFILE] load fail:', profileHref)}
+            onLoad={() => console.log('[PROFILE] load ok:', profileHref)}
           />
-        ) : null}
+        ) : (
+          <div className="absolute top-6 right-6 flex h-48 w-36 items-center justify-center rounded-[10px] bg-gray-200 text-xs text-gray-400">
+            프로필 없음
+          </div>
+        )}
 
         {/* 이름 / 직무 */}
         <header className="mb-8 flex items-center justify-between">
@@ -107,31 +186,7 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
         {/* 파일 섹션 */}
         <section className="mt-6 flex flex-row gap-2">
           <div className="flex-1 rounded-[10px] border border-[#E3DBDB] p-5">
-            <h2 className="font-semibold text-[#413F3F]">자기소개서</h2>
-
-            {/* ✅ File 객체를 직접 렌더하지 말고 label만 */}
-            {resumeLabel ? (
-              resumeHref ? (
-                <a
-                  href={resumeHref}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="font-light text-[#413F3F] hover:text-[#2E2C2C] hover:underline"
-                >
-                  {resumeLabel}
-                </a>
-              ) : (
-                <span className="font-light text-[#413F3F]">{resumeLabel}</span>
-              )
-            ) : (
-              <p className="text-sm text-[#837C7C]">자기소개서가 없습니다.</p>
-            )}
-          </div>
-
-          <div className="flex-1 rounded-[10px] border border-[#E3DBDB] p-5">
             <h2 className="font-semibold text-[#413F3F]">포트폴리오</h2>
-
-            {/* ✅ File 객체를 직접 렌더하지 말고 label만 */}
             {portfolioLabel ? (
               portfolioHref ? (
                 <a
