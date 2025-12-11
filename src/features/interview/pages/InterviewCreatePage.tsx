@@ -37,11 +37,20 @@ export default function InterviewCreatePage() {
     createReq?.body
   );
 
-  // POST 요청 결과 처리
-  useEffect(() => {
-    if (!createdInterview) return;
-    navigate('/interview/manage');
-  }, [createdInterview]);
+  // invites API 호출용 상태
+  const [inviteReq, setInviteReq] = useState<{
+    url: string;
+    method: string;
+    body: any;
+  } | null>(null);
+
+  const { resData: inviteResponse } = useFetch<{ resumeId: number }>(
+    inviteReq?.url || '',
+    null,
+    inviteReq?.method,
+    undefined,
+    inviteReq?.body
+  );
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -50,6 +59,41 @@ export default function InterviewCreatePage() {
 
   const [invited, setInvited] = useState<Interviewer[]>([]);
   const [search, setSearch] = useState('');
+
+  // 면접 생성 후 invites API 호출
+  useEffect(() => {
+    // createdInterview가 없으면 아무것도 하지 않음 (초기 로드 시 null)
+    if (!createdInterview) return;
+
+    // API 응답 구조: { interviewId: 13 }
+    const interviewId = createdInterview.interviewId || createdInterview.id;
+
+    if (!interviewId) {
+      console.warn('[InterviewCreatePage] interviewId를 찾을 수 없습니다:', createdInterview);
+      return;
+    }
+
+    console.log(
+      '[InterviewCreatePage] 면접 생성 완료, invites API 호출:',
+      interviewId,
+      invited,
+      resumeId
+    );
+    setInviteReq({
+      url: `/api/v1/interviews/${interviewId}/invites`,
+      method: 'POST',
+      body: {
+        resumeId: Number(resumeId),
+        participantIds: invited.map((i) => i.id),
+      },
+    });
+  }, [createdInterview, invited]);
+
+  // invites API 응답 처리 후 이동
+  useEffect(() => {
+    if (!inviteResponse) return;
+    navigate('/interview/manage');
+  }, [inviteResponse, navigate]);
 
   // 면접관 필터링
   const invitedIds = invited.map((i) => i.id);
