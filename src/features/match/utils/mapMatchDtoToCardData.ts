@@ -1,15 +1,17 @@
 import type { MatchListResponseDto } from '../types/match.types';
 import type { MatchCardData } from '../types/matchCardData.types';
 
-export function mapMatchDtoToCardData(dto: MatchListResponseDto): MatchCardData {
+export const mapMatchDtoToCardData = (dto: MatchListResponseDto): MatchCardData => {
   return {
     resumeId: dto.resumeId,
     name: dto.resumeName,
     profileImage: dto.resumeProfileImage,
     experience: null,
     skills: [],
-    summary: dto.resumeSummary ?? null,
+    summary: dto.resumeSummary,
     career: [],
-    matchScore: dto.matchScore ?? 0,
+    matchScore: dto.matchScore,
+    status: dto.status,
+    skillMatchRate: dto.skillMatchRate,
   };
-}
+};

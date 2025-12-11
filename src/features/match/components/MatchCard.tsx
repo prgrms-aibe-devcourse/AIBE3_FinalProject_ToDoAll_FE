@@ -1,25 +1,71 @@
 import emptyHeartImg from '../../../assets/Favorite-2.png';
 import fullHeartImg from '../../../assets/Heart.png';
 import { useState } from 'react';
-import type { MatchCardData } from '../types/matchCardData.types';
+import type { MatchCardData } from '../../match/types/matchCardData.types';
 
 type Props = {
   resume: MatchCardData;
   matchRate: number;
+  tab: 'recommended' | 'all';
   onView: () => void;
   onInvite: () => void;
 };
 
-export default function MatchCard({ resume, matchRate = 50, onView, onInvite }: Props) {
+export default function MatchCard({ resume, matchRate, tab, onView, onInvite }: Props) {
   const [checked, setChecked] = useState(false);
 
   const handleBookmark = () => {
-    setChecked(!checked);
+    setChecked((prev) => !prev);
   };
+
+  const numericRate =
+    resume.skillMatchRate != null && resume.skillMatchRate !== ''
+      ? parseFloat(resume.skillMatchRate)
+      : matchRate;
+
+  const rateLabel =
+    resume.skillMatchRate != null && resume.skillMatchRate !== ''
+      ? resume.skillMatchRate
+      : `${matchRate}%`;
+
+  let statusLabel: string | null = null;
+  let statusClass = 'bg-[#9CA3AF]';
+
+  if (tab === 'all' && resume.status) {
+    switch (resume.status) {
+      case 'RECOMMENDED':
+        statusLabel = '추천';
+        statusClass = 'bg-[#F7A534]';
+        break;
+      case 'APPLIED':
+        statusLabel = '지원';
+        statusClass = 'bg-[#6B7280]';
+        break;
+      case 'CONFIRMED':
+        statusLabel = '매칭 확정';
+        statusClass = 'bg-[#4CAF50]';
+        break;
+      case 'BOOKMARK':
+        statusLabel = '북마크';
+        statusClass = 'bg-[#3B82F6]';
+        break;
+      case 'HOLD':
+        statusLabel = '보류';
+        statusClass = 'bg-[#F97316]';
+        break;
+      case 'REJECTED':
+        statusLabel = '거절';
+        statusClass = 'bg-[#EF4444]';
+        break;
+      default:
+        statusLabel = resume.status;
+    }
+  }
 
   return (
     <div className="relative mx-auto flex w-full rounded-2xl bg-white p-6 shadow-md transition hover:shadow-lg">
       <div className="flex w-full items-start gap-4 pr-[160px]">
+        {/* 프로필 이미지 */}
         <img
           src={resume.profileImage || '/default-profile.png'}
           alt={resume.name}
@@ -28,28 +74,39 @@ export default function MatchCard({ resume, matchRate = 50, onView, onInvite }: 
 
         <div className="flex w-full flex-col justify-between">
           <div>
+            {/* 이름 + 상태 배지 */}
             <div className="mb-1 flex items-center gap-2">
               <h2 className="text-[24px] font-semibold text-[#413F3F]">{resume.name}</h2>
-              <span className="rounded-full bg-[#F7A534] px-2 py-[2px] text-xs font-semibold text-white">
-                추천
-              </span>
+
+              {tab === 'recommended' && (
+                <span className="rounded-full bg-[#F7A534] px-2 py-[2px] text-xs font-semibold text-white">
+                  추천
+                </span>
+              )}
+
+              {tab === 'all' && statusLabel && (
+                <span
+                  className={`rounded-full px-2 py-[2px] text-xs font-semibold text-white ${statusClass}`}
+                >
+                  {statusLabel}
+                </span>
+              )}
             </div>
-
-            <p className="mb-3 text-[#837C7C]">{resume.experience}</p>
-
-            <div className="mb-3 items-center gap-4">
+            {/* 기술 매칭률 */}
+            <div className="mb-3">
               <div className="mb-3 flex items-center gap-4">
                 <div className="text-m font-medium text-[#413F3F]">기술 매칭률</div>
-                <div className="px-[120px] text-2xl font-semibold text-[#DE4F36]">{matchRate}%</div>
+                <div className="text-2xl font-semibold text-[#DE4F36]">{rateLabel}</div>
               </div>
               <div className="h-2 w-64 rounded-full bg-[#E3DBDB]">
                 <div
                   className="h-2 rounded-full bg-[#DE4F36] transition-all"
-                  style={{ width: `${matchRate}%` }}
+                  style={{ width: `${numericRate}%` }}
                 />
               </div>
             </div>
 
+            {/* 이력서 요약 */}
             {resume.summary && (
               <div className="mt-4">
                 <div className="text-m mb-1 font-medium text-[#413F3F]">지원자 이력서 요약</div>
@@ -58,26 +115,18 @@ export default function MatchCard({ resume, matchRate = 50, onView, onInvite }: 
                 </p>
               </div>
             )}
-
-            {resume.career && resume.career.length > 0 && (
-              <ul className="mt-4 list-inside list-disc text-sm text-[#837C7C]">
-                {resume.career.map((c, idx) => (
-                  <li key={idx}>
-                    {c.company} / {c.position} / {c.department}
-                  </li>
-                ))}
-              </ul>
-            )}
           </div>
         </div>
       </div>
 
+      {/* 북마크 버튼 */}
       <div className="absolute top-6 right-6 flex flex-col items-end gap-2">
         <button onClick={handleBookmark} className="rounded-full transition">
           <img src={checked ? fullHeartImg : emptyHeartImg} alt="heart" className="h-5 w-5" />
         </button>
       </div>
 
+      {/* 보류 / 면접초대 */}
       <div className="absolute right-6 bottom-6 flex gap-2">
         <button
           onClick={onView}
