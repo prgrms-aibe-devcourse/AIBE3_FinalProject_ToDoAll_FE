@@ -12,6 +12,8 @@ export default function FileUploadForm({ formData, onChange }: Props) {
   const [newFile, setNewFile] = useState<{ name: string; file?: File }>({ name: '' });
 
   const addPortfolioFile = () => {
+    console.log('[addPortfolioFile] newFile:', newFile);
+
     if (!newFile.file) {
       alert('파일을 선택해주세요.');
       return;
@@ -19,12 +21,16 @@ export default function FileUploadForm({ formData, onChange }: Props) {
 
     const displayName = newFile.name?.trim() || newFile.file.name;
 
-    // ✅ files는 부분 객체만 넘겨도 OK (부모에서 merge)
+    console.log('[addPortfolioFile] 업로드되는 file:', newFile.file);
+
     onChange('files', {
+      ...formData.files,
       portfolio: newFile.file,
       portfolioName: displayName,
       portfolioKey: '',
-    } as any);
+    });
+
+    console.log('[addPortfolioFile] onChange 호출됨');
 
     setShowForm(false);
     setNewFile({ name: '', file: undefined });
