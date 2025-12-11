@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 import MatchFilterSection from '../components/MatchFilterSection';
 import MatchCard from '../components/MatchCard';
@@ -15,7 +15,7 @@ import type { MatchCardData } from '../types/matchCardData.types';
 
 export default function MatchListPage() {
   const navigate = useNavigate();
-
+  const location = useLocation();
   const [resumes, setResumes] = useState<MatchCardData[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -32,6 +32,13 @@ export default function MatchListPage() {
 
   const [searchTrigger, setSearchTrigger] = useState(0); // 검색 버튼 눌렀을 때만 조회
 
+  useEffect(() => {
+    const state = location.state as { jdId?: number } | null;
+    if (state?.jdId != null) {
+      setJobId(state.jdId);
+      setSearchTrigger((prev) => prev + 1);
+    }
+  }, [location.state]);
   // 조회 로직 — 검색 버튼 눌렀을 때만 실행됨
   useEffect(() => {
     if (jdId === null) {
@@ -84,6 +91,7 @@ export default function MatchListPage() {
       </h1>
 
       <MatchFilterSection
+        initialJobId={jdId}
         onSearch={() => {
           setSearchTrigger((prev) => prev + 1);
           setPage(0);

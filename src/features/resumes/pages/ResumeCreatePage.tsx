@@ -6,6 +6,8 @@ import ResumeForm from '../components/ResumeForm';
 import { createResume } from '../data/resumes.api';
 import { getJobDescription } from '../data/jd.api';
 
+// (상단 import 동일)
+
 const DRAFT_KEY = (jdId: number) => `resumeDraft:${jdId}`;
 
 export default function ResumeCreatePage() {
@@ -46,7 +48,7 @@ export default function ResumeCreatePage() {
     memo: '',
   });
 
-  // ✅ 공고명 불러오기
+  // 🔹 공고명 로드
   useEffect(() => {
     async function fetchJD() {
       if (!jdId || isNaN(jdId)) return;
@@ -60,7 +62,7 @@ export default function ResumeCreatePage() {
     fetchJD();
   }, [jdId]);
 
-  // ✅ 페이지 진입 시 draft 복원
+  // 🔹 draft 복원
   useEffect(() => {
     if (!jdId || isNaN(jdId)) return;
 
@@ -70,7 +72,6 @@ export default function ResumeCreatePage() {
     try {
       const saved = JSON.parse(raw) as ResumeData;
 
-      // File은 직렬화 불가 -> null로 복원 (텍스트/리스트만 복원)
       setFormData((prev) => ({
         ...prev,
         ...saved,
@@ -78,9 +79,6 @@ export default function ResumeCreatePage() {
         files: {
           ...prev.files,
           ...saved.files,
-          resume: null,
-          portfolio: null,
-          etc: [],
         },
       }));
     } catch {
@@ -88,26 +86,25 @@ export default function ResumeCreatePage() {
     }
   }, [jdId]);
 
+  // 🔹 draft 저장
+  // 수정된 saveDraft (파일을 건드리지 않음)
   const saveDraft = (next: ResumeData) => {
     if (!jdId || isNaN(jdId)) return;
 
     const toSave: ResumeData = {
       ...next,
       jdId,
+      // ❌ files 안에서 resume/portfolio 를 null로 덮어쓰지 말 것
       files: {
         ...next.files,
-        // File 객체는 저장 불가라 null 처리
-        resume: null,
-        portfolio: null,
-        etc: [],
+        // etc: []  // 이것도 굳이 초기화 안 해도 됨. 필요하면 유지.
       },
     };
 
     localStorage.setItem(DRAFT_KEY(jdId), JSON.stringify(toSave));
   };
 
-  // ✅ 입력 변경 시: state 업데이트 + 즉시 draft 저장
-  // ✅ files는 "merge" 처리 (핵심 수정)
+  // 🔹 필드 업데이트 + draft 저장
   const handleChange = <K extends keyof ResumeData>(field: K, value: ResumeData[K]) => {
     setFormData((prev) => {
       const next =
@@ -116,7 +113,7 @@ export default function ResumeCreatePage() {
               ...prev,
               files: {
                 ...prev.files,
-                ...(value as ResumeData['files']),
+                ...(value as ResumeData['files']), // 🔥 files 정확 merge
               },
             } as ResumeData)
           : ({ ...prev, [field]: value } as ResumeData);
@@ -126,18 +123,13 @@ export default function ResumeCreatePage() {
     });
   };
 
+  // 🔹 제출
   const handleSubmit = async () => {
-    // 제출 전 파일 확인
-    console.log('[SUBMIT] 제출 전 formData.files:', formData.files);
-    console.log('[SUBMIT] resume 파일:', formData.files.resume);
-    console.log('[SUBMIT] portfolio 파일:', formData.files.portfolio);
-    console.log('[SUBMIT] resume instanceof File:', formData.files.resume instanceof File);
-    console.log('[SUBMIT] portfolio instanceof File:', formData.files.portfolio instanceof File);
+    console.log('[SUBMIT] formData.files:', formData.files);
 
     try {
       const result = await createResume(formData);
 
-      // ✅ 제출 성공하면 draft 삭제
       if (jdId && !isNaN(jdId)) {
         localStorage.removeItem(DRAFT_KEY(jdId));
       }
@@ -167,13 +159,13 @@ export default function ResumeCreatePage() {
         <h2 className="mb-2 text-center text-[20px] font-light text-[#837C7C]">
           {jobTitle || '공고 불러오는 중...'}
         </h2>
+
         <h1 className="mb-8 text-center text-[30px] font-semibold text-[#413F3F]">지원서</h1>
 
         <h2 className="mb-2 text-[20px] font-medium text-[#413F3F]">
           기본 정보 <span className="mb-3 text-[14px] font-medium text-[#DE4F36]">*필수</span>
         </h2>
 
-        {/* ✅ onChange 타입/동작 통일 */}
         <BasicInfoForm formData={formData} onChange={handleChange} />
         <ResumeForm formData={formData} onChange={handleChange} />
 

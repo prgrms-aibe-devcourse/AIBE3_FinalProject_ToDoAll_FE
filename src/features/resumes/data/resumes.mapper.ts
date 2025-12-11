@@ -1,101 +1,69 @@
 // src/features/resumes/data/resumes.mapper.ts
-import type { ResumeData, EducationItem, Skill } from '../types/resumes.types';
+import type { ResumeData } from '../types/resumes.types';
 
-function mapEducationLevel(type: EducationItem['type']) {
-  switch (type) {
-    case '초등학교':
-      return 'ELEMENTARY';
-    case '중학교':
-      return 'MIDDLE';
-    case '고등학교':
-      return 'HIGH';
-    default:
-      return 'UNIVERSITY_ABOVE';
-  }
-}
-
-function mapAttendanceType(dayTime?: 'DAY' | 'NIGHT') {
-  return dayTime === 'NIGHT' ? 'NIGHT' : 'DAY';
-}
-
-function mapProficiencyLevel(level: Skill['level']) {
-  switch (level) {
-    case '초급':
-      return 'BEGINNER';
-    case '중급':
-      return 'INTERMEDIATE';
-    default:
-      return 'EXPERT';
-  }
-}
-
-function mapActivityType() {
-  return 'ACTIVITY';
-}
-function mapCertificationType() {
-  return 'LICENSE';
-}
-
-export function convertToBackendRequest(form: ResumeData) {
+export function convertToBackendRequest(resume: ResumeData) {
   return {
-    name: form.name,
-    jobDescriptionId: form.jdId,
-    gender: form.gender === '남' ? 'M' : 'F',
-    birthDate: form.birth,
-    email: form.email,
-    phone: form.phone,
-    address: form.address.city,
-    detailAddress: form.address.detail,
+    name: resume.name,
+    jobDescriptionId: resume.jdId,
+    gender: resume.gender,
+    birthDate: resume.birth,
 
-    // ✅ multipart로 파일을 보내므로 JSON에는 null
-    resumeFileUrl: null,
-    portfolioFileUrl: null,
+    email: resume.email,
+    phone: resume.phone,
 
-    education: form.education.map((e) => ({
-      educationLevel: mapEducationLevel(e.type),
+    address: resume.address.detail,
+    detailAddress: resume.address.city,
+
+    // JSON 배열로 전달해야 함
+    education: resume.education.map((e) => ({
+      educationLevel: e.type,
       schoolName: e.name,
-      major: e.type === '대학' || e.type === '대학원' ? e.major : null,
-      isGraduated: e.graduated,
-      admissionDate: e.startDate,
-      graduationDate: e.endDate,
-      attendanceType:
-        e.type === '대학' || e.type === '대학원' ? mapAttendanceType(e.dayTime) : null,
-      gpa: e.type === '대학' || e.type === '대학원' ? Number(e.gpa) || null : null,
-      gpaScale: e.type === '대학' || e.type === '대학원' ? Number(e.maxGpa) || null : null,
+      major: e.major ?? '',
+      isGraduated: Boolean(e.graduated),
+      admissionDate: e.startDate || null,
+      graduationDate: e.endDate || null,
+      attendanceType: e.dayTime || 'DAY',
+      gpa: e.gpa ? Number(e.gpa) : 0,
+      gpaScale: e.maxGpa ? Number(e.maxGpa) : 0,
     })),
 
-    experience:
-      form.career?.map((c) => ({
-        companyName: c.company,
-        department: c.department,
-        position: c.position,
-        startDate: c.startDate,
-        endDate: c.endDate,
-      })) ?? [],
+    experience: resume.career.map((c) => ({
+      companyName: c.company,
+      department: c.department,
+      position: c.position,
+      startDate: c.startDate,
+      endDate: c.endDate,
+    })),
 
-    skills: form.skills.map((s) => ({
+    skills: resume.skills.map((s) => ({
       skillName: s.name,
-      proficiencyLevel: mapProficiencyLevel(s.level),
+      proficiencyLevel:
+        s.level === '초급' ? 'BEGINNER' : s.level === '중급' ? 'INTERMEDIATE' : 'ADVANCED',
     })),
 
-    activities:
-      form.activities
-        ?.split('\n')
-        .filter(Boolean)
-        .map((t) => ({
-          title: t,
-          type: mapActivityType(),
-          organization: '',
-        })) ?? [],
+    activities: resume.activities
+      .split(',')
+      .map((v) => v.trim())
+      .filter((v) => v.length)
+      .map((v) => ({
+        title: v,
+        type: 'ACTIVITY',
+        organization: '',
+      })),
 
-    certifications:
-      form.certifications
-        ?.split('\n')
-        .filter(Boolean)
-        .map((t) => ({
-          name: t,
-          type: mapCertificationType(),
-          scoreOrLevel: '',
-        })) ?? [],
+    certifications: resume.certifications
+      .split(',')
+      .map((v) => v.trim())
+      .filter((v) => v.length)
+      .map((v) => ({
+        name: v,
+        type: 'LICENSE',
+        scoreOrLevel: '',
+      })),
+
+    // 🔥 파일 키 (기존 파일이 있고 새 파일을 업로드하지 않는 경우에만 전송)
+    // 새 파일을 업로드하면 백엔드에서 S3에 업로드하고 새 키를 생성하므로 불필요
+    resumeFileUrl: resume.files.resumeKey || '',
+    portfolioFileUrl: resume.files.portfolioKey || '',
   };
 }
