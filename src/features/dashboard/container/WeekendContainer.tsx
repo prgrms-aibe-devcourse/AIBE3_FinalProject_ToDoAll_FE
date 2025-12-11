@@ -50,6 +50,8 @@ export default function WeekendContainer() {
     }, 0);
 
     if (sum > 0) isBlank.current = false;
+
+    console.log(isBlank.current);
   }, [resData]);
 
   return (
