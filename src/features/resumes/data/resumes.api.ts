@@ -1,9 +1,16 @@
 // src/features/resumes/data/resumes.api.ts
+/* global HeadersInit */
 
 import type { ResumeData } from '../types/resumes.types';
 import { convertToBackendRequest } from './resumes.mapper';
 
 const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8080').replace(/\/$/, '');
+
+// 인증 헤더 가져오기
+function getAuthHeaders(): HeadersInit {
+  const token = localStorage.getItem('accessToken');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
 
 // ---------------------------------------
 // CREATE RESUME (multipart/form-data)
@@ -30,6 +37,7 @@ export async function createResume(resume: ResumeData) {
 
   const res = await fetch(`${BASE_URL}/api/v1/resumes`, {
     method: 'POST',
+    headers: getAuthHeaders(),
     body: form,
     credentials: 'include',
   });
@@ -55,7 +63,10 @@ export async function createResume(resume: ResumeData) {
 export async function getResume(resumeId: string): Promise<ResumeData> {
   const res = await fetch(`${BASE_URL}/api/v1/resumes/${resumeId}`, {
     method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders(),
+    },
     credentials: 'include',
   });
 
@@ -156,7 +167,10 @@ export async function getResume(resumeId: string): Promise<ResumeData> {
 export async function updateResumeMemo(resumeId: string, memo: string) {
   const res = await fetch(`${BASE_URL}/api/v1/resumes/${resumeId}/memo`, {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders(),
+    },
     credentials: 'include',
     body: JSON.stringify({ memo }),
   });
@@ -176,7 +190,10 @@ export async function updateResumeMemo(resumeId: string, memo: string) {
 export async function deleteResume(resumeId: string): Promise<void> {
   const res = await fetch(`${BASE_URL}/api/v1/resumes/${resumeId}`, {
     method: 'DELETE',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders(),
+    },
     credentials: 'include',
   });
 
@@ -196,7 +213,10 @@ export async function updateResumeStatus(
 ) {
   const res = await fetch(`${BASE_URL}/api/v1/resumes/${resumeId}/status`, {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders(),
+    },
     credentials: 'include',
     body: JSON.stringify({ resumeStatus: status }),
   });
@@ -216,7 +236,10 @@ export async function updateResumeStatus(
 export async function getResumeInterviewInfo(resumeId: string) {
   const res = await fetch(`${BASE_URL}/api/v1/resumes/${resumeId}/interview-info`, {
     method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders(),
+    },
     credentials: 'include',
   });
 
@@ -235,7 +258,10 @@ export async function getResumeInterviewInfo(resumeId: string) {
 export async function getDownloadUrl(fileKey: string): Promise<string> {
   const res = await fetch(
     `${BASE_URL}/api/v1/files/download?fileKey=${encodeURIComponent(fileKey)}`,
-    { credentials: 'include' }
+    {
+      headers: getAuthHeaders(),
+      credentials: 'include',
+    }
   );
 
   const response = await res.json();
