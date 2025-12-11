@@ -38,6 +38,15 @@ function broadcastProfileUpdate(profileUrl: string | null | undefined) {
   );
 }
 
+// 전화번호 하이픈 자동 입력
+function formatPhone(value: string) {
+  const digits = value.replace(/\D/g, '');
+
+  if (digits.length < 4) return digits;
+  if (digits.length < 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+  return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7, 11)}`;
+}
+
 export default function MyPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -494,7 +503,10 @@ export default function MyPage() {
                 <input
                   name="phone"
                   value={form.phone}
-                  onChange={onInputChange}
+                  onChange={(e) => {
+                    const formatted = formatPhone(e.target.value);
+                    updateForm('phone', formatted);
+                  }}
                   className="rounded-md border px-3 py-2"
                   type="tel"
                   placeholder="예: 010-1234-5678"
