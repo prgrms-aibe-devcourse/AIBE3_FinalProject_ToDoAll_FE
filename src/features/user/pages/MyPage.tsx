@@ -29,7 +29,7 @@ type MeResponse = {
   profileUrl?: string | null;
 };
 
-// [추가] 프로필 이미지 변경을 전역으로 알리는 이벤트 헬퍼
+// 프로필 이미지 변경을 전역으로 알리는 이벤트 헬퍼
 function broadcastProfileUpdate(profileUrl: string | null | undefined) {
   window.dispatchEvent(
     new CustomEvent('profile-updated', {
@@ -368,7 +368,7 @@ export default function MyPage() {
         profileUrl: newProfileUrl,
       }));
 
-      // 삭제 후에도 변경된 프로필을 브로드캐스트
+      // [추가] 삭제 후에도 변경된 프로필을 브로드캐스트
       broadcastProfileUpdate(newProfileUrl);
 
       showAlert('프로필 이미지가 기본 이미지로 변경되었습니다.', 'success', '삭제 완료');
@@ -527,7 +527,7 @@ export default function MyPage() {
                   name="gender"
                   value={form.gender}
                   onChange={onSelectChange}
-                  className="rounded-md border bg-white px-3 py-2"
+                  className="h-10 w-full rounded-md border bg-white px-3 py-2"
                 >
                   <option value="">(선택 없음)</option>
                   <option value="MALE">남성</option>
