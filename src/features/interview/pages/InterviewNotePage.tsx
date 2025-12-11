@@ -17,6 +17,7 @@ import {
 
 // 내 정보 조회용
 import { getMe } from '@/features/user/api/user.api';
+import useFetch from '@/hooks/useFetch';
 
 // 타입 & 초기 프로필
 
@@ -79,14 +80,13 @@ export default function InterviewNotePage() {
 
   // 상태
   const [profileData, setProfileData] = useState<ProfileData>(initialProfileData);
-  const [, setProfileError] = useState<string | null>(null);
-
   const [questionNotes, setQuestionNotes] = useState<QuestionSection[]>([]);
   const [, setQuestionError] = useState<string | null>(null);
 
   const [summaries, setSummaries] = useState<InterviewSummary[]>([]);
   const [summaryError, setSummaryError] = useState<string | null>(null);
   const [aiSummary, setAiSummary] = useState<string>('');
+
   // 내 정보 불러오기
   useEffect(() => {
     (async () => {
@@ -106,55 +106,36 @@ export default function InterviewNotePage() {
     }
   }, [numericInterviewId, navigate]);
 
-  // 1) 프로필 로딩 (InterviewQuestionNotePage와 동일 패턴)
+  // 1) Profile API 를 useFetch 로 호출
+  const { resData: profileApi } = useFetch<ProfileApiDto>(
+    resumeId && interviewIdParam ? `/api/v1/interviews/${interviewIdParam}/interview-profile` : ''
+  );
+
+  // profileApi가 오면 프로필 업데이트
   useEffect(() => {
-    const loadProfile = async () => {
-      const baseProfile: ProfileData = {
-        ...initialProfileData,
-        name: name ?? initialProfileData.name,
-        title: position ?? initialProfileData.title,
-        date: date ?? initialProfileData.date,
-        time: time ?? initialProfileData.time,
-        interviewers: interviewers
-          ? interviewers.split(',').map((s) => s.trim())
-          : initialProfileData.interviewers,
-      };
-
-      try {
-        if (resumeId && interviewIdParam) {
-          const res = await fetch(
-            `${apiBaseUrl}/api/v1/interviews/${interviewIdParam}/interview-profile`,
-            {
-              method: 'GET',
-              headers: { 'Content-Type': 'application/json' },
-              credentials: 'include',
-            }
-          );
-
-          if (res.ok) {
-            const body: ApiResponse<ProfileApiDto> = await res.json();
-
-            setProfileData({
-              ...baseProfile,
-              skills: body.data?.skills ?? baseProfile.skills,
-              missingSkills: body.data?.missingSkills ?? baseProfile.missingSkills,
-              experiences: body.data?.experiences ?? baseProfile.experiences,
-            });
-            return;
-          }
-        }
-
-        // 실패하거나 resumeId 없으면 기본값만
-        setProfileData(baseProfile);
-      } catch (e) {
-        console.error('프로필 로딩 실패:', e);
-        setProfileError('면접자 프로필을 불러오는 중 오류가 발생했습니다.');
-        setProfileData(baseProfile);
-      }
+    const baseProfile: ProfileData = {
+      ...initialProfileData,
+      name: name ?? initialProfileData.name,
+      title: position ?? initialProfileData.title,
+      date: date ?? initialProfileData.date,
+      time: time ?? initialProfileData.time,
+      interviewers: interviewers
+        ? interviewers.split(',').map((s) => s.trim())
+        : initialProfileData.interviewers,
     };
 
-    loadProfile();
-  }, [name, position, date, time, interviewers, resumeId, interviewIdParam]);
+    if (profileApi) {
+      setProfileData({
+        ...baseProfile,
+        skills: profileApi.skills ?? baseProfile.skills,
+        missingSkills: profileApi.missingSkills ?? baseProfile.missingSkills,
+        experiences: profileApi.experiences ?? baseProfile.experiences,
+      });
+    } else {
+      setProfileData(baseProfile);
+    }
+  }, [profileApi, name, position, date, time, interviewers]);
+
   // 2) 질문 로딩 (체크 상태 포함)
   useEffect(() => {
     if (!numericInterviewId) return;

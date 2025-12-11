@@ -21,6 +21,7 @@ type Props = {
   onJobChange: (_jobId: number | null) => void;
   onSortChange: (_sortType: string) => void;
   onStatusChange?: (_status: string) => void;
+  initialJobId?: number | null;
 };
 
 export default function MatchFilterSection({
@@ -30,6 +31,7 @@ export default function MatchFilterSection({
   onJobChange,
   onSortChange,
   onStatusChange,
+  initialJobId,
 }: Props) {
   const [activeTab, setActiveTab] = useState<'all' | 'recommended'>('recommended');
   const [selectedLimit, setSelectedLimit] = useState<number>(10);
@@ -38,6 +40,11 @@ export default function MatchFilterSection({
   const [jdOptions, setJdOptions] = useState<JdOption[]>([]);
   const [status, setStatus] = useState<string>('');
 
+  useEffect(() => {
+    if (initialJobId != null) {
+      setSelectedJob(initialJobId);
+    }
+  }, [initialJobId]);
   // JD 목록 불러오기
   useEffect(() => {
     const load = async () => {
