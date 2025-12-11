@@ -37,7 +37,7 @@ export default function JDDetailPage() {
       </div>
       <JobDetailView job={data} onEdit={() => navigate(`/jobs/${id}/update`)} />
       <Link
-        to={`/jobs/matches`}
+        to={`/matches`}
         state={{ jdId: Number(id) }}
         className="rounded bg-[#752F6D] px-4 py-2 text-white transition hover:bg-[#9A3F90]"
       >
