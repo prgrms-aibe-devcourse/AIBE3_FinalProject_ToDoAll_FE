@@ -1,7 +1,7 @@
 import TimeSlot, { type TimeSlotType } from '@components/dashboard/TimeSlot.tsx';
 import useFetch from '@/hooks/useFetch.ts';
 import { Skeleton } from '@components/Skeleton.tsx';
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import BlankCard from '@components/dashboard/BlankCard.tsx';
 
 const WeekName = {
@@ -40,7 +40,7 @@ export interface WeeklyCalendarType {
 
 export default function WeekendContainer() {
   const { resData } = useFetch<WeeklyCalendarType>('/api/v1/dashboard/week-calendar');
-  const isBlank = useRef(true);
+  const [isBlank, setIsBlank] = useState(true);
 
   useEffect(() => {
     if (!resData) return;
@@ -49,16 +49,14 @@ export default function WeekendContainer() {
       return acc + date.events.length;
     }, 0);
 
-    if (sum > 0) isBlank.current = false;
-
-    console.log(isBlank.current);
+    if (sum > 0) setIsBlank(false);
   }, [resData]);
 
   return (
     <section className="flex flex-wrap justify-between gap-4">
       {!resData ? (
         <Skeleton className="h-36 w-full rounded-[10px]" />
-      ) : isBlank.current ? (
+      ) : isBlank ? (
         <BlankCard text="등록된 일정이 없습니다." />
       ) : (
         Object.entries(resData.dailyCalendars).map(([week, data], i) => (
