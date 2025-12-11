@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search } from 'lucide-react';
+import { RotateCw } from 'lucide-react';
 
 import AllFilterSection from './AllFilterSection';
 import RecommendedFilterSection from './RecommendedFilterSection';
@@ -157,14 +157,13 @@ export default function MatchFilterSection({
             jdOptions={jdOptions}
           />
         )}
-
-        {/* 검색 버튼 */}
+        {/*  새로고침 버튼 */}
         <div className="ml-auto flex items-end pb-6">
           <button
             onClick={() => onSearch('')}
             className="flex items-center justify-center rounded-full bg-[#E3DBDB] p-3 hover:bg-[#D5CFCF]"
           >
-            <Search size={18} className="text-white" />
+            <RotateCw size={18} className="text-white" />
           </button>
         </div>
       </div>
