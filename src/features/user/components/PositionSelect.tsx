@@ -36,7 +36,7 @@ export default function PositionSelect({
         value={_value}
         onChange={handleChange}
         disabled={disabled}
-        className="border-jd-gray-light bg-jd-white focus:border-jd-violet h-10 w-full rounded-[10px] border px-3 text-sm text-[#413F3F] outline-none focus:ring-0"
+        className="h-10 w-full rounded-md border bg-white px-3 py-2"
       >
         <option value="" disabled>
           직책을 선택해주세요
