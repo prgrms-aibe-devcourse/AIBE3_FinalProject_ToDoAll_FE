@@ -1,31 +1,30 @@
+import { useNavigate } from 'react-router-dom';
 import type { ResumeData } from '../types/resumes.types';
 import checkImg from '../../../assets/Done.png';
-import prohibitionImg from '../../../assets/iconoir_prohibition.png';
 
 interface ApplicantStatusProps {
   data: ResumeData;
 }
 
 export default function ApplicantStatus({ data }: ApplicantStatusProps) {
+  const navigate = useNavigate();
+
+  const handleInterviewInvite = () => {
+    navigate(`/interview/create?resumeId=${data.id}&jdId=${data.jdId}`);
+  };
+
   return (
     <div className="flex w-96 items-center justify-between rounded-lg p-4">
       <div>
         <h3 className="text-[30px] font-semibold text-[#413F3F]">{data.name}</h3>
         <div className="flex gap-2">
           <button
+            onClick={handleInterviewInvite}
             style={{ borderColor: '#837C7C' }}
             className="flex items-center gap-2 rounded-lg border px-3 py-1 text-[#837C7C] hover:bg-[#E6F5E6] hover:text-[#1E4621]"
           >
-            합격
+            면접 초대
             <img src={checkImg} alt="done" className="h-4 w-4" />
-          </button>
-
-          <button
-            style={{ borderColor: '#DE4F36' }}
-            className="flex items-center gap-2 rounded-lg border px-3 py-1 text-[#DE4F36] hover:bg-[#FDE9E6] hover:text-[#A31D0D]"
-          >
-            불합격
-            <img src={prohibitionImg} alt="prohibition" className="h-4 w-4" />
           </button>
         </div>
       </div>
