@@ -29,6 +29,15 @@ type MeResponse = {
   profileUrl?: string | null;
 };
 
+// [추가] 프로필 이미지 변경을 전역으로 알리는 이벤트 헬퍼
+function broadcastProfileUpdate(profileUrl: string | null | undefined) {
+  window.dispatchEvent(
+    new CustomEvent('profile-updated', {
+      detail: profileUrl ?? null,
+    })
+  );
+}
+
 export default function MyPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -129,6 +138,9 @@ export default function MyPage() {
         setUser(nextUser);
         setForm(nextUser);
         syncPositionFromSource({ position: nextUser.position });
+
+        // 사이드바로 현재 프로필 이미지보내기
+        broadcastProfileUpdate(nextUser.profileUrl);
       })
       .catch((err) => {
         console.log('getMe 응답:', err);
@@ -312,14 +324,19 @@ export default function MyPage() {
       setUploading(true);
       const updated = (await uploadProfileImage(file)) as MeResponse;
 
+      const newProfileUrl = updated.profileUrl ?? user.profileUrl ?? '/images/default-profile.jpg';
+
       setUser((prev) => ({
         ...prev,
-        profileUrl: updated.profileUrl ?? prev.profileUrl,
+        profileUrl: newProfileUrl,
       }));
       setForm((f) => ({
         ...f,
-        profileUrl: updated.profileUrl ?? f.profileUrl,
+        profileUrl: newProfileUrl,
       }));
+
+      // 프로필 변경 이벤트 브로드캐스트
+      broadcastProfileUpdate(newProfileUrl);
     } catch (err) {
       console.error('프로필 이미지 업로드 실패:', err);
       showAlert('프로필 이미지 변경에 실패했습니다. 다시 시도해주세요.', 'success', '변경 실패');
@@ -340,14 +357,19 @@ export default function MyPage() {
       setRemoving(true);
       const updated = (await removeProfileImage()) as MeResponse;
 
+      const newProfileUrl = updated.profileUrl ?? '/images/default-profile.jpg';
+
       setUser((prev) => ({
         ...prev,
-        profileUrl: updated.profileUrl ?? prev.profileUrl,
+        profileUrl: newProfileUrl,
       }));
       setForm((f) => ({
         ...f,
-        profileUrl: updated.profileUrl ?? f.profileUrl,
+        profileUrl: newProfileUrl,
       }));
+
+      // 삭제 후에도 변경된 프로필을 브로드캐스트
+      broadcastProfileUpdate(newProfileUrl);
 
       showAlert('프로필 이미지가 기본 이미지로 변경되었습니다.', 'success', '삭제 완료');
     } catch (err) {
