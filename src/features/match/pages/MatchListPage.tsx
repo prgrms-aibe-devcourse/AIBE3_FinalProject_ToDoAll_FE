@@ -125,7 +125,7 @@ export default function MatchListPage() {
               key={resume.resumeId}
               resume={resume}
               matchRate={resume.matchScore ?? 0}
-              onView={() => console.log('보기 클릭', resume.name)}
+              onView={() => navigate(`/resumes/${resume.resumeId}`)}
               onInvite={() => handleInvite(resume.resumeId)}
             />
           ))}
