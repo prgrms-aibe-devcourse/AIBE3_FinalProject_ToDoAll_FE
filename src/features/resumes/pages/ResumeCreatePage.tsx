@@ -134,10 +134,11 @@ export default function ResumeCreatePage() {
         localStorage.removeItem(DRAFT_KEY(jdId));
       }
 
+      // File 객체는 location.state로 전달할 수 없으므로 resumeId만 전달
+      // ResumeSubmitSuccessPage에서 resumeId로 다시 조회
       navigate('/resume/submit-success', {
         state: {
           resumeId: result.id,
-          formData,
         },
       });
     } catch (e: any) {

@@ -29,18 +29,8 @@ export async function createResume(resume: ResumeData) {
 
   // ✅ 2-1) DTO 전체를 JSON으로 묶어서 "data"라는 파트로 전송
   // undefined 값은 제거하기 위해 replacer 사용
-  form.append(
-    'data',
-    new Blob(
-      [
-        JSON.stringify(dto, (value) => {
-          // undefined 값은 제거 (null은 유지)
-          return value === undefined ? undefined : value;
-        }),
-      ],
-      { type: 'application/json' }
-    )
-  );
+  form.append('data', new Blob([JSON.stringify(dto)], { type: 'application/json' }));
+
   // (환경에 따라) 아래처럼 해도 동작 가능
   // form.append('data', JSON.stringify(dto));
 
