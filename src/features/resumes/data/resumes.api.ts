@@ -23,6 +23,16 @@ export async function createResume(resume: ResumeData) {
   console.log('[createResume] activities:', JSON.stringify(dto.activities, null, 2));
   console.log('[createResume] certifications:', JSON.stringify(dto.certifications, null, 2));
   console.log('[createResume] resume.activities 원본:', resume.activities);
+  console.log(
+    '[createResume] files.resume:',
+    resume.files.resume instanceof File ? 'File' : resume.files.resumeKey
+  );
+  console.log(
+    '[createResume] files.portfolio:',
+    resume.files.portfolio instanceof File ? 'File' : resume.files.portfolioKey
+  );
+  console.log('[createResume] resumeFileUrl:', dto.resumeFileUrl);
+  console.log('[createResume] portfolioFileUrl:', dto.portfolioFileUrl);
 
   // 2) FormData 생성
   const form = new FormData();
@@ -33,7 +43,7 @@ export async function createResume(resume: ResumeData) {
     'data',
     new Blob(
       [
-        JSON.stringify(dto, (value) => {
+        JSON.stringify(dto, (_key, value) => {
           // undefined 값은 제거 (null은 유지)
           return value === undefined ? undefined : value;
         }),
@@ -41,6 +51,7 @@ export async function createResume(resume: ResumeData) {
       { type: 'application/json' }
     )
   );
+
   // (환경에 따라) 아래처럼 해도 동작 가능
   // form.append('data', JSON.stringify(dto));
 
@@ -78,7 +89,18 @@ export async function createResume(resume: ResumeData) {
 // GET RESUME
 // ---------------------------------------
 export async function getResume(resumeId: string): Promise<ResumeData> {
-  const res = await fetch(`${BASE_URL}/api/v1/resumes/${resumeId}`, {
+  // resumeId가 숫자 문자열인지 확인
+  const id = String(resumeId).trim();
+  if (!id || isNaN(Number(id))) {
+    throw new Error('유효하지 않은 이력서 ID입니다.');
+  }
+
+  // URL 인코딩 (특수문자 방지)
+  const encodedId = encodeURIComponent(id);
+  const url = `${BASE_URL}/api/v1/resumes/${encodedId}`;
+  console.log('[getResume] Fetching URL:', url);
+
+  const res = await fetch(url, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -87,10 +109,32 @@ export async function getResume(resumeId: string): Promise<ResumeData> {
     credentials: 'include',
   });
 
-  const response = await res.json();
+  const text = await res.text();
+  let response: any;
+
+  // 응답이 비어있지 않으면 JSON 파싱 시도
+  if (text && text.trim().length > 0) {
+    try {
+      response = JSON.parse(text);
+    } catch (e) {
+      console.error('[getResume] JSON parse failed:', e);
+      console.error('[getResume] Response text:', text);
+      throw new Error('서버 응답을 파싱할 수 없습니다.');
+    }
+  } else {
+    // 응답이 비어있으면 기본 응답 객체 생성
+    response = {};
+  }
 
   if (!res.ok) {
-    throw new Error(response.message || '이력서 조회 실패');
+    // HTTP 상태 코드에 따른 에러 메시지
+    if (res.status === 403) {
+      throw new Error('이력서 조회 권한이 없습니다. (HTTP 403)');
+    } else if (res.status === 404) {
+      throw new Error('이력서를 찾을 수 없습니다. (HTTP 404)');
+    } else {
+      throw new Error(response.message || `이력서 조회 실패 (HTTP ${res.status})`);
+    }
   }
 
   const data = response.data;

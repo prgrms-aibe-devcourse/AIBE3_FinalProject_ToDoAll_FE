@@ -149,7 +149,11 @@ export function convertToBackendRequest(resume: ResumeData) {
       })
       .filter((cert): cert is NonNullable<typeof cert> => cert !== null), // null 항목 필터링
 
-    resumeFileUrl: resume.files.resumeKey || '',
-    portfolioFileUrl: resume.files.portfolioKey || '',
+    // File 객체가 있으면 undefined로 설정 (백엔드에서 새 파일 업로드)
+    // File 객체가 없고 resumeKey가 있으면 기존 파일 재사용
+    resumeFileUrl:
+      resume.files.resume instanceof File ? undefined : resume.files.resumeKey || undefined,
+    portfolioFileUrl:
+      resume.files.portfolio instanceof File ? undefined : resume.files.portfolioKey || undefined,
   };
 }
