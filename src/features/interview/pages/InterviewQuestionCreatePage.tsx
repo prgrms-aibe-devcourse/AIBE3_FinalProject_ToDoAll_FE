@@ -1,6 +1,6 @@
 // src/pages/InterviewQuestionNotePage.tsx
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import ProfileCard from '../components/question-create/ProfileCard';
 import EditButton from '../components/question-create/EditButton';
@@ -68,6 +68,8 @@ const InterviewQuestionNotePage: React.FC = () => {
     resumeId?: number;
   };
 
+  const pollTimerRef = useRef<number | null>(null);
+
   const [questions, setQuestions] = useState<InterviewQuestionAiDto[] | null>(null);
   const [originalQuestions, setOriginalQuestions] = useState<InterviewQuestionAiDto[] | null>(null);
 
@@ -82,11 +84,11 @@ const InterviewQuestionNotePage: React.FC = () => {
 
   const apiBaseUrl = import.meta.env.VITE_API_URL || '';
 
-  const fetchQuestions = async () => {
+  const fetchQuestions = async (): Promise<boolean> => {
     if (!interviewId) {
       setLoadError('면접 ID가 없습니다.');
       setIsLoading(false);
-      return;
+      return true;
     }
 
     setIsLoading(true);
@@ -117,17 +119,35 @@ const InterviewQuestionNotePage: React.FC = () => {
         })) ?? [];
 
       setQuestions(mapped);
+      return mapped.length > 0;
     } catch (err) {
       console.error(err);
       setLoadError('질문을 불러오는 중 오류가 발생했습니다.');
       setQuestions(null);
+      return true;
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchQuestions();
+  let cancelled = false;
+
+  const poll = async () => {
+    const ready = await fetchQuestions();
+    if (cancelled) return;
+
+    if (!ready) {
+      pollTimerRef.current = window.setTimeout(poll, 5000);
+    }
+  };
+
+    void poll();
+
+    return () => {
+      cancelled = true;
+      if (pollTimerRef.current) window.clearTimeout(pollTimerRef.current);
+    };
   }, [interviewId]);
 
   useEffect(() => {
