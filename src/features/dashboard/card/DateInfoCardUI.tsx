@@ -1,6 +1,7 @@
-import { Calendar } from 'lucide-react';
+import SelectIcon from '@components/SelectIcon.tsx';
 
 export type DataInfoCardProps = {
+  isOrganizer: boolean;
   interviewDate: string;
   applicantName: string;
   jobTitle: string;
@@ -9,6 +10,7 @@ export type DataInfoCardProps = {
 };
 
 export default function DateInfoCardUI({
+  isOrganizer,
   interviewDate,
   applicantName,
   jobTitle,
@@ -18,7 +20,11 @@ export default function DateInfoCardUI({
   return (
     <section className="border-jd-gray-light flex flex-col items-center gap-4 rounded-[10px] border p-[20px] sm:flex-row md:gap-7">
       <div className="before:bg-jd-scarlet relative flex h-[36px] w-[36px] items-center justify-center before:absolute before:z-0 before:block before:h-[36px] before:w-[36px] before:rounded-4xl before:opacity-25">
-        <Calendar size="20px" className="text-jd-scarlet" />
+        {isOrganizer ? (
+          <SelectIcon name="calendar-clock" customize={{ size: 20 }} className="text-jd-scarlet" />
+        ) : (
+          <SelectIcon name="calendar-check" customize={{ size: 20 }} className="text-red-700" />
+        )}
       </div>
       <p>{interviewDate}</p>
       <div className="text-center sm:text-left">
