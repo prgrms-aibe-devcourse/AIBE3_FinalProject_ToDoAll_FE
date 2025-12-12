@@ -84,7 +84,6 @@ export default function InterviewCreatePage() {
       method: 'POST',
       body: {
         resumeId: Number(resumeId),
-        participantIds: invited.map((i) => i.id),
       },
     });
   }, [createdInterview, invited]);

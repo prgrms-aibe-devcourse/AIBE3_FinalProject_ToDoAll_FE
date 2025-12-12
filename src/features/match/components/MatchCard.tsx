@@ -1,7 +1,7 @@
 import emptyHeartImg from '../../../assets/Favorite-2.png';
 import fullHeartImg from '../../../assets/Heart.png';
-import { useState } from 'react';
-import type { MatchCardData } from '../../match/types/matchCardData.types';
+import { useState, type MouseEvent } from 'react';
+import type { MatchCardData } from '../types/matchCardData.types';
 
 type Props = {
   resume: MatchCardData;
@@ -14,7 +14,8 @@ type Props = {
 export default function MatchCard({ resume, matchRate, tab, onView, onInvite }: Props) {
   const [checked, setChecked] = useState(false);
 
-  const handleBookmark = () => {
+  const handleBookmark = (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
     setChecked((prev) => !prev);
   };
 
@@ -63,7 +64,10 @@ export default function MatchCard({ resume, matchRate, tab, onView, onInvite }: 
   }
 
   return (
-    <div className="relative mx-auto flex w-full rounded-2xl bg-white p-6 shadow-md transition hover:shadow-lg">
+    <div
+      className="relative mx-auto flex w-full cursor-pointer rounded-2xl bg-white p-6 shadow-md transition hover:shadow-lg"
+      onClick={onView}
+    >
       <div className="flex w-full items-start gap-4 pr-[160px]">
         {/* 프로필 이미지 */}
         <img
@@ -129,13 +133,19 @@ export default function MatchCard({ resume, matchRate, tab, onView, onInvite }: 
       {/* 보류 / 면접초대 */}
       <div className="absolute right-6 bottom-6 flex gap-2">
         <button
-          onClick={onView}
+          onClick={(e) => {
+            e.stopPropagation();
+            onView();
+          }}
           className="rounded-full bg-[#752F6D] px-4 py-2 font-medium text-[#FAF8F8] transition hover:bg-[#9A3F90]"
         >
           보류
         </button>
         <button
-          onClick={onInvite}
+          onClick={(e) => {
+            e.stopPropagation();
+            onInvite();
+          }}
           className="rounded-full bg-[#DE4F36] px-4 py-2 font-medium text-white transition hover:bg-[#b73d2b]"
         >
           면접 초대

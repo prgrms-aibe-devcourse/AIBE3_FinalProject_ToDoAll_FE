@@ -132,9 +132,9 @@ export default function MatchListPage() {
             <MatchCard
               key={resume.resumeId}
               resume={resume}
-              matchRate={resume.matchScore ?? 0}
               tab={tab}
-              onView={() => console.log('보기 클릭', resume.name)}
+              matchRate={resume.matchScore ?? 0}
+              onView={() => navigate(`/resumes/${resume.resumeId}`)}
               onInvite={() => handleInvite(resume.resumeId)}
             />
           ))}

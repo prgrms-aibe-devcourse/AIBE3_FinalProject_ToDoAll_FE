@@ -36,7 +36,7 @@ export default function TimeSlot({ time, title, type = 'INTERVIEW' }: TimeSlotPr
 
         <div
           className={cn(
-            'pointer-events-none',
+            'pointer-events-none z-20',
             'absolute bottom-full left-1/2',
             'mb-2 -translate-x-1/2',
             'bg-jd-gray-light border-jd-gray-dark rounded-lg border px-3 py-2',

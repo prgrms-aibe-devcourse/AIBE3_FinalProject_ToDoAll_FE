@@ -5,21 +5,50 @@ import { useEffect, useState } from 'react';
 
 const MainLayout = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
 
-  // 커스텀 이벤트로 Header의 드로어 상태 감지
   useEffect(() => {
-    const handleDrawerChange = (e: Event) => {
-      const customEvent = e as CustomEvent<boolean>;
-      setDrawerOpen(customEvent.detail);
-    };
+    const mq = window.matchMedia('(min-width: 1024px)');
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
 
-    window.addEventListener('drawer-state-change', handleDrawerChange);
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const custom = e as CustomEvent<boolean>;
+      setDrawerOpen(custom.detail);
+    };
+    const closeHandler = () => setDrawerOpen(false);
+
+    window.addEventListener('drawer-state-change', handler);
+    window.addEventListener('close-drawer', closeHandler);
+
     return () => {
-      window.removeEventListener('drawer-state-change', handleDrawerChange);
+      window.removeEventListener('drawer-state-change', handler);
+      window.removeEventListener('close-drawer', closeHandler);
     };
   }, []);
+
+  useEffect(() => {
+    if (!isDesktop && drawerOpen) document.body.style.overflow = 'hidden';
+    else document.body.style.overflow = '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [drawerOpen, isDesktop]);
+
   return (
-    <div className="flex min-h-screen flex-col">
+    <div
+      className={`relative flex min-h-screen flex-col transition-[padding-left] duration-300 ${drawerOpen && isDesktop ? 'pl-[240px]' : ''}`}
+    >
+      {/* 모바일 전용 오버레이 */}
+      <div
+        className={`fixed inset-0 z-40 bg-black/40 transition-opacity duration-300 md:hidden ${drawerOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'} `}
+        onClick={() => window.dispatchEvent(new CustomEvent('close-drawer'))}
+      />
+
       <Header />
       <main
         className="flex-grow"
