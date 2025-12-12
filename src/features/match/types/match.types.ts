@@ -18,3 +18,8 @@ export interface ResumeRecommendation {
   missingSkills?: string[];
   resumeSummary?: string | null;
 }
+
+export interface MatchResponseDto {
+  id: number;
+  status: 'APPLIED' | 'RECOMMENDED' | 'CONFIRMED' | 'BOOKMARK' | 'HOLD' | 'REJECTED';
+}

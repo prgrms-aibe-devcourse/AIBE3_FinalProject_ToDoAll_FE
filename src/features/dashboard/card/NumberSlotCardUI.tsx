@@ -40,7 +40,9 @@ export default function NumberSlotsCard({ title, slotData, status }: NumberSlots
         color={STATUS_INFO[status].color}
         className="static top-[20px] right-[20px] sm:absolute"
       />
-      <h3 className="text-jd-black mb-4 font-bold">{title}</h3>
+      <h3 className="text-jd-black mb-4 max-w-4/5 overflow-hidden font-bold text-ellipsis whitespace-nowrap">
+        {title}
+      </h3>
       <section className="mb-[10px] flex w-full flex-row flex-wrap justify-around gap-6 sm:gap-4">
         {['지원자', '북마크', '면접', '합격'].map((item, index) => (
           <SlotCard key={index} title={item} value={slotData[index]} />

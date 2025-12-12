@@ -7,6 +7,8 @@ import {
   ArrowRight,
   CircleDashed,
   type LucideProps,
+  CalendarClock,
+  CalendarCheck,
 } from 'lucide-react';
 
 interface SelectIconProps {
@@ -29,6 +31,10 @@ const SelectIcon = memo(function SelectIcon({ name, className, customize }: Sele
       return <ArrowRight className={className} {...customize} />;
     case 'circle-dashed':
       return <CircleDashed className={className} {...customize} />;
+    case 'calendar-clock':
+      return <CalendarClock className={className} {...customize} />;
+    case 'calendar-check':
+      return <CalendarCheck className={className} {...customize} />;
     default:
       return <CircleDashed className={className} {...customize} />;
   }
