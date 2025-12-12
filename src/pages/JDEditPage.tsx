@@ -66,7 +66,6 @@ const JDEditPage: React.FC = () => {
       deadline: values.deadline && values.deadline.length > 0 ? values.deadline : null,
       benefits: emptyToNull(values.benefits),
       location: emptyToNull(values.location),
-      thumbnailUrl: null,
       requiredSkills: values.requiredSkills ?? [],
       preferredSkills: values.preferredSkills ?? [],
     };
@@ -103,8 +102,7 @@ const JDEditPage: React.FC = () => {
       }
       const { thumbnailFile, ...otherValues } = values;
       const baseRequest = mapToJobUpdateRequest(otherValues);
-      const request = { ...baseRequest, thumbnailUrl: null };
-      await updateJobPost(id, request);
+      await updateJobPost(id, baseRequest);
       if (thumbnailFile instanceof File) {
         await updateJobThumbnail(id, thumbnailFile);
       }
