@@ -166,6 +166,7 @@ export async function fetchSkills(): Promise<Skill[]> {
 export async function updateJobStatus(id: string | number, status: JobStatus) {
   const res = await fetch(`${BASE_URL}/api/v1/jd/${id}/status`, {
     method: 'PATCH',
+    credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ status }),
   });
@@ -181,6 +182,7 @@ export async function updateJobStatus(id: string | number, status: JobStatus) {
 export async function updateJobPost(id: string | number, request: JobCreateRequest): Promise<void> {
   const res = await fetch(`${BASE_URL}/api/v1/jd/${id}`, {
     method: 'PATCH',
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
     },
