@@ -134,10 +134,15 @@ export default function ResumeCreatePage() {
         localStorage.removeItem(DRAFT_KEY(jdId));
       }
 
+      // File 객체는 location.state로 전달할 수 없으므로 resumeId만 전달
+      // ResumeSubmitSuccessPage에서 resumeId로 다시 조회
+      // resumeId를 문자열로 변환 (백엔드에서 숫자로 올 수 있음)
+      const resumeId = String(result.id);
+      console.log('[ResumeCreatePage] Created resume ID:', resumeId, typeof resumeId);
+
       navigate('/resume/submit-success', {
         state: {
-          resumeId: result.id,
-          formData,
+          resumeId,
         },
       });
     } catch (e: any) {
