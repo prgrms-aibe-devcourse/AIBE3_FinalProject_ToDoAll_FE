@@ -43,7 +43,7 @@ export async function createResume(resume: ResumeData) {
     'data',
     new Blob(
       [
-        JSON.stringify(dto, (key, value) => {
+        JSON.stringify(dto, (_key, value) => {
           // undefined 값은 제거 (null은 유지)
           return value === undefined ? undefined : value;
         }),
