@@ -131,16 +131,16 @@ const InterviewQuestionNotePage: React.FC = () => {
   };
 
   useEffect(() => {
-  let cancelled = false;
+    let cancelled = false;
 
-  const poll = async () => {
-    const ready = await fetchQuestions();
-    if (cancelled) return;
+    const poll = async () => {
+      const ready = await fetchQuestions();
+      if (cancelled) return;
 
-    if (!ready) {
-      pollTimerRef.current = window.setTimeout(poll, 5000);
-    }
-  };
+      if (!ready) {
+        pollTimerRef.current = window.setTimeout(poll, 5000);
+      }
+    };
 
     void poll();
 
