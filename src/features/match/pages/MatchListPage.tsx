@@ -132,6 +132,7 @@ export default function MatchListPage() {
             <MatchCard
               key={resume.resumeId}
               resume={resume}
+              tab={tab}
               matchRate={resume.matchScore ?? 0}
               onView={() => navigate(`/resumes/${resume.resumeId}`)}
               onInvite={() => handleInvite(resume.resumeId)}
