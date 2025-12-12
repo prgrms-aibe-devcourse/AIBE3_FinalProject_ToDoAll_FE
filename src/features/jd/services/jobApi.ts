@@ -80,7 +80,11 @@ const toArray = (v?: string[] | string | null): string[] => {
     .filter(Boolean);
 };
 export async function fetchJobDetail(id: string): Promise<JobDetail> {
-  const res = await fetch(`${BASE_URL}/api/v1/jd/${id}`);
+  const res = await fetch(`${BASE_URL}/api/v1/jd/${id}`, {
+    method: 'GET',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+  });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const body = (await res.json()) as ApiResponse<JobDetailResponse>;
   const dto = body.data!;

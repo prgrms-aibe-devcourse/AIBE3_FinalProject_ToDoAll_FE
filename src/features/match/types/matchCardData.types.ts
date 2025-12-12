@@ -7,4 +7,6 @@ export type MatchCardData = {
   summary: string | null;
   career: { company: string; position: string; department: string }[];
   matchScore: number;
+  status?: 'APPLIED' | 'RECOMMENDED' | 'CONFIRMED' | 'BOOKMARK' | 'HOLD' | 'REJECTED';
+  skillMatchRate?: string;
 };
