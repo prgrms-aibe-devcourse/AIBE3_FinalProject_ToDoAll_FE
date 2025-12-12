@@ -110,7 +110,7 @@ const JDEditPage: React.FC = () => {
       }
 
       alert('공고가 수정되었습니다.');
-      // 필요하면 상세 페이지로 이동 등
+      window.location.reload();
     } catch (error) {
       console.error('updateJobPost error:', error);
       alert('공고 수정 중 오류가 발생했습니다.');

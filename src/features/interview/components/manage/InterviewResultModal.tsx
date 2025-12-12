@@ -32,9 +32,14 @@ export default function InterviewResultModal({
     if (!interviewId) return;
 
     try {
+      const accessToken = localStorage.getItem('accessToken'); // 토큰 가져오기
+
       const response = await fetch(`${baseUrl}/api/v1/interviews/${interviewId}/result`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
         body: JSON.stringify({ result }),
       });
 

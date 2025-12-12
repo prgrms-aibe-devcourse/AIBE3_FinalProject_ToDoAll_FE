@@ -27,8 +27,8 @@ export default function ResumeForm({ formData, onChange }: Props) {
       />
 
       <ExperienceFormSection
-        experienceData={formData.experience ? formData.experience.split(',') : []}
-        onChange={(updated) => onChange('experience', updated.join(','))}
+        experienceData={formData.activities ? formData.activities.split(',') : []}
+        onChange={(updated) => onChange('activities', updated.join(','))}
       />
 
       <CertificationFormSection
