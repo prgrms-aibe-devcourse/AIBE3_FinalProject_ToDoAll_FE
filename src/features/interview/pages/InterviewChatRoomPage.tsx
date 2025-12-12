@@ -222,6 +222,8 @@ export default function InterviewChatRoomPage() {
         const questions = await getInterviewQuestions(interviewId);
         const map = new Map<string, InterviewQuestion[]>();
 
+        console.log('[QUESTIONS]', questions);
+
         questions.forEach((q: InterviewQuestion) => {
           const topic = q.questionType ?? '기타';
           if (!map.has(topic)) map.set(topic, []);
