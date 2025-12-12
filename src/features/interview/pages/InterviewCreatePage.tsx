@@ -98,12 +98,17 @@ export default function InterviewCreatePage() {
   const invitedIds = invited.map((i) => i.id);
   const filtered = useMemo(
     () =>
-      search.trim().length > 0 && interviewers
-        ? interviewers.filter(
-            (i) =>
-              !invitedIds.includes(i.id) &&
-              (i.name.includes(search) || i.email.toLowerCase().includes(search.toLowerCase()))
-          )
+      interviewers
+        ? interviewers.filter((i) => {
+            // 이미 초대된 사람 제외
+            if (invitedIds.includes(i.id)) return false;
+
+            // 검색어가 없으면 전부 통과
+            if (search.trim().length === 0) return true;
+
+            // 검색어가 있으면 이름 or 이메일 필터
+            return i.name.includes(search) || i.email.toLowerCase().includes(search.toLowerCase());
+          })
         : [],
     [search, interviewers, invitedIds]
   );
