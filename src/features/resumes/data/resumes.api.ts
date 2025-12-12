@@ -276,7 +276,7 @@ export async function updateResumeMemo(resumeId: string, memo: string) {
   const response = await res.json();
 
   if (!res.ok) {
-    throw new Error(response.message || '메모 저장 실패');
+    throw new Error(response.message || '메모  저장 실패');
   }
 
   return response.data;
