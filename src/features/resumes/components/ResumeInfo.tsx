@@ -18,6 +18,7 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
   const [portfolioHref, setPortfolioHref] = useState<string>('');
 
   const [resumeObjectUrl, setResumeObjectUrl] = useState<string>('');
+  const [portfolioObjectUrl, setPortfolioObjectUrl] = useState<string>('');
 
   useEffect(() => {
     let alive = true;
@@ -38,6 +39,12 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
         setPortfolioHref('');
       }
 
+      console.log('[ResumeInfo] Starting file load process');
+      console.log('[ResumeInfo] files.resume is File?', data.files?.resume instanceof File);
+      console.log('[ResumeInfo] files.resumeKey:', data.files?.resumeKey);
+      console.log('[ResumeInfo] files.portfolio is File?', data.files?.portfolio instanceof File);
+      console.log('[ResumeInfo] files.portfolioKey:', data.files?.portfolioKey);
+
       /** ----------------------------------------------------
        * 1) 프로필 사진은 "resumefileurl" (=resumeKey or resume File)로만 만든다
        *  - Preview/Success: files.resume = File
@@ -46,6 +53,7 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
       // A) File이면 objectURL로 프로필 + 자기소개서 링크 둘 다 설정
       if (data.files?.resume && data.files.resume instanceof File) {
         const objUrl = URL.createObjectURL(data.files.resume);
+        console.log('[ResumeInfo] Created resume objectURL:', objUrl);
         if (!alive) return;
         setResumeObjectUrl(objUrl); // cleanup용 저장
         setProfileHref(objUrl);
@@ -94,10 +102,10 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
       // File(미리보기/제출완료)면 objectURL
       if (data.files?.portfolio && data.files.portfolio instanceof File) {
         const objUrl = URL.createObjectURL(data.files.portfolio);
+        console.log('[ResumeInfo] Created portfolio objectURL:', objUrl);
         if (!alive) return;
+        setPortfolioObjectUrl(objUrl); // cleanup용 저장
         setPortfolioHref(objUrl);
-        // portfolio objectURL은 따로 저장/정리 안 했는데,
-        // 필요하면 resumeObjectUrl처럼 별도 state로 관리해도 됨.
       } else if (data.files?.portfolioKey) {
         try {
           const url = await getDownloadUrl(data.files.portfolioKey);
@@ -129,9 +137,16 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
 
   useEffect(() => {
     return () => {
-      if (resumeObjectUrl) URL.revokeObjectURL(resumeObjectUrl);
+      if (resumeObjectUrl) {
+        console.log('[ResumeInfo] Cleaning up resume objectURL');
+        URL.revokeObjectURL(resumeObjectUrl);
+      }
+      if (portfolioObjectUrl) {
+        console.log('[ResumeInfo] Cleaning up portfolio objectURL');
+        URL.revokeObjectURL(portfolioObjectUrl);
+      }
     };
-  }, [resumeObjectUrl]);
+  }, [resumeObjectUrl, portfolioObjectUrl]);
 
   return (
     <div>
@@ -144,7 +159,11 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
             src={profileHref}
             alt={`${data.name} 프로필`}
             className="absolute top-6 right-6 h-48 w-36 rounded-[10px] object-cover shadow-md"
-            onError={() => console.error('[PROFILE] load fail:', profileHref)}
+            onError={(e) => {
+              console.error('[PROFILE] load fail:', profileHref, e);
+              console.error('[PROFILE] files.resume:', data.files?.resume);
+              console.error('[PROFILE] files.resumeKey:', data.files?.resumeKey);
+            }}
             onLoad={() => console.log('[PROFILE] load ok:', profileHref)}
           />
         ) : (
@@ -236,6 +255,27 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
             </div>
           ) : (
             <p className="px-3 text-sm text-[#837C7C]">학력사항이 없습니다.</p>
+          )}
+        </section>
+
+        {/* 경력 */}
+        <section className="mt-4">
+          <h3 className="mb-3 border-y border-[#837C7C] bg-[#FAF8F8] px-3 py-2 font-semibold text-[#413F3F]">
+            경력
+          </h3>
+          {data.career && data.career.length > 0 ? (
+            <div className="space-y-2 px-3">
+              {data.career.map((career, idx) => (
+                <div key={idx}>
+                  <p>
+                    {career.company} {career.department && `- ${career.department}`} (
+                    {career.startDate} ~ {career.endDate}) {career.position}
+                  </p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="px-3 text-sm text-[#837C7C]">경력이 없습니다.</p>
           )}
         </section>
 

@@ -66,7 +66,6 @@ const JDEditPage: React.FC = () => {
       deadline: values.deadline && values.deadline.length > 0 ? values.deadline : null,
       benefits: emptyToNull(values.benefits),
       location: emptyToNull(values.location),
-      thumbnailUrl: null,
       requiredSkills: values.requiredSkills ?? [],
       preferredSkills: values.preferredSkills ?? [],
     };
@@ -103,14 +102,13 @@ const JDEditPage: React.FC = () => {
       }
       const { thumbnailFile, ...otherValues } = values;
       const baseRequest = mapToJobUpdateRequest(otherValues);
-      const request = { ...baseRequest, thumbnailUrl: null };
-      await updateJobPost(id, request);
+      await updateJobPost(id, baseRequest);
       if (thumbnailFile instanceof File) {
         await updateJobThumbnail(id, thumbnailFile);
       }
 
       alert('공고가 수정되었습니다.');
-      // 필요하면 상세 페이지로 이동 등
+      window.location.reload();
     } catch (error) {
       console.error('updateJobPost error:', error);
       alert('공고 수정 중 오류가 발생했습니다.');
