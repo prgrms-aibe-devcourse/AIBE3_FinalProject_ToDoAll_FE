@@ -189,7 +189,7 @@ export default function ScoreInputCard({ interviewId }: ScoreInputCardProps) {
         </div>
       ) : (
         // 표시 모드 (저장된 점수가 있을 때만)
-        <div className="border-jd-gray-light flex w-full flex-col items-start rounded-2xl border bg-white p-5 text-left shadow-sm">
+        <div className="border-jd-gray-light flex w-full flex-col items-start rounded-2xl border bg-white p-4 text-left shadow-sm">
           <div className="text-jd-gray-dark mb-2 flex w-full gap-2 text-sm font-medium">
             <div className="flex min-w-[100px] flex-1 flex-col items-center">
               <span className="whitespace-nowrap">기술 점수</span>
