@@ -73,26 +73,13 @@ const Header = () => {
     );
   }, [notifications]);
 
-  function parseJwt(token: string) {
-    const base64Payload = token.split('.')[1];
-    const payload = decodeURIComponent(
-      atob(base64Payload)
-        .split('')
-        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    );
-    return JSON.parse(payload);
-  }
-
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
     if (!token) return;
 
-    const decoded = parseJwt(token);
-    const userId = decoded?.sub;
-    if (!userId) return;
+    const encodedToken = encodeURIComponent(token);
 
-    const es = new EventSource(`${baseUrl}/api/v1/notifications/subscribe?userId=${userId}`);
+    const es = new EventSource(`${baseUrl}/api/v1/notifications/subscribe?token=${encodedToken}`);
     es.addEventListener('notification', (event) => {
       try {
         const data = JSON.parse(event.data);

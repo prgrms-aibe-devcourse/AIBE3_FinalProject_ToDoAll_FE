@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import type { ResumeData } from '../types/resumes.types';
 import checkImg from '../../../assets/Done.png';
+import { checkMatch } from '../../match/api/matchApi';
 
 interface ApplicantStatusProps {
   data: ResumeData;
@@ -9,8 +10,14 @@ interface ApplicantStatusProps {
 export default function ApplicantStatus({ data }: ApplicantStatusProps) {
   const navigate = useNavigate();
 
-  const handleInterviewInvite = () => {
-    navigate(`/interview/create?resumeId=${data.id}&jdId=${data.jdId}`);
+  const handleInterviewInvite = async () => {
+    try {
+      await checkMatch(data.jdId, Number(data.id));
+      navigate(`/interview/create?resumeId=${data.id}&jdId=${data.jdId}`);
+    } catch (error) {
+      console.error('매칭 확정 실패:', error);
+      alert('이미 매칭된 지원자이거나 오류가 발생했습니다.');
+    }
   };
 
   return (

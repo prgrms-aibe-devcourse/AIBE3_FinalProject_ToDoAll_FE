@@ -5,7 +5,7 @@ import MatchFilterSection from '../components/MatchFilterSection';
 import MatchCard from '../components/MatchCard';
 import NoSearchResult from '../components/NoSearchResult';
 
-import { fetchAllMatchedResumes, confirmMatch } from '../api/matchApi';
+import { fetchAllMatchedResumes, checkMatch } from '../api/matchApi';
 import { fetchRecommendedResumes } from '../api/recommendation.api';
 
 import { mapMatchDtoToCardData } from '../utils/mapMatchDtoToCardData';
@@ -76,7 +76,7 @@ export default function MatchListPage() {
       return;
     }
     try {
-      await confirmMatch(jdId, resumeId);
+      await checkMatch(jdId, resumeId);
       navigate(`/interview/create?resumeId=${resumeId}&jdId=${jdId}`);
     } catch (error) {
       console.error('매칭 확정 실패:', error);
