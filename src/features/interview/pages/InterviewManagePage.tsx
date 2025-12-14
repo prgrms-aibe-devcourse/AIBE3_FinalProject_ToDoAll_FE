@@ -4,7 +4,6 @@ import InterviewFilterTabs from '../components/manage/InterviewFilterTabs';
 import InterviewSortDropdown from '../components/manage/InterviewSortDropdown';
 import type { TabStatus, InterviewStatus, ResultStatus } from '../types/interviewer';
 import useFetch from '@/hooks/useFetch';
-import { API_ORIGIN } from '@lib/utils/base.ts';
 
 interface InterviewSummaryResponse {
   interviewId: number;
@@ -93,9 +92,6 @@ export default function InterviewManagePage() {
       const day = pad(kstDate.getDate());
       const hours = pad(kstDate.getHours());
       const minutes = pad(kstDate.getMinutes());
-      const imageUrl = i.candidateAvatar
-        ? `${API_ORIGIN}/${i.candidateAvatar}`
-        : `${API_ORIGIN}/images/default-profile.jpg`;
       return {
         id: i.interviewId,
         jdId: i.jdId,
@@ -106,7 +102,7 @@ export default function InterviewManagePage() {
         interviewers: i.interviewers?.join(', ') || '면접관 없음',
         status: i.status,
         result: i.resultStatus,
-        avatar: imageUrl,
+        avatar: i.candidateAvatar || '/images/default-profile.jpg',
         resumeId: i.resumeId,
       };
     }) ?? [];
