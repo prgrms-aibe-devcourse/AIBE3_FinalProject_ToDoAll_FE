@@ -44,9 +44,10 @@ export default function NumberSlotsCard({ title, slotData, status }: NumberSlots
         {title}
       </h3>
       <section className="mb-[10px] flex w-full flex-row flex-wrap justify-around gap-6 sm:gap-4">
-        {['지원자', '북마크', '면접', '합격'].map((item, index) => (
-          <SlotCard key={index} title={item} value={slotData[index]} />
-        ))}
+        {['지원자', '북마크', '면접', '합격'].map((item, index) => {
+          if (index == 1) return <></>;
+          return <SlotCard key={index} title={item} value={slotData[index]} />;
+        })}
       </section>
       <section className="bg-jd-scarlet h-[10px] w-full rounded-[90px] opacity-25"></section>
     </section>
