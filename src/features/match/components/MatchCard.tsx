@@ -46,20 +46,8 @@ export default function MatchCard({ resume, matchRate, tab, onView, onInvite }: 
         statusLabel = '매칭 확정';
         statusClass = 'bg-[#4CAF50]';
         break;
-      case 'BOOKMARK':
-        statusLabel = '북마크';
-        statusClass = 'bg-[#3B82F6]';
-        break;
-      case 'HOLD':
-        statusLabel = '보류';
-        statusClass = 'bg-[#F97316]';
-        break;
-      case 'REJECTED':
-        statusLabel = '거절';
-        statusClass = 'bg-[#EF4444]';
-        break;
       default:
-        statusLabel = resume.status;
+        statusLabel = null;
     }
   }
 
@@ -102,7 +90,9 @@ export default function MatchCard({ resume, matchRate, tab, onView, onInvite }: 
             {/* 기술 매칭률 */}
             <div className="mb-3">
               <div className="mb-3 flex items-center gap-4">
-                <div className="text-m font-medium text-[#413F3F]">기술 매칭률</div>
+                <div className="text-m font-medium text-[#413F3F]">
+                  {tab === 'recommended' ? '추천 매칭률' : '기술 매칭률'}
+                </div>
                 <div className="text-2xl font-semibold text-[#DE4F36]">{rateLabel}</div>
               </div>
               <div className="h-2 w-64 rounded-full bg-[#E3DBDB]">
