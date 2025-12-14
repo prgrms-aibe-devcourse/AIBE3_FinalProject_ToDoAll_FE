@@ -4,6 +4,7 @@ import ConfirmLogoutModal from '../features/user/components/ConfirmLogoutModal.t
 import { getMe } from '../features/user/api/user.api.ts';
 import { logout } from '../features/auth/api/auth.api.ts';
 import { API_ORIGIN } from '@lib/utils/base.ts';
+import { userDefaultImage } from '@/const.ts';
 
 type Props = {
   open: boolean;
@@ -21,7 +22,7 @@ export default function SidebarDrawer({ open, onClose }: Props) {
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const [user, setUser] = useState<DrawerUser | null>(null);
-  const avatarUrl = user?.profileUrl || `${API_ORIGIN}/images/default-profile.jpg`;
+  const avatarUrl = user?.profileUrl || API_ORIGIN + userDefaultImage;
 
   useEffect(() => {
     // 드로어가 열려 있을 때만 불러와도 되고, 한 번만 불러와도 됨
