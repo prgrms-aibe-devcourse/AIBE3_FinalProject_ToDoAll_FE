@@ -3,12 +3,14 @@ import React, { useEffect, useState } from 'react';
 import JobPostForm, { type JobPostFormValues } from '../features/jd/components/form/JobPostForm';
 import { createJobPost, fetchSkills, updateJobThumbnail } from '../features/jd/services/jobApi';
 import type { JobCreateRequest } from '../features/jd/services/jobApi';
+import { useNavigate } from 'react-router-dom';
 
 type Skill = {
   id: number;
   name: string;
 };
 const JDCreatePage: React.FC = () => {
+  const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
   const [skills, setSkills] = useState<Skill[]>([]);
   useEffect(() => {
@@ -79,7 +81,8 @@ const JDCreatePage: React.FC = () => {
         await updateJobThumbnail(jobId, thumbnailFile);
       }
 
-      alert(`공고가 등록되었습니다. ID: ${jobId}`);
+      alert('공고가 등록되었습니다.');
+      navigate(`/jobs/${jobId}`);
     } catch (error) {
       console.error('createJobPost error:', error);
       alert('공고 등록 중 오류가 발생했습니다.');
