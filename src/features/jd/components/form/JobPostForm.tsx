@@ -82,10 +82,10 @@ export default function JobPostForm({
         </div>
         <div className="sm:col-span-2">
           <Field label="썸네일 이미지 (선택)">
-            {defaultValues?.originalThumbnailUrl && !values.thumbnailFile && (
+            {values?.originalThumbnailUrl && !values.thumbnailFile && (
               <div className="mb-2">
                 <img
-                  src={defaultValues.originalThumbnailUrl}
+                  src={values.originalThumbnailUrl}
                   alt="Current Thumbnail"
                   className="h-24 w-24 rounded-md object-cover"
                 />

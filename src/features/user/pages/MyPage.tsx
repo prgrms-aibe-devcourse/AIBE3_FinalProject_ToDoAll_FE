@@ -12,6 +12,7 @@ import { buildPasswordChecks } from '@features/auth/utils/passwordChecks.ts';
 import { API_ORIGIN } from '@lib/utils/base.ts';
 import AlertModal from '@components/Alertmodal.tsx';
 import PositionSelect, { type PositionValue } from '@features/user/components/PositionSelect.tsx';
+import { userDefaultImage } from '@/const.ts';
 
 type Focus = 'profile' | 'password' | undefined;
 
@@ -85,7 +86,7 @@ export default function MyPage() {
     position: '',
     birthDate: '',
     gender: '' as Gender,
-    profileUrl: '/images/default-profile.jpg',
+    profileUrl: userDefaultImage,
   });
 
   const [form, setForm] = useState(user);
@@ -124,7 +125,7 @@ export default function MyPage() {
       user.profileUrl.startsWith('https://') ||
       user.profileUrl.startsWith('data:'))
       ? user.profileUrl
-      : `${API_ORIGIN}${user.profileUrl || '/images/default-profile.jpg'}`;
+      : `${API_ORIGIN}${user.profileUrl || userDefaultImage}`;
 
   // 2) 내 정보 조회
   useEffect(() => {
@@ -141,7 +142,7 @@ export default function MyPage() {
           position: me.position ?? '',
           birthDate: me.birthDate ?? '',
           gender: (me.gender ?? '') as Gender,
-          profileUrl: me.profileUrl ?? '/images/default-profile.jpg',
+          profileUrl: me.profileUrl ?? userDefaultImage,
         };
 
         setUser(nextUser);
@@ -333,7 +334,7 @@ export default function MyPage() {
       setUploading(true);
       const updated = (await uploadProfileImage(file)) as MeResponse;
 
-      const newProfileUrl = updated.profileUrl ?? user.profileUrl ?? '/images/default-profile.jpg';
+      const newProfileUrl = updated.profileUrl ?? user.profileUrl ?? userDefaultImage;
 
       setUser((prev) => ({
         ...prev,
@@ -366,7 +367,7 @@ export default function MyPage() {
       setRemoving(true);
       const updated = (await removeProfileImage()) as MeResponse;
 
-      const newProfileUrl = updated.profileUrl ?? '/images/default-profile.jpg';
+      const newProfileUrl = updated.profileUrl ?? userDefaultImage;
 
       setUser((prev) => ({
         ...prev,

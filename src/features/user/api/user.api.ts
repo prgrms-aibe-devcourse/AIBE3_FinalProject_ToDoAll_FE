@@ -1,4 +1,5 @@
 import { BASE_URL, request } from '../../../lib/utils/base';
+import { userDefaultImage } from '@/const.ts';
 
 // 내 정보 수정 API
 export async function updateMe(payload: {
@@ -60,7 +61,7 @@ export async function uploadProfileImage(file: File): Promise<unknown> {
   const profileUrl =
     body?.data?.profileUrl && body.data.profileUrl.trim() !== ''
       ? body.data.profileUrl
-      : '/images/default-profile.jpg';
+      : userDefaultImage;
 
   return {
     ...body.data,
@@ -77,9 +78,7 @@ export async function removeProfileImage(): Promise<unknown> {
   const data = res?.data ?? res;
 
   const profileUrl =
-    data?.profileUrl && data.profileUrl.trim() !== ''
-      ? data.profileUrl
-      : '/images/default-profile.jpg';
+    data?.profileUrl && data.profileUrl.trim() !== '' ? data.profileUrl : userDefaultImage;
 
   return {
     ...data,

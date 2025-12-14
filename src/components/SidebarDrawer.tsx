@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import ConfirmLogoutModal from '../features/user/components/ConfirmLogoutModal.tsx';
 import { getMe } from '../features/user/api/user.api.ts';
 import { logout } from '../features/auth/api/auth.api.ts';
 import { API_ORIGIN } from '@lib/utils/base.ts';
+import { userDefaultImage } from '@/const.ts';
+import { AuthContext } from '@/AuthContext.ts';
 
 type Props = {
   open: boolean;
@@ -21,7 +23,8 @@ export default function SidebarDrawer({ open, onClose }: Props) {
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const [user, setUser] = useState<DrawerUser | null>(null);
-  const avatarUrl = user?.profileUrl || `${API_ORIGIN}/images/default-profile.jpg`;
+  const { clearToken } = useContext(AuthContext);
+  const avatarUrl = user?.profileUrl || API_ORIGIN + userDefaultImage;
 
   useEffect(() => {
     // 드로어가 열려 있을 때만 불러와도 되고, 한 번만 불러와도 됨
@@ -231,6 +234,7 @@ export default function SidebarDrawer({ open, onClose }: Props) {
           } finally {
             // 재인증 시간 등 추가 상태도 정리
             localStorage.removeItem('reauthAt');
+            clearToken();
 
             // 드로어 닫고 로그인 페이지로 이동
             onClose();
