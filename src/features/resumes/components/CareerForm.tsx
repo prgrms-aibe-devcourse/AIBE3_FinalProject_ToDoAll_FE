@@ -34,7 +34,6 @@ export default function CareerForm({ formData, onChange }: Props) {
       return;
     }
 
-    // 시작일이 종료일보다 나중인지 확인
     if (new Date(startDate) > new Date(endDate)) {
       setShowDateWarning(true);
       return;

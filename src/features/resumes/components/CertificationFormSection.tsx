@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import plusImg from '../../../assets/Vector-2.png';
-import CustomSelect from './CustomSelect'; // CustomSelect import
+import CustomSelect from './CustomSelect';
 import AlertModal from '../../../components/Alertmodal';
 
 type Certification = { type: string; title: string; hasScore: boolean; score?: string };
@@ -118,11 +118,10 @@ export default function CertificationFormSection({
                 value={certInput.score}
                 onChange={(e) => {
                   const value = e.target.value;
-                  // 숫자만 허용 (빈 문자열도 허용)
+
                   if (value === '' || /^\d+$/.test(value)) {
                     setCertInput({ ...certInput, score: value });
                   } else {
-                    // 숫자가 아닌 문자가 포함된 경우 경고 모달 표시
                     setShowScoreWarning(true);
                   }
                 }}

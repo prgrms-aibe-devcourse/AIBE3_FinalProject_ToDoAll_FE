@@ -35,7 +35,6 @@ export default function FileUploadForm({ formData, onChange }: Props) {
       return;
     }
 
-    // 파일 크기 체크
     if (!checkFileSize(newFile.file)) {
       return;
     }
@@ -84,11 +83,9 @@ export default function FileUploadForm({ formData, onChange }: Props) {
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) {
-                  // 파일 선택 시 바로 크기 체크
                   if (checkFileSize(file)) {
                     setNewFile({ ...newFile, file });
                   } else {
-                    // 파일 크기 초과 시 input 초기화
                     e.target.value = '';
                   }
                 } else {

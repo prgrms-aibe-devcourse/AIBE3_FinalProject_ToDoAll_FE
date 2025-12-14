@@ -57,7 +57,6 @@ export default function EducationForm({ formData, onChange }: Props) {
       return;
     }
 
-    // 시작일이 종료일보다 나중인지 확인
     if (new Date(newEdu.startDate) > new Date(newEdu.endDate)) {
       setShowDateWarning(true);
       return;

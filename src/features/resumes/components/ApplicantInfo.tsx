@@ -5,7 +5,6 @@ interface ApplicantInfoProps {
 }
 
 export default function ApplicantInfo({ data }: ApplicantInfoProps) {
-  // applyDate 포맷 변환
   const formatDate = (isoString: string | undefined) => {
     if (!isoString) return '-';
     const date = new Date(isoString);

@@ -122,29 +122,23 @@ export default function BasicInfoForm({ formData, onChange }: Props) {
                 const file = e.target.files?.[0];
                 if (!file) return;
 
-                // 파일 크기 체크
                 if (!checkFileSize(file)) {
-                  // 파일 크기 초과 시 input 초기화
                   e.currentTarget.value = '';
                   return;
                 }
 
-                // 1) 미리보기용 dataURL 저장
                 const reader = new FileReader();
                 reader.onload = () => {
                   onChange('profileImage', reader.result as string);
                 };
                 reader.readAsDataURL(file);
 
-                // 2) ✅ 업로드용: files.resume에 저장
-                //    (부모 handleChange가 files를 merge 처리하므로 "부분 객체"만 넘겨도 안전)
                 onChange('files', {
                   resume: file,
                   resumeName: file.name,
                   resumeKey: '',
                 } as any);
 
-                // 같은 파일 다시 선택 가능하게 초기화(선택사항)
                 e.currentTarget.value = '';
               }}
             />

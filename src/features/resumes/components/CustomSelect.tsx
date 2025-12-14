@@ -22,7 +22,6 @@ export default function CustomSelect({
 }: Props) {
   const [open, setOpen] = useState(false);
 
-  // value → _value 로 변경
   const selected = options.find((opt) => opt.value === _value);
 
   return (

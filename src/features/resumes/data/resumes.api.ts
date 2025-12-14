@@ -1,50 +1,23 @@
-// src/features/resumes/data/resumes.api.ts
-/* global HeadersInit */
-
 import type { ResumeData } from '../types/resumes.types';
 import { convertToBackendRequest } from './resumes.mapper';
 
 const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8080').replace(/\/$/, '');
 
-// 인증 헤더 가져오기
-function getAuthHeaders(): HeadersInit {
+function getAuthHeaders(): Record<string, string> {
   const token = localStorage.getItem('accessToken');
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-// ---------------------------------------
-// CREATE RESUME (multipart/form-data)
-// ---------------------------------------
 export async function createResume(resume: ResumeData) {
-  // 1) 백엔드 DTO 형태로 변환
   const dto = convertToBackendRequest(resume);
 
-  // 디버깅: activities 확인
-  console.log('[createResume] activities:', JSON.stringify(dto.activities, null, 2));
-  console.log('[createResume] certifications:', JSON.stringify(dto.certifications, null, 2));
-  console.log('[createResume] resume.activities 원본:', resume.activities);
-  console.log(
-    '[createResume] files.resume:',
-    resume.files.resume instanceof File ? 'File' : resume.files.resumeKey
-  );
-  console.log(
-    '[createResume] files.portfolio:',
-    resume.files.portfolio instanceof File ? 'File' : resume.files.portfolioKey
-  );
-  console.log('[createResume] resumeFileUrl:', dto.resumeFileUrl);
-  console.log('[createResume] portfolioFileUrl:', dto.portfolioFileUrl);
-
-  // 2) FormData 생성
   const form = new FormData();
 
-  // ✅ 2-1) DTO 전체를 JSON으로 묶어서 "data"라는 파트로 전송
-  // undefined 값은 제거하기 위해 replacer 사용
   form.append(
     'data',
     new Blob(
       [
         JSON.stringify(dto, (_key, value) => {
-          // undefined 값은 제거 (null은 유지)
           return value === undefined ? undefined : value;
         }),
       ],
@@ -52,10 +25,6 @@ export async function createResume(resume: ResumeData) {
     )
   );
 
-  // (환경에 따라) 아래처럼 해도 동작 가능
-  // form.append('data', JSON.stringify(dto));
-
-  // ✅ 2-2) 파일 파트 그대로 추가
   if (resume.files.resume instanceof File) {
     form.append('resumeFile', resume.files.resume);
   }
@@ -85,20 +54,14 @@ export async function createResume(resume: ResumeData) {
   return response.data;
 }
 
-// ---------------------------------------
-// GET RESUME
-// ---------------------------------------
 export async function getResume(resumeId: string): Promise<ResumeData> {
-  // resumeId가 숫자 문자열인지 확인
   const id = String(resumeId).trim();
   if (!id || isNaN(Number(id))) {
     throw new Error('유효하지 않은 이력서 ID입니다.');
   }
 
-  // URL 인코딩 (특수문자 방지)
   const encodedId = encodeURIComponent(id);
   const url = `${BASE_URL}/api/v1/resumes/${encodedId}`;
-  console.log('[getResume] Fetching URL:', url);
 
   const res = await fetch(url, {
     method: 'GET',
@@ -112,22 +75,17 @@ export async function getResume(resumeId: string): Promise<ResumeData> {
   const text = await res.text();
   let response: any;
 
-  // 응답이 비어있지 않으면 JSON 파싱 시도
   if (text && text.trim().length > 0) {
     try {
       response = JSON.parse(text);
-    } catch (e) {
-      console.error('[getResume] JSON parse failed:', e);
-      console.error('[getResume] Response text:', text);
+    } catch {
       throw new Error('서버 응답을 파싱할 수 없습니다.');
     }
   } else {
-    // 응답이 비어있으면 기본 응답 객체 생성
     response = {};
   }
 
   if (!res.ok) {
-    // HTTP 상태 코드에 따른 에러 메시지
     if (res.status === 403) {
       throw new Error('이력서 조회 권한이 없습니다. (HTTP 403)');
     } else if (res.status === 404) {
@@ -159,7 +117,6 @@ export async function getResume(resumeId: string): Promise<ResumeData> {
 
     education:
       data.education?.map((edu: any) => {
-        // 백엔드 Enum → 프론트엔드 표시값 변환
         let type: string;
         switch (edu.educationLevel) {
           case 'ELEMENTARY':
@@ -172,7 +129,7 @@ export async function getResume(resumeId: string): Promise<ResumeData> {
             type = '고등학교';
             break;
           case 'UNIVERSITY_ABOVE':
-            type = '대학'; // 대학원도 UNIVERSITY_ABOVE로 오므로 기본값은 '대학'
+            type = '대학';
             break;
           default:
             type = edu.educationLevel || '대학';
@@ -213,7 +170,6 @@ export async function getResume(resumeId: string): Promise<ResumeData> {
     activities:
       data.activities
         ?.map((act: any) => {
-          // 백엔드 Enum → 프론트엔드 표시값 변환
           let frontendType: string;
           switch (act.type) {
             case 'ACTIVITY':
@@ -229,7 +185,6 @@ export async function getResume(resumeId: string): Promise<ResumeData> {
               frontendType = '활동';
           }
 
-          // 프론트엔드 형식: "타입:제목:기관"
           const org = act.organization ? `:${act.organization}` : '';
           return `${frontendType}:${act.title}${org}`;
         })
@@ -238,7 +193,6 @@ export async function getResume(resumeId: string): Promise<ResumeData> {
     certifications:
       data.certifications
         ?.map((cert: any) => {
-          // 백엔드 Enum → 프론트엔드 표시값 변환
           let frontendType: string;
           switch (cert.type) {
             case 'LICENSE':
@@ -254,7 +208,6 @@ export async function getResume(resumeId: string): Promise<ResumeData> {
               frontendType = '자격';
           }
 
-          // 프론트엔드 형식: "타입:이름:점수"
           const score = cert.scoreOrLevel ? `:${cert.scoreOrLevel}` : '';
           return `${frontendType}:${cert.name}${score}`;
         })
@@ -262,7 +215,6 @@ export async function getResume(resumeId: string): Promise<ResumeData> {
 
     skills:
       data.skills?.map((skill: any) => {
-        // 백엔드 Enum → 프론트엔드 표시값 변환
         let level: '초급' | '중급' | '고급';
         switch (skill.proficiencyLevel) {
           case 'BEGINNER':
@@ -303,9 +255,6 @@ export async function getResume(resumeId: string): Promise<ResumeData> {
   return resume;
 }
 
-// ---------------------------------------
-// UPDATE MEMO
-// ---------------------------------------
 export async function updateResumeMemo(resumeId: string, memo: string) {
   const res = await fetch(`${BASE_URL}/api/v1/resumes/${resumeId}/memo`, {
     method: 'PATCH',
@@ -326,9 +275,6 @@ export async function updateResumeMemo(resumeId: string, memo: string) {
   return response.data;
 }
 
-// ---------------------------------------
-// DELETE RESUME
-// ---------------------------------------
 export async function deleteResume(resumeId: string): Promise<void> {
   const res = await fetch(`${BASE_URL}/api/v1/resumes/${resumeId}`, {
     method: 'DELETE',
@@ -346,9 +292,6 @@ export async function deleteResume(resumeId: string): Promise<void> {
   }
 }
 
-// ---------------------------------------
-// UPDATE RESUME STATUS
-// ---------------------------------------
 export async function updateResumeStatus(
   resumeId: string,
   status: 'NEW' | 'BOOKMARK' | 'HOLD' | 'REJECT' | string
@@ -372,9 +315,6 @@ export async function updateResumeStatus(
   return response.data;
 }
 
-// ---------------------------------------
-// GET RESUME INTERVIEW INFO
-// ---------------------------------------
 export async function getResumeInterviewInfo(resumeId: string) {
   const res = await fetch(`${BASE_URL}/api/v1/resumes/${resumeId}/interview-info`, {
     method: 'GET',
@@ -394,9 +334,6 @@ export async function getResumeInterviewInfo(resumeId: string) {
   return response.data;
 }
 
-// ---------------------------------------
-// GET DOWNLOAD URL (Presigned URL)
-// ---------------------------------------
 export async function getDownloadUrl(fileKey: string): Promise<string> {
   const res = await fetch(
     `${BASE_URL}/api/v1/files/download?fileKey=${encodeURIComponent(fileKey)}`,

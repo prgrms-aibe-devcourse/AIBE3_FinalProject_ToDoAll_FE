@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import plusImg from '../../../assets/Vector-2.png';
-import CustomSelect from './CustomSelect'; // CustomSelect import
+import CustomSelect from './CustomSelect';
 
 type Experience = { type: string; title: string; organization: string };
 
@@ -18,12 +18,10 @@ export default function ExperienceFormSection({
     organization: '',
   });
 
-  // experienceData를 파싱해서 초기 리스트 구성
   const [list, setList] = useState<Experience[]>(() => {
     return experienceData
       .filter((v) => v.trim().length > 0)
       .map((v) => {
-        // "타입:제목:기관" 형식 파싱
         const parts = v.split(':').map((p) => p.trim());
         if (parts.length >= 2) {
           return {
@@ -37,7 +35,6 @@ export default function ExperienceFormSection({
       .filter((e): e is Experience => e !== null);
   });
 
-  // experienceData가 변경되면 리스트 업데이트
   useEffect(() => {
     const parsed = experienceData
       .filter((v) => v.trim().length > 0)
