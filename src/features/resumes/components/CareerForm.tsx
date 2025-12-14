@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import plusImg from '../../../assets/Vector-2.png';
 import type { ResumeData, CareerItem } from '../types/resumes.types';
+import AlertModal from '../../../components/Alertmodal';
 
 type Props = {
   formData: ResumeData;
@@ -15,6 +16,8 @@ function getTodayDate() {
 
 export default function CareerForm({ formData, onChange }: Props) {
   const [showForm, setShowForm] = useState(false);
+  const [showDateWarning, setShowDateWarning] = useState(false);
+  const [showRequiredWarning, setShowRequiredWarning] = useState(false);
   const [newCareer, setNewCareer] = useState<CareerItem>({
     company: '',
     startDate: getTodayDate(),
@@ -27,9 +30,15 @@ export default function CareerForm({ formData, onChange }: Props) {
   const addCareer = () => {
     const { company, startDate, endDate, position, department, job } = newCareer;
     if (!company || !startDate || !endDate || !position || !department || !job) {
-      alert('모든 항목을 입력해주세요.');
+      setShowRequiredWarning(true);
       return;
     }
+
+    if (new Date(startDate) > new Date(endDate)) {
+      setShowDateWarning(true);
+      return;
+    }
+
     onChange('career', [...(formData.career ?? []), newCareer]);
     setShowForm(false);
     setNewCareer({
@@ -58,7 +67,7 @@ export default function CareerForm({ formData, onChange }: Props) {
 
       <div>
         {formData.career?.map((item, idx) => (
-          <div key={idx} className="flex flex-wrap gap-2 border-b border-[#837C7C] p-2">
+          <div key={idx} className="relative flex flex-wrap gap-2 border-b border-[#837C7C] p-2">
             <span className="font-medium">{item.company}</span>
             <span>
               {item.startDate} ~ {item.endDate}
@@ -66,6 +75,26 @@ export default function CareerForm({ formData, onChange }: Props) {
             <span>{item.position}</span>
             <span>{item.department}</span>
             <span>{item.job}</span>
+            <button
+              type="button"
+              onClick={() => {
+                const updated = formData.career?.filter((_, i) => i !== idx) || [];
+                onChange('career', updated);
+              }}
+              className="absolute top-1 right-1 rounded-full p-1 transition hover:text-[#DE4F36]"
+              aria-label={`${item.company} 경력 삭제`}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
         ))}
       </div>
@@ -147,6 +176,24 @@ export default function CareerForm({ formData, onChange }: Props) {
           </div>
         </div>
       )}
+
+      <AlertModal
+        open={showDateWarning}
+        type="warning"
+        title="날짜 입력 오류"
+        message="입사일은 퇴사일보다 이전이어야 합니다. 날짜를 확인해주세요."
+        onClose={() => setShowDateWarning(false)}
+        confirmText="확인"
+      />
+
+      <AlertModal
+        open={showRequiredWarning}
+        type="warning"
+        title="입력 필수 항목"
+        message="모든 항목을 입력해주세요."
+        onClose={() => setShowRequiredWarning(false)}
+        confirmText="확인"
+      />
     </>
   );
 }

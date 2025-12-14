@@ -1,12 +1,28 @@
+import { useState } from 'react';
 import type { ResumeData } from '../types/resumes.types';
 import CustomSelect from './CustomSelect';
+import AlertModal from '../../../components/Alertmodal';
 
 type Props = {
   formData: ResumeData;
   onChange: <K extends keyof ResumeData>(_field: K, _value: ResumeData[K]) => void;
 };
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
 export default function BasicInfoForm({ formData, onChange }: Props) {
+  const [showSizeWarning, setShowSizeWarning] = useState(false);
+  const [fileSizeError, setFileSizeError] = useState<string>('');
+
+  const checkFileSize = (file: File): boolean => {
+    if (file.size > MAX_FILE_SIZE) {
+      const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+      setFileSizeError(`${fileSizeMB}MB`);
+      setShowSizeWarning(true);
+      return false;
+    }
+    return true;
+  };
   return (
     <section className="mb-6 rounded-2xl bg-white p-6 shadow-md">
       <div className="flex flex-col gap-6 md:flex-row">
@@ -83,7 +99,7 @@ export default function BasicInfoForm({ formData, onChange }: Props) {
           </div>
         </div>
 
-        <div className="h-48 w-48 flex-shrink-0">
+        <div className="relative h-48 w-48 flex-shrink-0">
           <label className="block h-full w-full cursor-pointer overflow-hidden rounded-lg border">
             {formData.profileImage ? (
               <img
@@ -106,28 +122,69 @@ export default function BasicInfoForm({ formData, onChange }: Props) {
                 const file = e.target.files?.[0];
                 if (!file) return;
 
-                // 1) 미리보기용 dataURL 저장
+                if (!checkFileSize(file)) {
+                  e.currentTarget.value = '';
+                  return;
+                }
+
                 const reader = new FileReader();
                 reader.onload = () => {
                   onChange('profileImage', reader.result as string);
                 };
                 reader.readAsDataURL(file);
 
-                // 2) ✅ 업로드용: files.resume에 저장
-                //    (부모 handleChange가 files를 merge 처리하므로 "부분 객체"만 넘겨도 안전)
                 onChange('files', {
                   resume: file,
                   resumeName: file.name,
                   resumeKey: '',
                 } as any);
 
-                // 같은 파일 다시 선택 가능하게 초기화(선택사항)
                 e.currentTarget.value = '';
               }}
             />
           </label>
+          {formData.profileImage && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onChange('profileImage', '');
+                onChange('files', {
+                  resume: null,
+                  resumeName: '',
+                  resumeKey: '',
+                } as any);
+              }}
+              className="text absolute top-1 right-1 rounded-full p-1 transition hover:text-[#DE4F36]"
+              aria-label="이미지 삭제"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
+
+      <AlertModal
+        open={showSizeWarning}
+        type="warning"
+        title="파일 크기 초과"
+        message={`파일 크기가 5MB를 초과합니다.\n\n선택한 파일 크기: ${fileSizeError}\n최대 허용 크기: 5MB\n\n5MB 이하의 파일을 선택해주세요.`}
+        onClose={() => {
+          setShowSizeWarning(false);
+          setFileSizeError('');
+        }}
+        confirmText="확인"
+      />
     </section>
   );
 }

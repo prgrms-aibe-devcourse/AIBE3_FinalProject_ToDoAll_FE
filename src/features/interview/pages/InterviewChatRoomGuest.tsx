@@ -1,4 +1,3 @@
-// src/pages/InterviewChatRoomGuest.tsx
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 
@@ -33,25 +32,21 @@ export default function InterviewChatRoomGuest() {
   const [candidateAvatar, setCandidateAvatar] = useState<string>(DEFAULT_AVATAR);
   const [resumeId, setResumeId] = useState<number | null>(null);
 
-  // echo 제거
   const pendingRef = useRef<{ content: string; at: number }[]>([]);
   const cleanupPending = useCallback(() => {
     const now = Date.now();
     pendingRef.current = pendingRef.current.filter((p) => now - p.at < 7000);
   }, []);
 
-  // ✅ “상대방 senderId” 추정: isMine=false 메시지들 중 첫 번째 senderId
   const otherSenderId = useMemo(() => {
     const firstOther = messages.find((m) => !m.isMine);
     return firstOther?.senderId;
   }, [messages]);
 
-  // INIT
   useEffect(() => {
     console.log('[GUEST INIT]', { interviewId, token: interviewToken ? 'YES' : 'NO' });
   }, [interviewId, interviewToken]);
 
-  // 인터뷰 상세
   useEffect(() => {
     if (!Number.isFinite(interviewId) || interviewId <= 0) return;
     if (!interviewToken) return;
@@ -74,7 +69,6 @@ export default function InterviewChatRoomGuest() {
     })();
   }, [interviewId, interviewToken]);
 
-  // 히스토리
   useEffect(() => {
     if (!Number.isFinite(interviewId) || interviewId <= 0) return;
     if (!interviewToken) return;
@@ -82,12 +76,6 @@ export default function InterviewChatRoomGuest() {
     (async () => {
       try {
         const history = await getChatHistoryWithGuestToken(interviewId, interviewToken);
-
-        console.log(
-          '[GUEST HISTORY senderIds]',
-          Array.from(new Set(history.map((x) => x.senderId)))
-        );
-        console.log('[GUEST HISTORY sample]', history.slice(0, 5));
 
         const mapped: UiMsg[] = history.map((m: ChatMessage) => ({
           id: m.id,
@@ -103,7 +91,6 @@ export default function InterviewChatRoomGuest() {
     })();
   }, [interviewId, interviewToken]);
 
-  // WS 수신
   const handleChatMessage = useCallback(
     (msg: any) => {
       const incoming = String(msg?.content ?? '').trim();
@@ -134,23 +121,17 @@ export default function InterviewChatRoomGuest() {
     guestToken: interviewToken,
   });
 
-  /**
-   * ✅ “지원자(상대방)” 아바타를 presigned로 세팅
-   * - senderId=0에 박지 않고, 실제로 화면에 등장하는 otherSenderId에 박는다.
-   */
   useEffect(() => {
     if (!interviewToken) return;
-    if (!otherSenderId) return; // 아직 메시지가 없으면 못 정함
+    if (!otherSenderId) return;
 
     (async () => {
       try {
-        // 1) candidateAvatar가 절대 URL이면 우선
         if (candidateAvatar && candidateAvatar !== DEFAULT_AVATAR) {
           setAvatarBySender((prev) => ({ ...prev, [otherSenderId]: candidateAvatar }));
           return;
         }
 
-        // 2) resumeId -> fileKey -> presigned
         if (!resumeId) {
           setAvatarBySender((prev) => ({ ...prev, [otherSenderId]: DEFAULT_AVATAR }));
           return;
@@ -178,7 +159,6 @@ export default function InterviewChatRoomGuest() {
     })();
   }, [interviewToken, resumeId, candidateAvatar, otherSenderId]);
 
-  // (옵션) 나머지 senderId들은 기본 아바타 세팅
   useEffect(() => {
     const senderIds = Array.from(new Set(messages.map((m) => m.senderId)));
     const missing = senderIds.filter(
@@ -193,8 +173,7 @@ export default function InterviewChatRoomGuest() {
 
     missing.forEach((id) => loadingAvatarRef.current.delete(id));
     setAvatarBySender((prev) => ({ ...prev, ...updates }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages]); // avatarBySender deps 제외
+  }, [messages]);
 
   const handleSend = (content: string) => {
     const trimmed = content.trim();

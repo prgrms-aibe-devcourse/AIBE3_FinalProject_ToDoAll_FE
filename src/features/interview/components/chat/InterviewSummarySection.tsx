@@ -139,16 +139,31 @@ export default function InterviewSummarySection({
                     type="text"
                     value={item.title}
                     onChange={(e) => handleEdit(idx, 'title', e.target.value)}
-                    onBlur={() => void handleBlur(idx)}
                     className="border-jd-gray-light focus:outline-jd-violet mb-2 w-full border-b bg-transparent text-sm font-semibold"
                   />
                   <textarea
                     value={item.content}
                     onChange={(e) => handleEdit(idx, 'content', e.target.value)}
-                    onBlur={() => void handleBlur(idx)}
                     rows={3}
-                    className="text-jd-black border-jd-gray-light focus:outline-jd-violet w-full resize-none rounded-md border bg-white p-2 text-sm"
+                    className="text-jd-black border-jd-gray-light focus:outline-jd-violet mb-2 w-full resize-none rounded-md border bg-white p-2 text-sm"
                   />
+                  <div className="flex justify-end gap-2">
+                    <button
+                      onClick={() => {
+                        setEditingIdx(null);
+                      }}
+                      className="text-jd-gray-dark hover:text-jd-black rounded px-3 py-1 text-xs transition"
+                    >
+                      취소
+                    </button>
+                    <button
+                      onClick={() => void handleBlur(idx)}
+                      disabled={savingIdx === idx}
+                      className="bg-jd-violet hover:bg-jd-violet-hover rounded px-3 py-1 text-xs font-semibold text-white transition disabled:cursor-not-allowed disabled:bg-gray-300"
+                    >
+                      {savingIdx === idx ? '저장 중...' : '저장'}
+                    </button>
+                  </div>
                 </>
               ) : (
                 <>
