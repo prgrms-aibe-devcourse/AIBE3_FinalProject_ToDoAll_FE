@@ -46,20 +46,8 @@ export default function MatchCard({ resume, matchRate, tab, onView, onInvite }: 
         statusLabel = '매칭 확정';
         statusClass = 'bg-[#4CAF50]';
         break;
-      case 'BOOKMARK':
-        statusLabel = '북마크';
-        statusClass = 'bg-[#3B82F6]';
-        break;
-      case 'HOLD':
-        statusLabel = '보류';
-        statusClass = 'bg-[#F97316]';
-        break;
-      case 'REJECTED':
-        statusLabel = '거절';
-        statusClass = 'bg-[#EF4444]';
-        break;
       default:
-        statusLabel = resume.status;
+        statusLabel = null;
     }
   }
 
