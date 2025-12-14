@@ -25,11 +25,6 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
 
     async function load() {
       console.groupCollapsed('[ResumeInfo] load');
-      console.log('files.resume:', data.files?.resume);
-      console.log('files.resumeKey:', data.files?.resumeKey);
-      console.log('files.portfolio:', data.files?.portfolio);
-      console.log('files.portfolioKey:', data.files?.portfolioKey);
-      console.log('profileImage:', data.profileImage);
       console.groupEnd();
 
       if (alive) {
@@ -37,12 +32,6 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
         setResumeHref('');
         setPortfolioHref('');
       }
-
-      console.log('[ResumeInfo] Starting file load process');
-      console.log('[ResumeInfo] files.resume is File?', data.files?.resume instanceof File);
-      console.log('[ResumeInfo] files.resumeKey:', data.files?.resumeKey);
-      console.log('[ResumeInfo] files.portfolio is File?', data.files?.portfolio instanceof File);
-      console.log('[ResumeInfo] files.portfolioKey:', data.files?.portfolioKey);
 
       if (data.files?.resume && data.files.resume instanceof File) {
         const objUrl = URL.createObjectURL(data.files.resume);
@@ -136,23 +125,23 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
 
       <div className="relative rounded-2xl bg-white p-6 shadow">
         {/* 프로필 */}
-        {profileHref ? (
-          <img
-            src={profileHref}
-            alt={`${data.name} 프로필`}
-            className="absolute top-6 right-6 h-48 w-36 rounded-[10px] object-cover shadow-md"
-            onError={(e) => {
-              console.error('[PROFILE] load fail:', profileHref, e);
-              console.error('[PROFILE] files.resume:', data.files?.resume);
-              console.error('[PROFILE] files.resumeKey:', data.files?.resumeKey);
-            }}
-            onLoad={() => console.log('[PROFILE] load ok:', profileHref)}
-          />
-        ) : (
-          <div className="absolute top-6 right-6 flex h-48 w-36 items-center justify-center rounded-[10px] bg-gray-200 text-xs text-gray-400">
-            프로필 없음
-          </div>
-        )}
+        <img
+          src={profileHref || '/images/default-profile.jpg'}
+          alt={`${data.name} 프로필`}
+          className="absolute top-6 right-6 h-48 w-36 rounded-[10px] object-cover shadow-md"
+          onError={(e) => {
+            console.error('[PROFILE] load fail:', profileHref, e);
+            console.error('[PROFILE] files.resume:', data.files?.resume);
+            console.error('[PROFILE] files.resumeKey:', data.files?.resumeKey);
+            const target = e.target as HTMLImageElement;
+            if (target.src !== '/images/default-profile.jpg') {
+              target.src = '/images/default-profile.jpg';
+            }
+          }}
+          onLoad={() =>
+            console.log('[PROFILE] load ok:', profileHref || '/images/default-profile.jpg')
+          }
+        />
 
         {/* 이름 / 직무 */}
         <header className="mb-8 flex items-center justify-between">
