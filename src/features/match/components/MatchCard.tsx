@@ -71,9 +71,12 @@ export default function MatchCard({ resume, matchRate, tab, onView, onInvite }: 
       <div className="flex w-full items-start gap-4 pr-[160px]">
         {/* 프로필 이미지 */}
         <img
-          src={resume.profileImage || '/default-profile.png'}
+          src={resume.profileImage || '/images/default-profile.jpg'}
           alt={resume.name}
           className="h-24 w-24 rounded-full object-cover"
+          onError={(e) => {
+            e.currentTarget.src = '/images/default-profile.jpg';
+          }}
         />
 
         <div className="flex w-full flex-col justify-between">
