@@ -1,12 +1,28 @@
+import { useState } from 'react';
 import type { ResumeData } from '../types/resumes.types';
 import CustomSelect from './CustomSelect';
+import AlertModal from '../../../components/Alertmodal';
 
 type Props = {
   formData: ResumeData;
   onChange: <K extends keyof ResumeData>(_field: K, _value: ResumeData[K]) => void;
 };
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
 export default function BasicInfoForm({ formData, onChange }: Props) {
+  const [showSizeWarning, setShowSizeWarning] = useState(false);
+  const [fileSizeError, setFileSizeError] = useState<string>('');
+
+  const checkFileSize = (file: File): boolean => {
+    if (file.size > MAX_FILE_SIZE) {
+      const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+      setFileSizeError(`${fileSizeMB}MB`);
+      setShowSizeWarning(true);
+      return false;
+    }
+    return true;
+  };
   return (
     <section className="mb-6 rounded-2xl bg-white p-6 shadow-md">
       <div className="flex flex-col gap-6 md:flex-row">
@@ -106,6 +122,13 @@ export default function BasicInfoForm({ formData, onChange }: Props) {
                 const file = e.target.files?.[0];
                 if (!file) return;
 
+                // 파일 크기 체크
+                if (!checkFileSize(file)) {
+                  // 파일 크기 초과 시 input 초기화
+                  e.currentTarget.value = '';
+                  return;
+                }
+
                 // 1) 미리보기용 dataURL 저장
                 const reader = new FileReader();
                 reader.onload = () => {
@@ -128,6 +151,18 @@ export default function BasicInfoForm({ formData, onChange }: Props) {
           </label>
         </div>
       </div>
+
+      <AlertModal
+        open={showSizeWarning}
+        type="warning"
+        title="파일 크기 초과"
+        message={`파일 크기가 5MB를 초과합니다.\n\n선택한 파일 크기: ${fileSizeError}\n최대 허용 크기: 5MB\n\n5MB 이하의 파일을 선택해주세요.`}
+        onClose={() => {
+          setShowSizeWarning(false);
+          setFileSizeError('');
+        }}
+        confirmText="확인"
+      />
     </section>
   );
 }

@@ -1,21 +1,41 @@
 import { useState } from 'react';
 import purplePlusImg from '../../../assets/Vector-3.png';
 import type { ResumeData } from '../types/resumes.types';
+import AlertModal from '../../../components/Alertmodal';
 
 type Props = {
   formData: ResumeData;
   onChange: <K extends keyof ResumeData>(_field: K, _value: ResumeData[K]) => void;
 };
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
 export default function FileUploadForm({ formData, onChange }: Props) {
   const [showForm, setShowForm] = useState(false);
   const [newFile, setNewFile] = useState<{ name: string; file?: File }>({ name: '' });
+  const [showSizeWarning, setShowSizeWarning] = useState(false);
+  const [fileSizeError, setFileSizeError] = useState<string>('');
+
+  const checkFileSize = (file: File): boolean => {
+    if (file.size > MAX_FILE_SIZE) {
+      const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+      setFileSizeError(`${fileSizeMB}MB`);
+      setShowSizeWarning(true);
+      return false;
+    }
+    return true;
+  };
 
   const addPortfolioFile = () => {
     console.log('[addPortfolioFile] newFile:', newFile);
 
     if (!newFile.file) {
       alert('파일을 선택해주세요.');
+      return;
+    }
+
+    // 파일 크기 체크
+    if (!checkFileSize(newFile.file)) {
       return;
     }
 
@@ -60,7 +80,20 @@ export default function FileUploadForm({ formData, onChange }: Props) {
               type="file"
               accept=".pdf,.doc,.docx,.ppt,.pptx,.zip,.jpg,.jpeg,.png"
               className="rounded-[10px] border p-2"
-              onChange={(e) => setNewFile({ ...newFile, file: e.target.files?.[0] })}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  // 파일 선택 시 바로 크기 체크
+                  if (checkFileSize(file)) {
+                    setNewFile({ ...newFile, file });
+                  } else {
+                    // 파일 크기 초과 시 input 초기화
+                    e.target.value = '';
+                  }
+                } else {
+                  setNewFile({ ...newFile, file: undefined });
+                }
+              }}
             />
             <button
               type="button"
@@ -81,6 +114,18 @@ export default function FileUploadForm({ formData, onChange }: Props) {
           </ul>
         </div>
       )}
+
+      <AlertModal
+        open={showSizeWarning}
+        type="warning"
+        title="파일 크기 초과"
+        message={`파일 크기가 5MB를 초과합니다.\n\n선택한 파일 크기: ${fileSizeError}\n최대 허용 크기: 5MB\n\n5MB 이하의 파일을 선택해주세요.`}
+        onClose={() => {
+          setShowSizeWarning(false);
+          setFileSizeError('');
+        }}
+        confirmText="확인"
+      />
     </>
   );
 }
