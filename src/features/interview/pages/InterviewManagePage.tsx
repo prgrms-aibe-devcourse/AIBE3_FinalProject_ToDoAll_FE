@@ -77,15 +77,15 @@ export default function InterviewManagePage() {
       title: jd.title,
     })) ?? [];
 
-  const toKST = (dateStr: string) => {
-    const date = new Date(dateStr);
-    date.setHours(date.getHours() + 9);
-    return date;
-  };
+  // const toKST = (dateStr: string) => {
+  //   const date = new Date(dateStr);
+  //   date.setHours(date.getHours() + 9);
+  //   return date;
+  // };
 
   const interviews: InterviewCardData[] =
     interviewList?.data?.map((i) => {
-      const kstDate = toKST(i.scheduledAt);
+      const kstDate = new Date(i.scheduledAt);
       const pad = (n: number) => n.toString().padStart(2, '0');
 
       const year = kstDate.getFullYear();

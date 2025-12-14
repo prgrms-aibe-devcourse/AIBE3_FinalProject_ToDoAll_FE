@@ -75,6 +75,9 @@ export default function MatchCard({ resume, matchRate, tab, onView, onInvite }: 
           src={resume.profileImage || userDefaultImage}
           alt={resume.name}
           className="h-24 w-24 rounded-full object-cover"
+          onError={(e) => {
+            e.currentTarget.src = userDefaultImage;
+          }}
         />
 
         <div className="flex w-full flex-col justify-between">
