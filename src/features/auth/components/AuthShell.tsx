@@ -23,13 +23,7 @@ export default function AuthShell({
   return (
     <div className="relative min-h-dvh w-full overflow-hidden">
       <div className="fixed inset-0 -z-10 bg-[radial-gradient(100%_100%_at_50%_0%,#eeeeef_0%,#dcdcdc_35%,#d6d6d6_60%,#cfcfcf_100%)]">
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-30"
-          style={{
-            backgroundImage: "url('/images/auth-still.jpg')",
-            filter: 'blur(2px)',
-          }}
-        />
+        <div className="absolute inset-0 bg-cover bg-center opacity-30" />
         <div
           className="pointer-events-none absolute inset-0 opacity-10 mix-blend-multiply"
           style={{

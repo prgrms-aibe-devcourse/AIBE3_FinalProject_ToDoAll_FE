@@ -2,6 +2,7 @@ import emptyHeartImg from '../../../assets/Favorite-2.png';
 import fullHeartImg from '../../../assets/Heart.png';
 import { useState, type MouseEvent } from 'react';
 import type { MatchCardData } from '../types/matchCardData.types';
+import { userDefaultImage } from '@/const.ts';
 
 type Props = {
   resume: MatchCardData;
@@ -59,11 +60,11 @@ export default function MatchCard({ resume, matchRate, tab, onView, onInvite }: 
       <div className="flex w-full items-start gap-4 pr-[160px]">
         {/* 프로필 이미지 */}
         <img
-          src={resume.profileImage || '/images/default-profile.jpg'}
+          src={resume.profileImage || userDefaultImage}
           alt={resume.name}
           className="h-24 w-24 rounded-full object-cover"
           onError={(e) => {
-            e.currentTarget.src = '/images/default-profile.jpg';
+            e.currentTarget.src = userDefaultImage;
           }}
         />
 
