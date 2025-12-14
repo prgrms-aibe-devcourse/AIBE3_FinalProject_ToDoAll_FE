@@ -133,6 +133,8 @@ export default function BasicInfoForm({ formData, onChange }: Props) {
                 };
                 reader.readAsDataURL(file);
 
+                console.log('file', file);
+
                 onChange('files', {
                   resume: file,
                   resumeName: file.name,
