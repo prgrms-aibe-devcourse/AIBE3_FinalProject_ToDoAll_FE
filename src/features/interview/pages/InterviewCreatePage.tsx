@@ -138,7 +138,7 @@ export default function InterviewCreatePage() {
     setIsSubmitting(true);
 
     // 선택된 날짜 + 시간 하나의 ISO로 병합
-    const scheduledAt = new Date(`${date}T${time}:00`).toISOString();
+    const scheduledAt = `${date}T${time}:00`;
 
     const body = {
       jdId: Number(jdId),
