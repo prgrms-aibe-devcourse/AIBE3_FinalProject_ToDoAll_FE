@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
+import { AuthContext } from '@/AuthContext.ts';
 let baseUrl = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 
 if (baseUrl.endsWith('/api')) {
@@ -22,6 +23,7 @@ export default function useFetch<T>(
 ) {
   const [resData, setResData] = useState<T | null>(defaultValue ?? null);
   const controller = useRef<AbortController | null>(null);
+  const { accessToken } = useContext(AuthContext);
 
   useEffect(() => {
     if (!url) return;
@@ -39,7 +41,7 @@ export default function useFetch<T>(
       method,
       credentials: 'include',
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
         ...headers,
       },

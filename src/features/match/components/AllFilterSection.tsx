@@ -38,9 +38,6 @@ function AllFilterSection({
           <option value="APPLIED">지원됨</option>
           <option value="RECOMMENDED">추천됨</option>
           <option value="CONFIRMED">매칭 확정됨</option>
-          <option value="BOOKMARK">북마크됨</option>
-          <option value="HOLD">보류됨</option>
-          <option value="REJECTED">거절됨</option>
         </select>
       </div>
 

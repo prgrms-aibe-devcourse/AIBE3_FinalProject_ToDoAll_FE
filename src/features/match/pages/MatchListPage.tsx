@@ -26,7 +26,7 @@ export default function MatchListPage() {
   const [totalPages, setTotalPages] = useState(1);
 
   const [jdId, setJobId] = useState<number | null>(null);
-  const [sortType, setSortType] = useState<string>('LATEST');
+  const [sortType, setSortType] = useState<string>('SCORE_DESC');
 
   const [status, setStatus] = useState<string>('');
 

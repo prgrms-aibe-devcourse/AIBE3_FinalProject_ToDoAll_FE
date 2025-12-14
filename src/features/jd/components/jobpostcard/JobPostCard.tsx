@@ -1,3 +1,5 @@
+import { JobPostDefaultImage } from '@/const.ts';
+
 export type JobPostCardProps = {
   title: string;
   location: string;
@@ -16,7 +18,7 @@ export default function JobPostCard({
   location,
   applicantsLabel,
   statusLabel = '진행중',
-  thumbnailUrl = 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=800&auto=format&fit=crop',
+  thumbnailUrl = JobPostDefaultImage,
   skills = [],
   updatedAt,
   postedAt,

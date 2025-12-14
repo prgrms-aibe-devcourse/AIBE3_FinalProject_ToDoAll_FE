@@ -4,6 +4,7 @@ import InterviewFilterTabs from '../components/manage/InterviewFilterTabs';
 import InterviewSortDropdown from '../components/manage/InterviewSortDropdown';
 import type { TabStatus, InterviewStatus, ResultStatus } from '../types/interviewer';
 import useFetch from '@/hooks/useFetch';
+import { userDefaultImage } from '@/const.ts';
 
 interface InterviewSummaryResponse {
   interviewId: number;
@@ -102,7 +103,7 @@ export default function InterviewManagePage() {
         interviewers: i.interviewers?.join(', ') || '면접관 없음',
         status: i.status,
         result: i.resultStatus,
-        avatar: i.candidateAvatar || '/images/default-profile.jpg',
+        avatar: i.candidateAvatar || userDefaultImage,
         resumeId: i.resumeId,
       };
     }) ?? [];
