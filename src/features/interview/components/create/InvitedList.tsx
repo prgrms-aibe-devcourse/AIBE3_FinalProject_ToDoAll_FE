@@ -17,7 +17,11 @@ export default function InvitedList({ invited, handleRemove }: Props) {
               className="relative flex items-center rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-md"
             >
               <div className="flex items-center gap-3">
-                <img src={i.avatar} alt={i.name} className="h-10 w-10 rounded-full object-cover" />
+                <img
+                  src={i.avatar ?? '/images/default-profile.jpg'}
+                  alt={i.name}
+                  className="h-10 w-10 rounded-full object-cover"
+                />
                 <span className="font-medium text-gray-800">{i.name}</span>
               </div>
 

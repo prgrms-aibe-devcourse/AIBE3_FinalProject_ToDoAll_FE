@@ -15,7 +15,7 @@ export default function ApplicantProfileCard({ applicant }: ApplicantProfile) {
   return (
     <div className="mt-16 flex flex-col items-center rounded-xl bg-[#d8cfcc] p-6 shadow-md">
       <img
-        src={avatar ?? '/default-avatar.png'}
+        src={avatar ?? '/images/default-profile.jpg'}
         alt={name}
         className="mb-6 h-36 w-36 rounded-full object-cover"
       />
