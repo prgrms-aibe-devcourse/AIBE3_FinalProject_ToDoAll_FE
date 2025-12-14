@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import ResumeInfo from '../components/ResumeInfo';
 import type { ResumeData } from '../types/resumes.types';
 
 export default function ResumeSubmitSuccessPage() {
-  const navigate = useNavigate();
   const { state } = useLocation();
 
   const jdId = state?.jdId as number | undefined;
@@ -32,7 +31,8 @@ export default function ResumeSubmitSuccessPage() {
     if (jdId) {
       localStorage.removeItem(`resumeDraft:${jdId}`);
     }
-    navigate('/');
+
+    window.close();
   };
 
   return (
@@ -50,17 +50,23 @@ export default function ResumeSubmitSuccessPage() {
             onClick={handleClose}
             className="mt-6 rounded-lg bg-[#752F6D] px-6 py-2 text-white hover:bg-[#5E2558]"
           >
-            닫기
+            창닫기
           </button>
         </>
       ) : (
         <div className="flex flex-col items-center">
           <p className="mb-4 text-red-500">이력서 데이터를 불러올 수 없습니다.</p>
           <button
-            onClick={() => navigate('/')}
-            className="rounded-lg bg-[#752F6D] px-6 py-2 text-white"
+            onClick={() => {
+              if (jdId) {
+                localStorage.removeItem(`resumeDraft:${jdId}`);
+              }
+
+              window.close();
+            }}
+            className="rounded-lg bg-[#752F6D] px-6 py-2 text-white hover:bg-[#5E2558]"
           >
-            홈으로
+            창닫기
           </button>
         </div>
       )}
