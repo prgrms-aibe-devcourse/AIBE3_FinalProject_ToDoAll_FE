@@ -87,7 +87,7 @@ export default function EducationForm({ formData, onChange }: Props) {
 
       <div>
         {formData.education.map((edu, idx) => (
-          <div key={idx} className="flex flex-wrap gap-2 border-b border-[#837C7C] p-2">
+          <div key={idx} className="relative flex flex-wrap gap-2 border-b border-[#837C7C] p-2">
             <span className="font-medium">{edu.type}</span>
             <span>{edu.name}</span>
             <span>
@@ -105,6 +105,26 @@ export default function EducationForm({ formData, onChange }: Props) {
                 )}
               </>
             ) : null}
+            <button
+              type="button"
+              onClick={() => {
+                const updated = formData.education.filter((_, i) => i !== idx);
+                onChange('education', updated);
+              }}
+              className="absolute top-1 right-1 rounded-full p-1 transition hover:text-[#DE4F36]"
+              aria-label={`${edu.name} 학력 삭제`}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
         ))}
       </div>
