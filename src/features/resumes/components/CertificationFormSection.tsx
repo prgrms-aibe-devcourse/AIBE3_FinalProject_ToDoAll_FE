@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import plusImg from '../../../assets/Vector-2.png';
-import CustomSelect from './CustomSelect'; // CustomSelect import
+import CustomSelect from './CustomSelect';
+import AlertModal from '../../../components/Alertmodal';
 
 type Certification = { type: string; title: string; hasScore: boolean; score?: string };
 
@@ -19,6 +20,7 @@ export default function CertificationFormSection({
     score: '',
   });
   const [list, setList] = useState<Certification[]>([]);
+  const [showScoreWarning, setShowScoreWarning] = useState(false);
 
   const addCert = () => {
     if (!certInput.title.trim()) return;
@@ -47,11 +49,32 @@ export default function CertificationFormSection({
         {list.map((c, idx) => (
           <div
             key={idx}
-            className="flex flex-wrap gap-2 border-b border-[#837C7C] p-2 last:border-b-0"
+            className="relative flex flex-wrap gap-2 border-b border-[#837C7C] p-2 last:border-b-0"
           >
             <span className="font-medium">{c.type}</span>
             <span>{c.title}</span>
             <span>{c.hasScore && c.score ? `${c.score}점` : ''}</span>
+            <button
+              type="button"
+              onClick={() => {
+                const updated = list.filter((_, i) => i !== idx);
+                setList(updated);
+                onChange(updated.map((i) => `${i.type}:${i.title}:${i.score || ''}`));
+              }}
+              className="absolute top-1 right-1 rounded-full p-1 transition hover:text-[#DE4F36]"
+              aria-label={`${c.title} 삭제`}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
         ))}
       </div>
@@ -93,7 +116,15 @@ export default function CertificationFormSection({
                 type="text"
                 placeholder="점수 입력"
                 value={certInput.score}
-                onChange={(e) => setCertInput({ ...certInput, score: e.target.value })}
+                onChange={(e) => {
+                  const value = e.target.value;
+
+                  if (value === '' || /^\d+$/.test(value)) {
+                    setCertInput({ ...certInput, score: value });
+                  } else {
+                    setShowScoreWarning(true);
+                  }
+                }}
                 className="w-24 rounded-[10px] border px-3 py-2"
               />
             )}
@@ -110,6 +141,15 @@ export default function CertificationFormSection({
           </div>
         </div>
       )}
+
+      <AlertModal
+        open={showScoreWarning}
+        type="warning"
+        title="입력 오류"
+        message="점수는 숫자만 입력 가능합니다. 숫자를 입력해주세요."
+        onClose={() => setShowScoreWarning(false)}
+        confirmText="확인"
+      />
     </>
   );
 }

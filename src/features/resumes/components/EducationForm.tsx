@@ -2,6 +2,7 @@ import { useState } from 'react';
 import plusImg from '../../../assets/Vector-2.png';
 import type { ResumeData, EducationItem } from '../types/resumes.types';
 import CustomSelect from './CustomSelect';
+import AlertModal from '../../../components/Alertmodal';
 
 type Props = {
   formData: ResumeData;
@@ -10,6 +11,8 @@ type Props = {
 
 export default function EducationForm({ formData, onChange }: Props) {
   const [showForm, setShowForm] = useState(false);
+  const [showDateWarning, setShowDateWarning] = useState(false);
+  const [showRequiredWarning, setShowRequiredWarning] = useState(false);
 
   const [newEdu, setNewEdu] = useState<Partial<EducationItem>>({
     type: undefined,
@@ -50,7 +53,12 @@ export default function EducationForm({ formData, onChange }: Props) {
 
   const addEducation = () => {
     if (!newEdu.type || !newEdu.name || !newEdu.startDate || !newEdu.endDate) {
-      alert('학력 구분, 학교명, 입학일, 졸업일을 모두 입력해주세요.');
+      setShowRequiredWarning(true);
+      return;
+    }
+
+    if (new Date(newEdu.startDate) > new Date(newEdu.endDate)) {
+      setShowDateWarning(true);
       return;
     }
 
@@ -87,7 +95,7 @@ export default function EducationForm({ formData, onChange }: Props) {
 
       <div>
         {formData.education.map((edu, idx) => (
-          <div key={idx} className="flex flex-wrap gap-2 border-b border-[#837C7C] p-2">
+          <div key={idx} className="relative flex flex-wrap gap-2 border-b border-[#837C7C] p-2">
             <span className="font-medium">{edu.type}</span>
             <span>{edu.name}</span>
             <span>
@@ -105,6 +113,26 @@ export default function EducationForm({ formData, onChange }: Props) {
                 )}
               </>
             ) : null}
+            <button
+              type="button"
+              onClick={() => {
+                const updated = formData.education.filter((_, i) => i !== idx);
+                onChange('education', updated);
+              }}
+              className="absolute top-1 right-1 rounded-full p-1 transition hover:text-[#DE4F36]"
+              aria-label={`${edu.name} 학력 삭제`}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
         ))}
       </div>
@@ -223,6 +251,24 @@ export default function EducationForm({ formData, onChange }: Props) {
           )}
         </div>
       )}
+
+      <AlertModal
+        open={showDateWarning}
+        type="warning"
+        title="날짜 입력 오류"
+        message="입학일은 졸업일보다 이전이어야 합니다. 날짜를 확인해주세요."
+        onClose={() => setShowDateWarning(false)}
+        confirmText="확인"
+      />
+
+      <AlertModal
+        open={showRequiredWarning}
+        type="warning"
+        title="입력 필수 항목"
+        message="학력 구분, 학교명, 입학일, 졸업일을 모두 입력해주세요."
+        onClose={() => setShowRequiredWarning(false)}
+        confirmText="확인"
+      />
     </>
   );
 }

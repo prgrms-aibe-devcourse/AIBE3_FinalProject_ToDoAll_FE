@@ -1,4 +1,3 @@
-// src/features/resumes/pages/ResumePreviewPage.tsx
 import { useLocation, useNavigate } from 'react-router-dom';
 import type { ResumeData } from '../types/resumes.types';
 import ResumeInfo from '../components/ResumeInfo';

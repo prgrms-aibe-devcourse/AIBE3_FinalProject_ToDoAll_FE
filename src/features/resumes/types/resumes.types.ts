@@ -1,5 +1,3 @@
-// src/features/resumes/types/resumes.types.ts
-
 export type Skill = {
   name: string;
   level: '초급' | '중급' | '고급';
@@ -29,16 +27,13 @@ export type CareerItem = {
 };
 
 export type ResumeFiles = {
-  // ✅ 업로드용
   resume: File | null;
   portfolio: File | null;
   etc: File[];
 
-  // ✅ 조회용(fileKey)
   resumeKey: string;
   portfolioKey: string;
 
-  // ✅ 화면 표시용
   resumeName: string;
   portfolioName: string;
   etcNames: string[];

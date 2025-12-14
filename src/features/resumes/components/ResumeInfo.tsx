@@ -32,7 +32,6 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
       console.log('profileImage:', data.profileImage);
       console.groupEnd();
 
-      // 초기화
       if (alive) {
         setProfileHref('');
         setResumeHref('');
@@ -45,22 +44,14 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
       console.log('[ResumeInfo] files.portfolio is File?', data.files?.portfolio instanceof File);
       console.log('[ResumeInfo] files.portfolioKey:', data.files?.portfolioKey);
 
-      /** ----------------------------------------------------
-       * 1) 프로필 사진은 "resumefileurl" (=resumeKey or resume File)로만 만든다
-       *  - Preview/Success: files.resume = File
-       *  - Detail: files.resumeKey = key
-       * ---------------------------------------------------- */
-      // A) File이면 objectURL로 프로필 + 자기소개서 링크 둘 다 설정
       if (data.files?.resume && data.files.resume instanceof File) {
         const objUrl = URL.createObjectURL(data.files.resume);
         console.log('[ResumeInfo] Created resume objectURL:', objUrl);
         if (!alive) return;
-        setResumeObjectUrl(objUrl); // cleanup용 저장
+        setResumeObjectUrl(objUrl);
         setProfileHref(objUrl);
         setResumeHref(objUrl);
-      }
-      // B) key면 presigned로 프로필 + 자기소개서 링크 둘 다 설정
-      else if (data.files?.resumeKey) {
+      } else if (data.files?.resumeKey) {
         try {
           const url = await getDownloadUrl(data.files.resumeKey);
           if (!alive) return;
@@ -72,17 +63,13 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
           setProfileHref('');
           setResumeHref('');
         }
-      }
-      // C) 둘 다 없으면 profileImage 확인 (key일 수도 있음)
-      else {
+      } else {
         const p = data.profileImage || '';
         if (p) {
-          // 이미 URL인 경우
           if (p.startsWith('http://') || p.startsWith('https://') || p.startsWith('data:')) {
             if (!alive) return;
             setProfileHref(p);
           } else {
-            // key인 경우 presigned URL로 변환
             try {
               const url = await getDownloadUrl(p);
               if (!alive) return;
@@ -96,15 +83,11 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
         }
       }
 
-      /** ----------------------------------------------------
-       *  2) 포트폴리오 링크
-       * ---------------------------------------------------- */
-      // File(미리보기/제출완료)면 objectURL
       if (data.files?.portfolio && data.files.portfolio instanceof File) {
         const objUrl = URL.createObjectURL(data.files.portfolio);
         console.log('[ResumeInfo] Created portfolio objectURL:', objUrl);
         if (!alive) return;
-        setPortfolioObjectUrl(objUrl); // cleanup용 저장
+        setPortfolioObjectUrl(objUrl);
         setPortfolioHref(objUrl);
       } else if (data.files?.portfolioKey) {
         try {
@@ -126,7 +109,6 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
     return () => {
       alive = false;
     };
-    // resume/portfolio가 File일 수도 있어서 deps에 포함
   }, [
     data.files?.resume,
     data.files?.resumeKey,
@@ -153,7 +135,7 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
       <h2 className="text-[30px] font-semibold text-[#413F3F]">지원서</h2>
 
       <div className="relative rounded-2xl bg-white p-6 shadow">
-        {/* 프로필: resumefileurl 기반(profileHref) */}
+        {/* 프로필 */}
         {profileHref ? (
           <img
             src={profileHref}
@@ -202,7 +184,7 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
           </div>
         </div>
 
-        {/* 파일 섹션 */}
+        {/* 파일 */}
         <section className="mt-6 flex flex-row gap-2">
           <div className="flex-1 rounded-[10px] border border-[#E3DBDB] p-5">
             <h2 className="font-semibold text-[#413F3F]">포트폴리오</h2>

@@ -5,8 +5,7 @@ import BasicInfoForm from '../components/BasicInfoForm';
 import ResumeForm from '../components/ResumeForm';
 import { createResume } from '../data/resumes.api';
 import { getJobDescription } from '../data/jd.api';
-
-// (상단 import 동일)
+import AlertModal from '../../../components/Alertmodal';
 
 const DRAFT_KEY = (jdId: number) => `resumeDraft:${jdId}`;
 
@@ -16,6 +15,8 @@ export default function ResumeCreatePage() {
   const navigate = useNavigate();
 
   const [jobTitle, setJobTitle] = useState('');
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [formData, setFormData] = useState<ResumeData>({
     id: '',
     jdId,
@@ -48,7 +49,6 @@ export default function ResumeCreatePage() {
     memo: '',
   });
 
-  // 🔹 공고명 로드
   useEffect(() => {
     async function fetchJD() {
       if (!jdId || isNaN(jdId)) return;
@@ -62,7 +62,6 @@ export default function ResumeCreatePage() {
     fetchJD();
   }, [jdId]);
 
-  // 🔹 draft 복원
   useEffect(() => {
     if (!jdId || isNaN(jdId)) return;
 
@@ -86,25 +85,20 @@ export default function ResumeCreatePage() {
     }
   }, [jdId]);
 
-  // 🔹 draft 저장
-  // 수정된 saveDraft (파일을 건드리지 않음)
   const saveDraft = (next: ResumeData) => {
     if (!jdId || isNaN(jdId)) return;
 
     const toSave: ResumeData = {
       ...next,
       jdId,
-      // ❌ files 안에서 resume/portfolio 를 null로 덮어쓰지 말 것
       files: {
         ...next.files,
-        // etc: []  // 이것도 굳이 초기화 안 해도 됨. 필요하면 유지.
       },
     };
 
     localStorage.setItem(DRAFT_KEY(jdId), JSON.stringify(toSave));
   };
 
-  // 🔹 필드 업데이트 + draft 저장
   const handleChange = <K extends keyof ResumeData>(field: K, value: ResumeData[K]) => {
     setFormData((prev) => {
       const next =
@@ -113,7 +107,7 @@ export default function ResumeCreatePage() {
               ...prev,
               files: {
                 ...prev.files,
-                ...(value as ResumeData['files']), // 🔥 files 정확 merge
+                ...(value as ResumeData['files']),
               },
             } as ResumeData)
           : ({ ...prev, [field]: value } as ResumeData);
@@ -123,30 +117,19 @@ export default function ResumeCreatePage() {
     });
   };
 
-  // 🔹 제출
   const handleSubmit = async () => {
-    console.log('[SUBMIT] formData.files:', formData.files);
-
     try {
-      const result = await createResume(formData);
-
-      if (jdId && !isNaN(jdId)) {
-        localStorage.removeItem(DRAFT_KEY(jdId));
-      }
-
-      // File 객체는 location.state로 전달할 수 없으므로 resumeId만 전달
-      // ResumeSubmitSuccessPage에서 resumeId로 다시 조회
-      // resumeId를 문자열로 변환 (백엔드에서 숫자로 올 수 있음)
-      const resumeId = String(result.id);
-      console.log('[ResumeCreatePage] Created resume ID:', resumeId, typeof resumeId);
+      await createResume(formData);
 
       navigate('/resume/submit-success', {
         state: {
-          resumeId,
+          jdId,
+          formData,
         },
       });
     } catch (e: any) {
-      alert('제출 실패: ' + e.message);
+      setErrorMessage('제출 실패: ' + e.message);
+      setShowErrorModal(true);
     }
   };
 
@@ -189,6 +172,18 @@ export default function ResumeCreatePage() {
           </button>
         </div>
       </div>
+
+      <AlertModal
+        open={showErrorModal}
+        type="error"
+        title="제출 실패"
+        message={errorMessage}
+        onClose={() => {
+          setShowErrorModal(false);
+          setErrorMessage('');
+        }}
+        confirmText="확인"
+      />
     </div>
   );
 }

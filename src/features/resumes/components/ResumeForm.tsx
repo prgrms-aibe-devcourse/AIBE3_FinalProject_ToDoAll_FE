@@ -15,7 +15,6 @@ type Props = {
 export default function ResumeForm({ formData, onChange }: Props) {
   return (
     <section className="mt-6 space-y-6 rounded-[10px] bg-white p-6 text-[#413F3F] shadow-sm">
-      {/* 🔥 resume + portfolio 업로드 모두 여기서 처리 */}
       <FileUploadForm formData={formData} onChange={onChange} />
 
       <EducationForm formData={formData} onChange={onChange} />

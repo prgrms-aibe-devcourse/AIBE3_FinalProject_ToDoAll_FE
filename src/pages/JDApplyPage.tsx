@@ -20,7 +20,7 @@ export default function JDDetailPage() {
         <h1 className="text-lg font-semibold">공고 관리</h1>
         <button
           className="rounded-full bg-orange-500 px-3 py-1.5 text-sm text-white shadow hover:bg-orange-600"
-          onClick={() => navigate(`/resume/create/${id}`)}
+          onClick={() => window.open(`/resume/create/${id}`, '_blank')}
         >
           지원하기
         </button>

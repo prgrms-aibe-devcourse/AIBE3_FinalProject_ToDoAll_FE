@@ -305,8 +305,8 @@ export default function InterviewNotePage() {
       </header>
 
       <div className="flex flex-1 gap-6 overflow-hidden p-6">
-        {/* 왼쪽 20% → 기존 25%보다 좁게 */}
-        <div className="flex w-[20%] min-w-[260px] flex-col gap-4">
+        {/* 왼쪽: 고정폭 + shrink 방지 */}
+        <div className="flex w-[280px] min-w-[280px] shrink-0 flex-col gap-3">
           <ProfileCard profileData={profileData} name={name} avatar={avatar} />
           <ScoreInputCard interviewId={numericInterviewId} />
         </div>
