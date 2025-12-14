@@ -40,7 +40,7 @@ export default function InterviewerSearchBox({ search, setSearch, filtered, hand
                 >
                   <div className="flex items-center gap-3">
                     <img
-                      src={i.avatar}
+                      src={i.avatar ?? '/images/default-profile.jpg'}
                       alt={i.name}
                       className="h-10 w-10 rounded-full object-cover"
                     />
