@@ -15,6 +15,7 @@ export default function FileUploadForm({ formData, onChange }: Props) {
   const [newFile, setNewFile] = useState<{ name: string; file?: File }>({ name: '' });
   const [showSizeWarning, setShowSizeWarning] = useState(false);
   const [fileSizeError, setFileSizeError] = useState<string>('');
+  const [showFileWarning, setShowFileWarning] = useState(false);
 
   const checkFileSize = (file: File): boolean => {
     if (file.size > MAX_FILE_SIZE) {
@@ -30,7 +31,7 @@ export default function FileUploadForm({ formData, onChange }: Props) {
     console.log('[addPortfolioFile] newFile:', newFile);
 
     if (!newFile.file) {
-      alert('파일을 선택해주세요.');
+      setShowFileWarning(true);
       return;
     }
 
@@ -150,6 +151,15 @@ export default function FileUploadForm({ formData, onChange }: Props) {
           setShowSizeWarning(false);
           setFileSizeError('');
         }}
+        confirmText="확인"
+      />
+
+      <AlertModal
+        open={showFileWarning}
+        type="warning"
+        title="파일 선택 필요"
+        message="파일을 선택해주세요."
+        onClose={() => setShowFileWarning(false)}
         confirmText="확인"
       />
     </>

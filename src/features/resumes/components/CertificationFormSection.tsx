@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import plusImg from '../../../assets/Vector-2.png';
 import CustomSelect from './CustomSelect'; // CustomSelect import
+import AlertModal from '../../../components/Alertmodal';
 
 type Certification = { type: string; title: string; hasScore: boolean; score?: string };
 
@@ -19,6 +20,7 @@ export default function CertificationFormSection({
     score: '',
   });
   const [list, setList] = useState<Certification[]>([]);
+  const [showScoreWarning, setShowScoreWarning] = useState(false);
 
   const addCert = () => {
     if (!certInput.title.trim()) return;
@@ -114,7 +116,16 @@ export default function CertificationFormSection({
                 type="text"
                 placeholder="점수 입력"
                 value={certInput.score}
-                onChange={(e) => setCertInput({ ...certInput, score: e.target.value })}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // 숫자만 허용 (빈 문자열도 허용)
+                  if (value === '' || /^\d+$/.test(value)) {
+                    setCertInput({ ...certInput, score: value });
+                  } else {
+                    // 숫자가 아닌 문자가 포함된 경우 경고 모달 표시
+                    setShowScoreWarning(true);
+                  }
+                }}
                 className="w-24 rounded-[10px] border px-3 py-2"
               />
             )}
@@ -131,6 +142,15 @@ export default function CertificationFormSection({
           </div>
         </div>
       )}
+
+      <AlertModal
+        open={showScoreWarning}
+        type="warning"
+        title="입력 오류"
+        message="점수는 숫자만 입력 가능합니다. 숫자를 입력해주세요."
+        onClose={() => setShowScoreWarning(false)}
+        confirmText="확인"
+      />
     </>
   );
 }

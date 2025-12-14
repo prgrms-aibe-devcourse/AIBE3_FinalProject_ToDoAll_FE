@@ -5,6 +5,7 @@ import BasicInfoForm from '../components/BasicInfoForm';
 import ResumeForm from '../components/ResumeForm';
 import { createResume } from '../data/resumes.api';
 import { getJobDescription } from '../data/jd.api';
+import AlertModal from '../../../components/Alertmodal';
 
 const DRAFT_KEY = (jdId: number) => `resumeDraft:${jdId}`;
 
@@ -14,6 +15,8 @@ export default function ResumeCreatePage() {
   const navigate = useNavigate();
 
   const [jobTitle, setJobTitle] = useState('');
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [formData, setFormData] = useState<ResumeData>({
     id: '',
     jdId,
@@ -125,7 +128,8 @@ export default function ResumeCreatePage() {
         },
       });
     } catch (e: any) {
-      alert('제출 실패: ' + e.message);
+      setErrorMessage('제출 실패: ' + e.message);
+      setShowErrorModal(true);
     }
   };
 
@@ -168,6 +172,18 @@ export default function ResumeCreatePage() {
           </button>
         </div>
       </div>
+
+      <AlertModal
+        open={showErrorModal}
+        type="error"
+        title="제출 실패"
+        message={errorMessage}
+        onClose={() => {
+          setShowErrorModal(false);
+          setErrorMessage('');
+        }}
+        confirmText="확인"
+      />
     </div>
   );
 }

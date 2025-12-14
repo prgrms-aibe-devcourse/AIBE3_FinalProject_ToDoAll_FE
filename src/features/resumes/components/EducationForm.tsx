@@ -2,6 +2,7 @@ import { useState } from 'react';
 import plusImg from '../../../assets/Vector-2.png';
 import type { ResumeData, EducationItem } from '../types/resumes.types';
 import CustomSelect from './CustomSelect';
+import AlertModal from '../../../components/Alertmodal';
 
 type Props = {
   formData: ResumeData;
@@ -10,6 +11,8 @@ type Props = {
 
 export default function EducationForm({ formData, onChange }: Props) {
   const [showForm, setShowForm] = useState(false);
+  const [showDateWarning, setShowDateWarning] = useState(false);
+  const [showRequiredWarning, setShowRequiredWarning] = useState(false);
 
   const [newEdu, setNewEdu] = useState<Partial<EducationItem>>({
     type: undefined,
@@ -50,7 +53,13 @@ export default function EducationForm({ formData, onChange }: Props) {
 
   const addEducation = () => {
     if (!newEdu.type || !newEdu.name || !newEdu.startDate || !newEdu.endDate) {
-      alert('학력 구분, 학교명, 입학일, 졸업일을 모두 입력해주세요.');
+      setShowRequiredWarning(true);
+      return;
+    }
+
+    // 시작일이 종료일보다 나중인지 확인
+    if (new Date(newEdu.startDate) > new Date(newEdu.endDate)) {
+      setShowDateWarning(true);
       return;
     }
 
@@ -243,6 +252,24 @@ export default function EducationForm({ formData, onChange }: Props) {
           )}
         </div>
       )}
+
+      <AlertModal
+        open={showDateWarning}
+        type="warning"
+        title="날짜 입력 오류"
+        message="입학일은 졸업일보다 이전이어야 합니다. 날짜를 확인해주세요."
+        onClose={() => setShowDateWarning(false)}
+        confirmText="확인"
+      />
+
+      <AlertModal
+        open={showRequiredWarning}
+        type="warning"
+        title="입력 필수 항목"
+        message="학력 구분, 학교명, 입학일, 졸업일을 모두 입력해주세요."
+        onClose={() => setShowRequiredWarning(false)}
+        confirmText="확인"
+      />
     </>
   );
 }

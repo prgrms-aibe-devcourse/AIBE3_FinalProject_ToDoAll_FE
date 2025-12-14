@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import plusImg from '../../../assets/Vector-2.png';
 import type { ResumeData, CareerItem } from '../types/resumes.types';
+import AlertModal from '../../../components/Alertmodal';
 
 type Props = {
   formData: ResumeData;
@@ -15,6 +16,8 @@ function getTodayDate() {
 
 export default function CareerForm({ formData, onChange }: Props) {
   const [showForm, setShowForm] = useState(false);
+  const [showDateWarning, setShowDateWarning] = useState(false);
+  const [showRequiredWarning, setShowRequiredWarning] = useState(false);
   const [newCareer, setNewCareer] = useState<CareerItem>({
     company: '',
     startDate: getTodayDate(),
@@ -27,9 +30,16 @@ export default function CareerForm({ formData, onChange }: Props) {
   const addCareer = () => {
     const { company, startDate, endDate, position, department, job } = newCareer;
     if (!company || !startDate || !endDate || !position || !department || !job) {
-      alert('모든 항목을 입력해주세요.');
+      setShowRequiredWarning(true);
       return;
     }
+
+    // 시작일이 종료일보다 나중인지 확인
+    if (new Date(startDate) > new Date(endDate)) {
+      setShowDateWarning(true);
+      return;
+    }
+
     onChange('career', [...(formData.career ?? []), newCareer]);
     setShowForm(false);
     setNewCareer({
@@ -167,6 +177,24 @@ export default function CareerForm({ formData, onChange }: Props) {
           </div>
         </div>
       )}
+
+      <AlertModal
+        open={showDateWarning}
+        type="warning"
+        title="날짜 입력 오류"
+        message="입사일은 퇴사일보다 이전이어야 합니다. 날짜를 확인해주세요."
+        onClose={() => setShowDateWarning(false)}
+        confirmText="확인"
+      />
+
+      <AlertModal
+        open={showRequiredWarning}
+        type="warning"
+        title="입력 필수 항목"
+        message="모든 항목을 입력해주세요."
+        onClose={() => setShowRequiredWarning(false)}
+        confirmText="확인"
+      />
     </>
   );
 }

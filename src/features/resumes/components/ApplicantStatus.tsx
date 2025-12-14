@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { ResumeData } from '../types/resumes.types';
 import checkImg from '../../../assets/Done.png';
 import { checkMatch } from '../../match/api/matchApi';
+import AlertModal from '../../../components/Alertmodal';
 
 interface ApplicantStatusProps {
   data: ResumeData;
@@ -9,6 +11,7 @@ interface ApplicantStatusProps {
 
 export default function ApplicantStatus({ data }: ApplicantStatusProps) {
   const navigate = useNavigate();
+  const [showErrorModal, setShowErrorModal] = useState(false);
 
   const handleInterviewInvite = async () => {
     try {
@@ -16,7 +19,7 @@ export default function ApplicantStatus({ data }: ApplicantStatusProps) {
       navigate(`/interview/create?resumeId=${data.id}&jdId=${data.jdId}`);
     } catch (error) {
       console.error('매칭 확정 실패:', error);
-      alert('이미 매칭된 지원자이거나 오류가 발생했습니다.');
+      setShowErrorModal(true);
     }
   };
 
@@ -35,6 +38,15 @@ export default function ApplicantStatus({ data }: ApplicantStatusProps) {
           </button>
         </div>
       </div>
+
+      <AlertModal
+        open={showErrorModal}
+        type="error"
+        title="오류 발생"
+        message="이미 매칭된 지원자이거나 오류가 발생했습니다."
+        onClose={() => setShowErrorModal(false)}
+        confirmText="확인"
+      />
     </div>
   );
 }
