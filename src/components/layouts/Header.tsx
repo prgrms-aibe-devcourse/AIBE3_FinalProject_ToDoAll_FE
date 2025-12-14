@@ -9,7 +9,7 @@ type Notice = {
   id: number;
   title: string;
   message: string;
-  createdAt: string;
+  scheduledAt: string;
   interviewId?: number;
   readFlag?: boolean;
 };
@@ -43,7 +43,7 @@ const Header = () => {
       title: string;
       message: string;
       type: string;
-      createdAt: string;
+      scheduledAt: string;
       payload?: string;
       readFlag: boolean;
     }[]
@@ -65,7 +65,7 @@ const Header = () => {
           id: n.notificationId,
           title: n.title,
           message: n.message,
-          createdAt: n.createdAt,
+          scheduledAt: n.scheduledAt,
           interviewId: payload.interviewId,
           readFlag: n.readFlag,
         };
@@ -96,7 +96,7 @@ const Header = () => {
             id: data.notificationId,
             title: data.title,
             message: data.message,
-            createdAt: data.createdAt,
+            scheduledAt: data.scheduledAt,
             interviewId: payload.interviewId,
             readFlag: false,
           },
@@ -209,7 +209,6 @@ const Header = () => {
   const formatTime = (dateStr: string) => {
     if (!dateStr) return '';
     const d = new Date(dateStr);
-    d.setHours(d.getHours() + 9);
     return d.toLocaleString('ko-KR', {
       month: '2-digit',
       day: '2-digit',
@@ -290,7 +289,9 @@ const Header = () => {
                       <div className="flex-1">
                         <p className="text-sm font-medium text-black">{n.title}</p>
                         <p className="text-xs whitespace-pre-line text-black/60">{n.message}</p>
-                        <p className="mt-1 text-[10px] text-gray-400">{formatTime(n.createdAt)}</p>
+                        <p className="mt-1 text-[10px] text-gray-400">
+                          {formatTime(n.scheduledAt)}
+                        </p>
                       </div>
 
                       <button
