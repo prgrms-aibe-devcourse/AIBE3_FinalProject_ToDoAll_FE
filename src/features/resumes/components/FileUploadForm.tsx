@@ -107,11 +107,37 @@ export default function FileUploadForm({ formData, onChange }: Props) {
       )}
 
       {(formData.files.portfolioName || formData.files.portfolioKey) && (
-        <div className="-mt-2 rounded-[10px] border border-[#E5E5E5] bg-white p-4">
+        <div className="relative -mt-2 rounded-[10px] border border-[#E5E5E5] bg-white p-4">
           <div className="mb-2 text-sm font-medium">첨부된 파일</div>
           <ul className="list-disc space-y-1 pl-5 text-sm">
             <li>{formData.files.portfolioName || formData.files.portfolioKey}</li>
           </ul>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onChange('files', {
+                ...formData.files,
+                portfolio: null,
+                portfolioName: '',
+                portfolioKey: '',
+              });
+            }}
+            className="absolute top-1 right-1 rounded-full p-1 transition hover:text-[#DE4F36]"
+            aria-label="파일 삭제"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
       )}
 

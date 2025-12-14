@@ -99,7 +99,7 @@ export default function BasicInfoForm({ formData, onChange }: Props) {
           </div>
         </div>
 
-        <div className="h-48 w-48 flex-shrink-0">
+        <div className="relative h-48 w-48 flex-shrink-0">
           <label className="block h-full w-full cursor-pointer overflow-hidden rounded-lg border">
             {formData.profileImage ? (
               <img
@@ -149,6 +149,34 @@ export default function BasicInfoForm({ formData, onChange }: Props) {
               }}
             />
           </label>
+          {formData.profileImage && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onChange('profileImage', '');
+                onChange('files', {
+                  resume: null,
+                  resumeName: '',
+                  resumeKey: '',
+                } as any);
+              }}
+              className="text absolute top-1 right-1 rounded-full p-1 transition hover:text-[#DE4F36]"
+              aria-label="이미지 삭제"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
 
