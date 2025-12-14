@@ -1,10 +1,11 @@
 import { JobPostDefaultImage } from '@/const.ts';
+import type { JobStatus } from '../../types/JobPost.types';
 
 export type JobPostCardProps = {
   title: string;
   location: string;
   applicantsLabel?: string;
-  statusLabel?: string; // '진행중' | '마감'
+  status?: JobStatus; // '진행중' | '마감'
   thumbnailUrl?: string;
   skills?: string[];
   updatedAt?: string;
@@ -12,12 +13,22 @@ export type JobPostCardProps = {
   onClick?: () => void;
   className?: string;
 };
+const STATUS_LABEL: Record<JobStatus, string> = {
+  OPEN: '진행중',
+  CLOSED: '마감',
+  DRAFT: '예정',
+};
 
+const STATUS_BADGE_CLASS: Record<JobStatus, string> = {
+  OPEN: 'bg-red-100 text-red-700',
+  CLOSED: 'bg-gray-100 text-gray-600',
+  DRAFT: 'bg-blue-100 text-blue-700',
+};
 export default function JobPostCard({
   title,
   location,
   applicantsLabel,
-  statusLabel = '진행중',
+  status = 'OPEN',
   thumbnailUrl = JobPostDefaultImage,
   skills = [],
   updatedAt,
@@ -25,6 +36,7 @@ export default function JobPostCard({
   onClick,
   className = '',
 }: JobPostCardProps) {
+  const statusLabel = STATUS_LABEL[status];
   return (
     <article
       role={onClick ? 'button' : undefined}
@@ -50,7 +62,7 @@ export default function JobPostCard({
             <span
               className={
                 'ml-1 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ' +
-                (statusLabel === '진행중' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600')
+                STATUS_BADGE_CLASS[status]
               }
             >
               {statusLabel}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import JobPostForm, { type JobPostFormValues } from '../features/jd/components/form/JobPostForm';
 import {
   fetchSkills,
@@ -19,6 +19,7 @@ const JDEditPage: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [skills, setSkills] = useState<Skill[]>([]);
   const [initialValues, setInitialValues] = useState<JobPostFormValues | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const load = async () => {
@@ -108,7 +109,7 @@ const JDEditPage: React.FC = () => {
       }
 
       alert('공고가 수정되었습니다.');
-      window.location.reload();
+      navigate(`/jobs/${id}`);
     } catch (error) {
       console.error('updateJobPost error:', error);
       alert('공고 수정 중 오류가 발생했습니다.');
