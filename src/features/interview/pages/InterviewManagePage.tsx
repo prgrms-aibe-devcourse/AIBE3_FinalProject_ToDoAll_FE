@@ -102,7 +102,7 @@ export default function InterviewManagePage() {
         interviewers: i.interviewers?.join(', ') || '면접관 없음',
         status: i.status,
         result: i.resultStatus,
-        avatar: i.candidateAvatar || '/default-avatar.png',
+        avatar: i.candidateAvatar || '/images/default-profile.jpg',
         resumeId: i.resumeId,
       };
     }) ?? [];
