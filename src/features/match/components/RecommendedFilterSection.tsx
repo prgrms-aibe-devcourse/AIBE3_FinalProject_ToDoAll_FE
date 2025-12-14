@@ -54,7 +54,7 @@ function RecommendedFilterSection({
           onChange={onSortChange}
           className="rounded-md border border-[#E3DBDB] p-2 text-[15px] text-[#413F3F]"
         >
-          <option value="SCORE_DESC">매칭 높은순</option>
+          <option value="SCORE_DESC">점수 높은순</option>
           <option value="LATEST">최신순</option>
         </select>
       </div>

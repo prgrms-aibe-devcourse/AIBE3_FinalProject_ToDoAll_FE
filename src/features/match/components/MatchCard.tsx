@@ -102,7 +102,9 @@ export default function MatchCard({ resume, matchRate, tab, onView, onInvite }: 
             {/* 기술 매칭률 */}
             <div className="mb-3">
               <div className="mb-3 flex items-center gap-4">
-                <div className="text-m font-medium text-[#413F3F]">기술 매칭률</div>
+                <div className="text-m font-medium text-[#413F3F]">
+                  {tab === 'recommended' ? '추천 매칭률' : '기술 매칭률'}
+                </div>
                 <div className="text-2xl font-semibold text-[#DE4F36]">{rateLabel}</div>
               </div>
               <div className="h-2 w-64 rounded-full bg-[#E3DBDB]">
