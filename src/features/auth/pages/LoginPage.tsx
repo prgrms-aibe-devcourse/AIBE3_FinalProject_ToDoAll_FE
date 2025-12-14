@@ -1,10 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useContext } from 'react';
+import { AuthContext } from '@/AuthContext.ts';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../api/auth.api.ts';
 import AlertModal from '@components/Alertmodal.tsx';
 
 export default function LoginPage() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const { setToken } = useContext(AuthContext);
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
 
@@ -35,18 +37,18 @@ export default function LoginPage() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    e.preventDefault();
     setSubmitting(true); // 중복 클릭을 방지
     const form = new FormData(e.target as HTMLFormElement);
     const email = String(form.get('email') || ''); // 비어 있으면 공백 문자열
     const password = String(form.get('password') || '');
     try {
-      await login({ email, password }); // 서버에서 accessToken을 받기
-      window.location.href = '/dashboard'; // 다음 단계(E2E 스모크)를 바로 확인
+      const result = await login({ email, password }); // 서버에서 accessToken을 받기
+      setToken(result.accessToken, result.refreshToken);
     } catch {
       showAlert('이메일 또는 비밀번호를 확인해 주세요.', 'error');
     } finally {
       setSubmitting(false); // 버튼 비활성화를 해제
+      window.location.href = '/dashboard';
     }
   };
 

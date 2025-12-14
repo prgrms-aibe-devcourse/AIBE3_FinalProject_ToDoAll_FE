@@ -2,6 +2,7 @@ import emptyHeartImg from '../../../assets/Favorite-2.png';
 import fullHeartImg from '../../../assets/Heart.png';
 import { useState, type MouseEvent } from 'react';
 import type { MatchCardData } from '../types/matchCardData.types';
+import { userDefaultImage } from '@/const.ts';
 
 type Props = {
   resume: MatchCardData;
@@ -46,20 +47,8 @@ export default function MatchCard({ resume, matchRate, tab, onView, onInvite }: 
         statusLabel = '매칭 확정';
         statusClass = 'bg-[#4CAF50]';
         break;
-      case 'BOOKMARK':
-        statusLabel = '북마크';
-        statusClass = 'bg-[#3B82F6]';
-        break;
-      case 'HOLD':
-        statusLabel = '보류';
-        statusClass = 'bg-[#F97316]';
-        break;
-      case 'REJECTED':
-        statusLabel = '거절';
-        statusClass = 'bg-[#EF4444]';
-        break;
       default:
-        statusLabel = resume.status;
+        statusLabel = null;
     }
   }
 
@@ -71,11 +60,11 @@ export default function MatchCard({ resume, matchRate, tab, onView, onInvite }: 
       <div className="flex w-full items-start gap-4 pr-[160px]">
         {/* 프로필 이미지 */}
         <img
-          src={resume.profileImage || '/images/default-profile.jpg'}
+          src={resume.profileImage || userDefaultImage}
           alt={resume.name}
           className="h-24 w-24 rounded-full object-cover"
           onError={(e) => {
-            e.currentTarget.src = '/images/default-profile.jpg';
+            e.currentTarget.src = userDefaultImage;
           }}
         />
 
@@ -102,7 +91,9 @@ export default function MatchCard({ resume, matchRate, tab, onView, onInvite }: 
             {/* 기술 매칭률 */}
             <div className="mb-3">
               <div className="mb-3 flex items-center gap-4">
-                <div className="text-m font-medium text-[#413F3F]">기술 매칭률</div>
+                <div className="text-m font-medium text-[#413F3F]">
+                  {tab === 'recommended' ? '추천 매칭률' : '기술 매칭률'}
+                </div>
                 <div className="text-2xl font-semibold text-[#DE4F36]">{rateLabel}</div>
               </div>
               <div className="h-2 w-64 rounded-full bg-[#E3DBDB]">

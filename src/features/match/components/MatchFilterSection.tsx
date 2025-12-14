@@ -36,7 +36,7 @@ export default function MatchFilterSection({
   const [activeTab, setActiveTab] = useState<'all' | 'recommended'>('recommended');
   const [selectedLimit, setSelectedLimit] = useState<number>(10);
   const [selectedJob, setSelectedJob] = useState<number | null>(null);
-  const [sortType, setSortType] = useState<string>('LATEST');
+  const [sortType, setSortType] = useState<string>('SCORE_DESC');
   const [jdOptions, setJdOptions] = useState<JdOption[]>([]);
   const [status, setStatus] = useState<string>('');
 
