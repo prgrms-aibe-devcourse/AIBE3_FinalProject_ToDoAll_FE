@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { updateResumeMemo } from '../data/resumes.api';
+import AlertModal from '../../../components/Alertmodal';
 
 export default function ResumeMemo({
   resumeId,
@@ -12,6 +13,7 @@ export default function ResumeMemo({
 }) {
   const [memo, setMemo] = useState(initialMemo || '');
   const [saving, setSaving] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   useEffect(() => {
     setMemo(initialMemo || '');
@@ -24,6 +26,8 @@ export default function ResumeMemo({
       const result = await updateResumeMemo(resumeId, memo);
 
       if (onMemoUpdated) onMemoUpdated(result.memo);
+
+      setShowSuccessModal(true);
     } catch (err: any) {
       console.error('메모 저장 오류:', err);
     } finally {
@@ -51,6 +55,15 @@ export default function ResumeMemo({
           {saving ? '저장중...' : '저장'}
         </button>
       </div>
+
+      <AlertModal
+        open={showSuccessModal}
+        type="success"
+        title="저장 완료"
+        message="메모가 성공적으로 저장되었습니다."
+        onClose={() => setShowSuccessModal(false)}
+        confirmText="확인"
+      />
     </div>
   );
 }

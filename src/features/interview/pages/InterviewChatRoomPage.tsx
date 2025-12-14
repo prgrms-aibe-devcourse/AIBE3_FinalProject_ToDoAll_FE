@@ -53,7 +53,6 @@ export default function InterviewChatRoomPage() {
   const [candidateAvatar, setCandidateAvatar] = useState<string>(DEFAULT_AVATAR);
   const [resumeId, setResumeId] = useState<number | null>(null);
 
-  // me 로딩
   useEffect(() => {
     (async () => {
       try {
@@ -66,7 +65,6 @@ export default function InterviewChatRoomPage() {
     })();
   }, []);
 
-  // 인터뷰 상세로 resumeId / candidateAvatar 확보
   useEffect(() => {
     if (!Number.isFinite(interviewId) || interviewId <= 0) return;
 
@@ -88,7 +86,6 @@ export default function InterviewChatRoomPage() {
     })();
   }, [interviewId]);
 
-  // 채팅 내역 불러오기 (senderId 숫자 정규화)
   useEffect(() => {
     if (!Number.isFinite(interviewId) || interviewId <= 0) return;
 
@@ -101,7 +98,7 @@ export default function InterviewChatRoomPage() {
           id: m.id,
           text: m.content,
           senderId: toNumId(m.senderId),
-          isMine: false, // me 로딩 후 보정
+          isMine: false,
         }));
         setMessages(mapped);
       } catch (e) {
@@ -110,7 +107,6 @@ export default function InterviewChatRoomPage() {
     })();
   }, [interviewId]);
 
-  // me 로딩 후 isMine 보정 (Number 비교)
   useEffect(() => {
     if (!me) return;
     setMessages((prev) =>
@@ -121,31 +117,23 @@ export default function InterviewChatRoomPage() {
     );
   }, [me]);
 
-  /**
-   * ✅ 지원자(senderId=0) 아바타 전용 로딩
-   * - 기존 문제: 처음엔 resumeId가 null이라 0번을 DEFAULT로 박고, resumeId가 나중에 와도 다시 fetch를 안 함
-   * - 해결: resumeId / candidateAvatar 변경에 반응해서 0번을 항상 최신으로 재계산
-   */
   useEffect(() => {
     if (!Number.isFinite(interviewId) || interviewId <= 0) return;
 
     (async () => {
       try {
-        // 1) candidateAvatar가 있으면 우선 사용 (단, DEFAULT면 의미 없으니 제외)
         if (candidateAvatar && candidateAvatar !== DEFAULT_AVATAR) {
           console.log('[CANDIDATE AVATAR] use candidateAvatar', candidateAvatar);
           setAvatarBySender((prev) => ({ ...prev, 0: candidateAvatar }));
           return;
         }
 
-        // 2) resumeId 없으면 default
         if (!resumeId) {
           console.log('[CANDIDATE AVATAR] no resumeId -> default');
           setAvatarBySender((prev) => ({ ...prev, 0: DEFAULT_AVATAR }));
           return;
         }
 
-        // 3) resumeFileUrl(fileKey) -> presigned
         const resume = await getResumeAuthed(resumeId);
         const fileKey = resume.resumeFileUrl;
         console.log('[CANDIDATE AVATAR] resumeFileUrl', fileKey);
@@ -167,10 +155,6 @@ export default function InterviewChatRoomPage() {
     })();
   }, [interviewId, resumeId, candidateAvatar]);
 
-  /**
-   * ✅ 면접관(senderId>0) 아바타 로딩 (0번 제외)
-   * - messages에 등장한 유저 중 avatarBySender에 없는 것만 로딩
-   */
   useEffect(() => {
     if (messages.length === 0) return;
 
@@ -210,10 +194,8 @@ export default function InterviewChatRoomPage() {
       console.log('[AVATAR] updates', updates);
       setAvatarBySender((prev) => ({ ...prev, ...updates }));
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages]); // avatarBySender는 의도적으로 deps 제외 (무한루프 방지)
+  }, [messages]);
 
-  // 질문 불러오기
   useEffect(() => {
     if (!Number.isFinite(interviewId) || interviewId <= 0) return;
 
@@ -244,7 +226,6 @@ export default function InterviewChatRoomPage() {
     })();
   }, [interviewId]);
 
-  // 메모 불러오기
   useEffect(() => {
     if (!Number.isFinite(interviewId) || interviewId <= 0) return;
 
@@ -298,7 +279,6 @@ export default function InterviewChatRoomPage() {
     })();
   }, [interviewId]);
 
-  // WS 메시지 수신 (senderId 정규화)
   const handleChatMessage = useCallback(
     (msg: any) => {
       const senderId = toNumId(msg.senderId ?? msg.sender_id ?? msg.userId ?? msg.user_id);
