@@ -2,7 +2,7 @@ export interface Interviewer {
   id: number;
   name: string;
   email: string;
-  avatar: string;
+  avatar?: string;
 }
 
 export type TabStatus = 'ALL' | 'WAITING' | 'DONE' | 'IN_PROGRESS';
