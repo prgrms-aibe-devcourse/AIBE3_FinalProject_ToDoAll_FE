@@ -1,5 +1,5 @@
 import JobPostCard from './JobPostCard';
-import type { JobPost, OpenHandler } from '../../types/JobPost.types';
+import type { JobPost, JobStatus, OpenHandler } from '../../types/JobPost.types';
 
 type Props = {
   post: JobPost;
@@ -7,7 +7,6 @@ type Props = {
 };
 
 export default function JobPostCardContainer({ post, onOpen }: Props) {
-  const statusLabel = post.status === 'OPEN' ? '진행중' : '마감';
   const updatedAt = post.deadline
     ? `마감일: ${new Date(post.deadline).toLocaleDateString()}`
     : undefined;
@@ -18,7 +17,7 @@ export default function JobPostCardContainer({ post, onOpen }: Props) {
       title={post.title}
       location={post.location}
       applicantsLabel={`${post.applicantCount}명 지원`}
-      statusLabel={statusLabel}
+      status={post.status as JobStatus}
       thumbnailUrl={post.thumbnailUrl}
       skills={post.skills}
       updatedAt={updatedAt}
