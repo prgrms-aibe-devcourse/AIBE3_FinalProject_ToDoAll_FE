@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import type { ResumeData } from '../types/resumes.types';
 import BasicInfoForm from '../components/BasicInfoForm';
 import ResumeForm from '../components/ResumeForm';
@@ -13,6 +13,7 @@ export default function ResumeCreatePage() {
   const { id } = useParams();
   const jdId = Number(id);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [jobTitle, setJobTitle] = useState('');
   const [showErrorModal, setShowErrorModal] = useState(false);
@@ -65,34 +66,54 @@ export default function ResumeCreatePage() {
   useEffect(() => {
     if (!jdId || isNaN(jdId)) return;
 
+    const stateFormData = location.state?.formData as ResumeData | undefined;
+    if (stateFormData) {
+      setFormData(stateFormData);
+      window.history.replaceState({}, document.title);
+      return;
+    }
+
     const raw = localStorage.getItem(DRAFT_KEY(jdId));
     if (!raw) return;
 
     try {
-      const saved = JSON.parse(raw) as ResumeData;
+      const saved = JSON.parse(raw) as any;
 
       setFormData((prev) => ({
         ...prev,
         ...saved,
         jdId,
         files: {
-          ...prev.files,
-          ...saved.files,
+          resume: prev.files.resume, // File 객체 유지
+          portfolio: prev.files.portfolio, // File 객체 유지
+          etc: prev.files.etc, // File 배열 유지
+          // 메타데이터만 localStorage에서 불러온 값으로 업데이트
+          resumeKey: saved.files?.resumeKey || prev.files.resumeKey,
+          portfolioKey: saved.files?.portfolioKey || prev.files.portfolioKey,
+          resumeName: saved.files?.resumeName || prev.files.resumeName,
+          portfolioName: saved.files?.portfolioName || prev.files.portfolioName,
+          etcNames: saved.files?.etcNames || prev.files.etcNames,
         },
       }));
     } catch {
       localStorage.removeItem(DRAFT_KEY(jdId));
     }
-  }, [jdId]);
+  }, [jdId, location.state]);
 
   const saveDraft = (next: ResumeData) => {
     if (!jdId || isNaN(jdId)) return;
 
-    const toSave: ResumeData = {
+    // File 객체는 JSON.stringify로 직렬화할 수 없으므로 제외하고 저장
+    const toSave = {
       ...next,
       jdId,
       files: {
-        ...next.files,
+        resumeKey: next.files.resumeKey,
+        portfolioKey: next.files.portfolioKey,
+        resumeName: next.files.resumeName,
+        portfolioName: next.files.portfolioName,
+        etcNames: next.files.etcNames,
+        // File 객체는 저장하지 않음 (resume, portfolio, etc)
       },
     };
 

@@ -5,13 +5,11 @@ import ChatSection from '../components/chat/ChatSection';
 import useInterviewSocket from '@/hooks/useInterviewSocket';
 import { MessageType, type OutgoingChatMessage } from '@/features/interview/types/chatroom';
 
-import { getResumeWithGuestToken } from '@/features/interview/api/profile.api';
 import { getInterviewDetailWithGuestToken } from '@/features/interview/api/interview-detail.api';
 import {
   getChatHistoryWithGuestToken,
   type ChatMessage,
 } from '@/features/interview/api/question.api';
-import { getPresignedDownloadUrlWithGuestToken } from '@/features/interview/api/file.api';
 
 import { DEFAULT_AVATAR, normalizeAvatarUrl } from '../util/avatar';
 
@@ -29,8 +27,8 @@ export default function InterviewChatRoomGuest() {
   const [avatarBySender, setAvatarBySender] = useState<Record<number, string>>({});
   const loadingAvatarRef = useRef<Set<number>>(new Set());
 
-  const [candidateAvatar, setCandidateAvatar] = useState<string>(DEFAULT_AVATAR);
-  const [resumeId, setResumeId] = useState<number | null>(null);
+  const [_candidateAvatar, setCandidateAvatar] = useState<string>(DEFAULT_AVATAR);
+  const [_resumeId, setResumeId] = useState<number | null>(null);
 
   const pendingRef = useRef<{ content: string; at: number }[]>([]);
   const cleanupPending = useCallback(() => {
@@ -122,42 +120,11 @@ export default function InterviewChatRoomGuest() {
   });
 
   useEffect(() => {
-    if (!interviewToken) return;
     if (!otherSenderId) return;
 
-    (async () => {
-      try {
-        if (candidateAvatar && candidateAvatar !== DEFAULT_AVATAR) {
-          setAvatarBySender((prev) => ({ ...prev, [otherSenderId]: candidateAvatar }));
-          return;
-        }
-
-        if (!resumeId) {
-          setAvatarBySender((prev) => ({ ...prev, [otherSenderId]: DEFAULT_AVATAR }));
-          return;
-        }
-
-        const resume = await getResumeWithGuestToken(resumeId, interviewToken);
-        const fileKey = resume.resumeFileUrl;
-
-        console.log('[GUEST CANDIDATE AVATAR] resume', resume);
-        console.log('[GUEST CANDIDATE AVATAR] fileKey', fileKey);
-
-        if (!fileKey) {
-          setAvatarBySender((prev) => ({ ...prev, [otherSenderId]: DEFAULT_AVATAR }));
-          return;
-        }
-
-        const presigned = await getPresignedDownloadUrlWithGuestToken(fileKey, interviewToken);
-        console.log('[GUEST CANDIDATE AVATAR] presigned OK', presigned);
-
-        setAvatarBySender((prev) => ({ ...prev, [otherSenderId]: presigned }));
-      } catch (e) {
-        console.error('[GUEST CANDIDATE AVATAR] FAIL', e);
-        setAvatarBySender((prev) => ({ ...prev, [otherSenderId]: DEFAULT_AVATAR }));
-      }
-    })();
-  }, [interviewToken, resumeId, candidateAvatar, otherSenderId]);
+    // 상대방 프로필을 항상 default-profile.jpg로 설정
+    setAvatarBySender((prev) => ({ ...prev, [otherSenderId]: '/images/default-profile.jpg' }));
+  }, [otherSenderId]);
 
   useEffect(() => {
     const senderIds = Array.from(new Set(messages.map((m) => m.senderId)));
@@ -169,11 +136,15 @@ export default function InterviewChatRoomGuest() {
     missing.forEach((id) => loadingAvatarRef.current.add(id));
 
     const updates: Record<number, string> = {};
-    missing.forEach((id) => (updates[id] = DEFAULT_AVATAR));
+    missing.forEach((id) => {
+      // 상대방(otherSenderId)인 경우 default-profile.jpg 사용, 나머지는 DEFAULT_AVATAR
+      updates[id] = id === otherSenderId ? '/images/default-profile.jpg' : DEFAULT_AVATAR;
+    });
 
     missing.forEach((id) => loadingAvatarRef.current.delete(id));
     setAvatarBySender((prev) => ({ ...prev, ...updates }));
-  }, [messages]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages, otherSenderId]);
 
   const handleSend = (content: string) => {
     const trimmed = content.trim();
@@ -206,7 +177,13 @@ export default function InterviewChatRoomGuest() {
       <div className="flex flex-1 overflow-hidden px-8 pb-8">
         <ChatSection
           initialMessages={messages}
-          getAvatarForSender={(senderId) => avatarBySender[senderId]}
+          getAvatarForSender={(senderId) => {
+            // 상대방(내가 아닌 사람)은 항상 default-profile.jpg 사용
+            if (senderId !== GUEST_SENDER_ID) {
+              return '/images/default-profile.jpg';
+            }
+            return avatarBySender[senderId];
+          }}
           onSend={handleSend}
         />
       </div>
