@@ -128,15 +128,6 @@ export default function MatchCard({ resume, matchRate, tab, onView, onInvite }: 
         <button
           onClick={(e) => {
             e.stopPropagation();
-            onView();
-          }}
-          className="rounded-full bg-[#752F6D] px-4 py-2 font-medium text-[#FAF8F8] transition hover:bg-[#9A3F90]"
-        >
-          보류
-        </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
             onInvite();
           }}
           className="rounded-full bg-[#DE4F36] px-4 py-2 font-medium text-white transition hover:bg-[#b73d2b]"
