@@ -29,7 +29,9 @@ export default function ResumePreviewPage() {
       </div>
 
       <button
-        onClick={() => navigate(-1)}
+        onClick={() => {
+          navigate(`/resume/create/${formData.jdId}`, { state: { formData } });
+        }}
         className="mt-6 rounded bg-[#752F6D] px-6 py-2 text-white hover:bg-[#5E2558]"
       >
         뒤로가기
