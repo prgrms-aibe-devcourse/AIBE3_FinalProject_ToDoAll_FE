@@ -283,5 +283,107 @@ HIT      MISS
 - 비동기 캐싱으로 첫 호출 체감 성능 개선
 - AI 결과는 DB에 영속 저장하여 구조적 안정성 확보
 
+---
+
+
+### 2. SSE 실시간 알림 반영 이슈 해결 (Vercel + Nginx)
+
+**📌 문제 상황**
+
+로컬 환경에서는 정상 동작하던 **SSE(Server-Sent Events) 알림이
+배포 환경(Vercel + Nginx Reverse Proxy)에서 실시간으로 반영되지 않는 문제**가 발생했다.
+
+- 알림이 즉시 수신되지 않음
+- 페이지 새로고침 시에만 알림이 도착
+- 서버 로그 상 이벤트는 정상적으로 발행됨
+
+👉 *프론트/백엔드 코드에는 문제가 없어 보였지만, 실제 사용자 경험은 실시간이 아니었음*
+
+<br>
+
+**🔍 원인 분석**
+
+**1️⃣ 배포 환경에서만 발생하는 현상**
+
+- 로컬(Spring Boot 직접 연결) → 정상
+- 배포(Vercel → Nginx → Spring Boot) → 지연 발생
+
+→ **인프라 레벨 이슈 가능성 판단**
+
+**2️⃣ Nginx Reverse Proxy 기본 동작**
+
+- Nginx는 기본적으로 **응답 버퍼링(proxy buffering)을 활성화**
+- 일정 크기 또는 조건이 충족될 때까지 응답을 모아서 전송
+
+**3️⃣ SSE 특성과의 충돌**
+
+- SSE는 **스트리밍 방식으로 이벤트를 즉시 전송해야 함**
+- 그러나:
+
+  * 알림 payload가 작음
+  * 버퍼 조건을 충족하지 못해 전송이 지연
+  * 결과적으로 “안 오는 것처럼 보이는” 현상 발생
+
+> 📌 **SSE는 서버 코드뿐 아니라 프록시 설정에 강하게 의존하는 기술**
+
+<br>
+
+**🛠 해결 방법**
+
+**Nginx SSE 전용 설정 분리**
+
+SSE 엔드포인트(`/api/v1/sse/subscribe`)에 대해서만
+**응답 버퍼링 비활성화 및 스트리밍 설정 적용**
+
+```nginx
+location /api/v1/sse/subscribe {
+    proxy_pass http://backend;
+    proxy_buffering off;
+    proxy_cache off;
+
+    proxy_set_header Connection keep-alive;
+    proxy_set_header Cache-Control no-cache;
+    proxy_set_header X-Accel-Buffering no;
+}
+```
+
+**적용 포인트**
+
+- `proxy_buffering off` : 응답 즉시 전달
+- `X-Accel-Buffering: no` : Nginx 내부 버퍼링 완전 차단
+- `Connection: keep-alive` : SSE 연결 유지
+- **일반 API와 SSE 설정을 분리하여 영향 최소화**
+
+<br>
+
+**✅ 결과**
+
+| 항목         | 개선 전    | 개선 후   |
+| ---------- | ------- | ------ |
+| 알림 수신 시점   | 새로고침 필요 | 즉시 수신  |
+| SSE 연결 안정성 | 불안정     | 안정적 유지 |
+| 로컬/배포 환경   | 동작 불일치  | 동작 동일  |
+
+👉 **배포 환경에서도 SSE 실시간 알림 정상 동작 확인**
+
+<br>
+
+**💡 배운 점**
+
+* SSE는 **백엔드 코드만으로 완성되지 않는 기술**
+* **프록시·네트워크·인프라 설정이 핵심 요소**
+* 로컬 테스트만으로는 실시간 기능의 완성도를 보장할 수 없음
+* 실시간 기능(SSE, WebSocket)은 **반드시 배포 환경 기준으로 검증해야 함**
+
+<br>
+
+### **✅ 최종 정리**
+
+* 문제 원인은 코드가 아닌 **Nginx Reverse Proxy 응답 버퍼링**
+* SSE 엔드포인트에 한해 **스트리밍 설정 분리 적용**
+* 배포 환경에서도 실시간 알림 안정화
+* 실시간 시스템 설계 시 **인프라까지 포함한 관점의 중요성 체감**
+
+
 
 
