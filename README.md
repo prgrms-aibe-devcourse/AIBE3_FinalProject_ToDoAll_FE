@@ -5,18 +5,34 @@
 
 <div align=start>
 
-<p align=start>
-  <a href="https://jobda.vercel.app">배포 바로가기</a>
-  &nbsp; | &nbsp;
-  <a href="https://be.jobda.store/swagger-ui/index.html">API 문서 (Swagger)</a>
-  &nbsp; | &nbsp;
-  <a href="https://img.shields.io/badge/Figma-Design-F24E1E?logo=figma&logoColor=white)](https://www.figma.com/design/UPdtMBrqB7IAYrJMq9Xsd4/JOBDA">피그마</a>
-  &nbsp; | &nbsp;
-  <a href="https://img.shields.io/badge/Notion-Docs-000000?logo=notion&logoColor=white)](https://www.notion.so/Team2-2933550b7b558091945ec4b806f224c0">팀 노션</a>
-  <br>
-  <a href="https://github.com/prgrms-aibe-devcourse/AIBE3_FinalProject_ToDoAll_BE">BE Repo</a>
-  &nbsp; | &nbsp;
-  <a href="https://github.com/prgrms-aibe-devcourse/AIBE3_FinalProject_ToDoAll_FE">FE Repo</a>
+<p align="center">
+  <a href="https://jobda.vercel.app">
+    🚀 배포 바로가기
+  </a>
+  &nbsp; · &nbsp;
+  <a href="https://be.jobda.store/swagger-ui/index.html">
+    📘 API 문서 (Swagger)
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://www.figma.com/design/UPdtMBrqB7IAYrJMq9Xsd4/JOBDA">
+    <img src="https://img.shields.io/badge/Figma-Design-F24E1E?logo=figma&logoColor=white" />
+  </a>
+  &nbsp;
+  <a href="https://www.notion.so/Team2-2933550b7b558091945ec4b806f224c0">
+    <img src="https://img.shields.io/badge/Notion-Team%20Docs-000000?logo=notion&logoColor=white" />
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/prgrms-aibe-devcourse/AIBE3_FinalProject_ToDoAll_BE">
+    🛠️ BE Repo
+  </a>
+  &nbsp; · &nbsp;
+  <a href="https://github.com/prgrms-aibe-devcourse/AIBE3_FinalProject_ToDoAll_FE">
+    🎨 FE Repo
+  </a>
 </p>
 
 </div>
@@ -50,8 +66,26 @@
 
 ---
 
+## 📚 목차
+- [프로젝트 소개](#프로젝트-소개)
+- [시스템 아키텍처](#시스템-아키텍처)
+- [ERD](#erd)
+- [기술 스택 및 도입 이유](#기술-스택-및-도입-이유)
+- [핵심 기능 소개](#핵심-기능-소개)
+- [트러블 슈팅](#트러블-슈팅)
+- [팀원 구성](#팀원-구성)
+
+---
+
 ## 🖼️ 시스템 아키텍처
 <img width="1410" height="953" alt="AIBE3_FINAL_아키텍쳐 drawio" src="https://github.com/user-attachments/assets/b33ef670-8419-4f12-8162-53e94599f117" />
+
+---
+
+---
+
+## 🧩 ERD
+<img width="1410" alt="ERD image" src="https://github.com/user-attachments/assets/fc0415df-3918-4890-9ad9-4d4a9a59081e" />
 
 ---
 
@@ -119,6 +153,10 @@
 |![EC958CEBA6BC-2](https://github.com/user-attachments/assets/a9db26b1-5c20-4394-a90e-a00bde29a520)|
 
 ### 💬 채팅
+| 실시간 채팅 |
+|----------|
+|![KakaoTalk_Photo_2025-12-16-12-08-03](https://github.com/user-attachments/assets/da107a71-0c2e-44d3-8b73-5242cd7c5ef0)|
+
 ### 🔎 ELS
 
 | 추천 지원자 조회 |
