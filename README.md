@@ -77,7 +77,7 @@
 | Security | ![Spring Security](https://img.shields.io/badge/Spring%20Security-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white) | JWT 기반 인증 및 역할별 접근 제어를 분리하기 위해 도입 |
 | Authentication | ![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white) | 무상태 인증 방식으로 확장성과 보안을 동시에 확보하기 위해 사용 |
 | Real-time Communication | ![WebSocket](https://img.shields.io/badge/WebSocket-010101?style=for-the-badge) | 면접관과 지원자간의 채팅 등 실시간 이벤트를 즉시 전달하기 위해 사용 |
-| Real-time Communication | ![SSE](https://img.shields.io/badge/WebSocket-010101?style=for-the-badge) | 실시간 알림 등 이벤트를 즉시 전달하기 위해 사용 |
+| Real-time Communication | ![SSE](https://img.shields.io/badge/SSE-010101?style=for-the-badge) | 실시간 알림 등 이벤트를 즉시 전달하기 위해 사용 |
 
 ---
 
