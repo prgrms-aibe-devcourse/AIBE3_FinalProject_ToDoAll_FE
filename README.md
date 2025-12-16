@@ -1,8 +1,25 @@
 # 📑 잡다 (JobDa) 
 **채용공고와 이력서를 표준화해, AI가 가장 ‘잘 맞는 인재’를 찾아주는 채용 코파일럿**
 
-<img width="541" height="228" alt="화면 캡처 2025-11-02 172301" src="https://github.com/user-attachments/assets/3319c5c0-04c3-4c92-aee6-c0fa1d4301b0" />
+<img width="800" alt="대문이미지" src="https://github.com/user-attachments/assets/4cf05102-fe5e-4c45-a419-5b4826633bbd" />
 
+<div align=start>
+
+<p align=start>
+  <a href="https://jobda.vercel.app">배포 바로가기</a>
+  &nbsp; | &nbsp;
+  <a href="https://be.jobda.store/swagger-ui/index.html">API 문서 (Swagger)</a>
+  &nbsp; | &nbsp;
+  <a href="https://img.shields.io/badge/Figma-Design-F24E1E?logo=figma&logoColor=white)](https://www.figma.com/design/UPdtMBrqB7IAYrJMq9Xsd4/JOBDA">피그마</a>
+  &nbsp; | &nbsp;
+  <a href="https://img.shields.io/badge/Notion-Docs-000000?logo=notion&logoColor=white)](https://www.notion.so/Team2-2933550b7b558091945ec4b806f224c0">팀 노션</a>
+  <br>
+  <a href="https://github.com/prgrms-aibe-devcourse/AIBE3_FinalProject_ToDoAll_BE">BE Repo</a>
+  &nbsp; | &nbsp;
+  <a href="https://github.com/prgrms-aibe-devcourse/AIBE3_FinalProject_ToDoAll_FE">FE Repo</a>
+</p>
+
+</div>
 
 ## 📝 프로젝트 소개
 
@@ -33,28 +50,8 @@
 
 ---
 
-## 📃 관련 문서
-### 🔗 배포 링크
-[서비스 바로가기](https://jobda.vercel.app/login)
-
-## 문서
-[![Figma](https://img.shields.io/badge/Figma-Design-F24E1E?logo=figma&logoColor=white)](https://www.figma.com/design/UPdtMBrqB7IAYrJMq9Xsd4/JOBDA)
-[![Notion](https://img.shields.io/badge/Notion-Docs-000000?logo=notion&logoColor=white)](https://www.notion.so/Team2-2933550b7b558091945ec4b806f224c0)
-
-
----
-
 ## 🖼️ 시스템 아키텍처
-<img width="1600" height="1000" alt="AIBE3_FINAL_아키텍쳐 drawio" src="https://github.com/user-attachments/assets/db596af9-f284-4494-9181-78d1e6c96b55" />
-
----
-
-## 📌 팀원 구성
-
-|<img src="https://avatars.githubusercontent.com/u/144124353?s=400&u=9bda70cb07b771d6301ac64df65acb931406b09e&v=4" width="125" />|<img src="https://avatars.githubusercontent.com/u/82808715?v=4" width="125" />|<img src="https://avatars.githubusercontent.com/u/217855127?v=4" width="125" />|<img src="https://avatars.githubusercontent.com/u/99888873?v=4" width="125" />|<img src="https://avatars.githubusercontent.com/u/96305452?v=4" width="125" />|<img src="https://avatars.githubusercontent.com/u/121555686?v=4" width="125" />|
-|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|
-|[유승인 (팀장)](https://github.com/seung-in-Yoo)|[김정호](https://github.com/Unoguna)|[김지윤](https://github.com/jiyoon-00)|[심수민](https://github.com/SWWWin)|[유승재](https://github.com/JaeSeungJae)|[정다솔](https://github.com/dbjoung)|
-|FE, BE|FE, BE|FE, BE|FE, BE|FE, BE|FE, BE|
+<img width="1410" height="953" alt="AIBE3_FINAL_아키텍쳐 drawio" src="https://github.com/user-attachments/assets/b33ef670-8419-4f12-8162-53e94599f117" />
 
 ---
 
@@ -384,6 +381,13 @@ location /api/v1/sse/subscribe {
 * 배포 환경에서도 실시간 알림 안정화
 * 실시간 시스템 설계 시 **인프라까지 포함한 관점의 중요성 체감**
 
+---
 
+## 📌 팀원 구성
+
+|<img src="https://avatars.githubusercontent.com/u/144124353?s=400&u=9bda70cb07b771d6301ac64df65acb931406b09e&v=4" width="125" />|<img src="https://avatars.githubusercontent.com/u/82808715?v=4" width="125" />|<img src="https://avatars.githubusercontent.com/u/217855127?v=4" width="125" />|<img src="https://avatars.githubusercontent.com/u/99888873?v=4" width="125" />|<img src="https://avatars.githubusercontent.com/u/96305452?v=4" width="125" />|<img src="https://avatars.githubusercontent.com/u/121555686?v=4" width="125" />|
+|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|
+|[유승인 (팀장)](https://github.com/seung-in-Yoo)|[김정호](https://github.com/Unoguna)|[김지윤](https://github.com/jiyoon-00)|[심수민](https://github.com/SWWWin)|[유승재](https://github.com/JaeSeungJae)|[정다솔](https://github.com/dbjoung)|
+|FE, BE|FE, BE|FE, BE|FE, BE|FE, BE|FE, BE|
 
 
