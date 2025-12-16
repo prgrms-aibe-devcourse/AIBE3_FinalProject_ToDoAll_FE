@@ -215,9 +215,12 @@ Optional<Resume> findWithEssentialDetailsById(Long resumeId);
 ```
 
 **3️⃣ 핵심 해결 — 비동기 캐싱 + Lazy 추천 제공**
+
 💡 설계 전환 -> “첫 요청에서 모든 걸 계산하지 말자”
+
 **기존 방식**
 - 요청 → 모든 계산 수행 → 응답
+
 **개선 방식**
 ```
 Client Request
