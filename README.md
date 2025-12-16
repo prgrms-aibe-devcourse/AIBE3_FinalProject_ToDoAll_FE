@@ -33,6 +33,10 @@
 
 ---
 
+## 📃 관련 문서
+
+## 🖼️ 시스템 아키텍처
+
 ## 📌 팀원 구성
 
 |<img src="https://avatars.githubusercontent.com/u/144124353?s=400&u=9bda70cb07b771d6301ac64df65acb931406b09e&v=4" width="125" />|<img src="https://avatars.githubusercontent.com/u/82808715?v=4" width="125" />|<img src="https://avatars.githubusercontent.com/u/217855127?v=4" width="125" />|<img src="https://avatars.githubusercontent.com/u/99888873?v=4" width="125" />|<img src="https://avatars.githubusercontent.com/u/96305452?v=4" width="125" />|<img src="https://avatars.githubusercontent.com/u/121555686?v=4" width="125" />|
@@ -87,6 +91,18 @@
 | Monitoring | ![Grafana](https://img.shields.io/badge/Grafana-F46800?style=for-the-badge&logo=grafana&logoColor=white) |
 | Metrics | ![Prometheus](https://img.shields.io/badge/Prometheus-E6522C?style=for-the-badge&logo=prometheus&logoColor=white) |
 
+---
+
+## ✨ 핵심 기능 소개
+### 🔔 알림
+### 💬 채팅
+### 🔎 ELS
+
+| ELS |
+|----------|
+|![elasticsearch](https://github.com/user-attachments/assets/6328d016-7652-462a-b7c9-a279def3ddb1)|
+
+### 🤖 MCP
 
 
 
