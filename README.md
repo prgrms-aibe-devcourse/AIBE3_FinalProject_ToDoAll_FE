@@ -37,9 +37,10 @@
 ### 🔗 배포 링크
 [서비스 바로가기](https://jobda.vercel.app/login)
 
-### [![Figma](img.shields.io)](https://www.notion.so/Team2-2933550b7b558091945ec4b806f224c0)
+## 문서
+[![Figma](https://img.shields.io/badge/Figma-Design-F24E1E?logo=figma&logoColor=white)](https://www.figma.com/design/UPdtMBrqB7IAYrJMq9Xsd4/JOBDA)
+[![Notion](https://img.shields.io/badge/Notion-Docs-000000?logo=notion&logoColor=white)](https://www.notion.so/Team2-2933550b7b558091945ec4b806f224c0)
 
-### [![Figma](img.shields.io)](https://www.figma.com/design/UPdtMBrqB7IAYrJMq9Xsd4/JOBDA?node-id=0-1&p=f&t=LJSp50zOs8jPMMZp-0)
 
 ---
 
