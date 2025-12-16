@@ -139,5 +139,146 @@
 |![면접요약-강조](https://github.com/user-attachments/assets/1e27bec2-1848-4117-9677-6c96ed4bf3eb)|
 
 
+--- 
+## 🛠 트러블 슈팅 
+### 1. Elasticsearch 추천/검색 성능 개선
+**📌 문제 상황**
+
+이력서 추천 API 호출 시, 매 요청마다 동일한 추천 로직과 AI 호출이 반복되며
+초기 응답 시간이 5초 이상 (5400ms) 소요되는 성능 문제가 발생
+
+특히:
+- Elasticsearch 검색
+- 다수의 JPA 연관 엔티티 조회
+- JD 키워드 추출 / 이력서 요약 / 추천 사유 생성 등 OpenAI 기반 연산
+이 한 요청 안에서 모두 수행되며 응답 속도 측면에서 문제가 명확히 드러났음.
+
+**🔍 원인 분석**
+1. 중복 연산 문제
+2. 동일 JD에 대해 추천 결과가 매번 새로 계산됨
+3. N+1 문제
+4. Resume 조회 시 다수의 연관 엔티티가 Lazy 로딩
+5. AI 호출 비용 - 첫 호출 시 OpenAI 기반 연산이 다수 포함되어 최소 3초 이상 소요
+
+**1️⃣ 1차 개선 — Redis 캐시 도입 (추천 결과 캐싱)**
+
+**✔️ 적용 내용**
+- JD 기준 추천 결과를 Redis에 캐싱
+- 두 번째 호출부터는 계산 없이 즉시 반환
+
+```java
+redisTemplate.opsForValue().set("recommend:jd_" + jdId, data, TTL);
+```
+
+
+**📊 결과**
+| 호출 횟수 | 실행 시간 |
+|----------|----------|
+| 첫 호출 | 5409ms |
+| 두 번째 호출 | 737ms |
+| 세 번째 호출 | 592ms |
+
+
+👉 캐시 효과는 명확했지만, 첫 호출이 여전히 느림
+
+**2️⃣ 2차 개선 — N+1 문제 해결 시도 (Fetch Join)**
+**✔️ 시도**
+
+연관 엔티티를 한 번에 로딩하기 위해 Fetch Join 적용
+```java
+@Query("""
+    SELECT r FROM Resume r
+    LEFT JOIN FETCH r.educations
+    LEFT JOIN FETCH r.experiences
+    LEFT JOIN FETCH r.skills
+    WHERE r.id = :resumeId
+""")
+```
+
+**❌ 문제 발생**
+```java
+MultipleBagFetchException:
+cannot simultaneously fetch multiple bags
+```
+- Hibernate는 2개 이상의 List 컬렉션 Fetch Join을 허용하지 않음
+
+**✔️ 최종 해결**
+- 1개 컬렉션만 Fetch Join
+- 나머지는 @BatchSize 적용
+```java
+@Query("""
+    SELECT DISTINCT r FROM Resume r
+    LEFT JOIN FETCH r.experiences
+    WHERE r.id = :resumeId
+""")
+Optional<Resume> findWithEssentialDetailsById(Long resumeId);
+```
+
+**3️⃣ 핵심 해결 — 비동기 캐싱 + Lazy 추천 제공**
+💡 설계 전환 -> “첫 요청에서 모든 걸 계산하지 말자”
+**기존 방식**
+- 요청 → 모든 계산 수행 → 응답
+**개선 방식**
+```
+Client Request
+   ↓
+Redis Cache 확인
+   ↓        ↘
+Cache Hit → 즉시 반환
+   ↓
+Cache Miss → 비동기 추천 계산 시작
+            → "추천 준비 중" 응답
+```
+**✔️ 비동기 캐싱 적용**
+```java
+@Async
+public void warmUpRecommendation(Long jdId) {
+    List<ResumeRecommendationDto> result =
+        recommendationCoreService.calculateRecommendations(jdId);
+    redisRecommendationCacheService.saveRecommendations(jdId, result);
+}
+```
+**📊 최종 성능 결과**
+| 시점 | 실행 시간 |
+|-----|----------|
+| 첫 요청 (비동기 트리거) | ~1700ms |
+| 두 번째 호출 | 102ms |
+| 세 번째 호출 | 14ms |
+
+👉 체감 성능 대폭 개선 + 서버 부하 감소
+
+
+**4️⃣ 추가 리팩토링 — AI 결과 영속성 개선** 
+**🧠 문제 인식**
+- JD 키워드, 이력서 요약, 추천 사유는 영속성이 높은 데이터로, Redis에만 저장하는 구조는 적절하지 않음
+
+**✔️ 개선 구조**
+```
+요청
+ ↓
+Redis 조회
+ ↓        ↘
+HIT      MISS
+ ↓        ↓
+반환     DB 조회
+          ↓        ↘
+         HIT       MISS
+          ↓         ↓
+     Redis 캐싱     AI 호출
+                    ↓
+                 DB 저장 + Redis 캐싱
+```
+
+**✔️ 효과**
+- AI 호출 횟수 최소화
+- 재시작/TTL 만료에도 데이터 유지
+- Redis는 가속 레이어 역할만 수행
+
+### ✅ 최종 정리
+- Redis 캐싱으로 중복 연산 제거
+- Fetch Join + BatchSize로 N+1 문제 완화
+- 비동기 캐싱으로 첫 호출 체감 성능 개선
+- AI 결과는 DB에 영속 저장하여 구조적 안정성 확보
+
 
 
