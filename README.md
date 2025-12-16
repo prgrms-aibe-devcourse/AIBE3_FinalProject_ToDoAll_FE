@@ -94,11 +94,16 @@
 ---
 
 ## ✨ 핵심 기능 소개
-### 🔔 알림
+### 🔔 SSE
+
+| 실시간 알림 |
+|----------|
+|![EC958CEBA6BC](https://github.com/user-attachments/assets/18e2cceb-ef8b-4934-a30a-ab20376799e4)|
+
 ### 💬 채팅
 ### 🔎 ELS
 
-| ELS |
+| 추천 지원자 조회 |
 |----------|
 |![elasticsearch](https://github.com/user-attachments/assets/6328d016-7652-462a-b7c9-a279def3ddb1)|
 
