@@ -1,8 +1,9 @@
 # 📑 잡다 (JobDa) 
+<p align="center">
 **채용공고와 이력서를 표준화해, AI가 가장 ‘잘 맞는 인재’를 찾아주는 채용 코파일럿**
 
 <img width="800" alt="대문이미지" src="https://github.com/user-attachments/assets/4cf05102-fe5e-4c45-a419-5b4826633bbd" />
-
+</p>
 <div align=start>
 
 <p align="center">
@@ -37,6 +38,7 @@
 
 </div>
 
+<a id="프로젝트-소개"></a>
 ## 📝 프로젝트 소개
 
 **잡다(JobDa)** 는 채용 담당자와 면접관의 업무 효율을 획기적으로 높이는  
@@ -76,19 +78,19 @@
 - [팀원 구성](#팀원-구성)
 
 ---
-
+<a id="시스템-아키텍처"></a>
 ## 🖼️ 시스템 아키텍처
 <img width="1410" height="953" alt="AIBE3_FINAL_아키텍쳐 drawio" src="https://github.com/user-attachments/assets/b33ef670-8419-4f12-8162-53e94599f117" />
 
 ---
 
 ---
-
+<a id="erd"></a>
 ## 🧩 ERD
 <img width="1410" alt="ERD image" src="https://github.com/user-attachments/assets/fc0415df-3918-4890-9ad9-4d4a9a59081e" />
 
 ---
-
+<a id="기술-스택-및-도입-이유"></a>
 ## 🛠 기술 스택 및 도입 이유 
 
 ### Frontend
@@ -144,7 +146,7 @@
 
 
 ---
-
+<a id="핵심-기능-소개"></a>
 ## ✨ 핵심 기능 소개
 ### 🔔 SSE
 
@@ -175,6 +177,7 @@
 
 
 --- 
+<a id="트러블-슈팅"></a>
 ## 🛠 트러블 슈팅 
 ### 1. Elasticsearch 추천/검색 성능 개선
 **📌 문제 상황**
@@ -420,7 +423,7 @@ location /api/v1/sse/subscribe {
 * 실시간 시스템 설계 시 **인프라까지 포함한 관점의 중요성 체감**
 
 ---
-
+<a id="팀원-구성"></a>
 ## 📌 팀원 구성
 
 |<img src="https://avatars.githubusercontent.com/u/144124353?s=400&u=9bda70cb07b771d6301ac64df65acb931406b09e&v=4" width="125" />|<img src="https://avatars.githubusercontent.com/u/82808715?v=4" width="125" />|<img src="https://avatars.githubusercontent.com/u/217855127?v=4" width="125" />|<img src="https://avatars.githubusercontent.com/u/99888873?v=4" width="125" />|<img src="https://avatars.githubusercontent.com/u/96305452?v=4" width="125" />|<img src="https://avatars.githubusercontent.com/u/121555686?v=4" width="125" />|
