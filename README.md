@@ -34,14 +34,12 @@
 ---
 
 ## 📃 관련 문서
-### 배포 링크
+### 🔗 배포 링크
 [서비스 바로가기](https://jobda.vercel.app/login)
 
-### 팀 노션
+### [![Figma](img.shields.io)](https://www.notion.so/Team2-2933550b7b558091945ec4b806f224c0)
 
-### 피그마
-
-[피그마](https://www.figma.com/design/UPdtMBrqB7IAYrJMq9Xsd4/JOBDA?node-id=0-1&p=f&t=LJSp50zOs8jPMMZp-0)
+### [![Figma](img.shields.io)](https://www.figma.com/design/UPdtMBrqB7IAYrJMq9Xsd4/JOBDA?node-id=0-1&p=f&t=LJSp50zOs8jPMMZp-0)
 
 ---
 
@@ -120,16 +118,25 @@
 
 | 실시간 알림 |
 |----------|
-|![EC958CEBA6BC](https://github.com/user-attachments/assets/18e2cceb-ef8b-4934-a30a-ab20376799e4)|
+|![EC958CEBA6BC-2](https://github.com/user-attachments/assets/a9db26b1-5c20-4394-a90e-a00bde29a520)|
 
 ### 💬 채팅
 ### 🔎 ELS
 
 | 추천 지원자 조회 |
 |----------|
-|![elasticsearch](https://github.com/user-attachments/assets/6328d016-7652-462a-b7c9-a279def3ddb1)|
+|![elasticsearch-7](https://github.com/user-attachments/assets/61a495a5-c901-47bf-b2f2-5d2d948c8851)|
+
 
 ### 🤖 MCP
+| 면접 질문 생성 |
+|----------|
+|![KakaoTalk_Video_2025-12-16-10-58-56](https://github.com/user-attachments/assets/391cb11a-01b7-403f-b50e-5bac5973cd48)|
+
+| AI 면접 요약 |
+|----------|
+|![면접요약-강조](https://github.com/user-attachments/assets/1e27bec2-1848-4117-9677-6c96ed4bf3eb)|
+
 
 
 
