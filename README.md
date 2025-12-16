@@ -34,8 +34,21 @@
 ---
 
 ## 📃 관련 문서
+### 배포 링크
+[서비스 바로가기](https://jobda.vercel.app/login)
+
+### 팀 노션
+
+### 피그마
+
+[피그마](https://www.figma.com/design/UPdtMBrqB7IAYrJMq9Xsd4/JOBDA?node-id=0-1&p=f&t=LJSp50zOs8jPMMZp-0)
+
+---
 
 ## 🖼️ 시스템 아키텍처
+<img width="1600" height="1000" alt="AIBE3_FINAL_아키텍쳐 drawio" src="https://github.com/user-attachments/assets/db596af9-f284-4494-9181-78d1e6c96b55" />
+
+---
 
 ## 📌 팀원 구성
 
@@ -44,6 +57,7 @@
 |[유승인 (팀장)](https://github.com/seung-in-Yoo)|[김정호](https://github.com/Unoguna)|[김지윤](https://github.com/jiyoon-00)|[심수민](https://github.com/SWWWin)|[유승재](https://github.com/JaeSeungJae)|[정다솔](https://github.com/dbjoung)|
 |FE, BE|FE, BE|FE, BE|FE, BE|FE, BE|FE, BE|
 
+---
 
 ## 🛠 기술 스택
 
