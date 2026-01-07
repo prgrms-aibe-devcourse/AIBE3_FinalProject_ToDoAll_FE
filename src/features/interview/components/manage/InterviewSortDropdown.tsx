@@ -42,13 +42,13 @@ export default function InterviewSortDropdown({ jobPosts, onSelect }: InterviewS
     <div ref={dropdownRef} className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="text-jd-gray-black hover:text-jd-black translate-y-17 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm transition"
+        className="text-jd-gray-black hover:text-jd-black rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm transition"
       >
         {selected}
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 z-10 mt-2 w-56 translate-y-17 rounded-md border border-gray-200 bg-white shadow-lg">
+        <div className="absolute right-0 z-10 mt-2 w-56 rounded-md border border-gray-200 bg-white shadow-lg">
           {/* 전체 보기 */}
           <button
             onClick={() => handleSelect(null)}

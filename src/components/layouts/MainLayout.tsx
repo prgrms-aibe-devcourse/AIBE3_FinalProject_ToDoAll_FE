@@ -41,7 +41,7 @@ const MainLayout = () => {
 
   return (
     <div
-      className={`relative flex min-h-screen flex-col transition-[padding-left] duration-300 ${drawerOpen && isDesktop ? 'pl-[240px]' : ''}`}
+      className={`relative flex h-full flex-col transition-[padding-left] duration-300 ${drawerOpen && isDesktop ? 'pl-[240px]' : ''}`}
     >
       {/* 모바일 전용 오버레이 */}
       <div
@@ -51,7 +51,7 @@ const MainLayout = () => {
 
       <Header />
       <main
-        className="flex-grow"
+        className="min-h-1/2"
         onClick={() => {
           if (drawerOpen) {
             window.dispatchEvent(new CustomEvent('close-drawer'));

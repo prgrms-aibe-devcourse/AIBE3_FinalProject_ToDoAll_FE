@@ -5,6 +5,7 @@ import InterviewSortDropdown from '../components/manage/InterviewSortDropdown';
 import type { TabStatus, InterviewStatus, ResultStatus } from '../types/interviewer';
 import useFetch from '@/hooks/useFetch';
 import { userDefaultImage } from '@/const.ts';
+import PageTitle from '@components/PageTitile.tsx';
 
 interface InterviewSummaryResponse {
   interviewId: number;
@@ -148,14 +149,11 @@ export default function InterviewManagePage() {
   }
 
   return (
-    <div className="bg-jd-white min-h-screen px-12 py-8">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">면접 관리</h1>
+    <PageTitle title="면접 관리" description="예정된 면접을 관리하세요.">
+      <section className="flex justify-between">
+        <InterviewFilterTabs activeTab={activeTab} onChange={handleTabChange} />
         <InterviewSortDropdown jobPosts={jobPosts} onSelect={handleJDChange} />
-      </div>
-
-      <InterviewFilterTabs activeTab={activeTab} onChange={handleTabChange} />
-
+      </section>
       <div className="mt-6 grid grid-cols-3 gap-8">
         {interviews.map((item) => (
           <InterviewCard key={item.id} {...item} />
@@ -184,6 +182,6 @@ export default function InterviewManagePage() {
           </button>
         )}
       </div>
-    </div>
+    </PageTitle>
   );
 }
