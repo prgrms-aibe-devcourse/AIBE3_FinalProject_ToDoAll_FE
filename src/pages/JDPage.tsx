@@ -3,6 +3,7 @@ import { fetchJobPosts } from '../features/jd/services/jobApi';
 import JobPostList from '../features/jd/components/jobpostlist/JobPostList';
 import type { JobPost } from '../features/jd/types/JobPost.types';
 import { useNavigate } from 'react-router-dom';
+import PageTitle from '@components/PageTitile.tsx';
 
 export default function JDPage() {
   const [items, setItems] = useState<JobPost[]>([]);
@@ -13,17 +14,11 @@ export default function JDPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-gray-50 p-4 sm:p-6">
-      <header className="mb-4 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-gray-900">공고 관리</h1>
-        <button
-          className="cursor-pointer rounded-full bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none"
-          onClick={() => navigate('/jobs/new')}
-        >
-          공고 등록
-        </button>
-      </header>
-
+    <PageTitle
+      title="공고 관리"
+      description="등록한 공고를 관리해보세요."
+      buttonOnClickFn={() => navigate('/jobs/new')}
+    >
       <div className="mx-auto max-w-5xl">
         <JobPostList
           items={items}
@@ -34,6 +29,6 @@ export default function JDPage() {
           }}
         />
       </div>
-    </main>
+    </PageTitle>
   );
 }

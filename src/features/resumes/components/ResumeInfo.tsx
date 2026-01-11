@@ -124,32 +124,29 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
       <h2 className="text-[30px] font-semibold text-[#413F3F]">지원서</h2>
 
       <div className="relative rounded-2xl bg-white p-6 shadow">
-        {/* 프로필 */}
-        <img
-          src={profileHref || '/images/default-profile.jpg'}
-          alt={`${data.name} 프로필`}
-          className="absolute top-6 right-6 h-48 w-36 rounded-[10px] object-cover shadow-md"
-          onError={(e) => {
-            console.error('[PROFILE] load fail:', profileHref, e);
-            console.error('[PROFILE] files.resume:', data.files?.resume);
-            console.error('[PROFILE] files.resumeKey:', data.files?.resumeKey);
-            const target = e.target as HTMLImageElement;
-            if (target.src !== '/images/default-profile.jpg') {
-              target.src = '/images/default-profile.jpg';
-            }
-          }}
-          onLoad={() =>
-            console.log('[PROFILE] load ok:', profileHref || '/images/default-profile.jpg')
-          }
-        />
-
-        {/* 이름 / 직무 */}
-        <header className="mb-8 flex items-center justify-between">
-          <div>
+        <section className="mb-4 flex flex-wrap items-center justify-between">
+          <section className="mb-4 flex flex-col">
             <h2 className="font-regular text-[25px] text-[#413F3F]">{data.name}</h2>
             <p className="text-[18px] text-[#837C7C]">프론트엔드 개발자 지원</p>
-          </div>
-        </header>
+          </section>
+          <img
+            src={profileHref || '/images/default-profile.jpg'}
+            alt={`${data.name} 프로필`}
+            className="h-48 w-36 rounded-[10px] object-cover shadow-md"
+            onError={(e) => {
+              console.error('[PROFILE] load fail:', profileHref, e);
+              console.error('[PROFILE] files.resume:', data.files?.resume);
+              console.error('[PROFILE] files.resumeKey:', data.files?.resumeKey);
+              const target = e.target as HTMLImageElement;
+              if (target.src !== '/images/default-profile.jpg') {
+                target.src = '/images/default-profile.jpg';
+              }
+            }}
+            onLoad={() =>
+              console.log('[PROFILE] load ok:', profileHref || '/images/default-profile.jpg')
+            }
+          />
+        </section>
 
         {/* 기본 정보 */}
         <div className="space-y-6 text-sm font-medium text-[#413F3F]">

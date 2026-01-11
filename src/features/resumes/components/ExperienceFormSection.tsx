@@ -113,8 +113,8 @@ export default function ExperienceFormSection({
 
       {showForm && (
         <div className="space-y-3 rounded-[10px] border border-[#E5E5E5] bg-[#FAFAFA] p-4">
-          <div className="mt-2 flex flex-wrap items-center gap-3">
-            <div className="flex-1">
+          <div className="xs:flex-row mt-2 flex flex-col flex-wrap gap-3">
+            <div className="w-full flex-1">
               <CustomSelect
                 value={expInput.type}
                 onChange={(val) => setExpInput({ ...expInput, type: val })}
@@ -131,7 +131,7 @@ export default function ExperienceFormSection({
               placeholder="제목 작성"
               value={expInput.title}
               onChange={(e) => setExpInput({ ...expInput, title: e.target.value })}
-              className="flex-1 rounded-[10px] border px-3 py-2"
+              className="w-full flex-1 rounded-[10px] border px-3 py-2"
             />
 
             <input
@@ -139,7 +139,7 @@ export default function ExperienceFormSection({
               placeholder="수행 기관"
               value={expInput.organization}
               onChange={(e) => setExpInput({ ...expInput, organization: e.target.value })}
-              className="flex-1 rounded-[10px] border px-3 py-2"
+              className="w-full flex-1 rounded-[10px] border px-3 py-2"
             />
           </div>
 

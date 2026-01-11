@@ -11,6 +11,9 @@
 }
 
 @theme {
+  /* breakpoint  */
+  --breakpoint-xs: 480px;
+
   /* 폰트 */
   --default-font-family: 'Pretendard Variable', var(--font-sans);
 
@@ -43,4 +46,10 @@
   .jd-dashboard-section {
     box-shadow: 0 4px 4px 0 #00000040;
   }
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
 }

@@ -2,6 +2,7 @@ import { Pill } from '../shared/Pill';
 import type { JobDetail } from '../../types/JobDetail.types';
 import JobStatusDropdown from './JobStatusDropdown';
 import { updateJobStatus } from '../../services/jobApi';
+import cn from '@/lib/utils/cn';
 
 type Mode = 'owner' | 'public';
 
@@ -19,14 +20,13 @@ export function JobDetailHeader({
   return (
     <header className="flex items-start justify-between gap-4">
       <div className="min-w-0">
-        <div className="flex items-center gap-2">
+        <div className="no flex items-center gap-2">
           <h1 className="truncate text-2xl font-bold text-gray-900">{job.title}</h1>
           <span
-            className={
-              statusLabel === '진행중'
-                ? 'rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-700'
-                : 'rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600'
-            }
+            className={cn(
+              'rounded-full px-2 py-0.5 text-xs whitespace-nowrap',
+              statusLabel === '진행중' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'
+            )}
           >
             {statusLabel}
           </span>

@@ -1,3 +1,5 @@
+import cn from '@lib/utils/cn.ts';
+
 export default function ApplicantCount({
   count,
   className = '',
@@ -6,8 +8,7 @@ export default function ApplicantCount({
   className?: string;
 }) {
   return (
-    <div className={'flex items-center gap-2 ' + className}>
-      {/* 아이콘: 의존성 없이 inline SVG */}
+    <div className={cn('flex items-center gap-2', className)}>
       <svg
         viewBox="0 0 24 24"
         aria-hidden="true"

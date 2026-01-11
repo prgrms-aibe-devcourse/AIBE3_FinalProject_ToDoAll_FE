@@ -75,11 +75,11 @@ export default function FileUploadForm({ formData, onChange }: Props) {
 
       {showForm && (
         <div className="space-y-3 rounded-[10px] p-4">
-          <div className="flex items-center gap-3">
+          <div className="xs:flex-nowrap flex flex-wrap items-center gap-3">
             <input
               type="file"
               accept=".pdf,.doc,.docx,.ppt,.pptx,.zip,.jpg,.jpeg,.png"
-              className="rounded-[10px] border p-2"
+              className="w-full rounded-[10px] border p-2"
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) {
@@ -95,7 +95,7 @@ export default function FileUploadForm({ formData, onChange }: Props) {
             />
             <button
               type="button"
-              className="rounded-[8px] bg-[#E3DBDB] px-4 py-2 transition hover:bg-[#B1A0A0]"
+              className="white rounded-[8px] bg-[#E3DBDB] px-4 py-2 whitespace-nowrap transition hover:bg-[#B1A0A0]"
               onClick={addPortfolioFile}
             >
               추가
