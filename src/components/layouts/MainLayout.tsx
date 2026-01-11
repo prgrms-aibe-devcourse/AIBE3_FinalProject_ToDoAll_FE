@@ -51,7 +51,7 @@ const MainLayout = () => {
 
       <Header />
       <main
-        className="min-h-1/2"
+        className="bg-jd-white min-h-1/2"
         onClick={() => {
           if (drawerOpen) {
             window.dispatchEvent(new CustomEvent('close-drawer'));

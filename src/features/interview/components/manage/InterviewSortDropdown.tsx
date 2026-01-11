@@ -39,7 +39,7 @@ export default function InterviewSortDropdown({ jobPosts, onSelect }: InterviewS
   };
 
   return (
-    <div ref={dropdownRef} className="relative">
+    <div ref={dropdownRef} className="relative self-end">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="text-jd-gray-black hover:text-jd-black rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm transition"

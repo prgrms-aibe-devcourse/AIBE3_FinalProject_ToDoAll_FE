@@ -13,7 +13,7 @@ export default function PageTitle({
   buttonOnClickFn?: MouseEventHandler<HTMLButtonElement> | undefined;
 }) {
   return (
-    <section className="bg-jd-white flex pb-20">
+    <section className="flex min-h-[800px] pb-20">
       <section className="flex w-full flex-col p-[2rem]">
         <section className="flex justify-between">
           <section className="flex flex-col">

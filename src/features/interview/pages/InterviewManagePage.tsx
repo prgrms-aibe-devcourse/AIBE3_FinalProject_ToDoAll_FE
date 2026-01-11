@@ -6,6 +6,7 @@ import type { TabStatus, InterviewStatus, ResultStatus } from '../types/intervie
 import useFetch from '@/hooks/useFetch';
 import { userDefaultImage } from '@/const.ts';
 import PageTitle from '@components/PageTitile.tsx';
+import BlankCard from '@components/dashboard/BlankCard.tsx';
 
 interface InterviewSummaryResponse {
   interviewId: number;
@@ -150,19 +151,21 @@ export default function InterviewManagePage() {
 
   return (
     <PageTitle title="면접 관리" description="예정된 면접을 관리하세요.">
-      <section className="flex justify-between">
+      <section className="xs:flex-row xs:justify-between flex flex-col gap-2">
         <InterviewFilterTabs activeTab={activeTab} onChange={handleTabChange} />
         <InterviewSortDropdown jobPosts={jobPosts} onSelect={handleJDChange} />
       </section>
-      <div className="mt-6 grid grid-cols-3 gap-8">
-        {interviews.map((item) => (
-          <InterviewCard key={item.id} {...item} />
-        ))}
-      </div>
+      {interviews.length <= 0 ? (
+        <BlankCard text={'해당하는 면접 일정이 없습니다.'} />
+      ) : (
+        <div className="mt-6 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {interviews.map((item) => (
+            <InterviewCard key={item.id} {...item} />
+          ))}
+        </div>
+      )}
 
-      {/* 페이지 이동 버튼 */}
       <div className="mt-10 flex justify-center gap-6">
-        {/* 이전 페이지 */}
         {cursorHistory.length > 1 && (
           <button
             onClick={handlePrev}
@@ -172,7 +175,6 @@ export default function InterviewManagePage() {
           </button>
         )}
 
-        {/* 다음 페이지 */}
         {interviewList.hasNext && (
           <button
             onClick={handleNext}
