@@ -1,6 +1,6 @@
 import SummarySection from '@features/dashboard/SummarySection.tsx';
 import DetailSection from '@features/dashboard/DetailSection.tsx';
-import PageTitle from '@components/PageTitile.tsx';
+import PageTitle from '@shared/components/PageTitile.tsx';
 
 export default function DashBoard() {
   return (

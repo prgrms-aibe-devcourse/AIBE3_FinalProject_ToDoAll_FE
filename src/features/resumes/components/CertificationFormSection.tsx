@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import plusImg from '../../../assets/Vector-2.png';
 import CustomSelect from './CustomSelect';
-import AlertModal from '../../../components/Alertmodal';
+import AlertModal from '@shared/components/Alertmodal.tsx';
 
 type Certification = { type: string; title: string; hasScore: boolean; score?: string };
 

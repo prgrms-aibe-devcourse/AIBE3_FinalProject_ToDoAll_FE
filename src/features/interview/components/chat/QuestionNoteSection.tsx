@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Check } from 'lucide-react';
 import type { QuestionSection } from '../../types/chatroom';
-import BlankCard from '@components/dashboard/BlankCard.tsx';
+import BlankCard from '@shared/components/BlankCard.tsx';
 
 interface QuestionNoteSectionProps {
   questionNotes: QuestionSection[];

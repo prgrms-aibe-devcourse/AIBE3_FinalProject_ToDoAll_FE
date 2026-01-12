@@ -20,7 +20,7 @@ import {
   type InterviewMemo,
 } from '@/features/interview/api/question.api';
 
-import useInterviewSocket from '@/hooks/useInterviewSocket';
+import useInterviewSocket from '@shared/hooks/useInterviewSocket';
 
 import {
   MessageType,

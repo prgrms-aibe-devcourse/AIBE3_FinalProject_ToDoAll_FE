@@ -3,10 +3,10 @@ import InterviewCard from '../components/manage/InterviewCard';
 import InterviewFilterTabs from '../components/manage/InterviewFilterTabs';
 import InterviewSortDropdown from '../components/manage/InterviewSortDropdown';
 import type { TabStatus, InterviewStatus, ResultStatus } from '../types/interviewer';
-import useFetch from '@/hooks/useFetch';
+import useFetch from '@shared/hooks/useFetch';
 import { userDefaultImage } from '@/const.ts';
-import PageTitle from '@components/PageTitile.tsx';
-import BlankCard from '@components/dashboard/BlankCard.tsx';
+import PageTitle from '@shared/components/PageTitile.tsx';
+import BlankCard from '@shared/components/BlankCard.tsx';
 
 interface InterviewSummaryResponse {
   interviewId: number;

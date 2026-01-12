@@ -1,4 +1,4 @@
-import SelectIcon from '@components/SelectIcon.tsx';
+import SelectIcon from '@shared/components/SelectIcon.tsx';
 
 export type DataInfoCardProps = {
   isOrganizer: boolean;

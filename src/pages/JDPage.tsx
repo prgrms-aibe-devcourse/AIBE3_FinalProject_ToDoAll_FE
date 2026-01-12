@@ -3,7 +3,7 @@ import { fetchJobPosts } from '../features/jd/services/jobApi';
 import JobPostList from '../features/jd/components/jobpostlist/JobPostList';
 import type { JobPost } from '../features/jd/types/JobPost.types';
 import { useNavigate } from 'react-router-dom';
-import PageTitle from '@components/PageTitile.tsx';
+import PageTitle from '@shared/components/PageTitile.tsx';
 
 export default function JDPage() {
   const [items, setItems] = useState<JobPost[]>([]);
@@ -20,14 +20,7 @@ export default function JDPage() {
       buttonOnClickFn={() => navigate('/jobs/new')}
     >
       <div className="mx-auto max-w-5xl">
-        <JobPostList
-          items={items}
-          onOpen={(id) => {
-            // 여기서 라우팅 또는 모달 열기 등 연결 예정
-            console.log('open job id:', id);
-            alert(`공고 상세로 이동: ${id}`);
-          }}
-        />
+        <JobPostList items={items} />
       </div>
     </PageTitle>
   );

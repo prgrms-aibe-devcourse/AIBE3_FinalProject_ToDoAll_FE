@@ -1,5 +1,5 @@
-import Badge, { type BadgeType } from '@components/dashboard/Badge.tsx';
-import { Skeleton } from '@components/Skeleton.tsx';
+import Badge, { type BadgeType } from '@features/dashboard/components/Badge.tsx';
+import { Skeleton } from '@shared/components/Skeleton.tsx';
 
 const STATUS_INFO = {
   byJob: {

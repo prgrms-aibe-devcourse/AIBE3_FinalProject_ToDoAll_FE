@@ -1,5 +1,5 @@
 import LongViewContainer from '@features/dashboard/container/LongViewContainer.tsx';
-import useFetch from '@/hooks/useFetch.ts';
+import useFetch from '@shared/hooks/useFetch.ts';
 import StatusCountCardUI from '@features/dashboard/card/StatusCountCardUI.tsx';
 
 type NumByProgressStatus = {

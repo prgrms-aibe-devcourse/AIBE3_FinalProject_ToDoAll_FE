@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import purplePlusImg from '../../../assets/Vector-3.png';
 import type { ResumeData } from '../types/resumes.types';
-import AlertModal from '../../../components/Alertmodal';
+import AlertModal from '@shared/components/Alertmodal.tsx';
 
 type Props = {
   formData: ResumeData;

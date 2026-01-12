@@ -5,7 +5,7 @@ import BasicInfoForm from '../components/BasicInfoForm';
 import ResumeForm from '../components/ResumeForm';
 import { createResume } from '../data/resumes.api';
 import { getJobDescription } from '../data/jd.api';
-import AlertModal from '../../../components/Alertmodal';
+import AlertModal from '@shared/components/Alertmodal.tsx';
 
 const DRAFT_KEY = (jdId: number) => `resumeDraft:${jdId}`;
 

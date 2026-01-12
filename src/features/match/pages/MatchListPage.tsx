@@ -12,7 +12,7 @@ import { mapMatchDtoToCardData } from '../utils/mapMatchDtoToCardData';
 import { mapRecommendationToCardData } from '../utils/mapRecommendationToResumeData';
 
 import type { MatchCardData } from '../types/matchCardData.types';
-import PageTitle from '@components/PageTitile.tsx';
+import PageTitle from '@shared/components/PageTitile.tsx';
 
 export default function MatchListPage() {
   const navigate = useNavigate();

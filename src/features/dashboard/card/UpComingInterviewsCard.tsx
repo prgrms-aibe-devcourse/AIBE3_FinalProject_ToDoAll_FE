@@ -1,10 +1,10 @@
 import LongViewContainer from '@features/dashboard/container/LongViewContainer.tsx';
-import useFetch from '@/hooks/useFetch.ts';
+import useFetch from '@shared/hooks/useFetch.ts';
 import DateInfoCardUI, {
   type DataInfoCardProps,
 } from '@features/dashboard/card/DateInfoCardUI.tsx';
-import { Skeleton } from '@components/Skeleton.tsx';
-import BlankCard from '@components/dashboard/BlankCard.tsx';
+import { Skeleton } from '@shared/components/Skeleton.tsx';
+import BlankCard from '@shared/components/BlankCard.tsx';
 
 export default function UpComingInterviewsCard() {
   const { resData } = useFetch<DataInfoCardProps[]>('/api/v1/dashboard/detail/upcoming-interview');

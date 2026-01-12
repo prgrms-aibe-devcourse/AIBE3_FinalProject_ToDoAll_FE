@@ -1,4 +1,4 @@
-import Badge, { type BadgeType } from '@components/dashboard/Badge.tsx';
+import Badge, { type BadgeType } from '@features/dashboard/components/Badge.tsx';
 
 const STATUS_INFO = {
   DOCUMENT: {
