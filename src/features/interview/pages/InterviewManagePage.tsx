@@ -158,7 +158,7 @@ export default function InterviewManagePage() {
       {interviews.length <= 0 ? (
         <BlankCard text={'해당하는 면접 일정이 없습니다.'} />
       ) : (
-        <div className="mt-6 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {interviews.map((item) => (
             <InterviewCard key={item.id} {...item} />
           ))}
