@@ -12,6 +12,7 @@ import { mapMatchDtoToCardData } from '../utils/mapMatchDtoToCardData';
 import { mapRecommendationToCardData } from '../utils/mapRecommendationToResumeData';
 
 import type { MatchCardData } from '../types/matchCardData.types';
+import PageTitle from '@shared/components/PageTitile.tsx';
 
 export default function MatchListPage() {
   const navigate = useNavigate();
@@ -85,11 +86,10 @@ export default function MatchListPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF8F8] p-6">
-      <h1 className="mb-6 text-2xl font-semibold text-[#413F3F]">
-        {tab === 'recommended' ? '추천된 지원자' : '전체 지원자'}
-      </h1>
-
+    <PageTitle
+      title={tab === 'recommended' ? '추천된 지원자' : '전체 지원자'}
+      description="접수된 이력서를 관리할 수 있습니다."
+    >
       <MatchFilterSection
         initialJobId={jdId}
         onSearch={() => {
@@ -156,6 +156,6 @@ export default function MatchListPage() {
           </button>
         </div>
       )}
-    </div>
+    </PageTitle>
   );
 }

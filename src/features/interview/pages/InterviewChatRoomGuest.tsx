@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 
 import ChatSection from '../components/chat/ChatSection';
-import useInterviewSocket from '@/hooks/useInterviewSocket';
+import useInterviewSocket from '@shared/hooks/useInterviewSocket';
 import { MessageType, type OutgoingChatMessage } from '@/features/interview/types/chatroom';
 
 import { getInterviewDetailWithGuestToken } from '@/features/interview/api/interview-detail.api';

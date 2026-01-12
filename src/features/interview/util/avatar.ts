@@ -1,7 +1,7 @@
 // src/util/avatar.ts
-import defaultAvatarUrl from '@/assets/default-profile 복사본.jpg';
+import { userDefaultImage } from '@/const.ts';
 
-export const DEFAULT_AVATAR: string = defaultAvatarUrl;
+export const DEFAULT_AVATAR: string = userDefaultImage;
 
 export function isAbsoluteUrl(url: string) {
   return /^https?:\/\//i.test(url) || url.startsWith('data:') || url.startsWith('blob:');

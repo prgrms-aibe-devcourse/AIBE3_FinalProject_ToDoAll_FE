@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import plusImg from '../../../assets/Vector-2.png';
 import CustomSelect from './CustomSelect';
-import AlertModal from '../../../components/Alertmodal';
+import AlertModal from '@shared/components/Alertmodal.tsx';
 
 type Certification = { type: string; title: string; hasScore: boolean; score?: string };
 
@@ -81,8 +81,8 @@ export default function CertificationFormSection({
 
       {showForm && (
         <div className="space-y-3 rounded-[10px] border border-[#E5E5E5] bg-[#FAFAFA] p-4">
-          <div className="mt-2 flex flex-wrap items-center gap-3">
-            <div className="flex-1">
+          <div className="mt-2 flex flex-col gap-3">
+            <section className="xs:flex-row flex flex-col gap-2">
               <CustomSelect
                 value={certInput.type}
                 onChange={(val) => setCertInput({ ...certInput, type: val })}
@@ -92,42 +92,44 @@ export default function CertificationFormSection({
                   { value: '수상', label: '수상' },
                 ]}
               />
-            </div>
 
-            <input
-              type="text"
-              placeholder="항목 입력"
-              value={certInput.title}
-              onChange={(e) => setCertInput({ ...certInput, title: e.target.value })}
-              className="flex-1 rounded-[10px] border px-3 py-2"
-            />
-
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={certInput.hasScore}
-                onChange={(e) => setCertInput({ ...certInput, hasScore: e.target.checked })}
-              />
-              <span>점수</span>
-            </label>
-
-            {certInput.hasScore && (
               <input
                 type="text"
-                placeholder="점수 입력"
-                value={certInput.score}
-                onChange={(e) => {
-                  const value = e.target.value;
-
-                  if (value === '' || /^\d+$/.test(value)) {
-                    setCertInput({ ...certInput, score: value });
-                  } else {
-                    setShowScoreWarning(true);
-                  }
-                }}
-                className="w-24 rounded-[10px] border px-3 py-2"
+                placeholder="항목 입력"
+                value={certInput.title}
+                onChange={(e) => setCertInput({ ...certInput, title: e.target.value })}
+                className="w-full flex-1 rounded-[10px] border px-3 py-2"
               />
-            )}
+            </section>
+
+            <section>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={certInput.hasScore}
+                  onChange={(e) => setCertInput({ ...certInput, hasScore: e.target.checked })}
+                />
+                <span>점수</span>
+              </label>
+
+              {certInput.hasScore && (
+                <input
+                  type="text"
+                  placeholder="점수 입력"
+                  value={certInput.score}
+                  onChange={(e) => {
+                    const value = e.target.value;
+
+                    if (value === '' || /^\d+$/.test(value)) {
+                      setCertInput({ ...certInput, score: value });
+                    } else {
+                      setShowScoreWarning(true);
+                    }
+                  }}
+                  className="w-24 w-full rounded-[10px] border px-3 py-2"
+                />
+              )}
+            </section>
           </div>
 
           <div className="mt-3 flex justify-end">

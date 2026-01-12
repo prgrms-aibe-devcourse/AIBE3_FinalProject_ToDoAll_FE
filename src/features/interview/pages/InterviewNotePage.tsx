@@ -17,7 +17,7 @@ import {
 
 // 내 정보 조회용
 import { getMe } from '@/features/user/api/user.api';
-import useFetch from '@/hooks/useFetch';
+import useFetch from '@shared/hooks/useFetch';
 
 // 타입 & 초기 프로필
 

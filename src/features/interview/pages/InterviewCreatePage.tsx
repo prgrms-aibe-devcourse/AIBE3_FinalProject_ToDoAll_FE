@@ -5,7 +5,7 @@ import ApplicantProfileCard from '../components/create/ApplicantProfileCard';
 import InterviewerSearchBox from '../components/create/InterviewerSearchBox';
 import InvitedList from '../components/create/InvitedList';
 import SchedulePicker from '../components/create/SchedulePicker';
-import useFetch from '@/hooks/useFetch';
+import useFetch from '@shared/hooks/useFetch';
 
 export default function InterviewCreatePage() {
   const navigate = useNavigate();

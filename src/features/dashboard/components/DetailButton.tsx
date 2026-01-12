@@ -1,5 +1,5 @@
 import cn from '@lib/utils/cn.ts';
-import SelectIcon from '@components/SelectIcon.tsx';
+import SelectIcon from '@shared/components/SelectIcon.tsx';
 
 export default function DetailButton({ className, url }: { className?: string; url: string }) {
   return (

@@ -66,7 +66,7 @@ export default function SkillFormSection({
         <h2 className="text-lg font-semibold">스킬</h2>
       </div>
 
-      <div className="p-4">
+      <div className="">
         <div className="relative mb-4">
           <div className="flex flex-wrap items-center gap-2 rounded-xl border border-[#E0E0E0] bg-[#FAF8F8] p-2">
             <input

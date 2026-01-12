@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useContext } from 'react';
 import { AuthContext } from '@/AuthContext.ts';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../api/auth.api.ts';
-import AlertModal from '@components/Alertmodal.tsx';
+import AlertModal from '@shared/components/Alertmodal.tsx';
 
 export default function LoginPage() {
   const videoRef = useRef<HTMLVideoElement | null>(null);

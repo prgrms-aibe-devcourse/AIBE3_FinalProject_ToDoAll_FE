@@ -3,8 +3,11 @@ import { useEffect, useRef } from 'react';
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
 import type { IMessage, IFrame } from '@stomp/stompjs';
-import type { OutgoingChatMessage, IncomingNoteMessage } from '@/features/interview/types/chatroom';
-import { toNumId } from '../features/interview/util/avatar';
+import type {
+  OutgoingChatMessage,
+  IncomingNoteMessage,
+} from '@features/interview/types/chatroom.ts';
+import { toNumId } from '@features/interview/util/avatar.ts';
 
 type AnyObj = Record<string, any>;
 

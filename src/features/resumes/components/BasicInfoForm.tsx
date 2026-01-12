@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { ResumeData } from '../types/resumes.types';
 import CustomSelect from './CustomSelect';
-import AlertModal from '../../../components/Alertmodal';
+import AlertModal from '@shared/components/Alertmodal.tsx';
 
 type Props = {
   formData: ResumeData;
@@ -27,7 +27,7 @@ export default function BasicInfoForm({ formData, onChange }: Props) {
     <section className="mb-6 rounded-2xl bg-white p-6 shadow-md">
       <div className="flex flex-col gap-6 md:flex-row">
         <div className="grid flex-1 grid-cols-1 gap-4">
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-4">
             <input
               className="w-46 rounded-[10px] border p-2 px-4"
               placeholder="이름"
@@ -68,7 +68,7 @@ export default function BasicInfoForm({ formData, onChange }: Props) {
             onChange={(e) => onChange('phone', e.target.value)}
           />
 
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-4">
             <input
               className="w-46 rounded-[10px] border p-2 px-4"
               placeholder="주소"

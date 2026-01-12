@@ -1,8 +1,8 @@
-import TimeSlot, { type TimeSlotType } from '@components/dashboard/TimeSlot.tsx';
-import useFetch from '@/hooks/useFetch.ts';
-import { Skeleton } from '@components/Skeleton.tsx';
+import TimeSlot, { type TimeSlotType } from '@features/dashboard/components/TimeSlot.tsx';
+import useFetch from '@shared/hooks/useFetch.ts';
+import { Skeleton } from '@shared/components/Skeleton.tsx';
 import { useEffect, useState } from 'react';
-import BlankCard from '@components/dashboard/BlankCard.tsx';
+import BlankCard from '@shared/components/BlankCard.tsx';
 
 const WeekName = {
   mon: '월',

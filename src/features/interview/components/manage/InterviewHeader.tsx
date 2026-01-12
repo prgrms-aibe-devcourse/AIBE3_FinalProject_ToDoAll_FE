@@ -4,6 +4,7 @@ import {
   statusLabelMap,
   resultStatusLabelMap,
 } from '../../types/interviewer';
+import cn from '@lib/utils/cn.ts';
 
 interface InterviewHeaderProps {
   avatar: string;
@@ -46,9 +47,15 @@ export default function InterviewHeader({
       <img src={avatar} alt={name} className="h-12 w-12 rounded-full object-cover" />
       <div className="flex flex-col">
         <h3 className="text-jd-black font-semibold">{name}</h3>
-        <p className="text-jd-gray-dark text-sm">{position}</p>
+        <p className="text-jd-gray-dark wh text-sm break-all">{position}</p>
       </div>
-      <span className={`ml-auto rounded-full px-3 py-1 text-xs font-medium ${bg} ${text}`}>
+      <span
+        className={cn(
+          'ml-auto rounded-full px-3 py-1 text-xs font-medium whitespace-nowrap',
+          bg,
+          text
+        )}
+      >
         {label}
       </span>
     </div>

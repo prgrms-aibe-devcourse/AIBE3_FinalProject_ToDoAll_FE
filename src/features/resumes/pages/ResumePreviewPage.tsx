@@ -10,7 +10,7 @@ export default function ResumePreviewPage() {
 
   if (!formData) {
     return (
-      <div className="flex flex-col items-center p-8">
+      <div className="flex flex-col items-center">
         <p>미리보기할 이력서 데이터가 없습니다.</p>
         <button
           onClick={() => navigate(-1)}
@@ -23,7 +23,7 @@ export default function ResumePreviewPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#FAF8F8] p-8">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[#FAF8F8]">
       <div className="w-full max-w-3xl scale-90 transform">
         <ResumeInfo data={formData} />
       </div>

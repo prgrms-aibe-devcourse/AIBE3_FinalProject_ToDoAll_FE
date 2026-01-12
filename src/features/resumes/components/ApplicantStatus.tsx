@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import type { ResumeData } from '../types/resumes.types';
 import checkImg from '../../../assets/Done.png';
 import { checkMatch } from '../../match/api/matchApi';
-import AlertModal from '../../../components/Alertmodal';
+import AlertModal from '@shared/components/Alertmodal.tsx';
 
 interface ApplicantStatusProps {
   data: ResumeData;

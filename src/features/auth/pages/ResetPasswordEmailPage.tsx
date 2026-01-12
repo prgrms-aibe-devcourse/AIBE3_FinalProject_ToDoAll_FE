@@ -2,7 +2,7 @@ import { type FormEvent, useState } from 'react';
 
 import { requestResetEmail } from '../api/auth.api.ts';
 import AuthShell from '../components/AuthShell.tsx';
-import AlertModal from '@components/Alertmodal.tsx';
+import AlertModal from '@shared/components/Alertmodal.tsx';
 
 export default function ResetPasswordEmailPage() {
   const [alertModal, setAlertModal] = useState({

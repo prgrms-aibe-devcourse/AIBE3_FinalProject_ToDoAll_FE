@@ -1,8 +1,8 @@
-import DetailButton from '@components/dashboard/DetailButton.tsx';
+import DetailButton from '@features/dashboard/components/DetailButton.tsx';
 
-import useFetch from '@/hooks/useFetch.ts';
-import SelectIcon from '@components/SelectIcon.tsx';
-import { Skeleton } from '@components/Skeleton.tsx';
+import useFetch from '@shared/hooks/useFetch.ts';
+import SelectIcon from '@shared/components/SelectIcon.tsx';
+import { Skeleton } from '@shared/components/Skeleton.tsx';
 
 type SummationCardProps = {
   title: string;

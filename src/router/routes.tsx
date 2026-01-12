@@ -1,5 +1,3 @@
-// routes.tsx
-
 import JDDetailPage from '@pages/JDDetailPage';
 import InterviewCreatePage from '@features/interview/pages/InterviewCreatePage';
 import InterviewManagePage from '@features/interview/pages/InterviewManagePage';
@@ -25,7 +23,10 @@ import ResumeSubmitSuccessPage from '@features/resumes/pages/ResumeSubmitSuccess
 import MyPage from '@features/user/pages/MyPage.tsx';
 import InterviewCHatRoomGuestPage from '@features/interview/pages/InterviewChatRoomGuest';
 import JDApplyPage from '@/pages/JDApplyPage';
-// 레이아웃 없는 페이지 (로그인/회원가입 관련)
+
+/**
+ * 레이아웃 없는 페이지 (로그인/회원가입 관련)
+ */
 export const noLayoutRoutes = [
   { path: '/login', element: <LoginPage /> },
   { path: '/signup/email', element: <SignupCompanyEmailPage /> },
@@ -39,7 +40,9 @@ export const noLayoutRoutes = [
   { path: '/jobs/:id/apply', element: <JDApplyPage /> },
 ];
 
-// 메인 레이아웃 적용되는 페이지
+/**
+ * 메인 레이아웃 적용되는 페이지
+ */
 export const mainRoutes = [
   { path: '/interview/create', element: <InterviewCreatePage /> },
   { path: '/mypage', element: <MyPage /> },

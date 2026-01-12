@@ -20,7 +20,7 @@ import {
   type InterviewMemo,
 } from '@/features/interview/api/question.api';
 
-import useInterviewSocket from '@/hooks/useInterviewSocket';
+import useInterviewSocket from '@shared/hooks/useInterviewSocket';
 
 import {
   MessageType,
@@ -383,8 +383,8 @@ export default function InterviewChatRoomPage() {
   };
 
   return (
-    <div className="bg-jd-white text-jd-black flex h-screen flex-col overflow-hidden">
-      <header className="flex h-20 shrink-0 items-center justify-between px-10 py-6">
+    <div className="text-jd-black flex flex-col">
+      <section className="flex items-center justify-between px-10 py-6">
         <h1 className="text-jd-black text-3xl font-semibold">면접</h1>
         <button
           onClick={handleEndInterview}
@@ -392,10 +392,10 @@ export default function InterviewChatRoomPage() {
         >
           면접 종료
         </button>
-      </header>
+      </section>
 
-      <div className="flex flex-1 gap-6 overflow-hidden px-8 pb-8">
-        <div className="flex h-full flex-1 gap-6 overflow-hidden">
+      <div className="flex flex-col gap-6 px-8 pb-8 lg:h-[calc(100dvh-136px)] lg:flex-row">
+        <section className="flex h-full flex-col gap-7 sm:h-[calc(100dvh-136px)] sm:flex-row sm:pb-8 lg:h-full lg:flex-6 lg:pb-0">
           <ChatSection
             initialMessages={messages}
             getAvatarForSender={(senderId) => avatarBySender[toNumId(senderId)]}
@@ -405,13 +405,13 @@ export default function InterviewChatRoomPage() {
             questionNotes={questionNotes}
             onToggleCheck={handleToggleQuestionCheck}
           />
-          <InterviewSummarySection
-            summaries={summaries}
-            currentUserId={me?.id}
-            onSendNote={handleSendNote}
-            onUpdateMemo={handleUpdateMemo}
-          />
-        </div>
+        </section>
+        <InterviewSummarySection
+          summaries={summaries}
+          currentUserId={me?.id}
+          onSendNote={handleSendNote}
+          onUpdateMemo={handleUpdateMemo}
+        />
       </div>
     </div>
   );

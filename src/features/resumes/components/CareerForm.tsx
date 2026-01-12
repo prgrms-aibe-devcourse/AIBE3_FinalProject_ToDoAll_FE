@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import plusImg from '../../../assets/Vector-2.png';
 import type { ResumeData, CareerItem } from '../types/resumes.types';
-import AlertModal from '../../../components/Alertmodal';
+import AlertModal from '@shared/components/Alertmodal.tsx';
 
 type Props = {
   formData: ResumeData;
@@ -111,7 +111,7 @@ export default function CareerForm({ formData, onChange }: Props) {
             />
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
             <div className="flex flex-1 flex-col">
               <label className="mb-1 text-sm text-gray-500">입사일</label>
               <input
@@ -133,7 +133,7 @@ export default function CareerForm({ formData, onChange }: Props) {
             </div>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
             <div className="flex flex-1 flex-col">
               <label className="mb-1 text-sm text-gray-500">직무</label>
               <input

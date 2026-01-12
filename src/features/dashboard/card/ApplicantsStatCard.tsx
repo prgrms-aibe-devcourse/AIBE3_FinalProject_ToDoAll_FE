@@ -2,9 +2,9 @@ import LongViewContainer from '@features/dashboard/container/LongViewContainer.t
 import NumberSlotsCard, {
   type NumberSlotsCardProps,
 } from '@features/dashboard/card/NumberSlotCardUI.tsx';
-import useFetch from '@/hooks/useFetch.ts';
-import { Skeleton } from '@components/Skeleton.tsx';
-import BlankCard from '@components/dashboard/BlankCard.tsx';
+import useFetch from '@shared/hooks/useFetch.ts';
+import { Skeleton } from '@shared/components/Skeleton.tsx';
+import BlankCard from '@shared/components/BlankCard.tsx';
 
 export default function ApplicantsStatCard() {
   const { resData } = useFetch<NumberSlotsCardProps[]>(

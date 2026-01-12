@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { updateResumeMemo } from '../data/resumes.api';
-import AlertModal from '../../../components/Alertmodal';
+import AlertModal from '@shared/components/Alertmodal.tsx';
 
 export default function ResumeMemo({
   resumeId,
