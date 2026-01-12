@@ -2,10 +2,26 @@ import Header from './Header.tsx';
 import Footer from './Footer.tsx';
 import { Outlet } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { useAlertStore } from '@shared/store/useAlertStore.ts';
+import { useShallow } from 'zustand/react/shallow';
+import AlertModal from '@shared/components/Alertmodal.tsx';
 
 const MainLayout = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
+
+  const alertState = useAlertStore(
+    useShallow((s) => ({
+      open: s.open,
+      type: s.type,
+      title: s.title,
+      message: s.message,
+      onClose: s.onClose,
+      confirmText: s.confirmText,
+      onConfirm: s.onConfirm,
+    }))
+  );
+  const closeAlertModal = useAlertStore((s) => s.action.closeAlertModal);
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 1024px)');
@@ -60,6 +76,8 @@ const MainLayout = () => {
       >
         <Outlet />
       </main>
+      <AlertModal {...alertState} onClose={closeAlertModal} onConfirm={closeAlertModal} />
+
       <Footer />
     </div>
   );

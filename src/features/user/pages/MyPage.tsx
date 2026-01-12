@@ -10,12 +10,10 @@ import {
 import ReqBadge from '@features/auth/components/ReqBadge.tsx';
 import { buildPasswordChecks } from '@features/auth/utils/passwordChecks.ts';
 import { API_ORIGIN } from '@lib/utils/base.ts';
-import AlertModal from '@shared/components/Alertmodal.tsx';
 import PositionSelect, { type PositionValue } from '@features/user/components/PositionSelect.tsx';
 import { userDefaultImage } from '@/const.ts';
 import PageTitle from '@shared/components/PageTitile.tsx';
 import { useAlertStore } from '@shared/store/useAlertStore.ts';
-import { useShallow } from 'zustand/react/shallow';
 
 type Focus = 'profile' | 'password' | undefined;
 
@@ -57,22 +55,7 @@ export default function MyPage() {
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // 상태만 (필요한 필드만 골라서) + shallow로 비교
-  const alertState = useAlertStore(
-    useShallow((s) => ({
-      open: s.open,
-      type: s.type,
-      title: s.title,
-      message: s.message,
-      onClose: s.onClose,
-      confirmText: s.confirmText,
-      onConfirm: s.onConfirm,
-    }))
-  );
-
-  // 액션은 따로 (참조 안정적)
   const openAlertModal = useAlertStore((s) => s.action.openAlertModal);
-  const closeAlertModal = useAlertStore((s) => s.action.closeAlertModal);
 
   // 1) 편집 토글 & 유저 상태
   const [editing, setEditing] = useState(false);
@@ -780,7 +763,6 @@ export default function MyPage() {
           </div>
         )}
       </div>
-      <AlertModal {...alertState} onClose={closeAlertModal} onConfirm={closeAlertModal} />
     </PageTitle>
   );
 }
