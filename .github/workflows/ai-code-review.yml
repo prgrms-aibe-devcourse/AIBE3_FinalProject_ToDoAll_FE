@@ -3,6 +3,8 @@ name: AI Code Review
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
+    branches-ignore:
+      - refactor/dbjoung
   issue_comment:
     types: [created]
 
