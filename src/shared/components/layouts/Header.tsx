@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import SidebarDrawer from '../../components/SidebarDrawer';
-import useFetch from '@/hooks/useFetch';
+import SidebarDrawer from '../SidebarDrawer.tsx';
+import useFetch from '@shared/hooks/useFetch.ts';
 
 let baseUrl = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 

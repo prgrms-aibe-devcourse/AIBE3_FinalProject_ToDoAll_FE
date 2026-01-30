@@ -1,8 +1,8 @@
 import { useEffect, useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import ConfirmLogoutModal from '../features/user/components/ConfirmLogoutModal.tsx';
-import { getMe } from '../features/user/api/user.api.ts';
-import { logout } from '../features/auth/api/auth.api.ts';
+import ConfirmLogoutModal from '@features/user/components/ConfirmLogoutModal.tsx';
+import { getMe } from '@features/user/api/user.api.ts';
+import { logout } from '@features/auth/api/auth.api.ts';
 import { API_ORIGIN } from '@lib/utils/base.ts';
 import { userDefaultImage } from '@/const.ts';
 import { AuthContext } from '@/AuthContext.ts';

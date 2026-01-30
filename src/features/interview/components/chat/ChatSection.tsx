@@ -1,4 +1,3 @@
-// src/components/chat/ChatSection.tsx
 import { useEffect, useRef, useState } from 'react';
 import { DEFAULT_AVATAR } from '../../util/avatar';
 
@@ -20,7 +19,7 @@ export default function ChatSection({
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
   }, [initialMessages]);
 
   const handleSend = () => {
@@ -31,7 +30,7 @@ export default function ChatSection({
   };
 
   return (
-    <div className="border-jd-gray-light flex max-h-full flex-1 flex-col overflow-hidden rounded-2xl border bg-white p-6 shadow-md">
+    <div className="border-jd-gray-light flex h-[calc(100dvh-160px)] flex-col overflow-hidden rounded-2xl border bg-white p-6 shadow-md sm:h-full md:flex-4">
       <div className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent mb-4 flex-1 space-y-3 overflow-y-auto pr-2">
         {initialMessages.length === 0 ? (
           <div className="text-jd-gray-black flex h-full items-center justify-center text-sm">

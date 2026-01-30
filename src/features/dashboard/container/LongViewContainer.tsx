@@ -1,4 +1,4 @@
-import DetailButton from '@components/dashboard/DetailButton.tsx';
+import DetailButton from '@features/dashboard/components/DetailButton.tsx';
 import type { ReactNode } from 'react';
 import cn from '@lib/utils/cn.ts';
 

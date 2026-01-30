@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { mainRoutes, noLayoutRoutes } from './routes';
 
-import NoLayout from '../components/layouts/NoLayout';
+import NoLayout from '@shared/components/layouts/NoLayout';
 import AuthRouteGuard from '@/router/AuthRouteGuard.tsx';
 
 export default function AppRouter() {

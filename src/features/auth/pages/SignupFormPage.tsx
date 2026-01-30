@@ -6,7 +6,7 @@ import PrivacyModal from '../components/PrivacyModal';
 import ReqBadge from '../components/ReqBadge';
 import { buildPasswordChecks } from '../utils/passwordChecks';
 import { signup } from '../api/auth.api.ts';
-import AlertModal from '@components/Alertmodal.tsx';
+import AlertModal from '@shared/components/Alertmodal.tsx';
 import type { PositionValue } from '@features/user/components/PositionSelect.tsx';
 
 const POSITION_OPTIONS: { value: PositionValue; label: string }[] = [

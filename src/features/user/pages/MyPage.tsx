@@ -10,9 +10,10 @@ import {
 import ReqBadge from '@features/auth/components/ReqBadge.tsx';
 import { buildPasswordChecks } from '@features/auth/utils/passwordChecks.ts';
 import { API_ORIGIN } from '@lib/utils/base.ts';
-import AlertModal from '@components/Alertmodal.tsx';
 import PositionSelect, { type PositionValue } from '@features/user/components/PositionSelect.tsx';
 import { userDefaultImage } from '@/const.ts';
+import PageTitle from '@shared/components/PageTitile.tsx';
+import { useAlertStore } from '@shared/store/useAlertStore.ts';
 
 type Focus = 'profile' | 'password' | undefined;
 
@@ -54,26 +55,7 @@ export default function MyPage() {
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const [alertModal, setAlertModal] = useState({
-    open: false,
-    type: 'info' as 'success' | 'error' | 'info' | 'warning',
-    title: '',
-    message: '',
-  });
-
-  // 모달 열기 헬퍼 함수
-  const showAlert = (
-    message: string,
-    type: 'success' | 'error' | 'info' | 'warning' = 'info',
-    title?: string
-  ) => {
-    setAlertModal({ open: true, type, title: title || '', message });
-  };
-
-  // 모달 닫기
-  const closeAlert = () => {
-    setAlertModal((prev) => ({ ...prev, open: false }));
-  };
+  const openAlertModal = useAlertStore((s) => s.action.openAlertModal);
 
   // 1) 편집 토글 & 유저 상태
   const [editing, setEditing] = useState(false);
@@ -149,12 +131,14 @@ export default function MyPage() {
         setForm(nextUser);
         syncPositionFromSource({ position: nextUser.position });
 
-        // 사이드바로 현재 프로필 이미지보내기
         broadcastProfileUpdate(nextUser.profileUrl);
       })
       .catch((err) => {
-        console.log('getMe 응답:', err);
-        showAlert('내 정보 조회에 실패했습니다. 다시 로그인 후 시도해주세요.', 'error');
+        console.error('조회 실패:', err);
+        openAlertModal({
+          message: '내 정보 조회에 실패했습니다. 다시 로그인 후 시도해주세요.',
+          type: 'error',
+        });
       });
   }, [navigate]);
 
@@ -226,7 +210,11 @@ export default function MyPage() {
   // 6) 내 정보 저장
   const onSave = async () => {
     if (!form.name?.trim() || !form.nickname?.trim()) {
-      showAlert('이름과 닉네임은 필수 항목입니다.', 'warning', '필수 항목 확인');
+      openAlertModal({
+        title: '필수 항목 확인',
+        message: '이름과 닉네임은 필수 항목입니다.',
+        type: 'warning',
+      });
       return;
     }
     try {
@@ -234,7 +222,11 @@ export default function MyPage() {
         positionType === 'OTHER' ? positionCustom.trim() : positionType || form.position;
 
       if (!finalPosition?.trim()) {
-        showAlert('직책은 필수 항목입니다.', 'warning', '필수 항목 확인');
+        openAlertModal({
+          title: '필수 항목 확인',
+          message: '직책은 필수 항목입니다.',
+          type: 'warning',
+        });
         return;
       }
 
@@ -263,10 +255,18 @@ export default function MyPage() {
       setForm(next);
       syncPositionFromSource({ position: next.position });
       setEditing(false);
-      showAlert('저장되었습니다.', 'success', '저장 완료');
+      openAlertModal({
+        title: '저장 완료',
+        message: '저장되었습니다.',
+        type: 'success',
+      });
     } catch (e) {
       console.error('updateMe 실패:', e);
-      showAlert('저장 중 문제가 발생했습니다. 다시 시도해주세요.', 'error', '저장 실패');
+      openAlertModal({
+        title: '저장 실패',
+        message: '저장 중 문제가 발생했습니다. 다시 시도해주세요.',
+        type: 'error',
+      });
     }
   };
 
@@ -321,12 +321,12 @@ export default function MyPage() {
 
     const MAX_SIZE = 5 * 1024 * 1024;
     if (file.size > MAX_SIZE) {
-      showAlert(
-        '이미지 용량이 너무 큽니다. \n 최대 5MB 파일만 업로드할 수 있어요.',
-        'error',
-        '업로드 실패'
-      );
       e.target.value = '';
+      openAlertModal({
+        title: '업로드 실패',
+        message: '이미지 용량이 너무 큽니다. \n 최대 5MB 파일만 업로드할 수 있어요.',
+        type: 'error',
+      });
       return;
     }
 
@@ -349,17 +349,15 @@ export default function MyPage() {
       broadcastProfileUpdate(newProfileUrl);
     } catch (err) {
       console.error('프로필 이미지 업로드 실패:', err);
-      showAlert('프로필 이미지 변경에 실패했습니다. 다시 시도해주세요.', 'success', '변경 실패');
+      openAlertModal({
+        title: '변경 실패',
+        message: '프로필 이미지 변경에 실패했습니다. 다시 시도해주세요.',
+        type: 'error',
+      });
     } finally {
       setUploading(false);
       e.target.value = '';
     }
-  };
-
-  const [confirmRemoveOpen, setConfirmRemoveOpen] = useState(false);
-
-  const onClickRemovePhoto = () => {
-    setConfirmRemoveOpen(true);
   };
 
   const handleConfirmRemovePhoto = async () => {
@@ -381,26 +379,27 @@ export default function MyPage() {
       // [추가] 삭제 후에도 변경된 프로필을 브로드캐스트
       broadcastProfileUpdate(newProfileUrl);
 
-      showAlert('프로필 이미지가 기본 이미지로 변경되었습니다.', 'success', '삭제 완료');
+      openAlertModal({
+        title: '삭제 완료',
+        message: '프로필 이미지가 기본 이미지로 변경되었습니다.',
+        type: 'success',
+      });
     } catch (err) {
       console.error('프로필 이미지 삭제 실패:', err);
-      showAlert('프로필 이미지를 삭제하지 못했습니다. 다시 시도해주세요.', 'error', '삭제 실패');
+      openAlertModal({
+        title: '삭제 실패',
+        message: '프로필 이미지를 삭제하지 못했습니다. 다시 시도해주세요.',
+        type: 'error',
+      });
     } finally {
       setRemoving(false);
-      setConfirmRemoveOpen(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-start bg-[var(--color-jd-white)] px-6 py-10 font-[var(--default-font-family)] sm:px-6 sm:py-12 md:px-8">
-      <div className="mt-10 mb-6 w-full max-w-[860px]">
-        <h2 className="ml-2 text-left text-xl font-bold text-[var(--color-jd-black)] sm:text-2xl">
-          마이페이지
-        </h2>
-      </div>
-
+    <PageTitle title={'마이페이지'} description={''}>
       {/* 메인 카드 */}
-      <div className="w-full max-w-[900px] rounded-3xl bg-white p-8 shadow-[0_6px_12px_#00000025] sm:p-10 md:p-10">
+      <div className="mr-auto ml-auto w-full max-w-[900px] rounded-3xl bg-white p-8 shadow-[0_6px_12px_#00000025] sm:p-10 md:p-10">
         {/* X → 이전 페이지로 */}
         <div className="mb-6 flex w-full max-w-[860px] items-center justify-end">
           <button
@@ -428,7 +427,15 @@ export default function MyPage() {
               {!isDefaultProfile && (
                 <button
                   type="button"
-                  onClick={onClickRemovePhoto}
+                  onClick={() => {
+                    openAlertModal({
+                      type: 'warning',
+                      title: '프로필 이미지 삭제',
+                      message: '현재 프로필 사진을 삭제하고 기본 이미지로 되돌릴까요?',
+                      onConfirm: handleConfirmRemovePhoto,
+                      confirmText: '삭제',
+                    });
+                  }}
                   disabled={removing || uploading}
                   aria-label="프로필 이미지 삭제"
                   className="absolute top-4 right-6 flex h-6 w-6 translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[rgba(130,110,180,0.65)] text-xs font-bold text-white shadow-md backdrop-blur-sm transition hover:bg-[rgba(130,110,180,0.85)] disabled:opacity-50"
@@ -675,7 +682,11 @@ export default function MyPage() {
 
                   localStorage.setItem('reauthAt', String(Date.now()));
 
-                  showAlert('비밀번호가 성공적으로 변경되었습니다.', 'success', '변경 완료');
+                  openAlertModal({
+                    message: '비밀번호가 성공적으로 변경되었습니다.',
+                    type: 'success',
+                    title: '변경 완료',
+                  });
 
                   setCurrentPassword('');
                   setNewPassword('');
@@ -752,22 +763,6 @@ export default function MyPage() {
           </div>
         )}
       </div>
-      <AlertModal
-        open={alertModal.open}
-        type={alertModal.type}
-        title={alertModal.title}
-        message={alertModal.message}
-        onClose={closeAlert}
-      />
-      <AlertModal
-        open={confirmRemoveOpen}
-        type="warning"
-        title="프로필 이미지 삭제"
-        message="현재 프로필 사진을 삭제하고 기본 이미지로 되돌릴까요?"
-        onClose={() => setConfirmRemoveOpen(false)}
-        onConfirm={handleConfirmRemovePhoto}
-        confirmText="삭제"
-      />
-    </div>
+    </PageTitle>
   );
 }

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import cn from '@lib/utils/cn.ts';
 
 type Option = {
   value: string;
@@ -25,10 +26,10 @@ export default function CustomSelect({
   const selected = options.find((opt) => opt.value === _value);
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={cn('relative', className)}>
       <button
         type="button"
-        className="flex w-full items-center justify-between rounded-xl border border-[#413F3F] px-4 py-2 text-left"
+        className="flex w-full items-center justify-between gap-2 rounded-xl border border-[#413F3F] px-4 py-2 text-left"
         onClick={() => setOpen((prev) => !prev)}
       >
         <span className="text-[#413F3F]">{selected ? selected.label : placeholder}</span>
