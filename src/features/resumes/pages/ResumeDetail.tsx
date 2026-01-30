@@ -37,8 +37,8 @@ export default function ResumeDetail() {
   if (!resume) return <p className="p-8">이력서 데이터가 없습니다.</p>;
 
   return (
-    <div className="flex h-screen bg-[#FAF8F8]">
-      <aside className="w-1/4 p-4">
+    <section className="flex flex-col bg-[#FAF8F8] sm:h-screen sm:flex-row">
+      <aside className="p-4">
         <ApplicantStatus data={resume} />
         <ApplicantInfo
           data={{
@@ -50,9 +50,9 @@ export default function ResumeDetail() {
         <ResumeMemo resumeId={resume.id} initialMemo={resume.memo} />
       </aside>
 
-      <main className="flex-1 overflow-y-auto p-8">
+      <section className="w-full p-8 sm:overflow-y-auto">
         <ResumeInfo data={resume} />
-      </main>
-    </div>
+      </section>
+    </section>
   );
 }

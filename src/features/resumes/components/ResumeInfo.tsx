@@ -120,10 +120,10 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
   }, [resumeObjectUrl, portfolioObjectUrl]);
 
   return (
-    <div>
+    <section className="flex flex-col">
       <h2 className="text-[30px] font-semibold text-[#413F3F]">지원서</h2>
 
-      <div className="relative rounded-2xl bg-white p-6 shadow">
+      <div className="rounded-2xl bg-white p-6 shadow">
         <section className="mb-4 flex flex-wrap items-center justify-between">
           <section className="mb-4 flex flex-col">
             <h2 className="font-regular text-[25px] text-[#413F3F]">{data.name}</h2>
@@ -293,6 +293,6 @@ export default function ResumeInfo({ data }: ResumeInfoProps) {
           )}
         </section>
       </div>
-    </div>
+    </section>
   );
 }

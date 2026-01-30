@@ -24,7 +24,7 @@ export default function ApplicantStatus({ data }: ApplicantStatusProps) {
   };
 
   return (
-    <div className="flex w-96 items-center justify-between rounded-lg p-4">
+    <div className="flex items-center justify-between rounded-lg p-4">
       <div>
         <h3 className="text-[30px] font-semibold text-[#413F3F]">{data.name}</h3>
         <div className="flex gap-2">
