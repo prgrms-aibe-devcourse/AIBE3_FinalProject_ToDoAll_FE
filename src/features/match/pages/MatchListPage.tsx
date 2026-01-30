@@ -21,7 +21,7 @@ export default function MatchListPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [tab, setTab] = useState<'recommended' | 'all'>('recommended');
+  const [tab, setTab] = useState<'recommended' | 'all'>('all');
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
@@ -91,6 +91,7 @@ export default function MatchListPage() {
       description="접수된 이력서를 관리할 수 있습니다."
     >
       <MatchFilterSection
+        tab={tab}
         initialJobId={jdId}
         onSearch={() => {
           setSearchTrigger((prev) => prev + 1);

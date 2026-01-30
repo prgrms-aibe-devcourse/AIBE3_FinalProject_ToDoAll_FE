@@ -15,6 +15,7 @@ type JdOption = {
 };
 
 type Props = {
+  tab: 'all' | 'recommended';
   onSearch: (_keyword: string) => void;
   onTabChange: (_tab: 'all' | 'recommended') => void;
   onLimitChange: (_limit: number) => void;
@@ -25,6 +26,7 @@ type Props = {
 };
 
 export default function MatchFilterSection({
+  tab,
   onSearch,
   onTabChange,
   onLimitChange,
@@ -33,7 +35,7 @@ export default function MatchFilterSection({
   onStatusChange,
   initialJobId,
 }: Props) {
-  const [activeTab, setActiveTab] = useState<'all' | 'recommended'>('recommended');
+  const [activeTab, setActiveTab] = useState<'all' | 'recommended'>(tab);
   const [selectedLimit, setSelectedLimit] = useState<number>(10);
   const [selectedJob, setSelectedJob] = useState<number | null>(null);
   const [sortType, setSortType] = useState<string>('SCORE_DESC');
