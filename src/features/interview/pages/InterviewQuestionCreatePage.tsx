@@ -5,6 +5,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import ProfileCard from '../components/question-create/ProfileCard';
 import EditButton from '../components/question-create/EditButton';
 import type { ApiResponse } from '@/features/jd/services/jobApi';
+import PageTitle from '@shared/components/PageTitile.tsx';
 
 type InterviewQuestionResponseDto = {
   questionId: number;
@@ -438,15 +439,11 @@ const InterviewQuestionNotePage: React.FC = () => {
   };
 
   return (
-    <div className="mx-auto min-h-screen bg-[#fbf9f9] p-8 font-sans font-semibold">
-      <h1 className="text-jd-black mb-6 text-2xl font-bold">질문 노트</h1>
+    <PageTitle title={'질문 노트'} description={''}>
+      <div className="flex flex-col gap-8 md:flex-row">
+        <ProfileCard profileData={profileData} name={name} avatar={avatar} />
 
-      <div className="flex gap-8">
-        <div className="w-1/4">
-          <ProfileCard profileData={profileData} name={name} avatar={avatar} />
-        </div>
-
-        <div className="w-3/4">
+        <div className="w-full">
           <div className="rounded-2xl border border-gray-200 bg-white p-8 text-sm leading-relaxed shadow-md">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-base font-semibold text-slate-900">질문 목록</h2>
@@ -465,7 +462,7 @@ const InterviewQuestionNotePage: React.FC = () => {
           <EditButton isEditing={isEditing} onToggle={handleToggleEdit} />
         </div>
       </div>
-    </div>
+    </PageTitle>
   );
 };
 
