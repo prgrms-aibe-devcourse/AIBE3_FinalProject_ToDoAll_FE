@@ -22,7 +22,10 @@ export default function InvitedList({ invited, handleRemove }: Props) {
                   alt={i.name}
                   className="h-10 w-10 rounded-full object-cover"
                 />
-                <span className="font-medium text-gray-800">{i.name}</span>
+                <div className="flex flex-col overflow-hidden">
+                  <span className="font-medium text-gray-800">{i.name}</span>
+                  <span className="text-sm font-light text-gray-800">{i.email}</span>
+                </div>
               </div>
 
               {/* 오른쪽 상단 X 버튼 */}

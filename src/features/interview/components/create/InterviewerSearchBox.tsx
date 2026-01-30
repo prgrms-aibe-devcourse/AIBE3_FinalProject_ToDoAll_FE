@@ -36,7 +36,8 @@ export default function InterviewerSearchBox({ search, setSearch, filtered, hand
               filtered.map((i) => (
                 <div
                   key={i.id}
-                  className="flex items-center justify-between rounded-lg px-4 py-2 hover:bg-gray-50"
+                  className="flex cursor-pointer items-center justify-between rounded-lg px-4 py-2 hover:bg-gray-50"
+                  onClick={() => handleInvite(i)}
                 >
                   <div className="flex items-center gap-3">
                     <img
@@ -49,12 +50,6 @@ export default function InterviewerSearchBox({ search, setSearch, filtered, hand
                       <p className="text-xs text-gray-500">{i.email}</p>
                     </div>
                   </div>
-                  <button
-                    onClick={() => handleInvite(i)}
-                    className="rounded-md bg-[#E35B43] px-4 py-1.5 text-sm font-semibold text-white hover:bg-[#d44f3a]"
-                  >
-                    선택
-                  </button>
                 </div>
               ))
             ) : (
