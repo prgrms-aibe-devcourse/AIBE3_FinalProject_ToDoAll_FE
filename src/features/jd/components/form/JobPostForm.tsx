@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Field, Input, TextArea, TagInput } from './fields';
+import { useAlertStore } from '@shared/store/useAlertStore.ts';
 
 export type JobPostFormValues = {
   title: string;
@@ -17,6 +18,11 @@ export type JobPostFormValues = {
   preferredSkills: string[];
   thumbnailFile?: File | null;
   originalThumbnailUrl?: string | null;
+};
+
+const dateTypeGuard = (value: unknown): string => {
+  if (typeof value === 'string') return value;
+  throw new TypeError('dateTypeGuard: 입력된 날짜 타입을 확인해주세요. ' + typeof value);
 };
 
 export default function JobPostForm({
@@ -50,8 +56,40 @@ export default function JobPostForm({
     ...defaultValues,
   });
 
-  const update = <K extends keyof JobPostFormValues>(k: K, v: JobPostFormValues[K]) =>
+  const openAlertModal = useAlertStore((s) => s.action.openAlertModal);
+
+  const update = <K extends keyof JobPostFormValues>(k: K, v: JobPostFormValues[K]) => {
+    if (k == 'deadline') {
+      const startDate = new Date(values.postedAt);
+      const newEndDate = new Date(dateTypeGuard(v));
+
+      if (startDate > newEndDate) {
+        openAlertModal({
+          title: '종료 날짜를 다시 확인해주세요.',
+          type: 'warning',
+          message: '종료일은 시작일보다 빠를 수 없습니다.',
+        });
+
+        return;
+      }
+    }
+    if (k == 'postedAt' && values.deadline && values.deadline.length > 0) {
+      const newStartDate = new Date(dateTypeGuard(v));
+      const endDate = new Date(values.deadline);
+
+      if (newStartDate > endDate) {
+        openAlertModal({
+          title: '시작 날짜를 다시 확인해주세요.',
+          type: 'warning',
+          message: '시작일은 종료일보다 늦을 수 없습니다.',
+        });
+
+        return;
+      }
+    }
+
     setValues((s) => ({ ...s, [k]: v }));
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
