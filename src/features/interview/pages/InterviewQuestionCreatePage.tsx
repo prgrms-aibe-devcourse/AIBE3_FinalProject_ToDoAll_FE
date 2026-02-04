@@ -1,6 +1,4 @@
-// src/pages/InterviewQuestionNotePage.tsx
-
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import ProfileCard from '../components/question-create/ProfileCard';
 import EditButton from '../components/question-create/EditButton';
@@ -85,7 +83,7 @@ const InterviewQuestionNotePage: React.FC = () => {
 
   const apiBaseUrl = import.meta.env.VITE_API_URL || '';
 
-  const fetchQuestions = async (): Promise<boolean> => {
+  const fetchQuestions = useCallback(async (): Promise<boolean> => {
     if (!interviewId) {
       setLoadError('면접 ID가 없습니다.');
       setIsLoading(false);
@@ -129,7 +127,7 @@ const InterviewQuestionNotePage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [apiBaseUrl, interviewId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -149,7 +147,7 @@ const InterviewQuestionNotePage: React.FC = () => {
       cancelled = true;
       if (pollTimerRef.current) window.clearTimeout(pollTimerRef.current);
     };
-  }, [interviewId]);
+  }, [fetchQuestions, interviewId]);
 
   useEffect(() => {
     const loadProfile = async () => {

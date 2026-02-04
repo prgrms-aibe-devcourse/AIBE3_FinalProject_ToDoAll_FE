@@ -1,4 +1,5 @@
-import { request, unwrap } from '../../../lib/utils/base';
+import { unwrap } from '@lib/utils/base.ts';
+import type { ClientRequestType } from '@shared/hooks/useAuthClient.ts';
 
 export interface LoginRequest {
   email: string;
@@ -7,12 +8,13 @@ export interface LoginRequest {
 
 export interface LoginResponse {
   accessToken: string;
+  refreshToken: string;
 }
 
-export async function login(dto: LoginRequest): Promise<LoginResponse> {
-  const raw = await request<any>('/api/v1/auth/token', {
+export async function login(dto: LoginRequest, client: ClientRequestType): Promise<LoginResponse> {
+  const raw = await client.request<LoginResponse>('/api/v1/auth/token', {
     method: 'POST',
-    body: JSON.stringify(dto),
+    body: dto,
   });
 
   const result = unwrap<LoginResponse>(raw);
@@ -25,40 +27,42 @@ export async function login(dto: LoginRequest): Promise<LoginResponse> {
     console.error('서버에서 로그인 토큰이 전달되지 않았습니다:', raw);
     throw new Error('로그인에 실패했습니다. 다시 시도해주세요.');
   }
-  localStorage.setItem('accessToken', result.accessToken);
-
-  console.log('로그인 성공:', result);
 
   return result;
 }
 
-export async function logout() {
-  await request<void>('/api/v1/auth/logout', {
+export async function logout(client: ClientRequestType) {
+  await client.request<void>('/api/v1/auth/logout', {
     method: 'POST',
   });
 }
 
-export async function requestResetEmail(email: string) {
-  await request<void>('/api/v1/auth/password/reset-requests', {
+export async function requestResetEmail(client: ClientRequestType, email: string) {
+  await client.request<void>('/api/v1/auth/password/reset-requests', {
     method: 'POST',
-    body: JSON.stringify({ email }),
+    body: { email },
   });
 }
 
-export async function resetPasswordByToken(token: string, newPassword: string) {
-  await request<void>('/api/v1/auth/password/reset', {
+export async function resetPasswordByToken(
+  client: ClientRequestType,
+  token: string,
+  newPassword: string
+) {
+  await client.request<void>('/api/v1/auth/password/reset', {
     method: 'POST',
-    body: JSON.stringify({ token, newPassword }),
+    body: { token, newPassword },
   });
 }
 
-export async function sendCompanyVerifyLink(email: string) {
-  await request<void>('/api/v1/auth/email-verifications', {
+export async function sendCompanyVerifyLink(client: ClientRequestType, email: string) {
+  await client.request<void>('/api/v1/auth/email-verifications', {
     method: 'POST',
-    body: JSON.stringify({ email }),
+    body: { email },
   });
 }
 
+/* TODO : 미사용로직 삭제
 export async function verifyCompanyEmailToken(token: string) {
   const path = `/api/v1/auth/email-verifications/complete?token=${encodeURIComponent(token)}`;
 
@@ -73,20 +77,24 @@ export async function verifyCompanyEmailToken(token: string) {
   }
   return data;
 }
+*/
 
-export async function signup(payload: {
-  token: string;
-  email: string;
-  name: string;
-  nickname: string;
-  position: string;
-  companyName: string;
-  password: string;
-}) {
-  const raw = await request<any>('/api/v1/users', {
+export async function signup(
+  payload: {
+    token: string;
+    email: string;
+    name: string;
+    nickname: string;
+    position: string;
+    companyName: string;
+    password: string;
+  },
+  client: ClientRequestType
+) {
+  const raw = await client.request<any>('/api/v1/users', {
     method: 'POST',
-    body: JSON.stringify(payload),
+    body: payload,
   });
 
-  return raw?.data ?? raw;
+  return unwrap(raw);
 }

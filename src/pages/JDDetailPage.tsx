@@ -4,15 +4,18 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { fetchJobDetail } from '../features/jd/services/jobApi';
 import { Link } from 'react-router-dom';
+import { useAuthedClient } from '@shared/hooks/useAuthClient.ts';
 
 export default function JDDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [data, setData] = useState<JobDetail | null>(null);
   const navigate = useNavigate();
+  const client = useAuthedClient();
+
   useEffect(() => {
     if (!id) return;
-    fetchJobDetail(id).then(setData);
-  }, [id]);
+    fetchJobDetail(client, id).then(setData);
+  }, [client, id]);
   const handleCopyLink = async () => {
     const url = `${window.location.origin}/jobs/${id}/apply`;
     try {

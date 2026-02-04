@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   getMe,
@@ -9,11 +9,12 @@ import {
 } from '../api/user.api.ts';
 import ReqBadge from '@features/auth/components/ReqBadge.tsx';
 import { buildPasswordChecks } from '@features/auth/utils/passwordChecks.ts';
-import { API_ORIGIN } from '@lib/utils/base.ts';
+
 import PositionSelect, { type PositionValue } from '@features/user/components/PositionSelect.tsx';
 import { userDefaultImage } from '@/const.ts';
 import PageTitle from '@shared/components/PageTitile.tsx';
 import { useAlertStore } from '@shared/store/useAlertStore.ts';
+import { useAuthedClient } from '@shared/hooks/useAuthClient.ts';
 
 type Focus = 'profile' | 'password' | undefined;
 
@@ -30,6 +31,14 @@ type MeResponse = {
   gender?: 'MALE' | 'FEMALE' | 'OTHER' | null;
   profileUrl?: string | null;
 };
+
+const KNOWN_POSITION_VALUES: PositionValue[] = [
+  'OWNER',
+  'HR_MANAGER',
+  'TEAM_LEAD',
+  'INTERVIEWER',
+  'OTHER',
+];
 
 // 프로필 이미지 변경을 전역으로 알리는 이벤트 헬퍼
 function broadcastProfileUpdate(profileUrl: string | null | undefined) {
@@ -50,6 +59,8 @@ function formatPhone(value: string) {
 }
 
 export default function MyPage() {
+  const client = useAuthedClient();
+
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -77,15 +88,7 @@ export default function MyPage() {
   const [positionType, setPositionType] = useState<PositionValue | ''>(''); // select 값
   const [positionCustom, setPositionCustom] = useState(''); // 기타 직접 입력
 
-  const KNOWN_POSITION_VALUES: PositionValue[] = [
-    'OWNER',
-    'HR_MANAGER',
-    'TEAM_LEAD',
-    'INTERVIEWER',
-    'OTHER',
-  ];
-
-  const syncPositionFromSource = (source: { position: string }) => {
+  const syncPositionFromSource = useCallback((source: { position: string }) => {
     const raw = source.position || '';
     if (KNOWN_POSITION_VALUES.includes(raw as PositionValue)) {
       setPositionType(raw as PositionValue);
@@ -97,7 +100,7 @@ export default function MyPage() {
       setPositionType('');
       setPositionCustom('');
     }
-  };
+  }, []);
 
   const isDefaultProfile = !user.profileUrl || user.profileUrl.includes('default-profile');
 
@@ -107,13 +110,12 @@ export default function MyPage() {
       user.profileUrl.startsWith('https://') ||
       user.profileUrl.startsWith('data:'))
       ? user.profileUrl
-      : `${API_ORIGIN}${user.profileUrl || userDefaultImage}`;
+      : user.profileUrl || userDefaultImage;
 
   // 2) 내 정보 조회
   useEffect(() => {
-    getMe()
+    getMe(client)
       .then((data) => {
-        console.log('getMe 응답:', data);
         const me = data as MeResponse;
         const nextUser = {
           name: me.name ?? '',
@@ -140,37 +142,7 @@ export default function MyPage() {
           type: 'error',
         });
       });
-  }, [navigate]);
-
-  // 3) 최근 재인증 여부
-  const [recentlyReauthed, setRecentlyReauthed] = useState(false);
-
-  useEffect(() => {
-    const checkReauth = () => {
-      const raw = localStorage.getItem('reauthAt') || '0';
-      const at = Number(raw);
-      const flag = Date.now() - at < 5 * 60 * 1000; //5분 이내면 true
-
-      console.log('최근 재인증 체크:', { raw, at, recentlyReauthed: flag });
-
-      setRecentlyReauthed(flag);
-    };
-
-    checkReauth(); //마운트 즉시 1회 평가
-    const interval = setInterval(checkReauth, 60 * 1000); //  1분 주기로
-
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === 'reauthAt') checkReauth();
-      console.log('reauthAt 변경 감지:', e.newValue);
-      checkReauth();
-    };
-    window.addEventListener('storage', onStorage);
-
-    return () => {
-      clearInterval(interval);
-      window.removeEventListener('storage', onStorage);
-    };
-  }, []);
+  }, [client, openAlertModal, syncPositionFromSource]);
 
   // 4) 의도에 따라 비밀번호 섹션 자동 오픈
   const [expandPassword, setExpandPassword] = useState(false);
@@ -238,7 +210,7 @@ export default function MyPage() {
         birthDate: form.birthDate,
         gender: form.gender || undefined,
       });
-      await updateMe({
+      await updateMe(client, {
         name: form.name.trim(),
         nickname: form.nickname.trim(),
         phoneNumber: form.phone,
@@ -332,7 +304,7 @@ export default function MyPage() {
 
     try {
       setUploading(true);
-      const updated = (await uploadProfileImage(file)) as MeResponse;
+      const updated = (await uploadProfileImage(client, file)) as MeResponse;
 
       const newProfileUrl = updated.profileUrl ?? user.profileUrl ?? userDefaultImage;
 
@@ -363,7 +335,7 @@ export default function MyPage() {
   const handleConfirmRemovePhoto = async () => {
     try {
       setRemoving(true);
-      const updated = (await removeProfileImage()) as MeResponse;
+      const updated = (await removeProfileImage(client)) as MeResponse;
 
       const newProfileUrl = updated.profileUrl ?? userDefaultImage;
 
@@ -648,11 +620,6 @@ export default function MyPage() {
         {/* 비밀번호 변경 섹션 */}
         {expandPassword && (
           <div className="mt-8 rounded-2xl border border-[var(--color-jd-gray-light)] bg-[var(--color-jd-white)] p-6">
-            {!recentlyReauthed && (
-              <div className="mb-3 text-sm text-[var(--color-jd-gray-dark)]">
-                보안을 위해 다시 한 번 비밀번호를 확인해야 합니다. (5분 경과)
-              </div>
-            )}
             <form
               onSubmit={async (e) => {
                 e.preventDefault();
@@ -678,7 +645,7 @@ export default function MyPage() {
                 }
 
                 try {
-                  await changePassword(currentPassword, newPassword);
+                  await changePassword(client, currentPassword, newPassword);
 
                   localStorage.setItem('reauthAt', String(Date.now()));
 

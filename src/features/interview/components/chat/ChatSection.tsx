@@ -20,6 +20,7 @@ export default function ChatSection({
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
+    console.log(initialMessages);
   }, [initialMessages]);
 
   const handleSend = () => {

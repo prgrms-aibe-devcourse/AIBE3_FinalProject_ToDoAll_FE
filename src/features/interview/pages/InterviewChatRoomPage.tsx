@@ -34,6 +34,7 @@ import { getResumeAuthed, getUserProfileAuthed } from '@/features/interview/api/
 import { DEFAULT_AVATAR, normalizeAvatarUrl, toNumId } from '../util/avatar';
 import { getInterviewDetailAuthed } from '@/features/interview/api/interview-detail.api';
 import { getPresignedDownloadUrlAuthed } from '@/features/interview/api/file.api';
+import { useAuthedClient } from '@shared/hooks/useAuthClient.ts';
 
 type UiMsg = { id: number; text: string; senderId: number; isMine: boolean };
 
@@ -53,10 +54,13 @@ export default function InterviewChatRoomPage() {
   const [candidateAvatar, setCandidateAvatar] = useState<string>(DEFAULT_AVATAR);
   const [resumeId, setResumeId] = useState<number | null>(null);
 
+  const client = useAuthedClient();
+
   useEffect(() => {
+    console.log(avatarBySender);
     (async () => {
       try {
-        const user = await getMeAuthed();
+        const user = await getMeAuthed(client);
         console.log('[ME LOADED]', user);
         setMe(user);
       } catch (error) {
@@ -70,7 +74,7 @@ export default function InterviewChatRoomPage() {
 
     (async () => {
       try {
-        const detail = await getInterviewDetailAuthed(interviewId);
+        const detail = await getInterviewDetailAuthed(client, interviewId);
         console.log('[DETAIL]', detail);
 
         setResumeId(detail.resumeId ?? null);
@@ -91,7 +95,7 @@ export default function InterviewChatRoomPage() {
 
     (async () => {
       try {
-        const history = await getChatHistory(interviewId);
+        const history = await getChatHistory(client, interviewId);
         console.log('[HISTORY RAW]', history);
 
         const mapped: UiMsg[] = history.map((m: ChatMessage) => ({
@@ -134,7 +138,7 @@ export default function InterviewChatRoomPage() {
           return;
         }
 
-        const resume = await getResumeAuthed(resumeId);
+        const resume = await getResumeAuthed(client, resumeId);
         const fileKey = resume.resumeFileUrl;
         console.log('[CANDIDATE AVATAR] resumeFileUrl', fileKey);
 
@@ -144,16 +148,16 @@ export default function InterviewChatRoomPage() {
           return;
         }
 
-        const presigned = await getPresignedDownloadUrlAuthed(fileKey);
+        const presigned = await getPresignedDownloadUrlAuthed(client, fileKey);
         console.log('[CANDIDATE AVATAR] presigned OK', presigned);
 
-        setAvatarBySender((prev) => ({ ...prev, 0: presigned }));
+        if (presigned) setAvatarBySender((prev) => ({ ...prev, 0: presigned }));
       } catch (e) {
         console.error('[CANDIDATE AVATAR] FAIL', e);
         setAvatarBySender((prev) => ({ ...prev, 0: DEFAULT_AVATAR }));
       }
     })();
-  }, [interviewId, resumeId, candidateAvatar]);
+  }, [interviewId, resumeId, candidateAvatar, client]);
 
   useEffect(() => {
     if (messages.length === 0) return;
@@ -177,7 +181,7 @@ export default function InterviewChatRoomPage() {
         await Promise.all(
           missing.map(async (senderId) => {
             try {
-              const user = await getUserProfileAuthed(senderId);
+              const user = await getUserProfileAuthed(client, senderId);
               console.log('[AVATAR] user raw', user);
 
               updates[senderId] = normalizeAvatarUrl(user.profileUrl) ?? DEFAULT_AVATAR;
@@ -201,7 +205,7 @@ export default function InterviewChatRoomPage() {
 
     (async () => {
       try {
-        const questions = await getInterviewQuestions(interviewId);
+        const questions = await getInterviewQuestions(client, interviewId);
         const map = new Map<string, InterviewQuestion[]>();
 
         questions.forEach((q: InterviewQuestion) => {
@@ -231,7 +235,7 @@ export default function InterviewChatRoomPage() {
 
     (async () => {
       try {
-        const memos = await getInterviewMemos(interviewId);
+        const memos = await getInterviewMemos(client, interviewId);
 
         const memoMap = new Map<number, InterviewMemo>();
         memos.forEach((memo: InterviewMemo) => {
@@ -328,7 +332,7 @@ export default function InterviewChatRoomPage() {
   });
 
   const handleToggleQuestionCheck = async (questionId: number) => {
-    await toggleQuestionCheck(interviewId, questionId);
+    await toggleQuestionCheck(client, interviewId, questionId);
     setQuestionNotes((prev) =>
       prev.map((section) => ({
         ...section,
@@ -367,7 +371,7 @@ export default function InterviewChatRoomPage() {
   };
 
   const handleUpdateMemo = async (memoId: number, content: string) => {
-    const data = await updateInterviewMemo(interviewId, memoId, content);
+    const data = await updateInterviewMemo(client, interviewId, memoId, content);
     setSummaries((prev) =>
       prev.map((s) => (s.id === data.memoId ? { ...s, content: data.content } : s))
     );
@@ -375,7 +379,7 @@ export default function InterviewChatRoomPage() {
 
   const handleEndInterview = async () => {
     try {
-      await endInterview(interviewId);
+      await endInterview(client, interviewId);
       navigate('/interview/manage');
     } catch (e) {
       console.error('면접 종료 실패:', e);

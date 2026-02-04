@@ -4,14 +4,16 @@ import JobPostList from '../features/jd/components/jobpostlist/JobPostList';
 import type { JobPost } from '../features/jd/types/JobPost.types';
 import { useNavigate } from 'react-router-dom';
 import PageTitle from '@shared/components/PageTitile.tsx';
+import { useAuthedClient } from '@shared/hooks/useAuthClient.ts';
 
 export default function JDPage() {
   const [items, setItems] = useState<JobPost[]>([]);
   const navigate = useNavigate();
+  const client = useAuthedClient();
 
   useEffect(() => {
-    fetchJobPosts().then(setItems);
-  }, []);
+    fetchJobPosts(client).then(setItems);
+  }, [client]);
 
   return (
     <PageTitle

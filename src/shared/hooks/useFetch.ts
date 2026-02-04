@@ -12,7 +12,8 @@ export default function useFetch<T>(
   defaultValue?: T | null,
   method?: string,
   headers?: Record<string, any>,
-  body?: Record<string, any>
+  body?: Record<string, any>,
+  errMemo?: string
 ) {
   const [resData, setResData] = useState<T | null>(defaultValue ?? null);
   const controller = useRef<AbortController | null>(null);
@@ -23,16 +24,19 @@ export default function useFetch<T>(
 
     controller.current = new AbortController();
     const signal = controller.current.signal;
-    // URL 앞쪽 / 을 제거 → 중복 /api 방지
 
-    authRequest<T>(url, accessToken, setToken, method, headers, body, signal).then((data) => {
-      setResData(data);
-    });
+    authRequest<T>(url, accessToken, setToken, method, headers, body, signal)
+      .then((data) => {
+        setResData(data);
+      })
+      .catch((err) => {
+        console.error(errMemo, err);
+      });
 
     return () => {
       if (controller.current) controller.current.abort();
     };
-  }, [url, method, headers, body, accessToken, setToken]);
+  }, [url, method, headers, body, accessToken, setToken, errMemo]);
 
   return { resData };
 }

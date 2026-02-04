@@ -1,10 +1,4 @@
-// src/features/interview/api/profile.api.ts
-import { authedRequest } from '@/lib/utils/authedRequest';
-
-type CommonResponse<T> = {
-  message: string;
-  data: T;
-};
+import type { ClientRequestType } from '@shared/hooks/useAuthClient.ts';
 
 export type UserProfile = {
   id: number;
@@ -18,21 +12,30 @@ export type ResumeProfile = {
   resumeFileUrl?: string;
 };
 
-export async function getUserProfileAuthed(userId: number): Promise<UserProfile> {
-  const raw = await authedRequest<CommonResponse<UserProfile>>(`/api/v1/users/${userId}`, {
+export async function getUserProfileAuthed(
+  client: ClientRequestType,
+  userId: number
+): Promise<UserProfile> {
+  const raw = await client.request<UserProfile>(`/api/v1/users/${userId}`, {
     method: 'GET',
   });
-  return raw.data;
+
+  return raw!;
 }
 
-export async function getResumeAuthed(resumeId: number): Promise<ResumeProfile> {
-  const raw = await authedRequest<CommonResponse<ResumeProfile>>(`/api/v1/resumes/${resumeId}`, {
+export async function getResumeAuthed(
+  client: ClientRequestType,
+  resumeId: number
+): Promise<ResumeProfile> {
+  const raw = await client.request<ResumeProfile>(`/api/v1/resumes/${resumeId}`, {
     method: 'GET',
   });
-  return raw.data;
+
+  return raw!;
 }
 
 /** ✅ 게스트(Interview-Token)로 resume 조회 */
+/* TODO : 미사용 로직 삭제
 export async function getResumeWithGuestToken(
   resumeId: number,
   guestToken: string
@@ -59,3 +62,4 @@ export async function getResumeWithGuestToken(
 
   return (body?.data ?? body) as ResumeProfile;
 }
+*/

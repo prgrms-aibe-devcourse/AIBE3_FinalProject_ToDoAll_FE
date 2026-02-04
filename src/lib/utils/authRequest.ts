@@ -49,7 +49,9 @@ export async function authRequest<T>(
   method: string = 'GET',
   headers?: Record<string, any>,
   body?: Record<string, any>,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  errMsg?: string | null,
+  isFormData?: boolean
 ): Promise<T | null> {
   const baseUrl = resolveBaseUrl();
   const cleanUrl = url.replace(/^\/+/, '');
@@ -59,6 +61,9 @@ export async function authRequest<T>(
 
   debugLog('FETCH URL:', finalUrl);
 
+  headers = headers || {};
+  if (!isFormData && !headers['Content-Type']) headers['Content-Type'] = 'application/json';
+
   const doFetch = (token: string | null) =>
     fetch(finalUrl, {
       signal,
@@ -66,11 +71,14 @@ export async function authRequest<T>(
       credentials: 'include',
       headers: {
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        'Content-Type': 'application/json',
         ...headers,
       },
-
-      body: body && method !== 'GET' && method !== 'HEAD' ? JSON.stringify(body) : null,
+      body:
+        body && method !== 'GET' && method !== 'HEAD'
+          ? isFormData
+            ? (body as FormData)
+            : JSON.stringify(body)
+          : null,
     });
 
   try {
@@ -84,7 +92,7 @@ export async function authRequest<T>(
       res = await doFetch(accessToken);
     }
 
-    if (!res.ok) throw new Error(`${res.status} : 네트워크 응답이 OK가 아님`);
+    if (!res.ok) throw new Error(`${res.status} : ${errMsg ?? '네트워크 응답이 OK가 아닙니다.'}`);
 
     const json = (await res.json()) as CommonResponse<T>;
     return json.data ?? null;

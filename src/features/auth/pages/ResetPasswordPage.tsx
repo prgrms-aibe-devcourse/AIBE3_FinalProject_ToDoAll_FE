@@ -4,6 +4,7 @@ import AuthShell from '../components/AuthShell';
 import ReqBadge from '../components/ReqBadge';
 import { buildPasswordChecks } from '../utils/passwordChecks';
 import { resetPasswordByToken } from '../api/auth.api.ts';
+import { useAuthedClient } from '@shared/hooks/useAuthClient.ts';
 
 export default function ResetPasswordPage() {
   const [searchParams] = useSearchParams();
@@ -21,6 +22,8 @@ export default function ResetPasswordPage() {
     passwordConfirm: false,
   });
   const [didSubmit, setDidSubmit] = useState(false);
+
+  const client = useAuthedClient();
 
   useEffect(() => {
     if (!token) {
@@ -50,7 +53,7 @@ export default function ResetPasswordPage() {
     setSubmitting(true);
     setServerError(null);
     try {
-      await resetPasswordByToken(token, password);
+      await resetPasswordByToken(client, token, password);
 
       setSuccess(true);
       setTimeout(() => navigate('/login'), 1800);

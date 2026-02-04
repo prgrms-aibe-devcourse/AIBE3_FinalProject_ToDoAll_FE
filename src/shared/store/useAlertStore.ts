@@ -34,10 +34,10 @@ export const useAlertStore = create<StoreType>((set) => ({
   onConfirm: () => null,
   action: {
     openAlertModal: (args: OpenAlertModalArgs) => {
-      set(() => ({ title: args.title, message: args.message, open: true }));
-      if (args.onClose) set(() => ({ onClose: args.onClose }));
-      if (args.confirmText) set(() => ({ confirmText: args.confirmText }));
-      if (args.onConfirm) set(() => ({ onConfirm: args.onConfirm }));
+      set((state) => ({
+        ...state,
+        ...args,
+      }));
     },
     closeAlertModal: () => {
       set(() => ({ open: false }));
