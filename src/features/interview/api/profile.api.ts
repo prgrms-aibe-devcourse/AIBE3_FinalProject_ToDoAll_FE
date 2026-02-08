@@ -1,4 +1,5 @@
 import type { ClientRequestType } from '@shared/hooks/useAuthClient.ts';
+import { unwrap } from '@lib/utils/base.ts';
 
 export type UserProfile = {
   id: number;
@@ -20,7 +21,7 @@ export async function getUserProfileAuthed(
     method: 'GET',
   });
 
-  return raw!;
+  return unwrap(raw);
 }
 
 export async function getResumeAuthed(
@@ -31,7 +32,7 @@ export async function getResumeAuthed(
     method: 'GET',
   });
 
-  return raw!;
+  return unwrap(raw);
 }
 
 /** ✅ 게스트(Interview-Token)로 resume 조회 */

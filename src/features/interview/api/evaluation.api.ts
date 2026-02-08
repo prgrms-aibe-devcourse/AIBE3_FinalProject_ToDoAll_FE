@@ -55,7 +55,7 @@ export async function updateInterviewEvaluation(
     `/api/v1/interviews/${interviewId}/evaluation/${evaluationId}`,
     {
       method: 'PATCH',
-      body: JSON.stringify(payload),
+      body: payload,
     },
     '평가 수정 실패'
   );

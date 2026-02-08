@@ -57,8 +57,6 @@ export async function authRequest<T>(
   const cleanUrl = url.replace(/^\/+/, '');
   const finalUrl = `${baseUrl}/${cleanUrl}`;
 
-  let tryCount = 0;
-
   debugLog('FETCH URL:', finalUrl);
 
   headers = headers || {};
@@ -84,9 +82,8 @@ export async function authRequest<T>(
   try {
     let res = await doFetch(accessToken);
 
-    if ((res.status === 401 || res.status === 403) && tryCount < 5) {
+    if (res.status === 401 || res.status === 403) {
       const { accessToken, refreshToken } = await refreshAccessToken(baseUrl);
-      tryCount++;
       debugLog('TOKEN:', accessToken, ', ', refreshToken);
       setToken(accessToken, refreshToken);
       res = await doFetch(accessToken);

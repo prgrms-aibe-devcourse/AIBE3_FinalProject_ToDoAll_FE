@@ -30,8 +30,8 @@ export default function LoginPage() {
         message: '이메일 또는 비밀번호를 확인해 주세요.',
       });
     } finally {
-      setSubmitting(false); // 버튼 비활성화를 해제
-      window.location.href = '/dashboard';
+      setSubmitting(false);
+      navigate('/dashboard', { replace: true });
     }
   };
 

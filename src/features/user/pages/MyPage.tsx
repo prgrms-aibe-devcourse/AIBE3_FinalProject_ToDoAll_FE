@@ -144,6 +144,36 @@ export default function MyPage() {
       });
   }, [client, openAlertModal, syncPositionFromSource]);
 
+  // 3) 최근 재인증 여부
+  const [recentlyReAuthed, setRecentlyReAuthed] = useState(false);
+
+  useEffect(() => {
+    const checkReAuth = () => {
+      const raw = localStorage.getItem('reauthAt') || '0';
+      const at = Number(raw);
+      const flag = Date.now() - at < 5 * 60 * 1000; //5분 이내면 true
+
+      console.log('최근 재인증 체크:', { raw, at, recentlyReauthed: flag });
+
+      setRecentlyReAuthed(flag);
+    };
+
+    checkReAuth(); //마운트 즉시 1회 평가
+    const interval = setInterval(checkReAuth, 60 * 1000); //  1분 주기로
+
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'reauthAt') checkReAuth();
+      console.log('reauthAt 변경 감지:', e.newValue);
+      checkReAuth();
+    };
+    window.addEventListener('storage', onStorage);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('storage', onStorage);
+    };
+  }, []);
+
   // 4) 의도에 따라 비밀번호 섹션 자동 오픈
   const [expandPassword, setExpandPassword] = useState(false);
   useEffect(() => {
@@ -620,6 +650,11 @@ export default function MyPage() {
         {/* 비밀번호 변경 섹션 */}
         {expandPassword && (
           <div className="mt-8 rounded-2xl border border-[var(--color-jd-gray-light)] bg-[var(--color-jd-white)] p-6">
+            {!recentlyReAuthed && (
+              <div className="mb-3 text-sm text-[var(--color-jd-gray-dark)]">
+                보안을 위해 다시 한 번 비밀번호를 확인해야 합니다. (5분 경과)
+              </div>
+            )}
             <form
               onSubmit={async (e) => {
                 e.preventDefault();

@@ -16,7 +16,7 @@ export async function updateMe(
 ): Promise<any> {
   const raw = await client.request<any>('/api/v1/users/me', {
     method: 'PATCH',
-    body: JSON.stringify(payload),
+    body: payload,
   });
   return raw?.data ?? raw;
 }
