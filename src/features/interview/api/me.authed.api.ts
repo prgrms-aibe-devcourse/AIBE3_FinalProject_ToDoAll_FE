@@ -1,10 +1,4 @@
-import { authedRequest } from '@/lib/utils/authedRequest';
-
-type CommonResponse<T> = {
-  errorCode: number;
-  message: string;
-  data: T;
-};
+import type { ClientRequestType } from '@shared/hooks/useAuthClient.ts';
 
 export type Me = {
   id: number;
@@ -12,7 +6,7 @@ export type Me = {
   nickname?: string;
 };
 
-export async function getMeAuthed(): Promise<Me> {
-  const raw = await authedRequest<CommonResponse<Me>>('/api/v1/users/me', { method: 'GET' });
-  return raw.data;
+export async function getMeAuthed(client: ClientRequestType): Promise<Me> {
+  const raw = await client.request<Me>('/api/v1/users/me', { method: 'GET' });
+  return raw!;
 }

@@ -36,7 +36,7 @@ export default function ResumeMemo({
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col p-4">
       <h3 className="mb-2 text-[14px] font-semibold text-[#413F3F]">메모</h3>
 
       <div className="relative">

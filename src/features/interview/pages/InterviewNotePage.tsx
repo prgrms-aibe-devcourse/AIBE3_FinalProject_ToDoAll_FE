@@ -18,6 +18,7 @@ import {
 // 내 정보 조회용
 import { getMe } from '@/features/user/api/user.api';
 import useFetch from '@shared/hooks/useFetch';
+import { useAuthedClient } from '@shared/hooks/useAuthClient.ts';
 
 // 타입 & 초기 프로필
 
@@ -87,17 +88,18 @@ export default function InterviewNotePage() {
   const [summaryError, setSummaryError] = useState<string | null>(null);
   const [aiSummary, setAiSummary] = useState<string>('');
 
-  // 내 정보 불러오기
+  const client = useAuthedClient();
+
   useEffect(() => {
     (async () => {
       try {
-        const user = await getMe();
+        const user = await getMe(client);
         setMe(user);
       } catch (e) {
         console.error('내 정보 조회 실패:', e);
       }
     })();
-  }, []);
+  }, [client]);
 
   // 0) 인터뷰 ID 없으면 뒤로
   useEffect(() => {
@@ -142,7 +144,7 @@ export default function InterviewNotePage() {
 
     (async () => {
       try {
-        const questions = await getInterviewQuestions(numericInterviewId);
+        const questions = await getInterviewQuestions(client, numericInterviewId);
 
         const map = new Map<string, InterviewQuestion[]>();
 
@@ -167,7 +169,7 @@ export default function InterviewNotePage() {
         setQuestionError('질문을 불러오는 중 오류가 발생했습니다.');
       }
     })();
-  }, [numericInterviewId]);
+  }, [client, numericInterviewId]);
   // 3) 메모 + AI 요약 로딩
   useEffect(() => {
     if (!numericInterviewId) return;
@@ -175,7 +177,7 @@ export default function InterviewNotePage() {
     (async () => {
       try {
         // 3-1) 메모 목록
-        const memos = await getInterviewMemos(numericInterviewId);
+        const memos = await getInterviewMemos(client, numericInterviewId);
 
         const memoMap = new Map<number, InterviewMemo>();
         memos.forEach((memo: InterviewMemo) => {

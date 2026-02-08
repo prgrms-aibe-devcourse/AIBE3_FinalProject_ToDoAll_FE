@@ -1,22 +1,17 @@
-import { type FormEvent, useState } from 'react';
+import { type FormEvent } from 'react';
 
 import { requestResetEmail } from '../api/auth.api.ts';
 import AuthShell from '../components/AuthShell.tsx';
-import AlertModal from '@shared/components/Alertmodal.tsx';
+import { useAuthedClient } from '@shared/hooks/useAuthClient.ts';
+import { useAlertStore } from '@shared/store/useAlertStore.ts';
 
 export default function ResetPasswordEmailPage() {
-  const [alertModal, setAlertModal] = useState({
-    open: false,
-    type: 'info' as 'success' | 'error' | 'info' | 'warning',
-    message: '',
-  });
+  const client = useAuthedClient();
+
+  const openAlertModal = useAlertStore((s) => s.action.openAlertModal);
 
   const showAlert = (message: string, type: 'success' | 'error' | 'info' | 'warning' = 'info') => {
-    setAlertModal({ open: true, type, message });
-  };
-
-  const closeAlert = () => {
-    setAlertModal((prev) => ({ ...prev, open: false }));
+    openAlertModal({ type, message });
   };
 
   const onSubmit = async (e: FormEvent) => {
@@ -24,7 +19,7 @@ export default function ResetPasswordEmailPage() {
     const form = new FormData(e.target as HTMLFormElement);
     const email = String(form.get('email') || '');
     try {
-      await requestResetEmail(email); // 서버에 메일 발송 요청
+      await requestResetEmail(client, email); // 서버에 메일 발송 요청
       showAlert('이메일을 확인해 주세요.\n비밀번호 재설정 링크가 발송되었습니다.', 'success');
     } catch {
       showAlert('이메일 전송에 실패했습니다.\n다시 시도해주세요.', 'error');
@@ -70,12 +65,6 @@ export default function ResetPasswordEmailPage() {
           이메일 인증
         </button>
       </form>
-      <AlertModal
-        open={alertModal.open}
-        type={alertModal.type}
-        message={alertModal.message}
-        onClose={closeAlert}
-      />
     </AuthShell>
   );
 }

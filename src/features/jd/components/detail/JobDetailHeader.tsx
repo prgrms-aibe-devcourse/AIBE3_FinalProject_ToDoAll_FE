@@ -3,6 +3,7 @@ import type { JobDetail } from '../../types/JobDetail.types';
 import JobStatusDropdown from './JobStatusDropdown';
 import { updateJobStatus } from '../../services/jobApi';
 import cn from '@/lib/utils/cn';
+import { useAuthedClient } from '@shared/hooks/useAuthClient.ts';
 
 type Mode = 'owner' | 'public';
 
@@ -15,6 +16,7 @@ export function JobDetailHeader({
   mode: Mode;
   onEdit?: () => void;
 }) {
+  const client = useAuthedClient();
   const isOwner = mode === 'owner';
   const statusLabel = job.status === 'OPEN' ? '진행중' : '마감';
   return (
@@ -47,7 +49,7 @@ export function JobDetailHeader({
             value={job.status}
             onChange={async (next) => {
               try {
-                await updateJobStatus(job.id, next);
+                await updateJobStatus(client, job.id, next);
                 alert('상태가 변경되었습니다.');
                 window.location.reload();
               } catch (error) {

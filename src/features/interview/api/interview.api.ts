@@ -1,13 +1,7 @@
-import { authedRequest } from '@/lib/utils/authedRequest';
+import type { ClientRequestType } from '@shared/hooks/useAuthClient.ts';
 
-type CommonResponse<T> = {
-  errorCode: number;
-  message: string;
-  data: T;
-};
-
-export async function endInterview(interviewId: number): Promise<void> {
-  await authedRequest<CommonResponse<unknown>>(`/api/v1/interviews/${interviewId}/end`, {
+export async function endInterview(client: ClientRequestType, interviewId: number): Promise<void> {
+  await client.request(`/api/v1/interviews/${interviewId}/end`, {
     method: 'PATCH',
   });
 }

@@ -1,17 +1,10 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { AuthContext } from '@/AuthContext.ts';
+import { authRequest } from '@lib/utils/authRequest.ts';
 let baseUrl = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 
 if (baseUrl.endsWith('/api')) {
   baseUrl = baseUrl.slice(0, -4); // '/api' 길이 = 4
-}
-
-console.log('ENV CHECK:', import.meta.env);
-
-interface CommonResponse<T> {
-  errorCode?: number;
-  message: string;
-  data?: T;
 }
 
 export default function useFetch<T>(
@@ -19,50 +12,31 @@ export default function useFetch<T>(
   defaultValue?: T | null,
   method?: string,
   headers?: Record<string, any>,
-  body?: Record<string, any>
+  body?: Record<string, any>,
+  errMemo?: string
 ) {
   const [resData, setResData] = useState<T | null>(defaultValue ?? null);
   const controller = useRef<AbortController | null>(null);
-  const { accessToken } = useContext(AuthContext);
+  const { accessToken, setToken } = useContext(AuthContext);
 
   useEffect(() => {
     if (!url) return;
 
     controller.current = new AbortController();
     const signal = controller.current.signal;
-    // URL 앞쪽 / 을 제거 → 중복 /api 방지
-    const cleanUrl = url.replace(/^\/+/, '');
 
-    // baseUrl + cleanUrl 합치기
-    const finalUrl = `${baseUrl}/${cleanUrl}`;
-    console.log('FETCH URL:', finalUrl);
-    fetch(finalUrl, {
-      signal,
-      method,
-      credentials: 'include',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        ...headers,
-      },
-      body: body ? JSON.stringify(body) : undefined,
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error(res.status + ' : ' + '네트워크 응답이 OK가 아님');
-        return res.json();
-      })
-      .then((jsonData: CommonResponse<T>) => {
-        setResData(jsonData.data ?? null);
+    authRequest<T>(url, accessToken, setToken, method, headers, body, signal)
+      .then((data) => {
+        setResData(data);
       })
       .catch((err) => {
-        if (err.name === 'AbortError') return;
-        console.error(err.message);
+        console.error(errMemo, err);
       });
 
     return () => {
       if (controller.current) controller.current.abort();
     };
-  }, [url, method, headers, body]);
+  }, [url, method, headers, body, accessToken, setToken, errMemo]);
 
   return { resData };
 }

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SidebarDrawer from '../SidebarDrawer.tsx';
 import useFetch from '@shared/hooks/useFetch.ts';
+import SelectIcon from '@shared/components/SelectIcon.tsx';
 
 let baseUrl = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 
@@ -227,9 +228,7 @@ const Header = () => {
             aria-label={leftOpen ? '메뉴 닫기' : '메뉴 열기'}
             onClick={() => setLeftOpen((prev) => !prev)}
           >
-            <svg width="20" height="18" viewBox="0 0 24 24" fill="none" className="text-white">
-              <path d="M3 6h18v2H3V6Zm0 5h18v2H3v-2Zm0 5h18v2H3v-2Z" fill="currentColor" />
-            </svg>
+            <SelectIcon name={leftOpen ? 'panel-left-close' : 'panel-left-open'} />
           </button>
         </div>
 

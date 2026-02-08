@@ -3,6 +3,7 @@ import { useState } from 'react';
 import AuthShell from '../components/AuthShell';
 import { sendCompanyVerifyLink } from '../api/auth.api.ts';
 import { ERROR_CODES } from '@features/constants/errorCodes.ts';
+import { useAuthedClient } from '@shared/hooks/useAuthClient.ts';
 
 const PERSONAL_DOMAINS = new Set([
   'gmail.com',
@@ -21,6 +22,7 @@ export default function SignupCompanyEmailPage() {
   const [loading, setLoading] = useState(false); // 전송 중 중복 클릭 방지
   const [sent, setSent] = useState(false); // 전송 완료 안내 표시
   const [error, setError] = useState('');
+  const client = useAuthedClient();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.trim();
@@ -38,7 +40,7 @@ export default function SignupCompanyEmailPage() {
     if (invalid || !email || loading) return; // 회사메일 아닐 때/중복 클릭 방지
     try {
       setLoading(true); // 버튼 잠금
-      await sendCompanyVerifyLink(email); // 서버에 “인증 링크 보내기” 요청
+      await sendCompanyVerifyLink(client, email); // 서버에 “인증 링크 보내기” 요청
       setSent(true); // 안내 메시지 노출
       setError('');
     } catch (err: any) {

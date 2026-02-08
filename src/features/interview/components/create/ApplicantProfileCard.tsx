@@ -15,7 +15,7 @@ export default function ApplicantProfileCard({ applicant }: ApplicantProfile) {
   const { name, email, phoneNumber, birthDate, avatar, jdTitle } = applicant;
 
   return (
-    <div className="mt-16 flex flex-col items-center rounded-xl bg-[#d8cfcc] p-6 shadow-md">
+    <div className="flex flex-col items-center rounded-xl bg-[#d8cfcc] p-6 shadow-md">
       <img
         src={avatar ?? userDefaultImage}
         alt={name}

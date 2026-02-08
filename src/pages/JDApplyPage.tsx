@@ -3,15 +3,18 @@ import JobDetailView from '../features/jd/components/detail/JobDetailView';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { fetchJobDetail } from '../features/jd/services/jobApi';
+import { useAuthedClient } from '@shared/hooks/useAuthClient.ts';
 
 export default function JDDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [data, setData] = useState<JobDetail | null>(null);
   const navigate = useNavigate();
+  const client = useAuthedClient();
+
   useEffect(() => {
     if (!id) return;
-    fetchJobDetail(id).then(setData);
-  }, [id]);
+    fetchJobDetail(client, id).then(setData);
+  }, [client, id]);
 
   if (!data) return <p className="p-4">불러오는 중입니다…</p>;
   return (

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { DEFAULT_AVATAR } from '../../util/avatar';
+import { debugLog } from '@lib/utils/debugLog.ts';
 
 type UiMsg = { id: number; text: string; senderId: number; isMine: boolean };
 
@@ -20,6 +21,7 @@ export default function ChatSection({
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
+    debugLog('initialMessages : ', initialMessages);
   }, [initialMessages]);
 
   const handleSend = () => {

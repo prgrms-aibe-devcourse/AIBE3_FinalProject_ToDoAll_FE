@@ -4,6 +4,7 @@ import {
   getInterviewEvaluation,
   updateInterviewEvaluation,
 } from '@features/interview/api/evaluation.api.ts';
+import { useAuthedClient } from '@shared/hooks/useAuthClient.ts';
 
 interface Scores {
   tech: string;
@@ -25,12 +26,14 @@ export default function ScoreInputCard({ interviewId }: ScoreInputCardProps) {
     total: '',
     comment: '',
   });
+  const client = useAuthedClient();
+
   useEffect(() => {
     if (!interviewId) return;
 
     (async () => {
       try {
-        const data = await getInterviewEvaluation(interviewId);
+        const data = await getInterviewEvaluation(client, interviewId);
         if (!data) {
           // 아직 평가 없음 → 입력 모드
           setIsEditing(true);
@@ -96,11 +99,11 @@ export default function ScoreInputCard({ interviewId }: ScoreInputCardProps) {
     try {
       if (evaluationId == null) {
         // 처음 저장 (POST)
-        const created = await createInterviewEvaluation(interviewId, payload);
+        const created = await createInterviewEvaluation(client, interviewId, payload);
         setEvaluationId(created.evaluationId);
       } else {
         // 이미 있으면 수정 (PATCH)
-        await updateInterviewEvaluation(interviewId, evaluationId, payload);
+        await updateInterviewEvaluation(client, interviewId, evaluationId, payload);
       }
 
       alert('면접 점수가 저장되었습니다.');

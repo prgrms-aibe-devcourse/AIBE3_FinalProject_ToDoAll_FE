@@ -4,6 +4,7 @@ import JobPostForm, { type JobPostFormValues } from '../features/jd/components/f
 import { createJobPost, fetchSkills, updateJobThumbnail } from '../features/jd/services/jobApi';
 import type { JobCreateRequest } from '../features/jd/services/jobApi';
 import { useNavigate } from 'react-router-dom';
+import { useAuthedClient } from '@shared/hooks/useAuthClient.ts';
 
 type Skill = {
   id: number;
@@ -13,17 +14,19 @@ const JDCreatePage: React.FC = () => {
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
   const [skills, setSkills] = useState<Skill[]>([]);
+  const client = useAuthedClient();
+
   useEffect(() => {
     const loadSkills = async () => {
       try {
-        const data = await fetchSkills();
+        const data = await fetchSkills(client);
         setSkills(data);
       } catch (err) {
         console.error('fetchSkills error:', err);
       }
     };
     loadSkills();
-  }, []);
+  }, [client]);
 
   const mapToJobCreateRequest = (
     values: Omit<JobPostFormValues, 'thumbnailFile'>
@@ -76,9 +79,9 @@ const JDCreatePage: React.FC = () => {
       const { thumbnailFile, ...otherValues } = values;
       const baseRequest = mapToJobCreateRequest(otherValues);
       const request = { ...baseRequest, thumbnailUrl: null };
-      const jobId = await createJobPost(request);
+      const jobId = await createJobPost(client, request);
       if (thumbnailFile instanceof File) {
-        await updateJobThumbnail(jobId, thumbnailFile);
+        await updateJobThumbnail(client, jobId, thumbnailFile);
       }
 
       alert('공고가 등록되었습니다.');
