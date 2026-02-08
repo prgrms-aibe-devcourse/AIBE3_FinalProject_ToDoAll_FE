@@ -89,7 +89,7 @@ export async function authRequest<T>(
       res = await doFetch(accessToken);
     }
 
-    if (!res.ok) throw new Error(`${res.status} : ${errMsg ?? '네트워크 응답이 OK가 아닙니다.'}`);
+    if (!res.ok) new Error(`${res.status} : ${errMsg ?? '네트워크 응답이 OK가 아닙니다.'}`);
 
     const json = (await res.json()) as CommonResponse<T>;
     return json.data ?? null;
