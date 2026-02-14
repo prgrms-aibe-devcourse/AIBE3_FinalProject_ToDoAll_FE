@@ -37,6 +37,7 @@ export const useAlertStore = create<StoreType>((set) => ({
       set((state) => ({
         ...state,
         ...args,
+        open: true,
       }));
     },
     closeAlertModal: () => {

@@ -42,7 +42,7 @@ export default function InterviewActions({
   const handleOpenInterviewNote = () => {
     if (!interviewId) return;
     navigate(`/interview/${interviewId}/note`, {
-      state: { name, avatar, interviewId },
+      state: { name, avatar, date, time, interviewers, position, resumeId, interviewId },
     });
   };
 

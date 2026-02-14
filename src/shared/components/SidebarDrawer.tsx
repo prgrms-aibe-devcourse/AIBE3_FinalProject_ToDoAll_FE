@@ -53,7 +53,7 @@ export default function SidebarDrawer({ open, onClose }: Props) {
           profileUrl: null,
         });
       });
-  }, []);
+  }, [client]);
 
   //  MyPage에서 브로드캐스트한 프로필 변경 이벤트 수신
   useEffect(() => {

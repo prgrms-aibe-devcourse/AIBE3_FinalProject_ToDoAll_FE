@@ -6,11 +6,13 @@ export default function PageTitle({
   description,
   children,
   buttonOnClickFn,
+  buttonText,
 }: {
   title: string;
   description: string;
   children: ReactNode;
   buttonOnClickFn?: MouseEventHandler<HTMLButtonElement> | undefined;
+  buttonText?: string;
 }) {
   return (
     <section className="flex min-h-[800px] pb-20">
@@ -27,7 +29,7 @@ export default function PageTitle({
             )}
             onClick={buttonOnClickFn}
           >
-            공고 등록
+            {buttonText}
           </button>
         </section>
         <section className="w-full">{children}</section>
