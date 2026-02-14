@@ -7,9 +7,23 @@ import { useShallow } from 'zustand/react/shallow';
 import AlertModal from '@shared/components/Alertmodal.tsx';
 import SidebarDrawer from '@shared/components/SidebarDrawer.tsx';
 
+const checkMedia = () => {
+  const mq = window.matchMedia('(min-width: 1024px)');
+  return mq.matches;
+};
+
+const checkIsDrawerOpen = (isDesktop: boolean) => {
+  if (!isDesktop) return isDesktop;
+
+  const prevState = window.localStorage.getItem('drawerOpen');
+  console.log(typeof prevState, 'prevState');
+  if (prevState) return prevState === 'true';
+  else return isDesktop;
+};
+
 const MainLayout = () => {
-  const [drawerOpen, setDrawerOpen] = useState(true);
-  const [isDesktop, setIsDesktop] = useState(true);
+  const [isDesktop, setIsDesktop] = useState(checkMedia());
+  const [drawerOpen, setDrawerOpen] = useState(checkIsDrawerOpen(isDesktop));
 
   const alertState = useAlertStore(
     useShallow((s) => ({
@@ -26,24 +40,16 @@ const MainLayout = () => {
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 1024px)');
-    setIsDesktop(mq.matches);
     const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
     mq.addEventListener('change', handler);
     return () => mq.removeEventListener('change', handler);
   }, []);
 
   useEffect(() => {
-    const handler = (e: Event) => {
-      const custom = e as CustomEvent<boolean>;
-      setDrawerOpen(custom.detail);
-    };
     const closeHandler = () => setDrawerOpen(false);
-
-    window.addEventListener('drawer-state-change', handler);
     window.addEventListener('close-drawer', closeHandler);
 
     return () => {
-      window.removeEventListener('drawer-state-change', handler);
       window.removeEventListener('close-drawer', closeHandler);
     };
   }, []);

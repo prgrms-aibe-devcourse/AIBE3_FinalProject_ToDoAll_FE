@@ -211,15 +211,19 @@ const Header = ({
     <>
       {/* 헤더 영역 */}
       <header className="fixed top-0 right-0 left-0 z-50 flex h-12 w-full items-center justify-between bg-[var(--color-jd-violet)] px-4 text-white shadow-[0_6px_22px_rgba(0,0,0,.15)]">
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            aria-label={drawerOpen ? '메뉴 닫기' : '메뉴 열기'}
-            onClick={() => setDrawerOpen((prev) => !prev)}
-          >
-            <SelectIcon name={drawerOpen ? 'panel-left-close' : 'panel-left-open'} />
-          </button>
-        </div>
+        <button
+          type="button"
+          aria-label={drawerOpen ? '메뉴 닫기' : '메뉴 열기'}
+          onClick={() =>
+            setDrawerOpen((prev) => {
+              window.localStorage.setItem('drawerOpen', (!prev).toString());
+              return !prev;
+            })
+          }
+          className="cursor-pointer"
+        >
+          <SelectIcon name={drawerOpen ? 'panel-left-close' : 'panel-left-open'} />
+        </button>
 
         {/* 알림 버튼 */}
         <div className="relative">
