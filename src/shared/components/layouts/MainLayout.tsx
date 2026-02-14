@@ -5,10 +5,11 @@ import { useEffect, useState } from 'react';
 import { useAlertStore } from '@shared/store/useAlertStore.ts';
 import { useShallow } from 'zustand/react/shallow';
 import AlertModal from '@shared/components/Alertmodal.tsx';
+import SidebarDrawer from '@shared/components/SidebarDrawer.tsx';
 
 const MainLayout = () => {
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(true);
+  const [isDesktop, setIsDesktop] = useState(true);
 
   const alertState = useAlertStore(
     useShallow((s) => ({
@@ -59,23 +60,31 @@ const MainLayout = () => {
     <div
       className={`relative flex h-full flex-col transition-[padding-left] duration-300 ${drawerOpen && isDesktop ? 'pl-[240px]' : ''}`}
     >
-      {/* 모바일 전용 오버레이 */}
       <div
         className={`fixed inset-0 z-40 bg-black/40 transition-opacity duration-300 md:hidden ${drawerOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'} `}
         onClick={() => window.dispatchEvent(new CustomEvent('close-drawer'))}
       />
 
-      <Header />
-      <main
-        className="bg-jd-white min-h-1/2"
-        onClick={() => {
-          if (drawerOpen) {
-            window.dispatchEvent(new CustomEvent('close-drawer'));
-          }
-        }}
-      >
-        <Outlet />
-      </main>
+      <Header drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} />
+      <section className="flex w-full">
+        <SidebarDrawer
+          open={drawerOpen}
+          onClose={() => {
+            if (isDesktop) return;
+            setDrawerOpen(false);
+          }}
+        />
+        <main
+          className="bg-jd-white min-h-1/2 w-full"
+          onClick={() => {
+            if (drawerOpen && !isDesktop) {
+              setDrawerOpen(false);
+            }
+          }}
+        >
+          <Outlet />
+        </main>
+      </section>
       <AlertModal {...alertState} onClose={closeAlertModal} onConfirm={closeAlertModal} />
 
       <Footer />

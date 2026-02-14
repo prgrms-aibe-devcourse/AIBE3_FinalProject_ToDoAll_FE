@@ -1,6 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, type Dispatch, type SetStateAction } from 'react';
 import { useNavigate } from 'react-router-dom';
-import SidebarDrawer from '../SidebarDrawer.tsx';
 import useFetch from '@shared/hooks/useFetch.ts';
 import SelectIcon from '@shared/components/SelectIcon.tsx';
 
@@ -15,27 +14,17 @@ type Notice = {
   readFlag?: boolean;
 };
 
-const Header = () => {
+const Header = ({
+  drawerOpen,
+  setDrawerOpen,
+}: {
+  drawerOpen: boolean;
+  setDrawerOpen: Dispatch<SetStateAction<boolean>>;
+}) => {
   const navigate = useNavigate();
-  const [leftOpen, setLeftOpen] = useState(false);
   const [notiOpen, setNotiOpen] = useState(false);
 
   const [notices, setNotices] = useState<Notice[]>([]);
-
-  useEffect(() => {
-    window.dispatchEvent(new CustomEvent('drawer-state-change', { detail: leftOpen }));
-  }, [leftOpen]);
-
-  useEffect(() => {
-    const handleCloseDrawer = () => {
-      setLeftOpen(false);
-    };
-
-    window.addEventListener('close-drawer', handleCloseDrawer);
-    return () => {
-      window.removeEventListener('close-drawer', handleCloseDrawer);
-    };
-  }, []);
 
   /** GET 알림 목록 */
   const { resData: notifications } = useFetch<
@@ -225,10 +214,10 @@ const Header = () => {
         <div className="flex items-center gap-3">
           <button
             type="button"
-            aria-label={leftOpen ? '메뉴 닫기' : '메뉴 열기'}
-            onClick={() => setLeftOpen((prev) => !prev)}
+            aria-label={drawerOpen ? '메뉴 닫기' : '메뉴 열기'}
+            onClick={() => setDrawerOpen((prev) => !prev)}
           >
-            <SelectIcon name={leftOpen ? 'panel-left-close' : 'panel-left-open'} />
+            <SelectIcon name={drawerOpen ? 'panel-left-close' : 'panel-left-open'} />
           </button>
         </div>
 
@@ -313,8 +302,6 @@ const Header = () => {
 
       {/* 헤더 높이만큼 패딩 */}
       <div className="h-12" />
-
-      <SidebarDrawer open={leftOpen} onClose={() => setLeftOpen(false)} />
     </>
   );
 };
