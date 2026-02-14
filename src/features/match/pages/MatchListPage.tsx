@@ -14,7 +14,6 @@ import { mapRecommendationToCardData } from '../utils/mapRecommendationToResumeD
 import type { MatchCardData } from '../types/matchCardData.types';
 import PageTitle from '@shared/components/PageTitile.tsx';
 import { useAuthedClient } from '@shared/hooks/useAuthClient.ts';
-import { useAlertStore } from '@shared/store/useAlertStore.ts';
 
 export default function MatchListPage() {
   const navigate = useNavigate();
@@ -36,8 +35,6 @@ export default function MatchListPage() {
   const [searchTrigger, setSearchTrigger] = useState(0); // 검색 버튼 눌렀을 때만 조회
 
   const client = useAuthedClient();
-
-  const openAlertModal = useAlertStore((s) => s.action.openAlertModal);
 
   useEffect(() => {
     const state = location.state as { jdId?: number } | null;
@@ -87,10 +84,6 @@ export default function MatchListPage() {
       navigate(`/interview/create?resumeId=${resumeId}&jdId=${jdId}`);
     } catch (error) {
       console.error('매칭 확정 실패:', error);
-      openAlertModal({
-        type: 'error',
-        message: '이미 매칭된 지원자이거나 오류가 발생했습니다.',
-      });
     }
   };
 

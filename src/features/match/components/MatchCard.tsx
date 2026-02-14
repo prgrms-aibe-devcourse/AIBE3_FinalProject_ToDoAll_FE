@@ -110,9 +110,13 @@ export default function MatchCard({ resume, matchRate, tab, onView, onInvite }: 
         <button
           onClick={(e) => {
             e.stopPropagation();
+            if (resume.status == 'CONFIRMED') return;
             onInvite();
           }}
-          className="rounded-full bg-[#DE4F36] px-4 py-2 font-medium text-white transition hover:bg-[#b73d2b]"
+          className={cn(
+            'bg-jd-gray-light rounded-full px-4 py-2 font-medium text-white transition',
+            resume.status != 'CONFIRMED' && 'cursor-pointer bg-[#DE4F36] hover:bg-[#b73d2b]'
+          )}
         >
           면접 초대
         </button>
