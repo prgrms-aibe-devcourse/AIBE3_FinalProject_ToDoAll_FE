@@ -20,6 +20,7 @@ export default function JDPage() {
       title="공고 관리"
       description="등록한 공고를 관리해보세요."
       buttonOnClickFn={() => navigate('/jobs/new')}
+      buttonText={'공고 관리'}
     >
       <div className="mx-auto max-w-5xl">
         <JobPostList items={items} />

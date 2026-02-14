@@ -19,10 +19,11 @@ import {
 import { getMe } from '@/features/user/api/user.api';
 import useFetch from '@shared/hooks/useFetch';
 import { useAuthedClient } from '@shared/hooks/useAuthClient.ts';
+import PageTitle from '@shared/components/PageTitile.tsx';
 
 // 타입 & 초기 프로필
 
-type ProfileData = {
+export type ProfileData = {
   name: string;
   title: string;
   date: string;
@@ -32,21 +33,6 @@ type ProfileData = {
   missingSkills: string[];
   experiences: string[];
   image: string;
-};
-const initialProfileData = {
-  name: '김철수',
-  title: '프론트엔드 개발자',
-  date: '2025-12-01',
-  time: '12:00',
-  interviewers: ['홍길동', '홍길순'],
-  skills: ['Git', 'React'],
-  missingSkills: ['TypeScript', 'Next.js'],
-  experiences: [
-    '7년 프론트엔드 개발 경험',
-    'React와 Next.js 전문가',
-    '대규모 전자상거래 플랫폼 개발 경험',
-  ],
-  image: 'https://cdn.pixabay.com/photo/2025/10/02/06/28/mood-9867715_1280.jpg',
 };
 
 type ProfileApiDto = {
@@ -80,7 +66,7 @@ export default function InterviewNotePage() {
   };
 
   // 상태
-  const [profileData, setProfileData] = useState<ProfileData>(initialProfileData);
+  const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [questionNotes, setQuestionNotes] = useState<QuestionSection[]>([]);
   const [, setQuestionError] = useState<string | null>(null);
 
@@ -101,41 +87,37 @@ export default function InterviewNotePage() {
     })();
   }, [client]);
 
-  // 0) 인터뷰 ID 없으면 뒤로
   useEffect(() => {
     if (!numericInterviewId) {
       navigate('/interview/manage');
     }
   }, [numericInterviewId, navigate]);
 
-  // 1) Profile API 를 useFetch 로 호출
   const { resData: profileApi } = useFetch<ProfileApiDto>(
     resumeId && interviewIdParam ? `/api/v1/interviews/${interviewIdParam}/interview-profile` : ''
   );
 
-  // profileApi가 오면 프로필 업데이트
   useEffect(() => {
+    if (!profileApi) return;
+
     const baseProfile: ProfileData = {
-      ...initialProfileData,
-      name: name ?? initialProfileData.name,
-      title: position ?? initialProfileData.title,
-      date: date ?? initialProfileData.date,
-      time: time ?? initialProfileData.time,
-      interviewers: interviewers
-        ? interviewers.split(',').map((s) => s.trim())
-        : initialProfileData.interviewers,
+      name: name ?? '',
+      title: position ?? '',
+      date: date ?? '',
+      time: time ?? '',
+      interviewers: interviewers ? interviewers.split(',').map((s) => s.trim()) : [],
+      skills: [],
+      missingSkills: [],
+      experiences: [],
+      image: '',
     };
 
-    if (profileApi) {
-      setProfileData({
-        ...baseProfile,
-        skills: profileApi.skills ?? baseProfile.skills,
-        missingSkills: profileApi.missingSkills ?? baseProfile.missingSkills,
-        experiences: profileApi.experiences ?? baseProfile.experiences,
-      });
-    } else {
-      setProfileData(baseProfile);
-    }
+    setProfileData({
+      ...baseProfile,
+      skills: profileApi.skills ?? baseProfile.skills,
+      missingSkills: profileApi.missingSkills ?? baseProfile.missingSkills,
+      experiences: profileApi.experiences ?? baseProfile.experiences,
+    });
   }, [profileApi, name, position, date, time, interviewers]);
 
   // 2) 질문 로딩 (체크 상태 포함)
@@ -170,13 +152,11 @@ export default function InterviewNotePage() {
       }
     })();
   }, [client, numericInterviewId]);
-  // 3) 메모 + AI 요약 로딩
   useEffect(() => {
     if (!numericInterviewId) return;
 
     (async () => {
       try {
-        // 3-1) 메모 목록
         const memos = await getInterviewMemos(client, numericInterviewId);
 
         const memoMap = new Map<number, InterviewMemo>();
@@ -294,49 +274,49 @@ export default function InterviewNotePage() {
   };
 
   return (
-    <div className="bg-jd-white text-jd-black flex h-screen flex-col overflow-hidden">
-      <header className="flex shrink-0 items-center justify-between px-10 pt-6">
-        <h1 className="text-jd-black text-2xl font-bold">면접 노트</h1>
-
-        <button
-          onClick={() => navigate('/interview/manage')}
-          className="text-jd-gray-dark hover:text-jd-black text-sm transition"
-        >
-          ← 돌아가기
-        </button>
-      </header>
-
-      <div className="flex flex-1 gap-6 overflow-hidden p-6">
-        {/* 왼쪽: 고정폭 + shrink 방지 */}
-        <div className="flex w-[280px] min-w-[280px] shrink-0 flex-col gap-3">
+    <PageTitle
+      title={'면접 노트'}
+      description={'면접 결과 요약을 확인하세요.'}
+      buttonOnClickFn={() => navigate('/interview/manage')}
+      buttonText={'돌아가기'}
+    >
+      <div className="flex flex-1 flex-col gap-6 sm:flex-row">
+        <div className="flex shrink-0 flex-col gap-3">
           <ProfileCard profileData={profileData} name={name} avatar={avatar} />
           <ScoreInputCard interviewId={numericInterviewId} />
         </div>
 
-        {/* 가운데 60% → 질문 + AI 요약 */}
-        <div className="mb-3 flex w-[60%] min-w-[600px] flex-col gap-4 overflow-auto">
-          {/* ❌ wrapper 카드 제거하고, 그냥 섹션만 */}
-          <QuestionNoteSection questionNotes={questionNotes} />
+        <div className="mb-3 flex w-full flex-col gap-4 lg:flex-row">
+          <div className="flex w-full flex-col gap-4">
+            <div className="min-h-[200px] w-full overflow-auto rounded-2xl border border-gray-200 bg-white p-6 shadow-md">
+              <h2 className="mb-3 text-base font-semibold text-slate-900">면접 질문</h2>
+              {questionNotes.length > 0 ? (
+                <QuestionNoteSection questionNotes={questionNotes} />
+              ) : (
+                <p className="text-sm leading-relaxed whitespace-pre-line text-slate-800">
+                  생성된 면접 질문이 없습니다.
+                </p>
+              )}
+            </div>
 
-          {/* AI 요약 카드만 단일 카드로 유지 */}
-          <div className="mt-4 mb-3 min-h-[200px] w-full rounded-2xl border border-gray-200 bg-white p-6 shadow-md">
-            <h2 className="mb-3 text-base font-semibold text-slate-900">AI 면접 요약</h2>
-            <p className="text-sm leading-relaxed whitespace-pre-line text-slate-800">
-              {aiSummary || '아직 생성된 면접 요약이 없습니다.'}
-            </p>
+            <div className="min-h-[200px] w-full overflow-auto rounded-2xl border border-gray-200 bg-white p-6 shadow-md">
+              <h2 className="mb-3 text-base font-semibold text-slate-900">AI 면접 요약</h2>
+              <p className="text-sm leading-relaxed whitespace-pre-line text-slate-800">
+                {aiSummary || '아직 생성된 면접 요약이 없습니다.'}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex w-full flex-col overflow-hidden lg:w-[50%]">
+            {summaryError && <p className="mb-1 text-xs text-red-500">{summaryError}</p>}
+            <InterviewNoteSummarySection
+              summaries={summaries}
+              currentUserId={me?.id ?? 0}
+              onUpdateMemo={handleUpdateMemo}
+            />
           </div>
         </div>
-
-        {/* 오른쪽: 면접관 메모만 */}
-        <div className="flex w-[26%] min-w-[300px] flex-col overflow-hidden">
-          {summaryError && <p className="mb-1 text-xs text-red-500">{summaryError}</p>}
-          <InterviewNoteSummarySection
-            summaries={summaries}
-            currentUserId={me?.id ?? 0}
-            onUpdateMemo={handleUpdateMemo}
-          />
-        </div>
       </div>
-    </div>
+    </PageTitle>
   );
 }
