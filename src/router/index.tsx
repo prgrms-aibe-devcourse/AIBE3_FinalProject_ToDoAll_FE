@@ -19,7 +19,6 @@ export default function AppRouter() {
           <Route key={route.path} path={route.path} element={route.element} />
         ))}
       </Route>
-
       <Route element={<AuthRouteGuard />}>
         {mainRoutes.map((route) => (
           <Route key={route.path} path={route.path} element={route.element} />
