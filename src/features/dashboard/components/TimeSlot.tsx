@@ -55,7 +55,7 @@ export default function TimeSlot({ time, title, type = 'INTERVIEW' }: TimeSlotPr
           ) : (
             <p>
               <span className="inline-block w-max">[{title}]</span>
-              접수 마감
+              공고 마감
             </p>
           )}
         </div>
