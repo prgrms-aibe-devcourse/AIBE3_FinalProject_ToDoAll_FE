@@ -11,7 +11,7 @@ export default function LongViewContainer({
 }: {
   title: string;
   description: string;
-  detailUrl: string;
+  detailUrl?: string;
   className?: string;
   children: ReactNode;
 }) {
@@ -22,7 +22,7 @@ export default function LongViewContainer({
         className
       )}
     >
-      <DetailButton className="mb-[15px]" url={detailUrl} />
+      {detailUrl && <DetailButton className="mb-[15px]" url={detailUrl} />}
       <section className="mb-[15px] flex flex-col">
         <h2 className="text-jd-black font-bold">{title}</h2>
         <p className="text-jd-gray-dark text-sm">{description}</p>

@@ -96,6 +96,7 @@ export async function authRequest<T>(
   } catch (err: any) {
     if (err.name === 'AbortError') return null;
     console.error(err.message ?? err);
+    setToken('', '');
     throw err;
   }
 }
