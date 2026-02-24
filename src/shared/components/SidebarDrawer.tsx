@@ -184,7 +184,6 @@ export default function SidebarDrawer({ open, onClose }: Props) {
           </NavLink>
         </nav>
 
-        {/* 하단 사용자 카드 */}
         <div className="absolute right-0 bottom-0 left-0 px-3 py-3">
           <div
             role="button"
