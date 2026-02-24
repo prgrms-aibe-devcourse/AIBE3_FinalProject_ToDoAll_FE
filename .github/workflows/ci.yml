@@ -88,6 +88,8 @@ jobs:
       - name: Create .env
         run: |
           echo "VITE_API_URL=$VITE_API_URL" > .env
+          echo "VITE_DEMO_EMAIL=$VITE_DEMO_EMAIL" >> .env
+          echo "VITE_DEMO_PASSWORD=$VITE_DEMO_PASSWORD" >> .env
           
       - name: Run build
         run: npm run build
@@ -104,6 +106,8 @@ jobs:
       - name: Create .env
         run: |
           echo "VITE_API_URL=$VITE_API_URL" > .env
+          echo "VITE_DEMO_EMAIL=$VITE_DEMO_EMAIL" >> .env
+          echo "VITE_DEMO_PASSWORD=$VITE_DEMO_PASSWORD" >> .env
 
       - name: Vercel pull (preview)
         run: npx vercel pull --yes --environment=preview --token=$VERCEL_TOKEN

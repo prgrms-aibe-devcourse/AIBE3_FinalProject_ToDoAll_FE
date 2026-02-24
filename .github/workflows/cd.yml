@@ -21,6 +21,8 @@ jobs:
       - name: Create .env
         run: |
           echo "VITE_API_URL=$VITE_API_URL" > .env
+          echo "VITE_DEMO_EMAIL=$VITE_DEMO_EMAIL" >> .env
+          echo "VITE_DEMO_PASSWORD=$VITE_DEMO_PASSWORD" >> .env
 
       - name: Vercel pull (prod)
         run: npx vercel pull --yes --environment=production --token=$VERCEL_TOKEN
