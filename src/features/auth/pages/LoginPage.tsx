@@ -1,10 +1,10 @@
-import React, { useState, useContext } from 'react';
+import { useState, useContext, type SyntheticEvent } from 'react';
 import { AuthContext } from '@/AuthContext.ts';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../api/auth.api.ts';
 import { useAuthedClient } from '@shared/hooks/useAuthClient.ts';
 import AuthShell from '@features/auth/components/AuthShell.tsx';
 import { useAlertStore } from '@shared/store/useAlertStore.ts';
+import { login } from '@features/auth/api/auth.api.ts';
 
 export default function LoginPage() {
   const { setToken } = useContext(AuthContext);
@@ -14,12 +14,7 @@ export default function LoginPage() {
 
   const openAlertModal = useAlertStore((s) => s.action.openAlertModal);
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true); // 중복 클릭을 방지
-    const form = new FormData(e.target as HTMLFormElement);
-    const email = String(form.get('email') || ''); // 비어 있으면 공백 문자열
-    const password = String(form.get('password') || '');
+  const fetchLogin = async (email: string, password: string) => {
     try {
       const result = await login({ email, password }, client); // 서버에서 accessToken을 받기
       setToken(result.accessToken, result.refreshToken);
@@ -35,6 +30,24 @@ export default function LoginPage() {
     }
   };
 
+  const demoLogin = async () => {
+    const email = import.meta.env.VITE_DEMO_EMAIL as string;
+    const password = import.meta.env.VITE_DEMO_PASSWORD as string;
+    await fetchLogin(email, password);
+  };
+
+  const onSubmit = async (e: SyntheticEvent<HTMLFormElement, SubmitEvent>) => {
+    e.preventDefault();
+
+    setSubmitting(true); // 중복 클릭을 방지
+    const form = new FormData(e.target as HTMLFormElement);
+
+    const email = String(form.get('email') || ''); // 비어 있으면 공백 문자열
+    const password = String(form.get('password') || '');
+
+    await fetchLogin(email, password);
+  };
+
   return (
     <AuthShell
       caption={
@@ -47,9 +60,7 @@ export default function LoginPage() {
     >
       <div className="md:-translate-x-8">
         <form onSubmit={onSubmit} className="flex w-full flex-col gap-8">
-          {/* 입력 필드 그룹 */}
           <div className="flex flex-col gap-8 sm:gap-10">
-            {/* 이메일 */}
             <div className="flex flex-col gap-3">
               <label htmlFor="email" className="text-m text-jd-black block font-semibold">
                 계정 이메일
@@ -77,7 +88,6 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* 비밀번호 */}
             <div className="flex flex-col gap-3">
               <label htmlFor="password" className="text-m text-jd-black block font-semibold">
                 비밀번호
@@ -116,21 +126,31 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* 로그인 버튼 */}
-          <button
-            type="submit"
-            disabled={submitting}
-            className="relative z-10 h-[44px] w-full !rounded-[15px] !bg-[#F7A534] [background-image:none] !text-white opacity-100 shadow-[0_4px_12px_rgba(247,165,52,.25)] transition hover:brightness-[1.05] active:brightness-95"
-          >
-            <span
-              className="login-btn-text text-[17px] font-semibold"
-              style={{ fontVariationSettings: "'wght' 800" }}
+          <div className="flex flex-col gap-2">
+            <button
+              type="submit"
+              disabled={submitting}
+              className="relative z-10 h-[44px] w-full !rounded-[15px] !bg-[#F7A534] [background-image:none] !text-white opacity-100 shadow-[0_4px_12px_rgba(247,165,52,.25)] transition hover:brightness-[1.05] active:brightness-95"
             >
-              {submitting ? '로그인 중...' : '로그인'}
-            </span>
-          </button>
+              <span
+                className="login-btn-text text-[17px] font-semibold"
+                style={{ fontVariationSettings: "'wght' 800" }}
+              >
+                {submitting ? '로그인 중...' : '로그인'}
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={demoLogin}
+              disabled={submitting}
+              className="!bg-jd-gray-dark relative z-10 h-[44px] w-full !rounded-[15px] [background-image:none] !text-white opacity-100 shadow-[0_4px_12px_rgba(247,165,52,.25)] transition hover:brightness-[1.05] active:brightness-95"
+            >
+              <span className="login-btn-text text-[17px] font-medium">
+                {submitting ? '로그인 중...' : '데모 계정 로그인'}
+              </span>
+            </button>
+          </div>
 
-          {/* 하단 링크 */}
           <div className="mt-[-20px] text-center text-sm text-[#413F3F]">
             <button
               type="button"
