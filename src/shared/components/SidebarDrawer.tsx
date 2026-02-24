@@ -1,11 +1,12 @@
 import { useEffect, useState, useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import ConfirmLogoutModal from '@features/user/components/ConfirmLogoutModal.tsx';
 import { getMe } from '@features/user/api/user.api.ts';
 import { logout } from '@features/auth/api/auth.api.ts';
 import { userDefaultImage } from '@/const.ts';
 import { AuthContext } from '@/AuthContext.ts';
 import { useAuthedClient } from '@shared/hooks/useAuthClient.ts';
+import cn from '@/lib/utils/cn';
 
 type Props = {
   open: boolean;
@@ -29,7 +30,6 @@ export default function SidebarDrawer({ open, onClose }: Props) {
   const client = useAuthedClient();
 
   useEffect(() => {
-    // 드로어가 열려 있을 때만 불러와도 되고, 한 번만 불러와도 됨
     getMe(client)
       .then((data) => {
         const userData = data as {
@@ -46,7 +46,6 @@ export default function SidebarDrawer({ open, onClose }: Props) {
       })
       .catch((err) => {
         console.error('SidebarDrawer getMe 실패:', err);
-        // 실패해도 UI는 기본 아바타 + 빈 텍스트로 표시
         setUser({
           nickname: '',
           email: '',
@@ -55,7 +54,6 @@ export default function SidebarDrawer({ open, onClose }: Props) {
       });
   }, [client]);
 
-  //  MyPage에서 브로드캐스트한 프로필 변경 이벤트 수신
   useEffect(() => {
     const handler = (e: Event) => {
       const custom = e as CustomEvent<string | null>;
@@ -76,18 +74,14 @@ export default function SidebarDrawer({ open, onClose }: Props) {
 
   return (
     <>
-      {/* 드로어 패널 */}
       <aside
         onClick={(e) => e.stopPropagation()}
         className={`fixed top-12 left-0 z-50 h-[calc(100vh-3rem)] w-[200px] bg-white text-[var(--color-jd-black)] shadow-[0_12px_30px_rgba(0,0,0,.25)] ring-1 ring-[var(--color-jd-violet)]/25 transition-transform duration-300 will-change-transform sm:w-[220px] md:w-[240px] ${open ? 'translate-x-0' : '-translate-x-full'} `}
         aria-label="Side controller"
       >
-        {/* 로고 + 슬로건 */}
         <div className="flex flex-col items-start gap-1 px-4 pt-4 pb-3">
-          {/* 로고 */}
           <img src="/logo/header-logo.png" alt="jobda" className="object-containc h-18 w-auto" />
 
-          {/* 슬로건 */}
           <span className="text-left text-[12px] leading-tight font-medium text-gray-500">
             당신의 채용 여정에 함께하는 AI 코파일럿
           </span>
@@ -95,14 +89,17 @@ export default function SidebarDrawer({ open, onClose }: Props) {
 
         <div className="h-px bg-[var(--color-jd-gray-light)]" />
 
-        {/* 메뉴 */}
         <nav className="space-y-1 px-3 py-3">
-          <Link
+          <NavLink
             to="/dashboard"
-            className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-[var(--color-jd-white)]"
+            className={({ isActive }) =>
+              cn(
+                'flex items-center gap-3 rounded-lg px-3 py-2',
+                isActive ? 'bg-jd-gray-light' : 'hover:bg-jd-white'
+              )
+            }
             onClick={onClose}
           >
-            {/* 아이콘 */}
             <svg
               width="18"
               height="18"
@@ -115,11 +112,16 @@ export default function SidebarDrawer({ open, onClose }: Props) {
               />
             </svg>
             <span className="text-sm">대시보드</span>
-          </Link>
+          </NavLink>
 
-          <Link
+          <NavLink
             to="/jobs"
-            className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-[var(--color-jd-white)]"
+            className={({ isActive }) =>
+              cn(
+                'flex items-center gap-3 rounded-lg px-3 py-2',
+                isActive ? 'bg-jd-gray-light' : 'hover:bg-jd-white'
+              )
+            }
             onClick={onClose}
           >
             <svg
@@ -134,11 +136,16 @@ export default function SidebarDrawer({ open, onClose }: Props) {
               />
             </svg>
             <span className="text-sm">공고 관리</span>
-          </Link>
+          </NavLink>
 
-          <Link
+          <NavLink
             to="/matches"
-            className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-[var(--color-jd-white)]"
+            className={({ isActive }) =>
+              cn(
+                'flex items-center gap-3 rounded-lg px-3 py-2',
+                isActive ? 'bg-jd-gray-light' : 'hover:bg-jd-white'
+              )
+            }
             onClick={onClose}
           >
             <svg
@@ -153,11 +160,16 @@ export default function SidebarDrawer({ open, onClose }: Props) {
               />
             </svg>
             <span className="text-sm">지원자 조회</span>
-          </Link>
+          </NavLink>
 
-          <Link
+          <NavLink
             to="/interview/manage"
-            className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-[var(--color-jd-white)]"
+            className={({ isActive }) =>
+              cn(
+                'flex items-center gap-3 rounded-lg px-3 py-2',
+                isActive ? 'bg-jd-gray-light' : 'hover:bg-jd-white'
+              )
+            }
             onClick={onClose}
           >
             <svg
@@ -169,7 +181,7 @@ export default function SidebarDrawer({ open, onClose }: Props) {
               <path d="M3 4h18v14H6l-3 3V4Z" fill="currentColor" />
             </svg>
             <span className="text-sm">면접 관리</span>
-          </Link>
+          </NavLink>
         </nav>
 
         {/* 하단 사용자 카드 */}
@@ -222,23 +234,19 @@ export default function SidebarDrawer({ open, onClose }: Props) {
           </div>
         </div>
       </aside>
-      {/* 로그아웃 확인 모달 */}
       <ConfirmLogoutModal
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
         onConfirm={async () => {
           setConfirmOpen(false);
           try {
-            // 실제 로그아웃 API + sessionStorage 토큰 삭제
             await logout(client);
           } catch (error) {
             console.error('로그아웃 API 호출 실패:', error);
           } finally {
-            // 재인증 시간 등 추가 상태도 정리
             localStorage.removeItem('reauthAt');
             clearToken();
 
-            // 드로어 닫고 로그인 페이지로 이동
             onClose();
             navigate('/login', { replace: true });
           }
