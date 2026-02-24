@@ -15,7 +15,6 @@ export default function LoginPage() {
   const openAlertModal = useAlertStore((s) => s.action.openAlertModal);
 
   const fetchLogin = async (email: string, password: string) => {
-    console.log(email, password);
     try {
       const result = await login({ email, password }, client); // 서버에서 accessToken을 받기
       setToken(result.accessToken, result.refreshToken);
