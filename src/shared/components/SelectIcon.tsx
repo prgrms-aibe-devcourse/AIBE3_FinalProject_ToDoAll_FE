@@ -9,6 +9,8 @@ import {
   type LucideProps,
   CalendarClock,
   CalendarCheck,
+  PanelLeftOpen,
+  PanelLeftClose,
 } from 'lucide-react';
 
 interface SelectIconProps {
@@ -35,6 +37,10 @@ const SelectIcon = memo(function SelectIcon({ name, className, customize }: Sele
       return <CalendarClock className={className} {...customize} />;
     case 'calendar-check':
       return <CalendarCheck className={className} {...customize} />;
+    case 'panel-left-open':
+      return <PanelLeftOpen className={className} {...customize} />;
+    case 'panel-left-close':
+      return <PanelLeftClose className={className} {...customize} />;
     default:
       return <CircleDashed className={className} {...customize} />;
   }

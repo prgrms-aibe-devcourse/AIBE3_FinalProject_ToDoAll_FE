@@ -1,6 +1,6 @@
 import type { JobPost, JobStatus } from '../types/JobPost.types';
 import type { JobDetail } from '../types/JobDetail.types';
-import { BASE_URL } from '@/lib/utils/base';
+import type { ClientRequestType } from '@shared/hooks/useAuthClient.ts';
 export type ApiResponse<T> = {
   errorCode?: number;
   message?: string;
@@ -30,15 +30,21 @@ type JobPostListItemResponse = {
   thumbnailUrl?: string | null;
 };
 
-export async function fetchJobPosts(page = 0, size = 10): Promise<JobPost[]> {
-  const res = await fetch(`${BASE_URL}/api/v1/jd?page=${page}&size=${size}`, {
-    method: 'GET',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-  });
-  const body = (await res.json()) as ApiResponse<SpringPage<JobPostListItemResponse>>;
-  if (!body.data) throw new Error(body.message ?? 'Empty response');
-  return body.data.content.map((it) => ({
+export async function fetchJobPosts(
+  client: ClientRequestType,
+  page = 0,
+  size = 10
+): Promise<JobPost[]> {
+  const res = await client.request<SpringPage<JobPostListItemResponse>>(
+    `/api/v1/jd?page=${page}&size=${size}`,
+    {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    }
+  );
+
+  if (!res) throw new Error('Empty response');
+  return res.content.map((it) => ({
     id: String(it.id),
     title: it.title,
     location: it.location ?? '—(location 미정)—',
@@ -79,15 +85,13 @@ const toArray = (v?: string[] | string | null): string[] => {
     .map((s) => s.trim())
     .filter(Boolean);
 };
-export async function fetchJobDetail(id: string): Promise<JobDetail> {
-  const res = await fetch(`${BASE_URL}/api/v1/jd/${id}`, {
+export async function fetchJobDetail(client: ClientRequestType, id: string): Promise<JobDetail> {
+  const res = await client.request<JobDetailResponse>(`/api/v1/jd/${id}`, {
     method: 'GET',
-    credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
   });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const body = (await res.json()) as ApiResponse<JobDetailResponse>;
-  const dto = body.data!;
+
+  const dto = res!;
   return {
     id: String(dto.id),
     title: dto.title,
@@ -128,19 +132,20 @@ export type JobCreateRequest = {
   preferredSkills?: string[];
 };
 
-export async function createJobPost(request: JobCreateRequest): Promise<string> {
-  const res = await fetch(`${BASE_URL}/api/v1/jd`, {
+export async function createJobPost(
+  client: ClientRequestType,
+  request: JobCreateRequest
+): Promise<string> {
+  const res = await client.request<number>('/api/v1/jd', {
     method: 'POST',
-    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(request),
+    body: request,
   });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const body = (await res.json()) as ApiResponse<number>;
-  if (!body.data) throw new Error(body.message ?? 'Empty response');
-  return String(body.data);
+
+  if (!res) throw new Error('Empty response');
+  return String(res);
 }
 
 export type Skill = {
@@ -148,68 +153,74 @@ export type Skill = {
   name: string;
 };
 
-export async function fetchSkills(): Promise<Skill[]> {
-  const res = await fetch(`${BASE_URL}/api/v1/jd/skills`, {
+export async function fetchSkills(client: ClientRequestType): Promise<Skill[]> {
+  const res = await client.request<Skill[]>(`/api/v1/jd/skills`, {
     method: 'GET',
-    credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
   });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-  const body = (await res.json()) as ApiResponse<Skill[]>;
-  if (!body.data) {
-    throw new Error(body.message ?? 'Empty skills response');
+  if (!res) {
+    throw new Error('Empty skills response');
   }
-  return body.data;
+  return res;
 }
 
-export async function updateJobStatus(id: string | number, status: JobStatus) {
-  const res = await fetch(`${BASE_URL}/api/v1/jd/${id}/status`, {
-    method: 'PATCH',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ status }),
-  });
-
-  if (!res.ok) {
-    throw new Error('상태 변경 실패');
-  }
-
-  const body = (await res.json()) as ApiResponse<{ id: number; status: JobStatus }>;
-  return body.data;
-}
-
-export async function updateJobPost(id: string | number, request: JobCreateRequest): Promise<void> {
-  const res = await fetch(`${BASE_URL}/api/v1/jd/${id}`, {
-    method: 'PATCH',
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
+export async function updateJobStatus(
+  client: ClientRequestType,
+  id: string | number,
+  status: JobStatus
+) {
+  const res = await client.request<{ id: number; status: JobStatus }>(
+    `/api/v1/jd/${id}/status`,
+    {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: { status },
     },
-    body: JSON.stringify(request),
-  });
+    '상태 변경 실패'
+  );
 
-  if (!res.ok) {
-    const body = (await res.json().catch(() => null)) as ApiResponse<unknown> | null;
-    throw new Error(body?.message ?? `공고 수정 실패 (HTTP ${res.status})`);
-  }
+  return res!;
 }
 
-export async function updateJobThumbnail(jobId: string, thumbnailFile: File): Promise<string> {
+export async function updateJobPost(
+  client: ClientRequestType,
+  id: string | number,
+  request: JobCreateRequest
+): Promise<void> {
+  await client.request(
+    `/api/v1/jd/${id}`,
+    {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: request,
+    },
+    '공고 수정 실패'
+  );
+}
+
+export async function updateJobThumbnail(
+  client: ClientRequestType,
+  jobId: string,
+  thumbnailFile: File
+): Promise<string> {
   const formData = new FormData();
 
   // 💡 백엔드 @RequestPart("thumbnailFile") 이름과 일치
   formData.append('thumbnailFile', thumbnailFile);
 
-  const res = await fetch(`${BASE_URL}/api/v1/jd/${jobId}/thumbnail`, {
-    method: 'PATCH', // 💡 HTTP 메서드는 PATCH
-    credentials: 'include',
-    // 🚨 Content-Type 헤더를 설정하지 않아야 합니다. 브라우저가 자동으로 multipart/form-data를 설정합니다.
-    body: formData,
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const res = await client.request<string>(
+    `/api/v1/jd/${jobId}/thumbnail`,
+    {
+      method: 'PATCH', // 💡 HTTP 메서드는 PATCH
+      body: formData,
+    },
+    null,
+    true
+  );
 
-  const body = (await res.json()) as ApiResponse<string>; // 서버는 File Key를 반환함
-  if (!body.data) throw new Error(body.message ?? 'Empty response');
-  return body.data;
+  if (!res) throw new Error('Empty response');
+  return res;
 }

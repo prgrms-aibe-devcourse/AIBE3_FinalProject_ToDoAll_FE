@@ -6,8 +6,9 @@ import PrivacyModal from '../components/PrivacyModal';
 import ReqBadge from '../components/ReqBadge';
 import { buildPasswordChecks } from '../utils/passwordChecks';
 import { signup } from '../api/auth.api.ts';
-import AlertModal from '@components/Alertmodal.tsx';
+import AlertModal from '@shared/components/Alertmodal.tsx';
 import type { PositionValue } from '@features/user/components/PositionSelect.tsx';
+import { useAuthedClient } from '@shared/hooks/useAuthClient.ts';
 
 const POSITION_OPTIONS: { value: PositionValue; label: string }[] = [
   { value: 'OWNER', label: '대표 / Founder' },
@@ -21,14 +22,12 @@ export default function SignupFormPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  // URL에서 email + token 둘 다 읽기
   const token = searchParams.get('token'); // URL에서 토큰만 읽음
   const emailFromUrl = searchParams.get('email') ?? ''; // 인증된 회사 이메일
 
   const [companyEmail, setCompanyEmail] = useState(emailFromUrl);
   const [loading, setLoading] = useState(true);
 
-  // 필수 입력값 상태들 — 컴포넌트 "안"에서 선언
   const [name, setName] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [position, setPosition] = useState<PositionValue | ''>('');
@@ -37,12 +36,11 @@ export default function SignupFormPage() {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [nickname, setNickname] = useState('');
 
-  // 비밀번호 입력 상태
-
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
 
-  // 모달 트리거 버튼 ref
+  const client = useAuthedClient();
+
   const openPrivacyBtnRef = useRef<HTMLButtonElement | null>(null);
 
   const [alertModal, setAlertModal] = useState({
@@ -175,15 +173,18 @@ export default function SignupFormPage() {
     const finalPosition = position === 'OTHER' ? customPosition.trim() : (position as string);
 
     try {
-      await signup({
-        token,
-        email: companyEmail,
-        name,
-        nickname,
-        position: finalPosition,
-        companyName,
-        password,
-      });
+      await signup(
+        {
+          token,
+          email: companyEmail,
+          name,
+          nickname,
+          position: finalPosition,
+          companyName,
+          password,
+        },
+        client
+      );
 
       showAlert('가입이 완료되었습니다.\n로그인 해주세요.', 'success');
       navigate('/login', { replace: true });

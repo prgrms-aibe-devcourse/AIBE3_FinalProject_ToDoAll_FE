@@ -1,3 +1,5 @@
+import type { ClientRequestType } from '@shared/hooks/useAuthClient.ts';
+
 export interface JobDescription {
   id: number;
   title: string;
@@ -33,21 +35,19 @@ const toArray = (v?: string[] | string | null): string[] => {
     .filter(Boolean);
 };
 
-export async function getJobDescription(id: number): Promise<JobDescription> {
-  const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8080').replace(/\/$/, '');
-  const res = await fetch(`${BASE_URL}/api/v1/jd/${id}`);
+export async function getJobDescription(
+  client: ClientRequestType,
+  id: number
+): Promise<JobDescription> {
+  const res = await client.request<JobDescription>(
+    `/api/v1/jd/${id}`,
+    {},
+    '공고 정보를 불러올 수 없습니다.'
+  );
 
-  if (!res.ok) {
-    throw new Error(`공고 정보를 불러올 수 없습니다. (HTTP ${res.status})`);
-  }
+  if (!res) throw new Error('Empty response');
 
-  const body = (await res.json()) as ApiResponse<JobDescription>;
-
-  if (!body.data) {
-    throw new Error(body.message ?? 'Empty response');
-  }
-
-  const dto = body.data;
+  const dto = res;
 
   return {
     id: dto.id,

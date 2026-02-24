@@ -1,5 +1,6 @@
 // src/components/ConfirmLogoutModal.tsx
 import { logout } from '../../auth/api/auth.api.ts';
+import { useAuthedClient } from '@shared/hooks/useAuthClient.ts';
 
 type Props = {
   open: boolean;
@@ -8,6 +9,7 @@ type Props = {
 };
 
 export default function ConfirmLogoutModal({ open, onConfirm, onClose }: Props) {
+  const client = useAuthedClient();
   if (!open) return null;
 
   return (
@@ -28,7 +30,7 @@ export default function ConfirmLogoutModal({ open, onConfirm, onClose }: Props) 
           <button
             onClick={async () => {
               try {
-                await logout(); // 서버 세션 종료 및 refreshToken 쿠키 제거
+                await logout(client); // 서버 세션 종료 및 refreshToken 쿠키 제거
               } finally {
                 onConfirm(); // 부모 컴포넌트로 알림 (ex: 화면 전환, 모달 닫기)
               }

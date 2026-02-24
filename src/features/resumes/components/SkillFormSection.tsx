@@ -3,6 +3,7 @@ import type { Skill } from '../types/resumes.types';
 import CustomSelect from './CustomSelect';
 import { Pill } from '../../jd/components/shared/Pill';
 import { fetchSkills } from '../../jd/services/jobApi';
+import { useAuthedClient } from '@shared/hooks/useAuthClient.ts';
 
 export default function SkillFormSection({
   skills,
@@ -16,11 +17,13 @@ export default function SkillFormSection({
   const [open, setOpen] = useState(false);
   const [skillOptions, setSkillOptions] = useState<string[]>([]);
 
+  const client = useAuthedClient();
+
   // 스킬 옵션 로드
   useEffect(() => {
     const loadSkills = async () => {
       try {
-        const data = await fetchSkills();
+        const data = await fetchSkills(client);
         setSkillOptions(data.map((s) => s.name));
       } catch (err) {
         console.error('fetchSkills error:', err);
@@ -66,7 +69,7 @@ export default function SkillFormSection({
         <h2 className="text-lg font-semibold">스킬</h2>
       </div>
 
-      <div className="p-4">
+      <div className="">
         <div className="relative mb-4">
           <div className="flex flex-wrap items-center gap-2 rounded-xl border border-[#E0E0E0] bg-[#FAF8F8] p-2">
             <input

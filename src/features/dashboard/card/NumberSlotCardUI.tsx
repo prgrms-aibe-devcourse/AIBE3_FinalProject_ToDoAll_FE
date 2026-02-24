@@ -1,4 +1,4 @@
-import Badge, { type BadgeType } from '@components/dashboard/Badge.tsx';
+import Badge, { type BadgeType } from '@features/dashboard/components/Badge.tsx';
 
 const STATUS_INFO = {
   DOCUMENT: {
@@ -45,7 +45,7 @@ export default function NumberSlotsCard({ title, slotData, status }: NumberSlots
       </h3>
       <section className="mb-[10px] flex w-full flex-row flex-wrap justify-around gap-6 sm:gap-4">
         {['지원자', '북마크', '면접', '합격'].map((item, index) => {
-          if (index == 1) return <></>;
+          if (index == 1) return null;
           return <SlotCard key={index} title={item} value={slotData[index]} />;
         })}
       </section>

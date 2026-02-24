@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import type { ResumeData } from '../types/resumes.types';
 import checkImg from '../../../assets/Done.png';
 import { checkMatch } from '../../match/api/matchApi';
-import AlertModal from '../../../components/Alertmodal';
+import AlertModal from '@shared/components/Alertmodal.tsx';
+import { useAuthedClient } from '@shared/hooks/useAuthClient.ts';
 
 interface ApplicantStatusProps {
   data: ResumeData;
@@ -12,10 +13,11 @@ interface ApplicantStatusProps {
 export default function ApplicantStatus({ data }: ApplicantStatusProps) {
   const navigate = useNavigate();
   const [showErrorModal, setShowErrorModal] = useState(false);
+  const client = useAuthedClient();
 
   const handleInterviewInvite = async () => {
     try {
-      await checkMatch(data.jdId, Number(data.id));
+      await checkMatch(client, data.jdId, Number(data.id));
       navigate(`/interview/create?resumeId=${data.id}&jdId=${data.jdId}`);
     } catch (error) {
       console.error('매칭 확정 실패:', error);
@@ -24,7 +26,7 @@ export default function ApplicantStatus({ data }: ApplicantStatusProps) {
   };
 
   return (
-    <div className="flex w-96 items-center justify-between rounded-lg p-4">
+    <div className="flex items-center justify-between rounded-lg p-4">
       <div>
         <h3 className="text-[30px] font-semibold text-[#413F3F]">{data.name}</h3>
         <div className="flex gap-2">

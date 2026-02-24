@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 
 import ChatSection from '../components/chat/ChatSection';
-import useInterviewSocket from '@/hooks/useInterviewSocket';
+import useInterviewSocket from '@shared/hooks/useInterviewSocket';
 import { MessageType, type OutgoingChatMessage } from '@/features/interview/types/chatroom';
 
 import { getInterviewDetailWithGuestToken } from '@/features/interview/api/interview-detail.api';
@@ -12,6 +12,7 @@ import {
 } from '@/features/interview/api/question.api';
 
 import { DEFAULT_AVATAR, normalizeAvatarUrl } from '../util/avatar';
+import { useAuthedClient } from '@shared/hooks/useAuthClient.ts';
 
 type UiMsg = { id: number; text: string; senderId: number; isMine: boolean };
 const GUEST_SENDER_ID = 0;
@@ -29,6 +30,8 @@ export default function InterviewChatRoomGuest() {
 
   const [_candidateAvatar, setCandidateAvatar] = useState<string>(DEFAULT_AVATAR);
   const [_resumeId, setResumeId] = useState<number | null>(null);
+
+  const client = useAuthedClient();
 
   const pendingRef = useRef<{ content: string; at: number }[]>([]);
   const cleanupPending = useCallback(() => {
@@ -51,7 +54,7 @@ export default function InterviewChatRoomGuest() {
 
     (async () => {
       try {
-        const detail = await getInterviewDetailWithGuestToken(interviewId, interviewToken);
+        const detail = await getInterviewDetailWithGuestToken(client, interviewId, interviewToken);
         console.log('[GUEST DETAIL]', detail);
 
         setResumeId(detail.resumeId ?? null);
@@ -73,7 +76,7 @@ export default function InterviewChatRoomGuest() {
 
     (async () => {
       try {
-        const history = await getChatHistoryWithGuestToken(interviewId, interviewToken);
+        const history = await getChatHistoryWithGuestToken(client, interviewId, interviewToken);
 
         const mapped: UiMsg[] = history.map((m: ChatMessage) => ({
           id: m.id,

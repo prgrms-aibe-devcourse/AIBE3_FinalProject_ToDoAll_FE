@@ -5,7 +5,8 @@ import ApplicantProfileCard from '../components/create/ApplicantProfileCard';
 import InterviewerSearchBox from '../components/create/InterviewerSearchBox';
 import InvitedList from '../components/create/InvitedList';
 import SchedulePicker from '../components/create/SchedulePicker';
-import useFetch from '@/hooks/useFetch';
+import useFetch from '@shared/hooks/useFetch';
+import PageTitle from '@shared/components/PageTitile.tsx';
 
 export default function InterviewCreatePage() {
   const navigate = useNavigate();
@@ -190,11 +191,9 @@ export default function InterviewCreatePage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#fbf9f9] px-12 py-8">
-      <h1 className="mt-4 w-40 text-xl font-semibold">면접 생성</h1>
-
-      <div className="mt-16 mr-40 flex flex-1 items-start justify-center rounded-3xl bg-white p-10 shadow-xl">
-        <div className="flex w-full max-w-5xl gap-12">
+    <PageTitle title={'면접 생성'} description={''}>
+      <div className="flex flex-1 items-start justify-center rounded-3xl bg-white p-10 shadow-xl">
+        <div className="flex w-full max-w-5xl flex-col gap-12 md:flex-row">
           {/* 지원자 카드 */}
           <div className="flex-1">
             <ApplicantProfileCard applicant={profile} />
@@ -225,6 +224,6 @@ export default function InterviewCreatePage() {
           </div>
         </div>
       </div>
-    </div>
+    </PageTitle>
   );
 }

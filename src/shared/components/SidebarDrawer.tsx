@@ -1,11 +1,11 @@
 import { useEffect, useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import ConfirmLogoutModal from '../features/user/components/ConfirmLogoutModal.tsx';
-import { getMe } from '../features/user/api/user.api.ts';
-import { logout } from '../features/auth/api/auth.api.ts';
-import { API_ORIGIN } from '@lib/utils/base.ts';
+import ConfirmLogoutModal from '@features/user/components/ConfirmLogoutModal.tsx';
+import { getMe } from '@features/user/api/user.api.ts';
+import { logout } from '@features/auth/api/auth.api.ts';
 import { userDefaultImage } from '@/const.ts';
 import { AuthContext } from '@/AuthContext.ts';
+import { useAuthedClient } from '@shared/hooks/useAuthClient.ts';
 
 type Props = {
   open: boolean;
@@ -24,11 +24,13 @@ export default function SidebarDrawer({ open, onClose }: Props) {
 
   const [user, setUser] = useState<DrawerUser | null>(null);
   const { clearToken } = useContext(AuthContext);
-  const avatarUrl = user?.profileUrl || API_ORIGIN + userDefaultImage;
+  const avatarUrl = user?.profileUrl || userDefaultImage;
+
+  const client = useAuthedClient();
 
   useEffect(() => {
     // 드로어가 열려 있을 때만 불러와도 되고, 한 번만 불러와도 됨
-    getMe()
+    getMe(client)
       .then((data) => {
         const userData = data as {
           nickname?: string | null;
@@ -51,7 +53,7 @@ export default function SidebarDrawer({ open, onClose }: Props) {
           profileUrl: null,
         });
       });
-  }, []);
+  }, [client]);
 
   //  MyPage에서 브로드캐스트한 프로필 변경 이벤트 수신
   useEffect(() => {
@@ -228,7 +230,7 @@ export default function SidebarDrawer({ open, onClose }: Props) {
           setConfirmOpen(false);
           try {
             // 실제 로그아웃 API + sessionStorage 토큰 삭제
-            await logout();
+            await logout(client);
           } catch (error) {
             console.error('로그아웃 API 호출 실패:', error);
           } finally {

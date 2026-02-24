@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, type Dispatch, type SetStateAction } from 'react';
 import { useNavigate } from 'react-router-dom';
-import SidebarDrawer from '../../components/SidebarDrawer';
-import useFetch from '@/hooks/useFetch';
+import useFetch from '@shared/hooks/useFetch.ts';
+import SelectIcon from '@shared/components/SelectIcon.tsx';
 
 let baseUrl = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 
@@ -14,27 +14,17 @@ type Notice = {
   readFlag?: boolean;
 };
 
-const Header = () => {
+const Header = ({
+  drawerOpen,
+  setDrawerOpen,
+}: {
+  drawerOpen: boolean;
+  setDrawerOpen: Dispatch<SetStateAction<boolean>>;
+}) => {
   const navigate = useNavigate();
-  const [leftOpen, setLeftOpen] = useState(false);
   const [notiOpen, setNotiOpen] = useState(false);
 
   const [notices, setNotices] = useState<Notice[]>([]);
-
-  useEffect(() => {
-    window.dispatchEvent(new CustomEvent('drawer-state-change', { detail: leftOpen }));
-  }, [leftOpen]);
-
-  useEffect(() => {
-    const handleCloseDrawer = () => {
-      setLeftOpen(false);
-    };
-
-    window.addEventListener('close-drawer', handleCloseDrawer);
-    return () => {
-      window.removeEventListener('close-drawer', handleCloseDrawer);
-    };
-  }, []);
 
   /** GET 알림 목록 */
   const { resData: notifications } = useFetch<
@@ -221,17 +211,19 @@ const Header = () => {
     <>
       {/* 헤더 영역 */}
       <header className="fixed top-0 right-0 left-0 z-50 flex h-12 w-full items-center justify-between bg-[var(--color-jd-violet)] px-4 text-white shadow-[0_6px_22px_rgba(0,0,0,.15)]">
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            aria-label={leftOpen ? '메뉴 닫기' : '메뉴 열기'}
-            onClick={() => setLeftOpen((prev) => !prev)}
-          >
-            <svg width="20" height="18" viewBox="0 0 24 24" fill="none" className="text-white">
-              <path d="M3 6h18v2H3V6Zm0 5h18v2H3v-2Zm0 5h18v2H3v-2Z" fill="currentColor" />
-            </svg>
-          </button>
-        </div>
+        <button
+          type="button"
+          aria-label={drawerOpen ? '메뉴 닫기' : '메뉴 열기'}
+          onClick={() =>
+            setDrawerOpen((prev) => {
+              window.localStorage.setItem('drawerOpen', (!prev).toString());
+              return !prev;
+            })
+          }
+          className="cursor-pointer"
+        >
+          <SelectIcon name={drawerOpen ? 'panel-left-close' : 'panel-left-open'} />
+        </button>
 
         {/* 알림 버튼 */}
         <div className="relative">
@@ -314,8 +306,6 @@ const Header = () => {
 
       {/* 헤더 높이만큼 패딩 */}
       <div className="h-12" />
-
-      <SidebarDrawer open={leftOpen} onClose={() => setLeftOpen(false)} />
     </>
   );
 };

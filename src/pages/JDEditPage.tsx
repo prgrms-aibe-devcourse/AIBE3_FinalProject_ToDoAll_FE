@@ -8,6 +8,7 @@ import {
   type JobCreateRequest,
   updateJobThumbnail,
 } from '../features/jd/services/jobApi';
+import { useAuthedClient } from '@shared/hooks/useAuthClient.ts';
 
 type Skill = {
   id: number;
@@ -20,11 +21,15 @@ const JDEditPage: React.FC = () => {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [initialValues, setInitialValues] = useState<JobPostFormValues | null>(null);
   const navigate = useNavigate();
+  const client = useAuthedClient();
 
   useEffect(() => {
     const load = async () => {
       try {
-        const [skillsRes, job] = await Promise.all([fetchSkills(), fetchJobDetail(id as string)]);
+        const [skillsRes, job] = await Promise.all([
+          fetchSkills(client),
+          fetchJobDetail(client, id as string),
+        ]);
         setSkills(skillsRes);
 
         setInitialValues({
@@ -103,9 +108,9 @@ const JDEditPage: React.FC = () => {
       }
       const { thumbnailFile, ...otherValues } = values;
       const baseRequest = mapToJobUpdateRequest(otherValues);
-      await updateJobPost(id, baseRequest);
+      await updateJobPost(client, id, baseRequest);
       if (thumbnailFile instanceof File) {
-        await updateJobThumbnail(id, thumbnailFile);
+        await updateJobThumbnail(client, id, thumbnailFile);
       }
 
       alert('공고가 수정되었습니다.');

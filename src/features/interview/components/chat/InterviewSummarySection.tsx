@@ -68,7 +68,7 @@ export default function InterviewSummarySection({
   );
 
   return (
-    <div className="border-jd-gray-light flex max-h-full w-[25%] flex-col overflow-hidden rounded-2xl border bg-white shadow-md">
+    <div className="border-jd-gray-light flex flex-3 flex-col overflow-hidden rounded-2xl border bg-white shadow-md">
       <div className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent flex-1 space-y-3 overflow-y-auto p-6">
         {/* 새 메모 작성 영역 */}
         {!isWriting && !mySummary && (

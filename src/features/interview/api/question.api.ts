@@ -1,4 +1,4 @@
-import { authedRequest } from '@/lib/utils/authedRequest';
+import type { ClientRequestType } from '@shared/hooks/useAuthClient.ts';
 
 export interface InterviewQuestion {
   questionId: number;
@@ -26,90 +26,81 @@ export interface InterviewMemo {
   updatedAt: string;
 }
 
-type CommonResponse<T> = {
-  errorCode: number;
-  message: string;
-  data: T;
-};
-
-export async function getInterviewQuestions(interviewId: number): Promise<InterviewQuestion[]> {
-  const res = await authedRequest<CommonResponse<InterviewQuestion[]>>(
+export async function getInterviewQuestions(
+  client: ClientRequestType,
+  interviewId: number
+): Promise<InterviewQuestion[]> {
+  const res = await client.request<InterviewQuestion[]>(
     `/api/v1/interviews/${interviewId}/questions`,
     { method: 'GET' }
   );
-  return res.data ?? [];
+
+  return res ?? [];
 }
 
 export async function toggleQuestionCheck(
+  client: ClientRequestType,
   interviewId: number,
   questionId: number
 ): Promise<InterviewQuestion> {
-  const res = await authedRequest<CommonResponse<InterviewQuestion>>(
+  const res = await client.request<InterviewQuestion>(
     `/api/v1/interviews/${interviewId}/questions/${questionId}/toggle-check`,
     { method: 'PATCH' }
   );
-  return res.data;
+
+  return res!;
 }
 
-export async function getChatHistory(interviewId: number): Promise<ChatMessage[]> {
-  const res = await authedRequest<CommonResponse<ChatMessage[]>>(
-    `/api/v1/interviews/${interviewId}/chat`,
-    { method: 'GET' }
-  );
-  return res.data ?? [];
+export async function getChatHistory(
+  client: ClientRequestType,
+  interviewId: number
+): Promise<ChatMessage[]> {
+  const res = await client.request<ChatMessage[]>(`/api/v1/interviews/${interviewId}/chat`, {
+    method: 'GET',
+  });
+
+  return res ?? [];
 }
 
 export async function getChatHistoryWithGuestToken(
+  client: ClientRequestType,
   interviewId: number,
   guestToken: string
 ): Promise<ChatMessage[]> {
-  const BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
-  const url = `${BASE_URL}/api/v1/interviews/${interviewId}/chat`;
-
-  const res = await fetch(url, {
+  const res = await client.request<ChatMessage[]>(`/api/v1/interviews/${interviewId}/chat`, {
     method: 'GET',
     headers: {
       'Interview-Token': guestToken,
     },
-    credentials: 'include',
   });
 
-  let body: unknown = null;
-  try {
-    body = await res.json();
-  } catch {
-    body = null;
-  }
-
-  if (!res.ok) {
-    const message = (body as any)?.message ?? `요청 실패 (status=${res.status})`;
-    throw new Error(message);
-  }
-
-  const response = body as CommonResponse<ChatMessage[]>;
-  return response.data ?? [];
+  return res ?? [];
 }
 
-export async function getInterviewMemos(interviewId: number): Promise<InterviewMemo[]> {
-  const res = await authedRequest<CommonResponse<InterviewMemo[]>>(
-    `/api/v1/interviews/${interviewId}/memos`,
-    { method: 'GET' }
-  );
-  return res.data ?? [];
+export async function getInterviewMemos(
+  client: ClientRequestType,
+  interviewId: number
+): Promise<InterviewMemo[]> {
+  const res = await client.request<InterviewMemo[]>(`/api/v1/interviews/${interviewId}/memos`, {
+    method: 'GET',
+  });
+
+  return res ?? [];
 }
 
 export async function updateInterviewMemo(
+  client: ClientRequestType,
   interviewId: number,
   memoId: number,
   content: string
 ): Promise<{ memoId: number; content: string; updatedAt: string }> {
-  const res = await authedRequest<
-    CommonResponse<{ memoId: number; content: string; updatedAt: string }>
-  >(`/api/v1/interviews/${interviewId}/memos/${memoId}`, {
-    method: 'PATCH', // 서버가 PUT이면 PUT으로 변경
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ content }),
-  });
+  const res = await client.request<{ memoId: number; content: string; updatedAt: string }>(
+    `/api/v1/interviews/${interviewId}/memos/${memoId}`,
+    {
+      method: 'PATCH', // 서버가 PUT이면 PUT으로 변경
+      body: { content },
+    }
+  );
 
-  return res.data;
+  return res!;
 }

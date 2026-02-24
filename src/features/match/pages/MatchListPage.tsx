@@ -12,6 +12,8 @@ import { mapMatchDtoToCardData } from '../utils/mapMatchDtoToCardData';
 import { mapRecommendationToCardData } from '../utils/mapRecommendationToResumeData';
 
 import type { MatchCardData } from '../types/matchCardData.types';
+import PageTitle from '@shared/components/PageTitile.tsx';
+import { useAuthedClient } from '@shared/hooks/useAuthClient.ts';
 
 export default function MatchListPage() {
   const navigate = useNavigate();
@@ -20,7 +22,7 @@ export default function MatchListPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [tab, setTab] = useState<'recommended' | 'all'>('recommended');
+  const [tab, setTab] = useState<'recommended' | 'all'>('all');
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
@@ -31,6 +33,8 @@ export default function MatchListPage() {
   const [status, setStatus] = useState<string>('');
 
   const [searchTrigger, setSearchTrigger] = useState(0); // 검색 버튼 눌렀을 때만 조회
+
+  const client = useAuthedClient();
 
   useEffect(() => {
     const state = location.state as { jdId?: number } | null;
@@ -52,10 +56,10 @@ export default function MatchListPage() {
 
       try {
         if (tab === 'recommended') {
-          const recs = await fetchRecommendedResumes(jdId, limit, sortType);
+          const recs = await fetchRecommendedResumes(client, jdId, limit, sortType);
           setResumes(recs.map(mapRecommendationToCardData));
         } else {
-          const all = await fetchAllMatchedResumes(jdId, page, limit, sortType, status);
+          const all = await fetchAllMatchedResumes(client, jdId, page, limit, sortType, status);
           setResumes(all.content.map(mapMatchDtoToCardData));
           setTotalPages(all.totalPages);
         }
@@ -68,7 +72,7 @@ export default function MatchListPage() {
     };
 
     load();
-  }, [searchTrigger, jdId, tab, limit, page, sortType, status]);
+  }, [searchTrigger, jdId, tab, limit, page, sortType, status, client]);
 
   const handleInvite = async (resumeId: number) => {
     if (jdId === null) {
@@ -76,21 +80,20 @@ export default function MatchListPage() {
       return;
     }
     try {
-      await checkMatch(jdId, resumeId);
+      await checkMatch(client, jdId, resumeId);
       navigate(`/interview/create?resumeId=${resumeId}&jdId=${jdId}`);
     } catch (error) {
       console.error('매칭 확정 실패:', error);
-      alert('이미 매칭된 지원자이거나 오류가 발생했습니다.');
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF8F8] p-6">
-      <h1 className="mb-6 text-2xl font-semibold text-[#413F3F]">
-        {tab === 'recommended' ? '추천된 지원자' : '전체 지원자'}
-      </h1>
-
+    <PageTitle
+      title={tab === 'recommended' ? '추천된 지원자' : '전체 지원자'}
+      description="접수된 이력서를 관리할 수 있습니다."
+    >
       <MatchFilterSection
+        tab={tab}
         initialJobId={jdId}
         onSearch={() => {
           setSearchTrigger((prev) => prev + 1);
@@ -156,6 +159,6 @@ export default function MatchListPage() {
           </button>
         </div>
       )}
-    </div>
+    </PageTitle>
   );
 }

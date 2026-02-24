@@ -21,7 +21,6 @@ export default function DetailSection() {
         title={'이번 주 캘린더'}
         description={'주간 일정 개요'}
         className="jd-LongViewContainerCard-RWD-full"
-        detailUrl={'#'}
       >
         <WeekendContainer />
       </LongViewContainer>

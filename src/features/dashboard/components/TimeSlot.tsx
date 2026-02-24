@@ -31,7 +31,11 @@ export default function TimeSlot({ time, title, type = 'INTERVIEW' }: TimeSlotPr
   return (
     <>
       <div className={cn(TimeSlotVariants({ type }), 'group relative')}>
-        <p className="text-xl font-semibold">{time}</p>
+        {type == 'INTERVIEW' ? (
+          <p className="text-xl font-semibold">{time}</p>
+        ) : (
+          <p className="w-full truncate text-xl font-semibold">{title}</p>
+        )}
         <p className="break-keep">{SLOT_STATUS[type]}</p>
 
         <div
@@ -51,7 +55,7 @@ export default function TimeSlot({ time, title, type = 'INTERVIEW' }: TimeSlotPr
           ) : (
             <p>
               <span className="inline-block w-max">[{title}]</span>
-              접수 마감
+              공고 마감
             </p>
           )}
         </div>

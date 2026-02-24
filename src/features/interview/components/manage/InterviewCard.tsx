@@ -32,25 +32,21 @@ export default function InterviewCard({
   const [currResult, setResult] = useState<ResultStatus>(result);
 
   return (
-    <div
+    <section
       key={id}
-      className="relative rounded-2xl bg-white p-6 shadow-md transition hover:shadow-lg"
+      className="relative flex flex-col justify-between rounded-2xl bg-white p-6 shadow-md transition hover:shadow-lg"
     >
-      {/* <button className="absolute top-3 right-3 text-gray-400 hover:text-gray-600">×</button> */}
+      <section>
+        <InterviewHeader
+          avatar={avatar}
+          name={name}
+          position={position}
+          status={status}
+          result={currResult}
+        />
 
-      {/* 헤더 영역 */}
-      <InterviewHeader
-        avatar={avatar}
-        name={name}
-        position={position}
-        status={status}
-        result={currResult}
-      />
-
-      {/* 인터뷰 정보 */}
-      <InterviewInfoSection date={date} time={time} interviewers={interviewers} />
-
-      {/* 버튼 영역 */}
+        <InterviewInfoSection date={date} time={time} interviewers={interviewers} />
+      </section>
       <InterviewActions
         status={status}
         result={currResult}
@@ -64,6 +60,6 @@ export default function InterviewCard({
         position={position}
         onResultChange={setResult}
       />
-    </div>
+    </section>
   );
 }

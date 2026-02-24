@@ -1,5 +1,6 @@
 // src/features/interview/api/file.api.ts
-import { authedRequest } from '@/lib/utils/authedRequest';
+
+import type { ClientRequestType } from '@shared/hooks/useAuthClient.ts';
 
 type CommonResponse<T> = {
   errorCode?: number;
@@ -8,12 +9,12 @@ type CommonResponse<T> = {
 };
 
 /** 로그인 사용자(Authorization)로 presigned download url 받기 */
-export async function getPresignedDownloadUrlAuthed(fileKey: string): Promise<string> {
-  const raw = await authedRequest<CommonResponse<string>>(
+export async function getPresignedDownloadUrlAuthed(client: ClientRequestType, fileKey: string) {
+  const raw = await client.request<CommonResponse<string>>(
     `/api/v1/files/download?fileKey=${encodeURIComponent(fileKey)}`,
     { method: 'GET' }
   );
-  return raw.data;
+  return raw?.data; // 너 코드 스타일에 맞춰 조정
 }
 
 /** 게스트(Interview-Token 헤더)로 presigned download url 받기 */

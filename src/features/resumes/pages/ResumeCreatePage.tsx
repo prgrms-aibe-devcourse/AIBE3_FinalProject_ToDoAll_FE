@@ -5,7 +5,8 @@ import BasicInfoForm from '../components/BasicInfoForm';
 import ResumeForm from '../components/ResumeForm';
 import { createResume } from '../data/resumes.api';
 import { getJobDescription } from '../data/jd.api';
-import AlertModal from '../../../components/Alertmodal';
+import AlertModal from '@shared/components/Alertmodal.tsx';
+import { useAuthedClient } from '@shared/hooks/useAuthClient.ts';
 
 const DRAFT_KEY = (jdId: number) => `resumeDraft:${jdId}`;
 
@@ -50,11 +51,13 @@ export default function ResumeCreatePage() {
     memo: '',
   });
 
+  const client = useAuthedClient();
+
   useEffect(() => {
     async function fetchJD() {
       if (!jdId || isNaN(jdId)) return;
       try {
-        const jd = await getJobDescription(jdId);
+        const jd = await getJobDescription(client, jdId);
         setJobTitle(jd.title);
       } catch (e) {
         console.error(e);

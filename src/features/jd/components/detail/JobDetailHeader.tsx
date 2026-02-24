@@ -2,6 +2,8 @@ import { Pill } from '../shared/Pill';
 import type { JobDetail } from '../../types/JobDetail.types';
 import JobStatusDropdown from './JobStatusDropdown';
 import { updateJobStatus } from '../../services/jobApi';
+import cn from '@/lib/utils/cn';
+import { useAuthedClient } from '@shared/hooks/useAuthClient.ts';
 
 type Mode = 'owner' | 'public';
 
@@ -14,19 +16,19 @@ export function JobDetailHeader({
   mode: Mode;
   onEdit?: () => void;
 }) {
+  const client = useAuthedClient();
   const isOwner = mode === 'owner';
   const statusLabel = job.status === 'OPEN' ? '진행중' : '마감';
   return (
     <header className="flex items-start justify-between gap-4">
       <div className="min-w-0">
-        <div className="flex items-center gap-2">
+        <div className="no flex items-center gap-2">
           <h1 className="truncate text-2xl font-bold text-gray-900">{job.title}</h1>
           <span
-            className={
-              statusLabel === '진행중'
-                ? 'rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-700'
-                : 'rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600'
-            }
+            className={cn(
+              'rounded-full px-2 py-0.5 text-xs whitespace-nowrap',
+              statusLabel === '진행중' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'
+            )}
           >
             {statusLabel}
           </span>
@@ -47,7 +49,7 @@ export function JobDetailHeader({
             value={job.status}
             onChange={async (next) => {
               try {
-                await updateJobStatus(job.id, next);
+                await updateJobStatus(client, job.id, next);
                 alert('상태가 변경되었습니다.');
                 window.location.reload();
               } catch (error) {
