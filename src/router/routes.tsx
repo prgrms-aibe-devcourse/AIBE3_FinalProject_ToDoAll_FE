@@ -27,12 +27,15 @@ import JDApplyPage from '@/pages/JDApplyPage';
 /**
  * 레이아웃 없는 페이지 (로그인/회원가입 관련)
  */
-export const noLayoutRoutes = [
+export const authLayoutRoutes = [
   { path: '/login', element: <LoginPage /> },
   { path: '/signup/email', element: <SignupCompanyEmailPage /> },
   { path: '/signup/form', element: <SignupFormPage /> },
   { path: '/forgot', element: <ResetPasswordEmailPage /> },
   { path: '/reset-password', element: <ResetPasswordPage /> },
+];
+
+export const noLayoutRoutes = [
   { path: '/resume/create/:id', element: <ResumeCreatePage /> },
   { path: '/resume/preview', element: <ResumePreviewPage /> },
   { path: '/resume/submit-success', element: <ResumeSubmitSuccessPage /> },

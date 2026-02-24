@@ -18,7 +18,7 @@ interface ScoreInputCardProps {
 }
 
 export default function ScoreInputCard({ interviewId }: ScoreInputCardProps) {
-  const [isEditing, setIsEditing] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
   const [evaluationId, setEvaluationId] = useState<number | null>(null);
   const [scores, setScores] = useState<Scores>({
     tech: '',

@@ -84,7 +84,6 @@ export default function MatchListPage() {
       navigate(`/interview/create?resumeId=${resumeId}&jdId=${jdId}`);
     } catch (error) {
       console.error('매칭 확정 실패:', error);
-      alert('이미 매칭된 지원자이거나 오류가 발생했습니다.');
     }
   };
 
