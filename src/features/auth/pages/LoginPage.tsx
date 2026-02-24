@@ -31,6 +31,8 @@ export default function LoginPage() {
   };
 
   const demoLogin = async () => {
+    setSubmitting(true);
+
     const email = import.meta.env.VITE_DEMO_EMAIL as string;
     const password = import.meta.env.VITE_DEMO_PASSWORD as string;
     await fetchLogin(email, password);
@@ -39,7 +41,7 @@ export default function LoginPage() {
   const onSubmit = async (e: SyntheticEvent<HTMLFormElement, SubmitEvent>) => {
     e.preventDefault();
 
-    setSubmitting(true); // 중복 클릭을 방지
+    setSubmitting(true);
     const form = new FormData(e.target as HTMLFormElement);
 
     const email = String(form.get('email') || ''); // 비어 있으면 공백 문자열
