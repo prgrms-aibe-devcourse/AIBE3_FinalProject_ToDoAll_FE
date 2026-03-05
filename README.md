@@ -10,7 +10,7 @@
 <div align=start>
 
 <p align="center">
-  <a href="https://jobda.vercel.app">
+  <a href="https://www.jobda.store">
     🚀 배포 바로가기
   </a>
   &nbsp; · &nbsp;
